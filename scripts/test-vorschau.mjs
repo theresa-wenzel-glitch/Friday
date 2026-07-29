@@ -25,7 +25,7 @@ try {
   check("Seite lädt ohne Skriptfehler", errors.length === 0, errors.join(" | "));
   check(
     "Alle Pferde werden gelistet",
-    (await page.textContent("#resultLine")).includes("96"),
+    (await page.textContent("#resultLine")).includes("118"),
     await page.textContent("#resultLine"),
   );
 

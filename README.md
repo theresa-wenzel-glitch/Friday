@@ -96,7 +96,7 @@ vor allem die in Europa stehenden Hengste fehlen weitgehend – genau die sollen
 ### Die Stammbäume wachsen mit dem Bestand
 
 Ein Baum wird nur dort tief, wo die Vorfahren selbst als Eintrag existieren.
-Deshalb sind zu den bekannten Hengsten rund 45 Vorfahren mit erfasst – Väter,
+Deshalb sind zu den bekannten Hengsten rund 70 Vorfahren mit erfasst – Väter,
 Mütter und Grosseltern, die selbst nie Deckhengste im Verzeichnis wären, den
 Stammbaum aber überhaupt erst entstehen lassen. Hollywood Dun It reicht damit
 zum Beispiel bis zu King P-234 zurück statt bei Vater und Mutter zu enden.

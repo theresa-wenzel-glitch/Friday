@@ -595,10 +595,10 @@ export const SEED_HORSES: SeedHorse[] = [
     color: "Overo-gescheckt",
     country: "US",
     disciplines: ["Reining"],
-    sireName: "Colonel Freckles",
+    sireName: "Colonelfourfreckle",
     damName: "Katie Gun",
     description:
-      "Einer der bekanntesten Reininghengste überhaupt - unverwechselbar durch seine Scheckung und mit enormem Einfluss auf die moderne Reiningzucht. Seine Nachkommen sind weltweit erfolgreich, auch in Europa stark vertreten.",
+      "Einer der bekanntesten Reininghengste überhaupt - unverwechselbar durch seine Scheckung und mit enormem Einfluss auf die moderne Reiningzucht. Seine Nachkommen sind weltweit erfolgreich, auch in Europa stark vertreten. Sein Vater ist Colonelfourfreckle; Colonel Freckles ist der Grossvater - das wird häufig verwechselt.",
     isHistoric: true,
   },
   {
@@ -864,9 +864,13 @@ export const SEED_HORSES: SeedHorse[] = [
     name: "Katie Gun",
     sex: "mare",
     yearOfBirth: 1987,
+    color: "Brauner, Overo-gescheckt",
     country: "US",
+    disciplines: ["Reining"],
+    sireName: "John Gun",
+    damName: "Bueno Katie",
     description:
-      "Mutter zweier prägender Reininghengste: Colonels Smoking Gun und Spooks Gotta Gun.",
+      "Mutter zweier prägender Reininghengste: Colonels Smoking Gun und Spooks Gotta Gun. In der NRHA Hall of Fame und unter den erfolgreichsten Mutterstuten der Reininggeschichte.",
     isHistoric: true,
   },
   {
@@ -1108,5 +1112,190 @@ export const SEED_HORSES: SeedHorse[] = [
     description: "Mutter von Impressive.",
     isHistoric: true,
   },
+
+  /* ---------------------------------------------------------------- */
+  /* Zweiter Recherchedurchgang - vor allem die Linie von Gunner       */
+  /* ---------------------------------------------------------------- */
+
+  /* --- Gunners Vaterlinie ----------------------------------------- */
+  {
+    name: "Colonelfourfreckle",
+    yearOfBirth: 1979,
+    color: "Fuchs",
+    country: "US",
+    disciplines: ["Cutting", "Reining"],
+    sireName: "Colonel Freckles",
+    damName: "Miss Solano",
+    description:
+      "Vater von Colonels Smoking Gun. Verbindet die Freckles-Linie über seine Mutter mit Doc Bar.",
+    isHistoric: true,
+  },
+  {
+    name: "Miss Solano",
+    sex: "mare",
+    country: "US",
+    sireName: "Doc's Solano",
+    isHistoric: true,
+  },
+  {
+    name: "Doc's Solano",
+    yearOfBirth: 1971,
+    country: "US",
+    disciplines: ["Cutting"],
+    sireName: "Doc Bar",
+    bloodlineNote: "Muttervater: Poco Tivio. Der Name der Mutter fehlt noch.",
+    isHistoric: true,
+  },
+
+  /* --- Gunners Mutterlinie ---------------------------------------- */
+  {
+    name: "John Gun",
+    country: "US",
+    description: "Vater der NRHA-Hall-of-Fame-Stute Katie Gun.",
+    isHistoric: true,
+  },
+  {
+    name: "Bueno Katie",
+    sex: "mare",
+    country: "US",
+    sireName: "Aledo Bueno Bar",
+    isHistoric: true,
+  },
+  {
+    name: "Aledo Bueno Bar",
+    country: "US",
+    isHistoric: true,
+  },
+
+  /* --- Freckles-Linie: Rey Jay steht hinter beiden Mutterstuten ---- */
+  {
+    name: "Christy Jay",
+    sex: "mare",
+    yearOfBirth: 1967,
+    country: "US",
+    sireName: "Rey Jay",
+    damName: "Leo Bob",
+    description: "Mutter von Colonel Freckles.",
+    isHistoric: true,
+  },
+  {
+    name: "Gay Jay",
+    sex: "mare",
+    country: "US",
+    sireName: "Rey Jay",
+    damName: "Georgia Cody",
+    description: "Mutter von Freckles Playboy.",
+    isHistoric: true,
+  },
+  {
+    name: "Rey Jay",
+    country: "US",
+    disciplines: ["Cutting"],
+    description:
+      "Bedeutender Muttervater der Cuttingzucht. Colonel Freckles und Freckles Playboy sind Dreiviertelbrüder - gleicher Vater, und beide Mütter von Rey Jay.",
+    isHistoric: true,
+  },
+  {
+    name: "Leo Bob",
+    sex: "mare",
+    country: "US",
+    isHistoric: true,
+  },
+  {
+    name: "Georgia Cody",
+    sex: "mare",
+    country: "US",
+    isHistoric: true,
+  },
+  {
+    name: "Leo Pan",
+    sex: "mare",
+    country: "US",
+    sireName: "Leo",
+    description:
+      "Mutter von Jewel's Leo Bars - über sie hängt die gesamte Freckles-Linie an Leo.",
+    isHistoric: true,
+  },
+
+  /* --- Gründergenerationen: schliesst die King-Ranch-Linie an ------ */
+  {
+    name: "Hickory Bill",
+    country: "US",
+    disciplines: ["Foundation / Zucht"],
+    sireName: "Peter McCue",
+    damName: "Lucretia M",
+    description:
+      "Sohn des Peter McCue und Vater von Old Sorrel. Über ihn führt das King-Ranch-Zuchtprogramm zurück auf die Gründerpferde der Rasse.",
+    isHistoric: true,
+  },
+  {
+    name: "Lucretia M",
+    sex: "mare",
+    country: "US",
+    sireName: "The Hero",
+    isHistoric: true,
+  },
+  {
+    name: "Dan Tucker",
+    country: "US",
+    disciplines: ["Foundation / Zucht"],
+    sireName: "Barney Owens",
+    damName: "Butt Cut",
+    description: "Vater von Peter McCue.",
+    isHistoric: true,
+  },
+  {
+    name: "Barney Owens",
+    country: "US",
+    isHistoric: true,
+  },
+  {
+    name: "Butt Cut",
+    sex: "mare",
+    country: "US",
+    sireName: "Jack Traveler",
+    isHistoric: true,
+  },
+  {
+    name: "Nora M",
+    sex: "mare",
+    breed: "Thoroughbred",
+    country: "US",
+    damName: "Kitty Clyde",
+    description: "Mutter von Peter McCue.",
+    isHistoric: true,
+  },
+  {
+    name: "Della P",
+    sex: "mare",
+    yearOfBirth: 1934,
+    color: "Fuchs",
+    country: "US",
+    sireName: "Doc Horn",
+    description: "Mutter von Lightning Bar und damit Grossmutter von Doc Bar.",
+    isHistoric: true,
+  },
+  {
+    name: "Doc Horn",
+    yearOfBirth: 1921,
+    color: "Fuchs",
+    country: "US",
+    isHistoric: true,
+  },
+  {
+    name: "Grulla San",
+    sex: "mare",
+    yearOfBirth: 1970,
+    country: "US",
+    sireName: "Leo San Hank",
+    description: "Mutter von High Brow Hickory.",
+    isHistoric: true,
+  },
+  {
+    name: "Leo San Hank",
+    country: "US",
+    isHistoric: true,
+  },
 ];
+
 

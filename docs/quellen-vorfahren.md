@@ -34,3 +34,39 @@
   Colonels Smoking Gun. Beide sind Halbbrüder über die Mutter Katie Gun.
   Beschreibung war falsch.
 - Poco Bueno: Ursprung von HERDA - gehört als Hinweis dazu.
+
+## Zweiter Durchgang - Linie von Colonels Smoking Gun (Gunner)
+
+| Pferd | Jahr | Vater | Mutter | Quelle |
+|---|---|---|---|---|
+| Colonelfourfreckle | 1979 | Colonel Freckles | Miss Solano | rimondo, StallionCompare, sporthorse-data |
+| Miss Solano | | Doc's Solano | | StallionCompare |
+| Doc's Solano | 1971 | Doc Bar | (Muttervater Poco Tivio) | rimondo, QHN |
+| Katie Gun | 1987 | John Gun | Bueno Katie | StallionCompare, rimondo |
+| Bueno Katie | | Aledo Bueno Bar | | Ace of Clubs |
+| Christy Jay | 1967 | Rey Jay | Leo Bob | rimondo, QHN |
+| Gay Jay | | Rey Jay | Georgia Cody | QHN, Wikipedia |
+| Leo Pan | | Leo | | Wikipedia |
+| Hickory Bill | | Peter McCue | Lucretia M | Western Horseman, AQHA |
+| Dan Tucker | | Barney Owens | Butt Cut | Western Horseman, Wikipedia |
+| Nora M (TB) | | | Kitty Clyde | Western Horseman |
+| Della P | 1934 | Doc Horn | | AQHA-Papierauszug (Forum) - schwächere Quelle |
+| Grulla San | 1970 | Leo San Hank | | sporthorse-data |
+
+## Korrektur
+
+**Colonels Smoking Gun stammt von Colonelfourfreckle, nicht von Colonel
+Freckles.** Colonel Freckles ist der Grossvater. Der Fehler stand vorher in
+den Startdaten und ist eine sehr verbreitete Verwechslung.
+
+## Was weiterhin fehlt
+
+allbreedpedigree.com bleibt für automatisierte Zugriffe gesperrt (HTTP 403,
+mehrfach geprüft). Ohne diese Quelle bleiben u. a. offen: Frontera Sugar,
+Miss Chickasha, Susie's Bay, Little Fanny, Nellene, Della Moore, Jabalina,
+Jeanette, San Sue Darks, Royal Smart, Miss Dual Doc, Miss Silver Pistol,
+Jeanie Whiz Bar, Gay Sugar Chic, A Little Starbert, Dollie Pine.
+
+Diese lassen sich am schnellsten schliessen, indem jemand die Abstammung bei
+allbreedpedigree.com nachschlägt und durchgibt - dann werden sie eingetragen,
+statt geraten.
