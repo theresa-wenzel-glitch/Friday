@@ -1,0 +1,23 @@
+node_modules/
+.next/
+out/
+build/
+dist/
+
+# Laufzeitdaten (SQLite-Datenbank) - gehört nicht ins Repository
+data/
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+.env
+.env.local
+.env*.local
+
+next-env.d.ts
+*.tsbuildinfo
+
+.DS_Store
+npm-debug.log*
+yarn-error.log*
