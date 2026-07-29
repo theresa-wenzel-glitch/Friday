@@ -9,7 +9,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "seed": "tsx scripts/seed.ts"
+    "seed": "tsx scripts/seed.ts",
+    "vorschau": "node scripts/build-vorschau.mjs"
   },
   "dependencies": {
     "better-sqlite3": "^13.0.1",

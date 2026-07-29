@@ -1,0 +1,1062 @@
+<style>
+  /* ---------------------------------------------------------------
+     Farben und Schrift übernehmen die Gestaltung der echten App
+     (src/app/globals.css): Sattelleder, Sand und warme Neutraltöne.
+     --------------------------------------------------------------- */
+  :root {
+    --sand-50: #faf7f1;
+    --sand-100: #f3ece0;
+    --sand-200: #e6dac6;
+    --leather-500: #a8703c;
+    --leather-600: #8d5a2c;
+    --leather-700: #6f4522;
+    --bark-800: #33281f;
+    --bark-900: #241c16;
+    --bark-950: #171210;
+
+    --bg: var(--sand-50);
+    --fg: var(--bark-900);
+    --surface: #ffffff;
+    --surface-muted: var(--sand-100);
+    --line: var(--sand-200);
+    --muted: #6b5c4d;
+    --accent: var(--leather-600);
+    --accent-fg: #ffffff;
+    --notice-bg: #f6efe1;
+    --notice-fg: #5b4520;
+
+    --display: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, serif;
+    --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+      "Helvetica Neue", Arial, sans-serif;
+
+    --step-0: 0.95rem;
+    --step-1: 1.125rem;
+    --step-2: 1.5rem;
+    --step-3: 2rem;
+    --step-4: 2.75rem;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: var(--bark-950);
+      --fg: var(--sand-100);
+      --surface: var(--bark-900);
+      --surface-muted: var(--bark-800);
+      --line: #3d3128;
+      --muted: #a8988a;
+      --accent: var(--leather-500);
+      --accent-fg: var(--bark-950);
+      --notice-bg: #2b2119;
+      --notice-fg: #e0cdb0;
+    }
+  }
+
+  /* Der Umschalter der Anzeige muss die Systemeinstellung überstimmen -
+     in beide Richtungen. */
+  :root[data-theme="dark"] {
+    --bg: var(--bark-950);
+    --fg: var(--sand-100);
+    --surface: var(--bark-900);
+    --surface-muted: var(--bark-800);
+    --line: #3d3128;
+    --muted: #a8988a;
+    --accent: var(--leather-500);
+    --accent-fg: var(--bark-950);
+    --notice-bg: #2b2119;
+    --notice-fg: #e0cdb0;
+  }
+
+  :root[data-theme="light"] {
+    --bg: var(--sand-50);
+    --fg: var(--bark-900);
+    --surface: #ffffff;
+    --surface-muted: var(--sand-100);
+    --line: var(--sand-200);
+    --muted: #6b5c4d;
+    --accent: var(--leather-600);
+    --accent-fg: #ffffff;
+    --notice-bg: #f6efe1;
+    --notice-fg: #5b4520;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--sans);
+    font-size: var(--step-0);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3 {
+    font-family: var(--display);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+    margin: 0;
+  }
+
+  a { color: inherit; }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 3px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+
+  .wrap {
+    width: 100%;
+    max-width: 64rem;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+
+  /* --- Kopfzeile --- */
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: color-mix(in srgb, var(--bg) 92%, transparent);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .topbar-inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1.25rem;
+    padding-top: 0.7rem;
+    padding-bottom: 0.7rem;
+  }
+
+  .brand {
+    font-family: var(--display);
+    font-size: var(--step-1);
+    font-weight: 600;
+    text-decoration: none;
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+  }
+
+  .brand small {
+    font-family: var(--sans);
+    font-size: 0.72rem;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .searchbox {
+    flex: 1 1 14rem;
+    min-width: 0;
+  }
+
+  /* --- Formularelemente --- */
+  .field {
+    width: 100%;
+    padding: 0.5rem 0.7rem;
+    border-radius: 0.45rem;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--fg);
+    font: inherit;
+    font-size: 0.92rem;
+  }
+
+  .label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.3rem;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    padding: 0.55rem 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid transparent;
+    font: inherit;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.15s ease;
+  }
+
+  .btn-primary { background: var(--accent); color: var(--accent-fg); }
+  .btn-primary:hover { background: var(--leather-700); }
+  :root[data-theme="dark"] .btn-primary:hover,
+  .btn-primary:hover { filter: none; }
+
+  .btn-ghost {
+    background: var(--surface);
+    border-color: var(--line);
+    color: var(--fg);
+  }
+  .btn-ghost:hover { background: var(--surface-muted); }
+
+  /* --- Hinweisstreifen --- */
+  .notice {
+    background: var(--notice-bg);
+    color: var(--notice-fg);
+    border: 1px solid var(--line);
+    border-radius: 0.6rem;
+    padding: 0.85rem 1.05rem;
+    font-size: 0.88rem;
+    line-height: 1.55;
+  }
+
+  .notice strong { font-weight: 700; }
+
+  /* --- Filterleiste --- */
+  .filters {
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 0.75rem;
+    padding: 1rem;
+  }
+
+  .resultline {
+    color: var(--muted);
+    font-size: 0.85rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* --- Karten --- */
+  .grid {
+    display: grid;
+    gap: 0.85rem;
+    grid-template-columns: repeat(auto-fill, minmax(15.5rem, 1fr));
+  }
+
+  .card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 0.75rem;
+    padding: 0.95rem 1rem;
+    text-decoration: none;
+    text-align: left;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+    transition: box-shadow 0.15s ease, border-color 0.15s ease;
+  }
+
+  .card:hover {
+    box-shadow: 0 2px 12px rgb(0 0 0 / 0.08);
+    border-color: color-mix(in srgb, var(--accent) 40%, var(--line));
+  }
+
+  .card-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.6rem;
+  }
+
+  .card h3 { font-size: var(--step-1); line-height: 1.25; }
+  .card .aka { font-family: var(--sans); font-size: 0.8rem; color: var(--muted); font-weight: 400; }
+  .meta { color: var(--muted); font-size: 0.83rem; font-variant-numeric: tabular-nums; }
+  .breeding { font-family: var(--display); font-size: 0.92rem; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: auto; padding-top: 0.45rem; }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.12rem 0.5rem;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    background: var(--surface-muted);
+    border: 1px solid var(--line);
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  .chip-accent {
+    background: color-mix(in srgb, var(--accent) 14%, var(--surface));
+    border-color: color-mix(in srgb, var(--accent) 35%, var(--line));
+    color: var(--accent);
+  }
+
+  /* --- Detailansicht --- */
+  .backlink {
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    font-size: 0.85rem;
+    color: var(--muted);
+    cursor: pointer;
+    text-decoration: underline;
+  }
+
+  .detail-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.7rem; }
+  .detail-head h1 { font-size: var(--step-3); }
+
+  .parents { font-family: var(--display); font-size: var(--step-1); }
+  .parents a { text-decoration: underline; }
+
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 0.75rem;
+    padding: 1.1rem 1.25rem;
+  }
+
+  .facts { display: grid; gap: 0.4rem; margin: 0; }
+  .facts > div { display: flex; gap: 0.75rem; }
+  .facts dt { color: var(--muted); min-width: 7.5rem; flex-shrink: 0; font-size: 0.85rem; }
+  .facts dd { margin: 0; font-weight: 500; font-size: 0.9rem; font-variant-numeric: tabular-nums; }
+
+  .prose { max-width: 40rem; }
+  .prose p { margin: 0 0 0.7rem; }
+
+  .cols {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+  }
+
+  @media (min-width: 60rem) {
+    .cols { grid-template-columns: minmax(0, 1fr) 17rem; }
+  }
+
+  /* --- Abstammungsraster ---
+     Vier Spalten, je Generation. Jeder Vorfahr überspannt so viele Zeilen,
+     wie er Nachfahrenplätze abdeckt - dadurch entsteht die verschachtelte
+     Optik einer gedruckten Abstammung. */
+  .pedigree-scroll { overflow-x: auto; padding-bottom: 0.4rem; }
+
+  .pedigree {
+    display: grid;
+    gap: 0.35rem;
+    grid-template-columns: repeat(4, minmax(9.5rem, 1fr));
+    grid-template-rows: repeat(16, minmax(2.5rem, auto));
+    min-width: 40rem;
+  }
+
+  .ped-cell {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0.4rem 0.6rem;
+    border-radius: 0.4rem;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    text-decoration: none;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    overflow: hidden;
+  }
+
+  .ped-cell.dam-side { background: var(--surface-muted); }
+  .ped-cell.sire-side { border-left: 3px solid var(--accent); }
+  .ped-cell.linked { cursor: pointer; }
+  .ped-cell.linked:hover { box-shadow: 0 1px 8px rgb(0 0 0 / 0.1); }
+
+  .ped-name { font-size: 0.83rem; font-weight: 700; line-height: 1.2; }
+  .ped-sub { font-size: 0.72rem; color: var(--muted); line-height: 1.2; font-variant-numeric: tabular-nums; }
+
+  .ped-empty {
+    border: 1px dashed var(--line);
+    background: none;
+    color: var(--muted);
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+  }
+
+  .offspring-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.4rem;
+    grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+  }
+
+  .offspring-list button {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.5rem;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 0.45rem;
+    padding: 0.45rem 0.7rem;
+    font: inherit;
+    font-size: 0.88rem;
+    color: inherit;
+    cursor: pointer;
+    text-align: left;
+  }
+
+  .offspring-list button:hover { background: var(--surface-muted); }
+  .offspring-list .yr { font-size: 0.75rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+  section.block { display: flex; flex-direction: column; gap: 0.7rem; }
+  section.block h2 { font-size: var(--step-2); }
+
+  .stack { display: flex; flex-direction: column; gap: 2rem; }
+  .stack-sm { display: flex; flex-direction: column; gap: 0.9rem; }
+
+  .page { padding: 1.75rem 0 3rem; }
+
+  .empty {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 0.75rem;
+    padding: 2.5rem 1rem;
+    text-align: center;
+    color: var(--muted);
+  }
+
+  footer.site {
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 0.82rem;
+  }
+
+  footer.site .wrap { padding-top: 1.5rem; padding-bottom: 2rem; }
+
+  .hidden { display: none !important; }
+
+  /* --- Demo-Formular --- */
+  .demo-form { display: grid; gap: 0.75rem; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); }
+  .demo-form .full { grid-column: 1 / -1; }
+
+  details.demo > summary {
+    cursor: pointer;
+    font-weight: 600;
+    padding: 0.3rem 0;
+  }
+</style>
+
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <a class="brand" href="#/" id="brandLink">
+      Westernhengste <small>Vorschau</small>
+    </a>
+    <div class="searchbox">
+      <label class="label" for="q" style="position:absolute;left:-9999px;">Suche</label>
+      <input id="q" class="field" type="search" placeholder="Name oder Abstammung suchen, z. B. Doc Bar" autocomplete="off">
+    </div>
+  </div>
+</header>
+
+<main class="wrap page">
+  <!-- Übersicht -->
+  <div id="listView" class="stack">
+    <div class="stack-sm">
+      <h1 style="font-size:var(--step-4);line-height:1.1;">Westernhengste an einem Ort.</h1>
+      <p class="prose" style="color:var(--muted);font-size:var(--step-1);margin:0;">
+        Die grossen Vererber der Westernpferdezucht mit Abstammung über vier
+        Generationen. Bewusst ohne Decktaxen und ohne Verkauf – nur das Pferd
+        und seine Papiere.
+      </p>
+      <div class="notice" role="note">
+        <strong>Das hier ist die Ansichts-Version.</strong>
+        Sie zeigt den Startbestand und funktioniert ohne Installation. Was hier
+        fehlt: Hengste, die andere Leute dauerhaft eintragen, und die
+        Kontaktadressen der Besitzer. Dafür muss die richtige App auf einem
+        Server laufen – die liegt fertig im Projektordner.
+        <br>
+        <span style="opacity:0.85;">
+          Alle Angaben stammen aus allgemeiner Rassegeschichte und sind
+          <em>noch nicht gegen Zuchtbuchpapiere geprüft</em>.
+        </span>
+      </div>
+    </div>
+
+    <div class="stack-sm">
+      <div class="filters">
+        <div>
+          <label class="label" for="fDiscipline">Disziplin</label>
+          <select id="fDiscipline" class="field"><option value="">alle</option></select>
+        </div>
+        <div>
+          <label class="label" for="fBestand">Bestand</label>
+          <select id="fBestand" class="field">
+            <option value="">alle</option>
+            <option value="historic">nur historische Vererber</option>
+            <option value="current">nur aktuelle Hengste</option>
+          </select>
+        </div>
+        <div>
+          <label class="label" for="fSex">Geschlecht</label>
+          <select id="fSex" class="field">
+            <option value="">alle</option>
+            <option value="stallion">nur Hengste</option>
+            <option value="mare">nur Stuten</option>
+          </select>
+        </div>
+        <div>
+          <label class="label" for="fSort">Sortierung</label>
+          <select id="fSort" class="field">
+            <option value="name">Name A–Z</option>
+            <option value="year">Jahrgang, neueste zuerst</option>
+            <option value="yearAsc">Jahrgang, älteste zuerst</option>
+          </select>
+        </div>
+      </div>
+
+      <p class="resultline" id="resultLine"></p>
+      <div class="grid" id="cardGrid"></div>
+      <div class="empty hidden" id="emptyState">
+        Zu dieser Suche gibt es keinen Eintrag.
+      </div>
+    </div>
+
+    <details class="demo panel">
+      <summary>Selbst einen Hengst eintragen – ausprobieren</summary>
+      <p style="color:var(--muted);font-size:0.86rem;margin:0.6rem 0 1rem;">
+        So funktioniert das Eintragen in der richtigen App. Hier ist es nur zum
+        Ausprobieren: <strong>der Eintrag bleibt nur in diesem Fenster</strong> und
+        ist beim nächsten Öffnen wieder weg. Trag als Vater ruhig einen Hengst
+        ein, den es schon gibt – etwa <em>Doc Bar</em> oder <em>Metallic Cat</em> –
+        dann siehst du, wie sich der Stammbaum von selbst verbindet.
+      </p>
+      <form class="demo-form" id="demoForm">
+        <div>
+          <label class="label" for="dName">Name</label>
+          <input id="dName" class="field" required maxlength="80" placeholder="z. B. Mein Hengst">
+        </div>
+        <div>
+          <label class="label" for="dYear">Geburtsjahr</label>
+          <input id="dYear" class="field" type="number" min="1850" max="2027" placeholder="2015">
+        </div>
+        <div>
+          <label class="label" for="dColor">Farbe</label>
+          <input id="dColor" class="field" maxlength="60" placeholder="Buckskin">
+        </div>
+        <div>
+          <label class="label" for="dSire">Vater</label>
+          <input id="dSire" class="field" maxlength="80" placeholder="Doc Bar">
+        </div>
+        <div>
+          <label class="label" for="dDam">Mutter</label>
+          <input id="dDam" class="field" maxlength="80" placeholder="Poco Lena">
+        </div>
+        <div>
+          <label class="label" for="dDisc">Disziplin</label>
+          <input id="dDisc" class="field" maxlength="40" placeholder="Reining">
+        </div>
+        <div class="full">
+          <button class="btn btn-primary" type="submit">Zum Verzeichnis hinzufügen</button>
+        </div>
+      </form>
+    </details>
+  </div>
+
+  <!-- Einzelnes Pferd -->
+  <div id="detailView" class="stack hidden"></div>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    Ansichts-Version des Projekts „Westernhengste“. Alle Angaben ohne Gewähr und
+    noch nicht gegen Zuchtbuchpapiere geprüft.
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  /* Startbestand - wird beim Bauen aus der Datenbank eingesetzt. */
+  var SEED = /*DATEN*/[{"id":35,"slug":"colonel-freckles","name":"Colonel Freckles","aka":null,"sex":"stallion","breed":"Quarter Horse","reg":null,"born":1973,"died":null,"color":"Fuchs","country":"US","disciplines":["Cutting","Reining"],"description":"Erfolgreicher Cuttinghengst und Vererber, der auch in die Reiningzucht ausstrahlte - unter anderem als Vater von Colonels Smoking Gun.","note":null,"sireName":"Jewel's Leo Bars","damName":"Christy Jay","sireId":34,"damId":null,"availability":"unknown","historic":true},{"id":42,"slug":"colonels-smoking-gun","name":"Colonels Smoking Gun","aka":"Gunner","sex":"stallion","breed":"Quarter Horse","reg":null,"born":1993,"died":2015,"color":"Overo-gescheckt","country":"US","disciplines":["Reining"],"description":"Einer der bekanntesten Reininghengste überhaupt - unverwechselbar durch seine Scheckung und mit enormem Einfluss auf die moderne Reiningzucht. Seine Nachkommen sind weltweit erfolgreich, auch in Europa stark vertreten.","note":null,"sireName":"Colonel Freckles","damName":"Katie Gun","sireId":35,"damId":null,"availability":"unknown","historic":true},{"id":16,"slug":"doc-bar","name":"Doc Bar","aka":null,"sex":"stallion","breed":"Quarter Horse","reg":null,"born":1956,"died":1992,"color":"Fuchs","country":"US","disciplines":["Cutting","Foundation / Zucht"],"description":"Als Rennpferd eine Enttäuschung, als Vererber eine Revolution. In Verbindung mit den Poco-Bueno-Stuten der Jensen-Zucht begründete er den modernen Cuttingtyp: kompakt, extrem cowsensitiv und mit enormer Hinterhandaktion. Kaum ein Cuttingpedigree kommt heute ohne ihn aus.","note":null,"sireName":"Lightning Bar","damName":"Dandy Doll","sireId":15,"damId":null,"availability":"unknown","historic":true},{"id":20,"slug":"doc-olena","name":"Doc O'Lena","aka":null,"sex":"stallion","breed":"Quarter Horse","reg":null,"born":1967,"died":1993,"color":"Braun","country":"US","disciplines":["Cutting"],"description":"Gewann 1970 die NCHA Futurity, nach verbreiteter Darstellung ohne einen einzigen verlorenen Go-Round. Als Vererber wurde er über Smart Little Lena zum Bindeglied in die moderne Cuttingzucht.","note":null,"sireName":"Doc Bar","damName":"Poco Lena","sireId":16,"damId":18,"availability":"unknown","historic":true},{"id":22,"slug":"docs-hickory","name":"Doc's Hickory","aka":null,"sex":"stallion","breed":"Quarter Horse","reg":null,"born":1975,"died":null,"color":"Fuchs","country":"US","disciplines":["Cutting"],"description":"Doc-Bar-Sohn mit starkem Einfluss auf die spätere Cuttingzucht, vor allem über High Brow Hickory und dessen Sohn High Brow Cat.","note":null,"sireName":"Doc Bar","damName":"Miss Chickasha","sireId":16,"damId":null,"availability":"unknown","historic":true},{"id":23,"slug":"docs-oak","name":"Doc's Oak","aka":null,"sex":"stallion","breed":"Quarter Horse","reg":null,"born":1971,"died":null,"color":"Fuchs","country":"US","disciplines":["Cutting"],"description":"Weiterer bedeutender Doc-Bar-Sohn, dessen Nachkommen sowohl im Cutting als auch im Reined Cow Horse erfolgreich waren.","note":null,"sireName":"Doc Bar","damName":"Susie's Bay","sireId":16,"damId":null,"availability":"unknown","historic":true},{"id":21,"slug":"dry-doc","name":"Dry Doc","aka":null,"sex":"stallion","breed":"Quarter Horse","reg":null,"born":1970,"died":null,"color":"Fuchs","country":"US","disciplines":["Cutting"],"description":"Vollbruder zu Doc O'Lena und Gewinner der NCHA Futurity 1971 - die Verbindung Doc Bar x Poco Lena stellte damit in zwei aufeinanderfolgenden Jahren den Futurity-Sieger.","note":null,"sireName":"Doc Bar","damName":"Poco Lena","sireId":16,"damId":18,"availability":"unknown","historic":true},{"id":31,"slug":"dual-pep","name":"Dual Pep","aka":null,"sex":"stallion","breed":"Quarter Horse","reg":null,"born":1986,"died":null,"color":"Fuchs","country":"US","disciplines":["Cutting"],"description":"Sehr erfolgreicher Cuttinghengst und Vererber, dessen Nachkommen über Jahre die Futurity-Finals prägten.","note":null,"sireName":"Peppy San Badger","damName":"Miss Dual Doc","sireId":28,"damId":null,"availability":"unknown","historic":true},{"id":36,"slug":"freckles-playboy","name":"Freckles Playboy","aka":null,"sex":"stallion","breed":"Quarter Horse","reg":null,"born":1973,"died":null,"color":"Fuchs","country":"US","disciplines":["Cutting"],"description":"Einer der bedeutendsten Cuttingvererber seiner Generation. Seine Töchter sind als Zuchtstuten ausgesprochen gefragt.","note":null,"sireName":"Jewel's Leo Bars","damName":"Gay Jay","sireId":34,"damId":null,"availability":"unknown","historic":true},{"id":24,"slug":"genuine-doc","name":"Genuine Doc","aka":null,"sex":"stallion","breed":"Quarter Horse","reg":null,"born":1976,"died":null,"color":"Fuchs","country":"US","disciplines":["Cutting","Reining"],"description":"Doc-Bar-Sohn und Vater von Shining Spark. Über diese Linie reicht der Doc-Bar-Einfluss weit in die Reining- und Allroundzucht hinein.","note":"Muttername in dieser Datenbank noch nicht gesichert - bitte prüfen.","sireName":"Doc Bar","damName":null,"sireId":16,"damId":null,"availability":"unknown","historic":true},{"id":39,"slug":"high-brow-cat","name":"High Brow Cat","aka":null,"sex":"stallion","breed":"Quarter Horse","reg":null,"born":1988,"died":2019,"color":"Fuchs","country":"US","disciplines":["Cutting"],"description":"Über viele Jahre der führende Cuttingvererber überhaupt, gemessen an den Gewinnsummen seiner Nachkommen. Seine Söhne - allen voran Metallic Cat - bestimmen die aktuelle Zucht massgeblich.","note":null,"sireName":"High Brow Hickory","damName":"Smart Little Kitty","sireId":38,"damId":null,"availability":"unknown","historic":true},{"id":38,"slug":"high-brow-hickory","name":"High Brow Hickory","aka":null,"sex":"stallion","breed":"Quarter Horse","reg":null,"born":1983,"died":null,"color":"Fuchs","country":"US","disciplines":["Cutting"],"description":"Vater von High Brow Cat und damit Ausgangspunkt der derzeit dominierenden Cuttinglinie.","note":null,"sireName":"Doc's Hickory","damName":"Grulla San","sireId":22,"damId":null,"availability":"unknown","historic":true},{"id":41,"slug":"hollywood-dun-it","name":"Hollywood Dun It","aka":null,"sex":"stallion","breed":"Quarter Horse","reg":null,"born":1983,"died":2005,"color":"Dunalino / Dun","country":"US","disciplines":["Reining"],"description":"Der prägende Reiningvererber seiner Zeit und über Jahre an der Spitze der NRHA-Vererberstatistik. Seine Nachkommen gelten als besonders willig im Kopf und stark im Stop - Eigenschaften, die die moderne Reiningzucht bis heute suchen.","note":null,"sireName":"Hollywood Jac 86","damName":"Blossom Berry","sireId":null,"damId":null,"availability":"unknown","historic":true},{"id":50,"slug":"impressive","name":"Impressive","aka":null,"sex":"stallion","breed":"Quarter Horse","reg":null,"born":1969,"died":1995,"color":"Fuchs","country":"US","disciplines":["Halter"],"description":"Prägte die Halterzucht wie kein zweiter Hengst - extreme Bemuskelung und Ausstrahlung. Auf ihn geht allerdings auch die Erbkrankheit HYPP zurück; alle Nachkommen seiner Linie sollten getestet sein. Ein Eintrag ohne HYPP-Status ist in dieser Linie unvollständig.","note":"Ursprung der HYPP-Mutation. Bei allen Nachkommen bitte den HYPP-Status angeben.","sireName":"Lucky Bar","damName":"Glamour Bars","sireId":null,"damId":null,"availability":"unknown","historic":true},{"id":34,"slug":"jewels-leo-bars","name":"Jewel's Leo Bars","aka":"Freckles","sex":"stallion","breed":"Quarter Horse","reg":null,"born":1962,"died":null,"color":"Fuchs","country":"US","disciplines":["Cutting"],"description":"Vater von Colonel Freckles und Freckles Playboy. Über diese beiden Söhne begründete er eine eigene, bis heute stark nachgefragte Cuttinglinie.","note":null,"sireName":"Sugar Bars","damName":"Leo Pan","sireId":14,"damId":null,"availability":"unknown","historic":true},{"id":8,"slug":"joe-hancock","name":"Joe Hancock","aka":null,"sex":"stallion","breed":"Quarter Horse","reg":null,"born":1923,"died":null,"color":"Braun","country":"US","disciplines":["Foundation / Zucht","Roping"],"description":"Bekannt für Grösse, Knochenstärke und enorme Zugkraft - seine Mutter war Percheron-geprägt. Die Hancock-Linie steht bis heute für robuste, kräftige Ranch- und Ropingpferde und gilt als sehr eigenständig im Charakter.","note":null,"sireName":"John Wilkens","damName":null,"sireId":null,"damId":null,"availability":"unknown","historic":true},{"id":10,"slug":"joe-reed-ii","name":"Joe Reed II","aka":null,"sex":"stallion","breed":"Quarter Horse","reg":null,"born":1936,"died":null,"color":"Fuchs","country":"US","disciplines":["Foundation / Zucht"],"description":"Vater von Leo und damit ein Schlüsselpferd für die gesamte Leo-Linie.","note":null,"sireName":"Joe Reed P-3","damName":"Nellene","sireId":9,"damId":null,"availability":"unknown","historic":true},{"id":9,"slug":"joe-reed-p-3","name":"Joe Reed P-3","aka":null,"sex":"stallion","breed":"Quarter Horse","reg":"P-3","born":1921,"died":null,"color":"Fuchs","country":"US","disciplines":["Foundation / Zucht"],"description":"Verbindet über seinen Thoroughbred-Vater Joe Blair Rennblut mit der Quarter-Horse-Stutenbasis. Begründer der Joe-Reed-Linie, die über Leo weitreichenden Einfluss auf Renn-, Pleasure- und Performancezucht nahm.","note":null,"sireName":"Joe Blair","damName":"Della Moore","sireId":null,"damId":null,"availability":"unknown","historic":true},{"id":5,"slug":"king","name":"King","aka":"King P-234","sex":"stallion","breed":"Quarter Horse","reg":"P-234","born":1932,"died":1958,"color":"Fuchs","country":"US","disciplines":["Foundation / Zucht","Cutting"],"description":"Einer der bedeutendsten Vererber der Rassegeschichte und Namensgeber der King-Linie. Seine Nachkommen prägten vor allem den Cutting- und Ranchsport und gelten als besonders kopfstark und cowsensitiv. Poco Bueno ist sein bekanntester Sohn.","note":null,"sireName":"Zantanon","damName":"Jabalina","sireId":4,"damId":null,"availability":"unknown","historic":true},{"id":11,"slug":"leo","name":"Leo","aka":null,"sex":"stallion","breed":"Quarter Horse","reg":null,"born":1940,"died":1967,"color":"Fuchs","country":"US","disciplines":["Foundation / Zucht","Cutting"],"description":"Erfolgreicher Rennhengst und anschliessend einer der grossen Vererber seiner Zeit. Die Leo-Linie ist über Leo San und Peppy San bis in die heutige Cutting-Spitze durchgehend präsent.","note":null,"sireName":"Joe Reed II","damName":"Little Fanny","sireId":10,"damId":null,"availability":"unknown","historic":true},{"id":25,"slug":"leo-san","name":"Leo San","aka":null,"sex":"stallion","breed":"Quarter Horse","reg":null,"born":1949,"died":null,"color":"Fuchs","country":"US","disciplines":["Cutting","Foundation / Zucht"],"description":"Vater von Peppy San und Mr San Peppy und damit Ausgangspunkt einer der erfolgreichsten Cuttinglinien überhaupt.","note":null,"sireName":"Leo","damName":"San Sue Darks","sireId":11,"damId":null,"availability":"unknown","historic":true},{"id":15,"slug":"lightning-bar","name":"Lightning Bar","aka":null,"sex":"stallion","breed":"Quarter Horse","reg":null,"born":1951,"died":1960,"color":"Fuchs","country":"US","disciplines":["Foundation / Zucht"],"description":"Früh verstorben, aber durch einen einzigen Sohn unsterblich: Doc Bar. Sein Einfluss auf die Cuttingzucht ist kaum zu überschätzen.","note":null,"sireName":"Three Bars","damName":"Della P","sireId":13,"damId":null,"availability":"unknown","historic":true},{"id":3,"slug":"little-joe","name":"Little Joe","aka":null,"sex":"stallion","breed":"Quarter Horse","reg":null,"born":1905,"died":null,"color":"Fuchs","country":"US","disciplines":["Foundation / Zucht"],"description":"Sohn des Traveler und ein Bindeglied zwischen den frühen texanischen Sprinterlinien und der späteren Zucht. Über seinen Sohn Zantanon führt die Linie direkt zu King P-234.","note":null,"sireName":"Traveler","damName":null,"sireId":1,"damId":null,"availability":"unknown","historic":true},{"id":40,"slug":"metallic-cat","name":"Metallic Cat","aka":null,"sex":"stallion","breed":"Quarter Horse","reg":null,"born":2005,"died":null,"color":"Red Roan","country":"US","disciplines":["Cutting"],"description":"NCHA-Futurity-Champion und einer der erfolgreichsten Vererber der Gegenwart. Seine Nachkommen sind im Cutting, aber zunehmend auch im Reined Cow Horse und in der Ranchzucht vertreten.","note":null,"sireName":"High Brow Cat","damName":"Chers Shadow","sireId":39,"damId":null,"availability":"frozen","historic":false},{"id":27,"slug":"mr-san-peppy","name":"Mr San Peppy","aka":null,"sex":"stallion","breed":"Quarter Horse","reg":null,"born":1968,"died":1995,"color":"Fuchs","country":"US","disciplines":["Cutting"],"description":"NCHA World Champion und Aushängeschild des King-Ranch-Zuchtprogramms. Sein Sohn Peppy San Badger führte die Linie an die absolute Spitze.","note":null,"sireName":"Leo San","damName":"Peppy Belle","sireId":25,"damId":null,"availability":"unknown","historic":true},{"id":6,"slug":"old-sorrel","name":"Old Sorrel","aka":null,"sex":"stallion","breed":"Quarter Horse","reg":null,"born":1915,"died":null,"color":"Fuchs","country":"US","disciplines":["Foundation / Zucht"],"description":"Gründerhengst des King-Ranch-Zuchtprogramms in Texas. Aus ihm entwickelte die Ranch über konsequente Linienzucht einen eigenen, sehr einheitlichen Pferdetyp - die Grundlage der späteren King-Ranch-Cutting-Pferde.","note":"Mutter: Thoroughbred-Stute, in den Unterlagen ohne Namen geführt.","sireName":"Hickory Bill","damName":null,"sireId":null,"damId":null,"availability":"unknown","historic":true},{"id":26,"slug":"peppy-san","name":"Peppy San","aka":null,"sex":"stallion","breed":"Quarter Horse","reg":null,"born":1959,"died":null,"color":"Fuchs","country":"US","disciplines":["Cutting"],"description":"NCHA World Champion und erfolgreicher Vererber. Seine Tochter Smart Peppy wurde als Mutter von Smart Little Lena zu einer Schlüsselstute der Rasse.","note":null,"sireName":"Leo San","damName":"Peppy Belle","sireId":25,"damId":null,"availability":"unknown","historic":true},{"id":28,"slug":"peppy-san-badger","name":"Peppy San Badger","aka":"Little Peppy","sex":"stallion","breed":"Quarter Horse","reg":null,"born":1974,"died":2005,"color":"Fuchs","country":"US","disciplines":["Cutting"],"description":"Gewinner der NCHA Futurity 1977 und über Jahrzehnte einer der bedeutendsten Cuttingvererber. Seine Nachkommen zeichnen sich durch Cowsense, Trainierbarkeit und Härte aus; über Dual Pep und Peptoboonsmal ist er in der modernen Zucht fest verankert.","note":null,"sireName":"Mr San Peppy","damName":"Sugar Badger","sireId":27,"damId":null,"availability":"unknown","historic":true},{"id":32,"slug":"peptoboonsmal","name":"Peptoboonsmal","aka":null,"sex":"stallion","breed":"Quarter Horse","reg":null,"born":1992,"died":null,"color":"Blue Roan","country":"US","disciplines":["Cutting"],"description":"Gewinner der NCHA Futurity 1995 und einer der prägenden Vererber der 2000er Jahre. Verbindet die Peppy-San-Badger-Linie mit der Ausnahmestute Royal Blue Boon.","note":null,"sireName":"Peppy San Badger","damName":"Royal Blue Boon","sireId":28,"damId":33,"availability":"unknown","historic":true},{"id":2,"slug":"peter-mccue","name":"Peter McCue","aka":null,"sex":"stallion","breed":"Quarter Horse","reg":null,"born":1895,"died":1923,"color":"Fuchs","country":"US","disciplines":["Foundation / Zucht"],"description":"Gilt neben Traveler als wichtigster Gründervererber der Rasse. Er war ein herausragender Sprinter und gab Kaliber, Muskulatur und Schnelligkeit sehr konstant weiter. Ein grosser Teil der modernen Quarter Horses führt ihn mehrfach im Pedigree.","note":null,"sireName":"Dan Tucker","damName":"Nora M","sireId":null,"damId":null,"availability":"unknown","historic":true},{"id":37,"slug":"playgun","name":"Playgun","aka":null,"sex":"stallion","breed":"Quarter Horse","reg":null,"born":1989,"died":null,"color":"Fuchs","country":"US","disciplines":["Cutting","Reined Cow Horse"],"description":"Freckles-Playboy-Sohn mit Erfolgen im Cutting und starker Verbreitung in der Cow-Horse- und Ranchzucht.","note":null,"sireName":"Freckles Playboy","damName":"Miss Silver Pistol","sireId":36,"damId":null,"availability":"unknown","historic":true},{"id":17,"slug":"poco-bueno","name":"Poco Bueno","aka":null,"sex":"stallion","breed":"Quarter Horse","reg":null,"born":1944,"died":1969,"color":"Braun","country":"US","disciplines":["Cutting","Foundation / Zucht"],"description":"Erfolgreicher Cuttinghengst und einer der teuersten Quarter Horses seiner Zeit. Seine Töchter erwiesen sich als aussergewöhnliche Zuchtstuten - die Kombination Poco-Bueno-Stute x Doc Bar gilt als eine der wirkungsvollsten Anpaarungen der Rassegeschichte.","note":null,"sireName":"King","damName":"Miss Taylor","sireId":5,"damId":null,"availability":"unknown","historic":true},{"id":18,"slug":"poco-lena","name":"Poco Lena","aka":null,"sex":"mare","breed":"Quarter Horse","reg":null,"born":1949,"died":1975,"color":"Braun","country":"US","disciplines":["Cutting"],"description":"Eine der grössten Cuttingstuten überhaupt und mehrfache NCHA-Championesse. Nach einer Verletzung wurde sie Zuchtstute und brachte mit Doc Bar unter anderem Doc O'Lena und Dry Doc - beide Sieger der NCHA Futurity.","note":null,"sireName":"Poco Bueno","damName":"Sheilwin","sireId":17,"damId":null,"availability":"unknown","historic":true},{"id":19,"slug":"poco-tivio","name":"Poco Tivio","aka":null,"sex":"stallion","breed":"Quarter Horse","reg":null,"born":1947,"died":null,"color":"Braun","country":"US","disciplines":["Cutting","Reined Cow Horse"],"description":"Vollbruder-Generation zu Poco Lena und selbst ein einflussreicher Vererber, vor allem an der Westküste im Reined-Cow-Horse-Bereich.","note":null,"sireName":"Poco Bueno","damName":"Sheilwin","sireId":17,"damId":null,"availability":"unknown","historic":true},{"id":33,"slug":"royal-blue-boon","name":"Royal Blue Boon","aka":null,"sex":"mare","breed":"Quarter Horse","reg":null,"born":1980,"died":null,"color":"Blue Roan","country":"US","disciplines":["Cutting"],"description":"Gilt als eine der erfolgreichsten Cutting-Zuchtstuten aller Zeiten, gemessen an den Gewinnsummen ihrer Nachkommen. Mutter von Peptoboonsmal.","note":null,"sireName":"Boon Bar","damName":"Royal Tincie","sireId":null,"damId":null,"availability":"unknown","historic":true},{"id":44,"slug":"shining-spark","name":"Shining Spark","aka":null,"sex":"stallion","breed":"Quarter Horse","reg":null,"born":1989,"died":2018,"color":"Palomino","country":"US","disciplines":["Reining","Allround"],"description":"Aussergewöhnlich vielseitiger Vererber: seine Nachkommen waren im Reining, im Allroundbereich und im Cow Horse erfolgreich. Zusätzlich beliebt wegen der Farbvererbung.","note":null,"sireName":"Genuine Doc","damName":"Diamonds Sparkle","sireId":24,"damId":null,"availability":"unknown","historic":true},{"id":12,"slug":"skipper-w","name":"Skipper W","aka":null,"sex":"stallion","breed":"Quarter Horse","reg":null,"born":1945,"died":null,"color":"Fuchs","country":"US","disciplines":["Halter","Western Pleasure"],"description":"Begründer der Skipper-W-Linie, die vor allem die Halter- und Pleasurezucht geprägt hat. Steht für Typ, Ausstrahlung und ausgeglichenes Wesen.","note":null,"sireName":"Nick Shoemaker","damName":"Hired Girl","sireId":null,"damId":null,"availability":"unknown","historic":true},{"id":45,"slug":"smart-chic-olena","name":"Smart Chic Olena","aka":null,"sex":"stallion","breed":"Quarter Horse","reg":null,"born":1988,"died":2007,"color":"Fuchs","country":"US","disciplines":["Reining","Reined Cow Horse"],"description":"Smart-Little-Lena-Sohn, der die Cuttinglinie erfolgreich in die Reining- und Cow-Horse-Zucht überführte. Vater zahlreicher Verbandschampions.","note":null,"sireName":"Smart Little Lena","damName":"Gay Sugar Chic","sireId":30,"damId":null,"availability":"unknown","historic":true},{"id":30,"slug":"smart-little-lena","name":"Smart Little Lena","aka":null,"sex":"stallion","breed":"Quarter Horse","reg":null,"born":1979,"died":2010,"color":"Fuchs","country":"US","disciplines":["Cutting"],"description":"Gewinner der sogenannten Triple Crown des Cutting (NCHA Futurity, Super Stakes und Derby) und danach einer der erfolgreichsten Vererber der Rassegeschichte. Praktisch die gesamte moderne Cuttingzucht arbeitet mit seinem Blut.","note":null,"sireName":"Doc O'Lena","damName":"Smart Peppy","sireId":20,"damId":29,"availability":"unknown","historic":true},{"id":29,"slug":"smart-peppy","name":"Smart Peppy","aka":null,"sex":"mare","breed":"Quarter Horse","reg":null,"born":1971,"died":null,"color":"Fuchs","country":"US","disciplines":["Cutting"],"description":"Zuchtstute von aussergewöhnlicher Bedeutung - Mutter von Smart Little Lena und Namensgeberin für unzählige 'Smart'-Nachkommen.","note":null,"sireName":"Peppy San","damName":"Royal Smart","sireId":26,"damId":null,"availability":"unknown","historic":true},{"id":47,"slug":"spooks-gotta-whiz","name":"Spooks Gotta Whiz","aka":null,"sex":"stallion","breed":"Quarter Horse","reg":null,"born":2007,"died":null,"color":"Fuchs","country":"US","disciplines":["Reining"],"description":"Erfolgreicher Reininghengst und Vererber der jüngeren Generation, der die Gunner- und die Whiz-Linie in sich vereint.","note":null,"sireName":"Spooks Gotta Gun","damName":"Prettywhizprettydoes","sireId":null,"damId":null,"availability":"frozen","historic":false},{"id":14,"slug":"sugar-bars","name":"Sugar Bars","aka":null,"sex":"stallion","breed":"Quarter Horse","reg":null,"born":1951,"died":null,"color":"Fuchs","country":"US","disciplines":["Foundation / Zucht"],"description":"Sohn des Three Bars und selbst ein bedeutender Vererber. Über Jewel's Leo Bars führt seine Linie zu Colonel Freckles und Freckles Playboy - zwei Eckpfeilern der modernen Cuttingzucht.","note":null,"sireName":"Three Bars","damName":"Frontera Sugar","sireId":13,"damId":null,"availability":"unknown","historic":true},{"id":13,"slug":"three-bars","name":"Three Bars","aka":"Three Bars (TB)","sex":"stallion","breed":"Thoroughbred","reg":null,"born":1940,"died":1968,"color":"Fuchs","country":"US","disciplines":["Foundation / Zucht"],"description":"Der wohl einflussreichste Thoroughbred in der Quarter-Horse-Zucht. Er brachte Grösse, Galoppqualität und Athletik in die Rasse ein. Über Doc Bar, Sugar Bars und Lightning Bar wirkt er in Cutting-, Reining- und Pleasurelinien gleichermassen.","note":null,"sireName":"Percentage","damName":"Myrtle Dee","sireId":null,"damId":null,"availability":"unknown","historic":true},{"id":43,"slug":"topsail-whiz","name":"Topsail Whiz","aka":null,"sex":"stallion","breed":"Quarter Horse","reg":null,"born":1987,"died":null,"color":"Fuchs","country":"US","disciplines":["Reining"],"description":"Bedeutender Reiningvererber, dessen 'Whiz'-Nachkommen über Jahrzehnte die NRHA-Ergebnislisten prägen.","note":null,"sireName":"Topsail Cody","damName":"Jeanie Whiz Bar","sireId":null,"damId":null,"availability":"unknown","historic":true},{"id":1,"slug":"traveler","name":"Traveler","aka":null,"sex":"stallion","breed":"Quarter Horse","reg":null,"born":1885,"died":null,"color":"Fuchs","country":"US","disciplines":["Foundation / Zucht"],"description":"Einer der einflussreichsten Gründerhengste der Quarter-Horse-Zucht. Seine Herkunft ist bis heute ungeklärt - überliefert ist, dass er in Texas als Arbeitspferd auftauchte und sich als aussergewöhnlicher Sprinter erwies. Über seine Söhne wirkt er in praktisch jeder heutigen Quarter-Horse-Linie nach.","note":"Abstammung unbekannt; in den Papieren als Gründerpferd geführt.","sireName":null,"damName":null,"sireId":null,"damId":null,"availability":"unknown","historic":true},{"id":49,"slug":"two-eyed-jack","name":"Two Eyed Jack","aka":null,"sex":"stallion","breed":"Quarter Horse","reg":null,"born":1961,"died":1985,"color":"Fuchs","country":"US","disciplines":["Halter","Allround"],"description":"Einer der erfolgreichsten Allroundvererber der Rassegeschichte mit einer aussergewöhnlichen Zahl an Champions in Halter- und Performanceklassen. Steht für Typ, Umgänglichkeit und Vielseitigkeit.","note":null,"sireName":"Two D Two","damName":"Triangle Tookie","sireId":null,"damId":null,"availability":"unknown","historic":true},{"id":7,"slug":"wimpy","name":"Wimpy","aka":"Wimpy P-1","sex":"stallion","breed":"Quarter Horse","reg":"P-1","born":1937,"died":null,"color":"Fuchs","country":"US","disciplines":["Halter","Foundation / Zucht"],"description":"Trägt die Registriernummer P-1 der AQHA - er erhielt sie als Grand Champion der Fort Worth Stock Show 1941, nicht weil er das erste eingetragene Pferd war. Ein King-Ranch-Produkt und über Jahrzehnte ein Begriff in der Halterzucht.","note":null,"sireName":"Solis","damName":"Panda","sireId":null,"damId":null,"availability":"unknown","historic":true},{"id":46,"slug":"wimpys-little-step","name":"Wimpys Little Step","aka":null,"sex":"stallion","breed":"Quarter Horse","reg":null,"born":1998,"died":null,"color":"Palomino","country":"US","disciplines":["Reining"],"description":"NRHA-Futurity-Champion 2002 und anschliessend einer der gefragtesten Reiningvererber weltweit. Sein Blut ist in Europa über Gefriersamen weit verbreitet.","note":null,"sireName":"Nu Chex To Cash","damName":"A Little Starbert","sireId":null,"damId":null,"availability":"frozen","historic":false},{"id":4,"slug":"zantanon","name":"Zantanon","aka":"The Ghost of the Rio Grande","sex":"stallion","breed":"Quarter Horse","reg":null,"born":1917,"died":null,"color":"Fuchs","country":"MX","disciplines":["Foundation / Zucht"],"description":"Legendärer Rennhengst aus dem mexikanischen Grenzgebiet, der trotz härtester Einsatzbedingungen kaum geschlagen wurde. Sein Beiname stammt aus dieser Zeit. Als Vater von King P-234 wurde er zu einer der tragenden Säulen der Quarter-Horse-Zucht.","note":null,"sireName":"Little Joe","damName":"Jeanette","sireId":3,"damId":null,"availability":"unknown","historic":true},{"id":48,"slug":"zippo-pine-bar","name":"Zippo Pine Bar","aka":null,"sex":"stallion","breed":"Quarter Horse","reg":null,"born":1969,"died":1998,"color":"Fuchs","country":"US","disciplines":["Western Pleasure","Allround"],"description":"Der Gründervater der modernen Western-Pleasure-Zucht. Seine Nachkommen definierten über Jahrzehnte, wie ein Pleasurepferd sich bewegen soll; die 'Zippo'-Namen sind bis heute ein Qualitätsmerkmal in dieser Sparte.","note":null,"sireName":"Zippo Pat Bars","damName":"Dollie Pine","sireId":null,"damId":null,"availability":"unknown","historic":true}]/*DATEN*/;
+
+  var GENERATIONS = 4;
+  var ROWS = Math.pow(2, GENERATIONS);
+
+  var SEX_LABEL = { stallion: "Hengst", mare: "Stute", gelding: "Wallach" };
+  var AVAILABILITY_LABEL = {
+    unknown: null,
+    frozen: "Gefriersamen",
+    fresh: "Frischsamen",
+    both: "Frisch- und Gefriersamen",
+    live_cover: "Natursprung",
+    none: "Steht nicht zur Verfügung"
+  };
+  var COUNTRY = {
+    DE: "Deutschland", AT: "Österreich", CH: "Schweiz", US: "USA",
+    CA: "Kanada", MX: "Mexiko", NL: "Niederlande", IT: "Italien",
+    FR: "Frankreich", BE: "Belgien", DK: "Dänemark", SE: "Schweden",
+    GB: "Grossbritannien", AU: "Australien", BR: "Brasilien"
+  };
+
+  /* Vom Besucher hinzugefügte Pferde - nur für diese Sitzung. */
+  var added = [];
+  var nextId = -1;
+
+  function horses() { return SEED.concat(added); }
+
+  function esc(value) {
+    return String(value == null ? "" : value)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+  }
+
+  /* Namensvergleich wie in der App: Apostrophe und Zeichensetzung ignorieren,
+     damit "Doc O'Lena" und "Doc OLena" dasselbe Pferd sind. */
+  function normalizeName(value) {
+    return String(value || "")
+      .normalize("NFD")
+      .replace(/[̀-ͯ]/g, "")
+      .toLowerCase()
+      .replace(/['‘’`´]/g, "")
+      .replace(/[^a-z0-9]+/g, " ")
+      .trim();
+  }
+
+  function byId(id) {
+    if (id == null) return null;
+    var list = horses();
+    for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i];
+    return null;
+  }
+
+  function bySlug(slug) {
+    var list = horses();
+    for (var i = 0; i < list.length; i++) if (list[i].slug === slug) return list[i];
+    return null;
+  }
+
+  function findByName(name, sex) {
+    var key = normalizeName(name);
+    if (!key) return null;
+    var list = horses();
+    for (var i = 0; i < list.length; i++) {
+      if (normalizeName(list[i].name) === key && (!sex || list[i].sex === sex)) return list[i];
+    }
+    return null;
+  }
+
+  /* --- Textbausteine --- */
+
+  function summaryLine(h) {
+    var years = h.born ? (h.died ? h.born + "–" + h.died : String(h.born)) : null;
+    return [SEX_LABEL[h.sex] || "", years, h.color, h.breed]
+      .filter(Boolean).join(" · ");
+  }
+
+  function pedigreeLine(h) {
+    if (!h.sireName && !h.damName) return null;
+    return (h.sireName || "unbekannt") + " x " + (h.damName || "unbekannt");
+  }
+
+  function allbreedUrl(name) {
+    return "https://www.allbreedpedigree.com/index.php?rk=0&hn=" +
+      encodeURIComponent(name) + "&h=&inbred=";
+  }
+
+  /* --- Abstammung ---
+     Vorfahren mit eigenem Datensatz werden weiter aufgeklappt, alle anderen
+     enden als reiner Name. Besuchte Kennungen verhindern Endlosschleifen. */
+
+  function buildPedigree(root) {
+    var visited = {};
+    visited[root.id] = true;
+
+    function node(h, depth) {
+      return {
+        name: h.name, slug: h.slug, born: h.born, color: h.color,
+        sire: depth > 0 ? child(h.sireId, h.sireName, depth - 1) : null,
+        dam: depth > 0 ? child(h.damId, h.damName, depth - 1) : null
+      };
+    }
+
+    function child(id, name, depth) {
+      if (id != null && !visited[id]) {
+        visited[id] = true;
+        var parent = byId(id);
+        if (parent) return node(parent, depth);
+      }
+      if (name && String(name).trim()) {
+        return { name: String(name).trim(), slug: null, born: null, color: null, sire: null, dam: null };
+      }
+      return null;
+    }
+
+    return node(root, GENERATIONS);
+  }
+
+  function pedigreeColumns(root) {
+    var columns = [];
+    var level = [root.sire || null, root.dam || null];
+    for (var g = 0; g < GENERATIONS; g++) {
+      columns.push(level);
+      var next = [];
+      for (var i = 0; i < level.length; i++) {
+        next.push(level[i] ? level[i].sire || null : null);
+        next.push(level[i] ? level[i].dam || null : null);
+      }
+      level = next;
+    }
+    return columns;
+  }
+
+  function renderPedigree(root) {
+    var columns = pedigreeColumns(root);
+    var filled = 0, total = 0;
+    var cells = [];
+
+    for (var g = 0; g < columns.length; g++) {
+      var column = columns[g];
+      var span = ROWS / column.length;
+
+      for (var i = 0; i < column.length; i++) {
+        total++;
+        var node = column[i];
+        var style = "grid-column:" + (g + 1) + ";grid-row:" + (i * span + 1) + " / span " + span + ";";
+
+        if (!node) {
+          cells.push('<div class="ped-cell ped-empty" style="' + style + '" aria-label="Vorfahr nicht erfasst">—</div>');
+          continue;
+        }
+
+        filled++;
+        var side = i % 2 === 0 ? "sire-side" : "dam-side";
+        var sub = [node.born, node.color].filter(Boolean).join(" · ");
+        var inner = '<span class="ped-name">' + esc(node.name) + "</span>" +
+          (sub ? '<span class="ped-sub">' + esc(sub) + "</span>" : "");
+
+        if (node.slug) {
+          cells.push('<button type="button" class="ped-cell linked ' + side +
+            '" style="' + style + '" data-slug="' + esc(node.slug) +
+            '" title="' + esc(node.name) + ' – Datenblatt öffnen">' + inner + "</button>");
+        } else {
+          cells.push('<div class="ped-cell ' + side + '" style="' + style +
+            '" title="' + esc(node.name) + ' – noch kein eigener Datensatz">' + inner + "</div>");
+        }
+      }
+    }
+
+    return { html: '<div class="pedigree">' + cells.join("") + "</div>", filled: filled, total: total };
+  }
+
+  /* --- Übersicht --- */
+
+  var els = {
+    q: document.getElementById("q"),
+    discipline: document.getElementById("fDiscipline"),
+    bestand: document.getElementById("fBestand"),
+    sex: document.getElementById("fSex"),
+    sort: document.getElementById("fSort"),
+    grid: document.getElementById("cardGrid"),
+    empty: document.getElementById("emptyState"),
+    result: document.getElementById("resultLine"),
+    listView: document.getElementById("listView"),
+    detailView: document.getElementById("detailView")
+  };
+
+  function fillDisciplines() {
+    var seen = {};
+    horses().forEach(function (h) {
+      (h.disciplines || []).forEach(function (d) { seen[d] = true; });
+    });
+    var names = Object.keys(seen).sort(function (a, b) { return a.localeCompare(b, "de"); });
+    var current = els.discipline.value;
+    els.discipline.innerHTML = '<option value="">alle</option>' +
+      names.map(function (d) { return '<option value="' + esc(d) + '">' + esc(d) + "</option>"; }).join("");
+    els.discipline.value = current;
+  }
+
+  function matches(h) {
+    var term = normalizeName(els.q.value);
+    if (term) {
+      var haystack = [h.name, h.aka, h.sireName, h.damName].map(normalizeName).join(" ");
+      if (haystack.indexOf(term) === -1) return false;
+    }
+    if (els.discipline.value && (h.disciplines || []).indexOf(els.discipline.value) === -1) return false;
+    if (els.bestand.value === "historic" && !h.historic) return false;
+    if (els.bestand.value === "current" && h.historic) return false;
+    if (els.sex.value && h.sex !== els.sex.value) return false;
+    return true;
+  }
+
+  function sortHorses(list) {
+    var mode = els.sort.value;
+    return list.slice().sort(function (a, b) {
+      if (mode === "year" || mode === "yearAsc") {
+        var av = a.born == null ? Infinity : a.born;
+        var bv = b.born == null ? Infinity : b.born;
+        if (av !== bv) return mode === "year" ? bv - av : av - bv;
+      }
+      return a.name.localeCompare(b.name, "de");
+    });
+  }
+
+  function cardHtml(h) {
+    var breeding = pedigreeLine(h);
+    var chips = (h.disciplines || []).slice(0, 3).map(function (d) {
+      return '<span class="chip">' + esc(d) + "</span>";
+    });
+    if (h.country) chips.push('<span class="chip">' + esc(COUNTRY[h.country] || h.country) + "</span>");
+    if (h.isNew) chips.unshift('<span class="chip chip-accent">dein Eintrag</span>');
+
+    return '<button type="button" class="card" data-slug="' + esc(h.slug) + '">' +
+      '<div class="card-head"><h3>' + esc(h.name) +
+      (h.aka ? ' <span class="aka">„' + esc(h.aka) + '“</span>' : "") + "</h3>" +
+      (h.historic ? '<span class="chip">historisch</span>' : "") + "</div>" +
+      '<p class="meta" style="margin:0;">' + esc(summaryLine(h)) + "</p>" +
+      (breeding ? '<p class="breeding" style="margin:0;">' + esc(breeding) + "</p>" : "") +
+      '<div class="chips">' + chips.join("") + "</div>" +
+      "</button>";
+  }
+
+  /* Der zuletzt gezeichnete Filterstand. Solange er sich nicht ändert, bleibt
+     das Raster unangetastet - würde es unnötig neu aufgebaut, verschwänden die
+     Karten mitten im Klick und der Klick ginge verloren. */
+  var lastSignature = null;
+
+  function filterSignature() {
+    return JSON.stringify([
+      els.q.value, els.discipline.value, els.bestand.value,
+      els.sex.value, els.sort.value, added.length
+    ]);
+  }
+
+  function renderList(force) {
+    var signature = filterSignature();
+    if (!force && signature === lastSignature) return;
+    lastSignature = signature;
+
+    var list = sortHorses(horses().filter(matches));
+    els.grid.innerHTML = list.map(cardHtml).join("");
+    els.empty.classList.toggle("hidden", list.length > 0);
+    els.result.textContent = list.length === 1 ? "1 Treffer" : list.length + " Treffer";
+  }
+
+  /* --- Detailansicht --- */
+
+  function renderDetail(h) {
+    var ped = renderPedigree(buildPedigree(h));
+
+    var offspring = horses().filter(function (o) {
+      return o.sireId === h.id || o.damId === h.id;
+    }).sort(function (a, b) {
+      return (a.born || 9999) - (b.born || 9999) || a.name.localeCompare(b.name, "de");
+    });
+
+    var facts = [
+      ["Geschlecht", SEX_LABEL[h.sex]],
+      ["Rasse", h.breed],
+      ["Papiernummer", h.reg],
+      ["Jahrgang", h.born ? (h.died ? h.born + " – " + h.died : String(h.born)) : null],
+      ["Farbe", h.color],
+      ["Land", h.country ? (COUNTRY[h.country] || h.country) : null],
+      ["Verfügbarkeit", AVAILABILITY_LABEL[h.availability] || null]
+    ].filter(function (row) { return row[1]; });
+
+    function parentLink(id, name) {
+      if (!name) return "unbekannt";
+      var parent = byId(id);
+      if (!parent) return esc(name);
+      return '<a href="#/hengst/' + esc(parent.slug) + '">' + esc(name) + "</a>";
+    }
+
+    var html =
+      '<div><button type="button" class="backlink" data-back="1">← zurück zur Übersicht</button></div>' +
+      '<div class="stack-sm">' +
+        '<div class="detail-head"><h1>' + esc(h.name) + "</h1>" +
+          (h.historic ? '<span class="chip">historisch</span>' : "") +
+          '<span class="chip">ungeprüft</span>' +
+          (h.isNew ? '<span class="chip chip-accent">dein Eintrag</span>' : "") +
+        "</div>" +
+        (h.aka ? '<p class="meta" style="margin:0;">genannt „' + esc(h.aka) + '“</p>' : "") +
+        '<p class="meta" style="margin:0;">' + esc(summaryLine(h)) + "</p>" +
+        (pedigreeLine(h)
+          ? '<p class="parents" style="margin:0;">' + parentLink(h.sireId, h.sireName) +
+            ' <span style="color:var(--muted);">x</span> ' + parentLink(h.damId, h.damName) + "</p>"
+          : "") +
+      "</div>" +
+
+      '<div class="notice">' +
+        "<strong>Angaben noch nicht geprüft.</strong> Sie stammen aus allgemein " +
+        "zugänglicher Rassegeschichte und wurden nicht gegen Zuchtbuchpapiere " +
+        "abgeglichen." +
+      "</div>" +
+
+      '<div class="cols"><div class="stack">' +
+
+        (h.description
+          ? '<section class="block"><h2>Zum Pferd</h2><div class="prose"><p>' +
+            esc(h.description) + "</p></div></section>"
+          : "") +
+
+        '<section class="block">' +
+          '<div style="display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:0.6rem;">' +
+            "<h2>Abstammung</h2>" +
+            '<a href="' + esc(allbreedUrl(h.name)) + '" target="_blank" rel="noopener noreferrer nofollow" style="font-size:0.85rem;">' +
+              "bei All Breed Pedigree ansehen ↗</a>" +
+          "</div>" +
+          '<p class="meta" style="margin:0;">' + ped.filled + " von " + ped.total +
+            " Ahnenplätzen über " + GENERATIONS + " Generationen erfasst. " +
+            "Vorfahren mit eigenem Eintrag lassen sich anklicken.</p>" +
+          (ped.filled === 0
+            ? '<div class="empty">Zu diesem Pferd ist noch keine Abstammung hinterlegt.</div>'
+            : '<div class="pedigree-scroll">' + ped.html + "</div>") +
+          (h.note ? '<p class="meta" style="margin:0;">' + esc(h.note) + "</p>" : "") +
+        "</section>" +
+
+        (offspring.length
+          ? '<section class="block"><h2>Nachkommen im Verzeichnis</h2>' +
+            '<p class="meta" style="margin:0;">' + offspring.length +
+            (offspring.length === 1 ? " Eintrag verweist" : " Einträge verweisen") +
+            " auf " + esc(h.name) + " als Elternteil.</p>" +
+            '<ul class="offspring-list">' + offspring.map(function (o) {
+              return '<li><button type="button" data-slug="' + esc(o.slug) + '">' +
+                "<span>" + esc(o.name) + '</span><span class="yr">' +
+                esc(o.born || "") + "</span></button></li>";
+            }).join("") + "</ul></section>"
+          : "") +
+
+      "</div>" +
+
+      '<aside class="stack-sm">' +
+        (facts.length
+          ? '<div class="panel"><h2 style="font-size:var(--step-1);margin-bottom:0.7rem;">Steckbrief</h2>' +
+            '<dl class="facts">' + facts.map(function (row) {
+              return "<div><dt>" + esc(row[0]) + "</dt><dd>" + esc(row[1]) + "</dd></div>";
+            }).join("") + "</dl></div>"
+          : "") +
+        ((h.disciplines || []).length
+          ? '<div class="panel"><h2 style="font-size:var(--step-1);margin-bottom:0.7rem;">Disziplinen</h2>' +
+            '<div class="chips" style="padding-top:0;">' + h.disciplines.map(function (d) {
+              return '<span class="chip">' + esc(d) + "</span>";
+            }).join("") + "</div></div>"
+          : "") +
+        '<div class="panel"><h2 style="font-size:var(--step-1);margin-bottom:0.5rem;">Kontakt</h2>' +
+          '<p class="meta" style="margin:0;">' +
+          (h.historic
+            ? "Historischer Eintrag – es gibt keinen Ansprechpartner."
+            : "Kontaktadressen der Besitzer gibt es nur in der Online-Version.") +
+          "</p></div>" +
+      "</aside></div>";
+
+    els.detailView.innerHTML = html;
+  }
+
+  /* --- Navigation über die Adresszeile --- */
+
+  function route() {
+    var hash = window.location.hash || "#/";
+    var match = hash.match(/^#\/hengst\/(.+)$/);
+
+    if (match) {
+      var horse = bySlug(decodeURIComponent(match[1]));
+      if (horse) {
+        renderDetail(horse);
+        els.listView.classList.add("hidden");
+        els.detailView.classList.remove("hidden");
+        window.scrollTo({ top: 0, behavior: "auto" });
+        return;
+      }
+    }
+
+    els.detailView.classList.add("hidden");
+    els.listView.classList.remove("hidden");
+    renderList(true);
+  }
+
+  function open(slug) { window.location.hash = "#/hengst/" + encodeURIComponent(slug); }
+
+  /* --- Ereignisse --- */
+
+  document.addEventListener("click", function (event) {
+    var back = event.target.closest("[data-back]");
+    if (back) {
+      // Immer zur Übersicht - so steht es auf dem Knopf. Der Verlauf würde
+      // stattdessen zum zuletzt angesehenen Pferd zurückspringen.
+      window.location.hash = "#/";
+      return;
+    }
+    var target = event.target.closest("[data-slug]");
+    if (target) open(target.getAttribute("data-slug"));
+  });
+
+  function onFilterChange() {
+    if (!els.listView.classList.contains("hidden")) renderList();
+  }
+
+  // Das Suchfeld reagiert auf "input" (jeder Tastendruck). Bewusst NICHT auf
+  // "change": das feuert beim Verlassen des Feldes - also genau dann, wenn
+  // jemand eine Karte anklickt.
+  els.q.addEventListener("input", onFilterChange);
+  [els.discipline, els.bestand, els.sex, els.sort].forEach(function (el) {
+    el.addEventListener("change", onFilterChange);
+  });
+
+  window.addEventListener("hashchange", route);
+
+  /* --- Demo-Eintrag --- */
+
+  document.getElementById("demoForm").addEventListener("submit", function (event) {
+    event.preventDefault();
+
+    var name = document.getElementById("dName").value.trim();
+    if (name.length < 2) return;
+
+    var sireName = document.getElementById("dSire").value.trim();
+    var damName = document.getElementById("dDam").value.trim();
+    var discipline = document.getElementById("dDisc").value.trim();
+    var year = parseInt(document.getElementById("dYear").value, 10);
+
+    var sire = sireName ? findByName(sireName, "stallion") : null;
+    var dam = damName ? findByName(damName, "mare") : null;
+
+    var slugBase = normalizeName(name).replace(/\s+/g, "-") || "pferd";
+    var slug = slugBase;
+    for (var n = 2; bySlug(slug); n++) slug = slugBase + "-" + n;
+
+    added.push({
+      id: nextId--, slug: slug, name: name, aka: null, sex: "stallion",
+      breed: "Quarter Horse", reg: null,
+      born: isNaN(year) ? null : year, died: null,
+      color: document.getElementById("dColor").value.trim() || null,
+      country: null, disciplines: discipline ? [discipline] : [],
+      description: null, note: null,
+      sireName: sireName || null, damName: damName || null,
+      sireId: sire ? sire.id : null, damId: dam ? dam.id : null,
+      availability: "unknown", historic: false, isNew: true
+    });
+
+    this.reset();
+    fillDisciplines();
+    renderList(true);
+    open(slug);
+  });
+
+  /* --- Start --- */
+
+  fillDisciplines();
+  route();
+})();
+</script>

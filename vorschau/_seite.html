@@ -1,0 +1,1062 @@
+<style>
+  /* ---------------------------------------------------------------
+     Farben und Schrift übernehmen die Gestaltung der echten App
+     (src/app/globals.css): Sattelleder, Sand und warme Neutraltöne.
+     --------------------------------------------------------------- */
+  :root {
+    --sand-50: #faf7f1;
+    --sand-100: #f3ece0;
+    --sand-200: #e6dac6;
+    --leather-500: #a8703c;
+    --leather-600: #8d5a2c;
+    --leather-700: #6f4522;
+    --bark-800: #33281f;
+    --bark-900: #241c16;
+    --bark-950: #171210;
+
+    --bg: var(--sand-50);
+    --fg: var(--bark-900);
+    --surface: #ffffff;
+    --surface-muted: var(--sand-100);
+    --line: var(--sand-200);
+    --muted: #6b5c4d;
+    --accent: var(--leather-600);
+    --accent-fg: #ffffff;
+    --notice-bg: #f6efe1;
+    --notice-fg: #5b4520;
+
+    --display: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, serif;
+    --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+      "Helvetica Neue", Arial, sans-serif;
+
+    --step-0: 0.95rem;
+    --step-1: 1.125rem;
+    --step-2: 1.5rem;
+    --step-3: 2rem;
+    --step-4: 2.75rem;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: var(--bark-950);
+      --fg: var(--sand-100);
+      --surface: var(--bark-900);
+      --surface-muted: var(--bark-800);
+      --line: #3d3128;
+      --muted: #a8988a;
+      --accent: var(--leather-500);
+      --accent-fg: var(--bark-950);
+      --notice-bg: #2b2119;
+      --notice-fg: #e0cdb0;
+    }
+  }
+
+  /* Der Umschalter der Anzeige muss die Systemeinstellung überstimmen -
+     in beide Richtungen. */
+  :root[data-theme="dark"] {
+    --bg: var(--bark-950);
+    --fg: var(--sand-100);
+    --surface: var(--bark-900);
+    --surface-muted: var(--bark-800);
+    --line: #3d3128;
+    --muted: #a8988a;
+    --accent: var(--leather-500);
+    --accent-fg: var(--bark-950);
+    --notice-bg: #2b2119;
+    --notice-fg: #e0cdb0;
+  }
+
+  :root[data-theme="light"] {
+    --bg: var(--sand-50);
+    --fg: var(--bark-900);
+    --surface: #ffffff;
+    --surface-muted: var(--sand-100);
+    --line: var(--sand-200);
+    --muted: #6b5c4d;
+    --accent: var(--leather-600);
+    --accent-fg: #ffffff;
+    --notice-bg: #f6efe1;
+    --notice-fg: #5b4520;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--sans);
+    font-size: var(--step-0);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3 {
+    font-family: var(--display);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+    margin: 0;
+  }
+
+  a { color: inherit; }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 3px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+
+  .wrap {
+    width: 100%;
+    max-width: 64rem;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+
+  /* --- Kopfzeile --- */
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: color-mix(in srgb, var(--bg) 92%, transparent);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .topbar-inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1.25rem;
+    padding-top: 0.7rem;
+    padding-bottom: 0.7rem;
+  }
+
+  .brand {
+    font-family: var(--display);
+    font-size: var(--step-1);
+    font-weight: 600;
+    text-decoration: none;
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+  }
+
+  .brand small {
+    font-family: var(--sans);
+    font-size: 0.72rem;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .searchbox {
+    flex: 1 1 14rem;
+    min-width: 0;
+  }
+
+  /* --- Formularelemente --- */
+  .field {
+    width: 100%;
+    padding: 0.5rem 0.7rem;
+    border-radius: 0.45rem;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--fg);
+    font: inherit;
+    font-size: 0.92rem;
+  }
+
+  .label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.3rem;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    padding: 0.55rem 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid transparent;
+    font: inherit;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.15s ease;
+  }
+
+  .btn-primary { background: var(--accent); color: var(--accent-fg); }
+  .btn-primary:hover { background: var(--leather-700); }
+  :root[data-theme="dark"] .btn-primary:hover,
+  .btn-primary:hover { filter: none; }
+
+  .btn-ghost {
+    background: var(--surface);
+    border-color: var(--line);
+    color: var(--fg);
+  }
+  .btn-ghost:hover { background: var(--surface-muted); }
+
+  /* --- Hinweisstreifen --- */
+  .notice {
+    background: var(--notice-bg);
+    color: var(--notice-fg);
+    border: 1px solid var(--line);
+    border-radius: 0.6rem;
+    padding: 0.85rem 1.05rem;
+    font-size: 0.88rem;
+    line-height: 1.55;
+  }
+
+  .notice strong { font-weight: 700; }
+
+  /* --- Filterleiste --- */
+  .filters {
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 0.75rem;
+    padding: 1rem;
+  }
+
+  .resultline {
+    color: var(--muted);
+    font-size: 0.85rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* --- Karten --- */
+  .grid {
+    display: grid;
+    gap: 0.85rem;
+    grid-template-columns: repeat(auto-fill, minmax(15.5rem, 1fr));
+  }
+
+  .card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 0.75rem;
+    padding: 0.95rem 1rem;
+    text-decoration: none;
+    text-align: left;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+    transition: box-shadow 0.15s ease, border-color 0.15s ease;
+  }
+
+  .card:hover {
+    box-shadow: 0 2px 12px rgb(0 0 0 / 0.08);
+    border-color: color-mix(in srgb, var(--accent) 40%, var(--line));
+  }
+
+  .card-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.6rem;
+  }
+
+  .card h3 { font-size: var(--step-1); line-height: 1.25; }
+  .card .aka { font-family: var(--sans); font-size: 0.8rem; color: var(--muted); font-weight: 400; }
+  .meta { color: var(--muted); font-size: 0.83rem; font-variant-numeric: tabular-nums; }
+  .breeding { font-family: var(--display); font-size: 0.92rem; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: auto; padding-top: 0.45rem; }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.12rem 0.5rem;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    background: var(--surface-muted);
+    border: 1px solid var(--line);
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  .chip-accent {
+    background: color-mix(in srgb, var(--accent) 14%, var(--surface));
+    border-color: color-mix(in srgb, var(--accent) 35%, var(--line));
+    color: var(--accent);
+  }
+
+  /* --- Detailansicht --- */
+  .backlink {
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    font-size: 0.85rem;
+    color: var(--muted);
+    cursor: pointer;
+    text-decoration: underline;
+  }
+
+  .detail-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.7rem; }
+  .detail-head h1 { font-size: var(--step-3); }
+
+  .parents { font-family: var(--display); font-size: var(--step-1); }
+  .parents a { text-decoration: underline; }
+
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 0.75rem;
+    padding: 1.1rem 1.25rem;
+  }
+
+  .facts { display: grid; gap: 0.4rem; margin: 0; }
+  .facts > div { display: flex; gap: 0.75rem; }
+  .facts dt { color: var(--muted); min-width: 7.5rem; flex-shrink: 0; font-size: 0.85rem; }
+  .facts dd { margin: 0; font-weight: 500; font-size: 0.9rem; font-variant-numeric: tabular-nums; }
+
+  .prose { max-width: 40rem; }
+  .prose p { margin: 0 0 0.7rem; }
+
+  .cols {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+  }
+
+  @media (min-width: 60rem) {
+    .cols { grid-template-columns: minmax(0, 1fr) 17rem; }
+  }
+
+  /* --- Abstammungsraster ---
+     Vier Spalten, je Generation. Jeder Vorfahr überspannt so viele Zeilen,
+     wie er Nachfahrenplätze abdeckt - dadurch entsteht die verschachtelte
+     Optik einer gedruckten Abstammung. */
+  .pedigree-scroll { overflow-x: auto; padding-bottom: 0.4rem; }
+
+  .pedigree {
+    display: grid;
+    gap: 0.35rem;
+    grid-template-columns: repeat(4, minmax(9.5rem, 1fr));
+    grid-template-rows: repeat(16, minmax(2.5rem, auto));
+    min-width: 40rem;
+  }
+
+  .ped-cell {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0.4rem 0.6rem;
+    border-radius: 0.4rem;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    text-decoration: none;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    overflow: hidden;
+  }
+
+  .ped-cell.dam-side { background: var(--surface-muted); }
+  .ped-cell.sire-side { border-left: 3px solid var(--accent); }
+  .ped-cell.linked { cursor: pointer; }
+  .ped-cell.linked:hover { box-shadow: 0 1px 8px rgb(0 0 0 / 0.1); }
+
+  .ped-name { font-size: 0.83rem; font-weight: 700; line-height: 1.2; }
+  .ped-sub { font-size: 0.72rem; color: var(--muted); line-height: 1.2; font-variant-numeric: tabular-nums; }
+
+  .ped-empty {
+    border: 1px dashed var(--line);
+    background: none;
+    color: var(--muted);
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+  }
+
+  .offspring-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.4rem;
+    grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+  }
+
+  .offspring-list button {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.5rem;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 0.45rem;
+    padding: 0.45rem 0.7rem;
+    font: inherit;
+    font-size: 0.88rem;
+    color: inherit;
+    cursor: pointer;
+    text-align: left;
+  }
+
+  .offspring-list button:hover { background: var(--surface-muted); }
+  .offspring-list .yr { font-size: 0.75rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+  section.block { display: flex; flex-direction: column; gap: 0.7rem; }
+  section.block h2 { font-size: var(--step-2); }
+
+  .stack { display: flex; flex-direction: column; gap: 2rem; }
+  .stack-sm { display: flex; flex-direction: column; gap: 0.9rem; }
+
+  .page { padding: 1.75rem 0 3rem; }
+
+  .empty {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 0.75rem;
+    padding: 2.5rem 1rem;
+    text-align: center;
+    color: var(--muted);
+  }
+
+  footer.site {
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 0.82rem;
+  }
+
+  footer.site .wrap { padding-top: 1.5rem; padding-bottom: 2rem; }
+
+  .hidden { display: none !important; }
+
+  /* --- Demo-Formular --- */
+  .demo-form { display: grid; gap: 0.75rem; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); }
+  .demo-form .full { grid-column: 1 / -1; }
+
+  details.demo > summary {
+    cursor: pointer;
+    font-weight: 600;
+    padding: 0.3rem 0;
+  }
+</style>
+
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <a class="brand" href="#/" id="brandLink">
+      Westernhengste <small>Vorschau</small>
+    </a>
+    <div class="searchbox">
+      <label class="label" for="q" style="position:absolute;left:-9999px;">Suche</label>
+      <input id="q" class="field" type="search" placeholder="Name oder Abstammung suchen, z. B. Doc Bar" autocomplete="off">
+    </div>
+  </div>
+</header>
+
+<main class="wrap page">
+  <!-- Übersicht -->
+  <div id="listView" class="stack">
+    <div class="stack-sm">
+      <h1 style="font-size:var(--step-4);line-height:1.1;">Westernhengste an einem Ort.</h1>
+      <p class="prose" style="color:var(--muted);font-size:var(--step-1);margin:0;">
+        Die grossen Vererber der Westernpferdezucht mit Abstammung über vier
+        Generationen. Bewusst ohne Decktaxen und ohne Verkauf – nur das Pferd
+        und seine Papiere.
+      </p>
+      <div class="notice" role="note">
+        <strong>Das hier ist die Ansichts-Version.</strong>
+        Sie zeigt den Startbestand und funktioniert ohne Installation. Was hier
+        fehlt: Hengste, die andere Leute dauerhaft eintragen, und die
+        Kontaktadressen der Besitzer. Dafür muss die richtige App auf einem
+        Server laufen – die liegt fertig im Projektordner.
+        <br>
+        <span style="opacity:0.85;">
+          Alle Angaben stammen aus allgemeiner Rassegeschichte und sind
+          <em>noch nicht gegen Zuchtbuchpapiere geprüft</em>.
+        </span>
+      </div>
+    </div>
+
+    <div class="stack-sm">
+      <div class="filters">
+        <div>
+          <label class="label" for="fDiscipline">Disziplin</label>
+          <select id="fDiscipline" class="field"><option value="">alle</option></select>
+        </div>
+        <div>
+          <label class="label" for="fBestand">Bestand</label>
+          <select id="fBestand" class="field">
+            <option value="">alle</option>
+            <option value="historic">nur historische Vererber</option>
+            <option value="current">nur aktuelle Hengste</option>
+          </select>
+        </div>
+        <div>
+          <label class="label" for="fSex">Geschlecht</label>
+          <select id="fSex" class="field">
+            <option value="">alle</option>
+            <option value="stallion">nur Hengste</option>
+            <option value="mare">nur Stuten</option>
+          </select>
+        </div>
+        <div>
+          <label class="label" for="fSort">Sortierung</label>
+          <select id="fSort" class="field">
+            <option value="name">Name A–Z</option>
+            <option value="year">Jahrgang, neueste zuerst</option>
+            <option value="yearAsc">Jahrgang, älteste zuerst</option>
+          </select>
+        </div>
+      </div>
+
+      <p class="resultline" id="resultLine"></p>
+      <div class="grid" id="cardGrid"></div>
+      <div class="empty hidden" id="emptyState">
+        Zu dieser Suche gibt es keinen Eintrag.
+      </div>
+    </div>
+
+    <details class="demo panel">
+      <summary>Selbst einen Hengst eintragen – ausprobieren</summary>
+      <p style="color:var(--muted);font-size:0.86rem;margin:0.6rem 0 1rem;">
+        So funktioniert das Eintragen in der richtigen App. Hier ist es nur zum
+        Ausprobieren: <strong>der Eintrag bleibt nur in diesem Fenster</strong> und
+        ist beim nächsten Öffnen wieder weg. Trag als Vater ruhig einen Hengst
+        ein, den es schon gibt – etwa <em>Doc Bar</em> oder <em>Metallic Cat</em> –
+        dann siehst du, wie sich der Stammbaum von selbst verbindet.
+      </p>
+      <form class="demo-form" id="demoForm">
+        <div>
+          <label class="label" for="dName">Name</label>
+          <input id="dName" class="field" required maxlength="80" placeholder="z. B. Mein Hengst">
+        </div>
+        <div>
+          <label class="label" for="dYear">Geburtsjahr</label>
+          <input id="dYear" class="field" type="number" min="1850" max="2027" placeholder="2015">
+        </div>
+        <div>
+          <label class="label" for="dColor">Farbe</label>
+          <input id="dColor" class="field" maxlength="60" placeholder="Buckskin">
+        </div>
+        <div>
+          <label class="label" for="dSire">Vater</label>
+          <input id="dSire" class="field" maxlength="80" placeholder="Doc Bar">
+        </div>
+        <div>
+          <label class="label" for="dDam">Mutter</label>
+          <input id="dDam" class="field" maxlength="80" placeholder="Poco Lena">
+        </div>
+        <div>
+          <label class="label" for="dDisc">Disziplin</label>
+          <input id="dDisc" class="field" maxlength="40" placeholder="Reining">
+        </div>
+        <div class="full">
+          <button class="btn btn-primary" type="submit">Zum Verzeichnis hinzufügen</button>
+        </div>
+      </form>
+    </details>
+  </div>
+
+  <!-- Einzelnes Pferd -->
+  <div id="detailView" class="stack hidden"></div>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    Ansichts-Version des Projekts „Westernhengste“. Alle Angaben ohne Gewähr und
+    noch nicht gegen Zuchtbuchpapiere geprüft.
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  /* Startbestand - wird beim Bauen aus der Datenbank eingesetzt. */
+  var SEED = /*DATEN*/[]/*DATEN*/;
+
+  var GENERATIONS = 4;
+  var ROWS = Math.pow(2, GENERATIONS);
+
+  var SEX_LABEL = { stallion: "Hengst", mare: "Stute", gelding: "Wallach" };
+  var AVAILABILITY_LABEL = {
+    unknown: null,
+    frozen: "Gefriersamen",
+    fresh: "Frischsamen",
+    both: "Frisch- und Gefriersamen",
+    live_cover: "Natursprung",
+    none: "Steht nicht zur Verfügung"
+  };
+  var COUNTRY = {
+    DE: "Deutschland", AT: "Österreich", CH: "Schweiz", US: "USA",
+    CA: "Kanada", MX: "Mexiko", NL: "Niederlande", IT: "Italien",
+    FR: "Frankreich", BE: "Belgien", DK: "Dänemark", SE: "Schweden",
+    GB: "Grossbritannien", AU: "Australien", BR: "Brasilien"
+  };
+
+  /* Vom Besucher hinzugefügte Pferde - nur für diese Sitzung. */
+  var added = [];
+  var nextId = -1;
+
+  function horses() { return SEED.concat(added); }
+
+  function esc(value) {
+    return String(value == null ? "" : value)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+  }
+
+  /* Namensvergleich wie in der App: Apostrophe und Zeichensetzung ignorieren,
+     damit "Doc O'Lena" und "Doc OLena" dasselbe Pferd sind. */
+  function normalizeName(value) {
+    return String(value || "")
+      .normalize("NFD")
+      .replace(/[̀-ͯ]/g, "")
+      .toLowerCase()
+      .replace(/['‘’`´]/g, "")
+      .replace(/[^a-z0-9]+/g, " ")
+      .trim();
+  }
+
+  function byId(id) {
+    if (id == null) return null;
+    var list = horses();
+    for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i];
+    return null;
+  }
+
+  function bySlug(slug) {
+    var list = horses();
+    for (var i = 0; i < list.length; i++) if (list[i].slug === slug) return list[i];
+    return null;
+  }
+
+  function findByName(name, sex) {
+    var key = normalizeName(name);
+    if (!key) return null;
+    var list = horses();
+    for (var i = 0; i < list.length; i++) {
+      if (normalizeName(list[i].name) === key && (!sex || list[i].sex === sex)) return list[i];
+    }
+    return null;
+  }
+
+  /* --- Textbausteine --- */
+
+  function summaryLine(h) {
+    var years = h.born ? (h.died ? h.born + "–" + h.died : String(h.born)) : null;
+    return [SEX_LABEL[h.sex] || "", years, h.color, h.breed]
+      .filter(Boolean).join(" · ");
+  }
+
+  function pedigreeLine(h) {
+    if (!h.sireName && !h.damName) return null;
+    return (h.sireName || "unbekannt") + " x " + (h.damName || "unbekannt");
+  }
+
+  function allbreedUrl(name) {
+    return "https://www.allbreedpedigree.com/index.php?rk=0&hn=" +
+      encodeURIComponent(name) + "&h=&inbred=";
+  }
+
+  /* --- Abstammung ---
+     Vorfahren mit eigenem Datensatz werden weiter aufgeklappt, alle anderen
+     enden als reiner Name. Besuchte Kennungen verhindern Endlosschleifen. */
+
+  function buildPedigree(root) {
+    var visited = {};
+    visited[root.id] = true;
+
+    function node(h, depth) {
+      return {
+        name: h.name, slug: h.slug, born: h.born, color: h.color,
+        sire: depth > 0 ? child(h.sireId, h.sireName, depth - 1) : null,
+        dam: depth > 0 ? child(h.damId, h.damName, depth - 1) : null
+      };
+    }
+
+    function child(id, name, depth) {
+      if (id != null && !visited[id]) {
+        visited[id] = true;
+        var parent = byId(id);
+        if (parent) return node(parent, depth);
+      }
+      if (name && String(name).trim()) {
+        return { name: String(name).trim(), slug: null, born: null, color: null, sire: null, dam: null };
+      }
+      return null;
+    }
+
+    return node(root, GENERATIONS);
+  }
+
+  function pedigreeColumns(root) {
+    var columns = [];
+    var level = [root.sire || null, root.dam || null];
+    for (var g = 0; g < GENERATIONS; g++) {
+      columns.push(level);
+      var next = [];
+      for (var i = 0; i < level.length; i++) {
+        next.push(level[i] ? level[i].sire || null : null);
+        next.push(level[i] ? level[i].dam || null : null);
+      }
+      level = next;
+    }
+    return columns;
+  }
+
+  function renderPedigree(root) {
+    var columns = pedigreeColumns(root);
+    var filled = 0, total = 0;
+    var cells = [];
+
+    for (var g = 0; g < columns.length; g++) {
+      var column = columns[g];
+      var span = ROWS / column.length;
+
+      for (var i = 0; i < column.length; i++) {
+        total++;
+        var node = column[i];
+        var style = "grid-column:" + (g + 1) + ";grid-row:" + (i * span + 1) + " / span " + span + ";";
+
+        if (!node) {
+          cells.push('<div class="ped-cell ped-empty" style="' + style + '" aria-label="Vorfahr nicht erfasst">—</div>');
+          continue;
+        }
+
+        filled++;
+        var side = i % 2 === 0 ? "sire-side" : "dam-side";
+        var sub = [node.born, node.color].filter(Boolean).join(" · ");
+        var inner = '<span class="ped-name">' + esc(node.name) + "</span>" +
+          (sub ? '<span class="ped-sub">' + esc(sub) + "</span>" : "");
+
+        if (node.slug) {
+          cells.push('<button type="button" class="ped-cell linked ' + side +
+            '" style="' + style + '" data-slug="' + esc(node.slug) +
+            '" title="' + esc(node.name) + ' – Datenblatt öffnen">' + inner + "</button>");
+        } else {
+          cells.push('<div class="ped-cell ' + side + '" style="' + style +
+            '" title="' + esc(node.name) + ' – noch kein eigener Datensatz">' + inner + "</div>");
+        }
+      }
+    }
+
+    return { html: '<div class="pedigree">' + cells.join("") + "</div>", filled: filled, total: total };
+  }
+
+  /* --- Übersicht --- */
+
+  var els = {
+    q: document.getElementById("q"),
+    discipline: document.getElementById("fDiscipline"),
+    bestand: document.getElementById("fBestand"),
+    sex: document.getElementById("fSex"),
+    sort: document.getElementById("fSort"),
+    grid: document.getElementById("cardGrid"),
+    empty: document.getElementById("emptyState"),
+    result: document.getElementById("resultLine"),
+    listView: document.getElementById("listView"),
+    detailView: document.getElementById("detailView")
+  };
+
+  function fillDisciplines() {
+    var seen = {};
+    horses().forEach(function (h) {
+      (h.disciplines || []).forEach(function (d) { seen[d] = true; });
+    });
+    var names = Object.keys(seen).sort(function (a, b) { return a.localeCompare(b, "de"); });
+    var current = els.discipline.value;
+    els.discipline.innerHTML = '<option value="">alle</option>' +
+      names.map(function (d) { return '<option value="' + esc(d) + '">' + esc(d) + "</option>"; }).join("");
+    els.discipline.value = current;
+  }
+
+  function matches(h) {
+    var term = normalizeName(els.q.value);
+    if (term) {
+      var haystack = [h.name, h.aka, h.sireName, h.damName].map(normalizeName).join(" ");
+      if (haystack.indexOf(term) === -1) return false;
+    }
+    if (els.discipline.value && (h.disciplines || []).indexOf(els.discipline.value) === -1) return false;
+    if (els.bestand.value === "historic" && !h.historic) return false;
+    if (els.bestand.value === "current" && h.historic) return false;
+    if (els.sex.value && h.sex !== els.sex.value) return false;
+    return true;
+  }
+
+  function sortHorses(list) {
+    var mode = els.sort.value;
+    return list.slice().sort(function (a, b) {
+      if (mode === "year" || mode === "yearAsc") {
+        var av = a.born == null ? Infinity : a.born;
+        var bv = b.born == null ? Infinity : b.born;
+        if (av !== bv) return mode === "year" ? bv - av : av - bv;
+      }
+      return a.name.localeCompare(b.name, "de");
+    });
+  }
+
+  function cardHtml(h) {
+    var breeding = pedigreeLine(h);
+    var chips = (h.disciplines || []).slice(0, 3).map(function (d) {
+      return '<span class="chip">' + esc(d) + "</span>";
+    });
+    if (h.country) chips.push('<span class="chip">' + esc(COUNTRY[h.country] || h.country) + "</span>");
+    if (h.isNew) chips.unshift('<span class="chip chip-accent">dein Eintrag</span>');
+
+    return '<button type="button" class="card" data-slug="' + esc(h.slug) + '">' +
+      '<div class="card-head"><h3>' + esc(h.name) +
+      (h.aka ? ' <span class="aka">„' + esc(h.aka) + '“</span>' : "") + "</h3>" +
+      (h.historic ? '<span class="chip">historisch</span>' : "") + "</div>" +
+      '<p class="meta" style="margin:0;">' + esc(summaryLine(h)) + "</p>" +
+      (breeding ? '<p class="breeding" style="margin:0;">' + esc(breeding) + "</p>" : "") +
+      '<div class="chips">' + chips.join("") + "</div>" +
+      "</button>";
+  }
+
+  /* Der zuletzt gezeichnete Filterstand. Solange er sich nicht ändert, bleibt
+     das Raster unangetastet - würde es unnötig neu aufgebaut, verschwänden die
+     Karten mitten im Klick und der Klick ginge verloren. */
+  var lastSignature = null;
+
+  function filterSignature() {
+    return JSON.stringify([
+      els.q.value, els.discipline.value, els.bestand.value,
+      els.sex.value, els.sort.value, added.length
+    ]);
+  }
+
+  function renderList(force) {
+    var signature = filterSignature();
+    if (!force && signature === lastSignature) return;
+    lastSignature = signature;
+
+    var list = sortHorses(horses().filter(matches));
+    els.grid.innerHTML = list.map(cardHtml).join("");
+    els.empty.classList.toggle("hidden", list.length > 0);
+    els.result.textContent = list.length === 1 ? "1 Treffer" : list.length + " Treffer";
+  }
+
+  /* --- Detailansicht --- */
+
+  function renderDetail(h) {
+    var ped = renderPedigree(buildPedigree(h));
+
+    var offspring = horses().filter(function (o) {
+      return o.sireId === h.id || o.damId === h.id;
+    }).sort(function (a, b) {
+      return (a.born || 9999) - (b.born || 9999) || a.name.localeCompare(b.name, "de");
+    });
+
+    var facts = [
+      ["Geschlecht", SEX_LABEL[h.sex]],
+      ["Rasse", h.breed],
+      ["Papiernummer", h.reg],
+      ["Jahrgang", h.born ? (h.died ? h.born + " – " + h.died : String(h.born)) : null],
+      ["Farbe", h.color],
+      ["Land", h.country ? (COUNTRY[h.country] || h.country) : null],
+      ["Verfügbarkeit", AVAILABILITY_LABEL[h.availability] || null]
+    ].filter(function (row) { return row[1]; });
+
+    function parentLink(id, name) {
+      if (!name) return "unbekannt";
+      var parent = byId(id);
+      if (!parent) return esc(name);
+      return '<a href="#/hengst/' + esc(parent.slug) + '">' + esc(name) + "</a>";
+    }
+
+    var html =
+      '<div><button type="button" class="backlink" data-back="1">← zurück zur Übersicht</button></div>' +
+      '<div class="stack-sm">' +
+        '<div class="detail-head"><h1>' + esc(h.name) + "</h1>" +
+          (h.historic ? '<span class="chip">historisch</span>' : "") +
+          '<span class="chip">ungeprüft</span>' +
+          (h.isNew ? '<span class="chip chip-accent">dein Eintrag</span>' : "") +
+        "</div>" +
+        (h.aka ? '<p class="meta" style="margin:0;">genannt „' + esc(h.aka) + '“</p>' : "") +
+        '<p class="meta" style="margin:0;">' + esc(summaryLine(h)) + "</p>" +
+        (pedigreeLine(h)
+          ? '<p class="parents" style="margin:0;">' + parentLink(h.sireId, h.sireName) +
+            ' <span style="color:var(--muted);">x</span> ' + parentLink(h.damId, h.damName) + "</p>"
+          : "") +
+      "</div>" +
+
+      '<div class="notice">' +
+        "<strong>Angaben noch nicht geprüft.</strong> Sie stammen aus allgemein " +
+        "zugänglicher Rassegeschichte und wurden nicht gegen Zuchtbuchpapiere " +
+        "abgeglichen." +
+      "</div>" +
+
+      '<div class="cols"><div class="stack">' +
+
+        (h.description
+          ? '<section class="block"><h2>Zum Pferd</h2><div class="prose"><p>' +
+            esc(h.description) + "</p></div></section>"
+          : "") +
+
+        '<section class="block">' +
+          '<div style="display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:0.6rem;">' +
+            "<h2>Abstammung</h2>" +
+            '<a href="' + esc(allbreedUrl(h.name)) + '" target="_blank" rel="noopener noreferrer nofollow" style="font-size:0.85rem;">' +
+              "bei All Breed Pedigree ansehen ↗</a>" +
+          "</div>" +
+          '<p class="meta" style="margin:0;">' + ped.filled + " von " + ped.total +
+            " Ahnenplätzen über " + GENERATIONS + " Generationen erfasst. " +
+            "Vorfahren mit eigenem Eintrag lassen sich anklicken.</p>" +
+          (ped.filled === 0
+            ? '<div class="empty">Zu diesem Pferd ist noch keine Abstammung hinterlegt.</div>'
+            : '<div class="pedigree-scroll">' + ped.html + "</div>") +
+          (h.note ? '<p class="meta" style="margin:0;">' + esc(h.note) + "</p>" : "") +
+        "</section>" +
+
+        (offspring.length
+          ? '<section class="block"><h2>Nachkommen im Verzeichnis</h2>' +
+            '<p class="meta" style="margin:0;">' + offspring.length +
+            (offspring.length === 1 ? " Eintrag verweist" : " Einträge verweisen") +
+            " auf " + esc(h.name) + " als Elternteil.</p>" +
+            '<ul class="offspring-list">' + offspring.map(function (o) {
+              return '<li><button type="button" data-slug="' + esc(o.slug) + '">' +
+                "<span>" + esc(o.name) + '</span><span class="yr">' +
+                esc(o.born || "") + "</span></button></li>";
+            }).join("") + "</ul></section>"
+          : "") +
+
+      "</div>" +
+
+      '<aside class="stack-sm">' +
+        (facts.length
+          ? '<div class="panel"><h2 style="font-size:var(--step-1);margin-bottom:0.7rem;">Steckbrief</h2>' +
+            '<dl class="facts">' + facts.map(function (row) {
+              return "<div><dt>" + esc(row[0]) + "</dt><dd>" + esc(row[1]) + "</dd></div>";
+            }).join("") + "</dl></div>"
+          : "") +
+        ((h.disciplines || []).length
+          ? '<div class="panel"><h2 style="font-size:var(--step-1);margin-bottom:0.7rem;">Disziplinen</h2>' +
+            '<div class="chips" style="padding-top:0;">' + h.disciplines.map(function (d) {
+              return '<span class="chip">' + esc(d) + "</span>";
+            }).join("") + "</div></div>"
+          : "") +
+        '<div class="panel"><h2 style="font-size:var(--step-1);margin-bottom:0.5rem;">Kontakt</h2>' +
+          '<p class="meta" style="margin:0;">' +
+          (h.historic
+            ? "Historischer Eintrag – es gibt keinen Ansprechpartner."
+            : "Kontaktadressen der Besitzer gibt es nur in der Online-Version.") +
+          "</p></div>" +
+      "</aside></div>";
+
+    els.detailView.innerHTML = html;
+  }
+
+  /* --- Navigation über die Adresszeile --- */
+
+  function route() {
+    var hash = window.location.hash || "#/";
+    var match = hash.match(/^#\/hengst\/(.+)$/);
+
+    if (match) {
+      var horse = bySlug(decodeURIComponent(match[1]));
+      if (horse) {
+        renderDetail(horse);
+        els.listView.classList.add("hidden");
+        els.detailView.classList.remove("hidden");
+        window.scrollTo({ top: 0, behavior: "auto" });
+        return;
+      }
+    }
+
+    els.detailView.classList.add("hidden");
+    els.listView.classList.remove("hidden");
+    renderList(true);
+  }
+
+  function open(slug) { window.location.hash = "#/hengst/" + encodeURIComponent(slug); }
+
+  /* --- Ereignisse --- */
+
+  document.addEventListener("click", function (event) {
+    var back = event.target.closest("[data-back]");
+    if (back) {
+      // Immer zur Übersicht - so steht es auf dem Knopf. Der Verlauf würde
+      // stattdessen zum zuletzt angesehenen Pferd zurückspringen.
+      window.location.hash = "#/";
+      return;
+    }
+    var target = event.target.closest("[data-slug]");
+    if (target) open(target.getAttribute("data-slug"));
+  });
+
+  function onFilterChange() {
+    if (!els.listView.classList.contains("hidden")) renderList();
+  }
+
+  // Das Suchfeld reagiert auf "input" (jeder Tastendruck). Bewusst NICHT auf
+  // "change": das feuert beim Verlassen des Feldes - also genau dann, wenn
+  // jemand eine Karte anklickt.
+  els.q.addEventListener("input", onFilterChange);
+  [els.discipline, els.bestand, els.sex, els.sort].forEach(function (el) {
+    el.addEventListener("change", onFilterChange);
+  });
+
+  window.addEventListener("hashchange", route);
+
+  /* --- Demo-Eintrag --- */
+
+  document.getElementById("demoForm").addEventListener("submit", function (event) {
+    event.preventDefault();
+
+    var name = document.getElementById("dName").value.trim();
+    if (name.length < 2) return;
+
+    var sireName = document.getElementById("dSire").value.trim();
+    var damName = document.getElementById("dDam").value.trim();
+    var discipline = document.getElementById("dDisc").value.trim();
+    var year = parseInt(document.getElementById("dYear").value, 10);
+
+    var sire = sireName ? findByName(sireName, "stallion") : null;
+    var dam = damName ? findByName(damName, "mare") : null;
+
+    var slugBase = normalizeName(name).replace(/\s+/g, "-") || "pferd";
+    var slug = slugBase;
+    for (var n = 2; bySlug(slug); n++) slug = slugBase + "-" + n;
+
+    added.push({
+      id: nextId--, slug: slug, name: name, aka: null, sex: "stallion",
+      breed: "Quarter Horse", reg: null,
+      born: isNaN(year) ? null : year, died: null,
+      color: document.getElementById("dColor").value.trim() || null,
+      country: null, disciplines: discipline ? [discipline] : [],
+      description: null, note: null,
+      sireName: sireName || null, damName: damName || null,
+      sireId: sire ? sire.id : null, damId: dam ? dam.id : null,
+      availability: "unknown", historic: false, isNew: true
+    });
+
+    this.reset();
+    fillDisciplines();
+    renderList(true);
+    open(slug);
+  });
+
+  /* --- Start --- */
+
+  fillDisciplines();
+  route();
+})();
+</script>
