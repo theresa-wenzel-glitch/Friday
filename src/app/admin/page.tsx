@@ -48,11 +48,16 @@ export default async function AdminPage() {
     <div className="mx-auto w-full max-w-5xl px-4 py-10">
       <div className="flex flex-wrap items-baseline justify-between gap-4 mb-8">
         <h1 className="text-3xl">Moderation</h1>
-        <form action={logoutAction}>
-          <button type="submit" className="btn btn-secondary">
-            Abmelden
-          </button>
-        </form>
+        <div className="flex flex-wrap gap-2">
+          <Link href="/admin/abstammung" className="btn btn-secondary no-underline">
+            Abstammungen eintragen
+          </Link>
+          <form action={logoutAction}>
+            <button type="submit" className="btn btn-secondary">
+              Abmelden
+            </button>
+          </form>
+        </div>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-4 mb-10">

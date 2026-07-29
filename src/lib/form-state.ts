@@ -38,3 +38,21 @@ export interface LoginState {
 }
 
 export const EMPTY_LOGIN_STATE: LoginState = {};
+
+export interface ImportAction {
+  name: string;
+  kind: "create" | "update" | "unchanged";
+  sex: "stallion" | "mare" | "gelding";
+  detail: string;
+}
+
+export interface ImportState {
+  status: "idle" | "preview" | "done";
+  text: string;
+  errors?: string[];
+  actions?: ImportAction[];
+  counts?: { create: number; update: number; unchanged: number };
+  message?: string;
+}
+
+export const EMPTY_IMPORT_STATE: ImportState = { status: "idle", text: "" };

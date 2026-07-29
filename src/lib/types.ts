@@ -1,6 +1,6 @@
 export type Sex = "stallion" | "mare" | "gelding";
 export type HorseStatus = "pending" | "approved" | "rejected";
-export type HorseSource = "seed" | "community";
+export type HorseSource = "seed" | "community" | "import";
 
 /** Verfügbarkeit von Samen bzw. Natursprung - reine Sachinformation, bewusst OHNE Preise. */
 export type Availability =

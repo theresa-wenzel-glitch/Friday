@@ -114,6 +114,25 @@ eigene Einträge anlegt – die Verknüpfung über den Namen passiert von selbst
 rückwirkend für alle Nachkommen. Geraten wird dabei nichts: lieber ein leeres
 Feld als eine erfundene Abstammung, die still in jeden Nachkommen wandert.
 
+### Abstammungen stapelweise nachtragen
+
+Unter `/admin/abstammung` lassen sich mehrere Pferde auf einmal eintragen –
+gedacht für den Fall, dass eine Abstammung vorliegt (Zuchtbuchpapier,
+allbreedpedigree.com, Katalog) und nicht jedes Pferd einzeln über das Formular
+angelegt werden soll. Je Zeile ein Pferd:
+
+```
+Colonels Smoking Gun | Colonelfourfreckle | Katie Gun | 1993
+Colonelfourfreckle   | Colonel Freckles   | Miss Solano
+Katie Gun            | John Gun           | Bueno Katie | 1987
+```
+
+Ein Bindestrich heisst „unbekannt“ – dort wird nichts eingetragen. Genannte
+Vorfahren werden gleich mit angelegt, damit der Stammbaum weiterwächst; ob
+Hengst oder Stute, ergibt sich aus der Spalte bzw. aus dem vorhandenen
+Bestand. **Vorhandene Angaben werden nur ergänzt, nie überschrieben**, und eine
+Vorschau zeigt vorher genau, was passieren würde.
+
 ### Startdaten erweitern
 
 Neue Pferde in `src/lib/seed-data.ts` eintragen und dann:
@@ -160,6 +179,18 @@ Screenshots zur Sichtprüfung (hell, dunkel, mobil):
 ```bash
 node scripts/screenshots.mjs
 ```
+
+Die weiteren Testläufe (Server muss laufen):
+
+```bash
+node scripts/e2e-import.mjs     # Abstammungen stapelweise eintragen
+node scripts/test-vorschau.mjs  # Ansichts-Version, direkt auf der Datei
+```
+
+`scripts/e2e-import.mjs` **schreibt in die Datenbank** – nur gegen eine
+Wegwerf-Datenbank laufen lassen. Die Testpferde heissen absichtlich
+„Pruefhengst Alpha“ und ähnlich, damit eine erfundene Abstammung nie
+versehentlich im echten Bestand landet.
 
 ## Online stellen
 
