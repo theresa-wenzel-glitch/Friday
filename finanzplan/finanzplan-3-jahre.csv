@@ -1,0 +1,38 @@
+Kategorie;Position;Einheit;Jahr 1;Jahr 2;Jahr 3;Anmerkung
+Annahme;Abo-ARPU (Plus/Pro gemischt);EUR/Monat;11,50;11,50;11,50;85% Plus / 15% Pro, 40% Jahresabo
+Annahme;Partnererloese je Zahler;EUR/Monat;0,50;1,20;2,00;waechst mit Nutzerdichte
+Annahme;Monatliche Abwanderung;%;7,0;7,0;6,5;kritischste Annahme
+Annahme;Free-Nutzer je Zahler;Anzahl;8,0;7,0;7,0;bestimmt KI-Kostenanteil
+Annahme;Blended CAC;EUR;22;28;30;steigt mit bezahltem Anteil
+Annahme;Cache-Trefferquote Modellaufrufe;%;60;60;65;senkt Eingabekosten
+Nutzer;Registrierte Nutzer (kumuliert, Jahresende);Anzahl;42000;165000;380000;
+Nutzer;Zahlende Abos (Jahresende);Anzahl;5000;22000;45000;
+Nutzer;Konversionsrate Free zu Bezahlt;%;11,9;13,3;11,8;
+Nutzer;ARR (Jahresende);TEUR;720;3300;7290;
+Umsatz;Abonnements B2C;TEUR;212;1720;3980;
+Umsatz;Partnervermittlung;TEUR;14;205;855;
+Umsatz;B2B / B2G-Lizenzen;TEUR;5;130;660;
+Umsatz;Marktplatz;TEUR;0;0;0;ab Jahr 3 optional, nicht eingeplant
+Umsatz;Gesamtumsatz;TEUR;231;2055;5495;
+COGS;KI-Modellkosten;TEUR;15;125;330;0,70 EUR je Zahler und Monat
+COGS;Zahlungsabwicklung;TEUR;19;158;420;Stripe + App-Store gemischt
+COGS;Infrastruktur (Hosting, Speicher, CDN);TEUR;4;26;70;
+COGS;Support;TEUR;6;52;135;
+COGS;Inhalte und Kuratierung;TEUR;4;34;90;
+COGS;COGS gesamt;TEUR;48;395;1045;
+Ergebnis;Rohertrag;TEUR;183;1660;4450;
+Ergebnis;Rohmarge;%;79,2;80,8;81,0;
+Betriebskosten;Personal;TEUR;470;1350;2600;
+Betriebskosten;Marketing;TEUR;180;700;1300;
+Betriebskosten;Recht, Beratung, Buchhaltung;TEUR;45;80;140;
+Betriebskosten;Werkzeuge, Software, Buero;TEUR;45;130;280;
+Betriebskosten;Betriebskosten gesamt;TEUR;740;2260;4320;
+Ergebnis;EBITDA;TEUR;-557;-600;130;
+Ergebnis;Kumuliertes EBITDA;TEUR;-557;-1157;-1027;
+Team;Mitarbeitende (Jahresende, FTE);Anzahl;8;16;30;
+Kennzahl;LTV;EUR;136;136;146;
+Kennzahl;LTV zu CAC;Verhaeltnis;6,2;4,9;4,9;
+Kennzahl;Amortisationsdauer CAC;Monate;2,3;2,9;3,0;
+Finanzierung;Pre-Seed (Monat 0);TEUR;400;0;0;
+Finanzierung;Seed (Monat 14);TEUR;0;1800;0;
+Finanzierung;Kapitalbedarf kumuliert bis Break-even;TEUR;;;1250;zzgl. Puffer, Gesamtbedarf ca. 2200
