@@ -351,12 +351,11 @@
      Optik einer gedruckten Abstammung. */
   .pedigree-scroll { overflow-x: auto; padding-bottom: 0.4rem; }
 
+  /* Spalten- und Zeilenzahl kommen aus dem Skript - sie richten sich danach,
+     wie viele Generationen tatsächlich bekannt sind. */
   .pedigree {
     display: grid;
     gap: 0.35rem;
-    grid-template-columns: repeat(4, minmax(9.5rem, 1fr));
-    grid-template-rows: repeat(16, minmax(2.5rem, auto));
-    min-width: 40rem;
   }
 
   .ped-cell {
@@ -707,10 +706,10 @@
     return node(root, GENERATIONS);
   }
 
-  function pedigreeColumns(root) {
+  function pedigreeColumns(root, generations) {
     var columns = [];
     var level = [root.sire || null, root.dam || null];
-    for (var g = 0; g < GENERATIONS; g++) {
+    for (var g = 0; g < generations; g++) {
       columns.push(level);
       var next = [];
       for (var i = 0; i < level.length; i++) {
@@ -722,14 +721,34 @@
     return columns;
   }
 
+  /* Wie viele Generationen sind überhaupt belegt? Ein Raster mit vier Spalten
+     zu zeichnen, wenn nur Vater und Mutter bekannt sind, ergibt eine Wand aus
+     leeren Kästchen - besonders störend auf dem Handy. */
+  function usableGenerations(root) {
+    var columns = pedigreeColumns(root, GENERATIONS);
+    var deepest = 0;
+    for (var g = 0; g < columns.length; g++) {
+      for (var i = 0; i < columns[g].length; i++) {
+        if (columns[g][i]) { deepest = g + 1; break; }
+      }
+    }
+    return deepest;
+  }
+
   function renderPedigree(root) {
-    var columns = pedigreeColumns(root);
+    var generations = usableGenerations(root);
+    if (generations === 0) {
+      return { html: "", filled: 0, total: 0, generations: 0 };
+    }
+
+    var rows = Math.pow(2, generations);
+    var columns = pedigreeColumns(root, generations);
     var filled = 0, total = 0;
     var cells = [];
 
     for (var g = 0; g < columns.length; g++) {
       var column = columns[g];
-      var span = ROWS / column.length;
+      var span = rows / column.length;
 
       for (var i = 0; i < column.length; i++) {
         total++;
@@ -758,7 +777,17 @@
       }
     }
 
-    return { html: '<div class="pedigree">' + cells.join("") + "</div>", filled: filled, total: total };
+    // Schmalere Spalten, wenn der Baum tief ist - sonst passt auf dem Handy
+    // gar nichts mehr nebeneinander.
+    var colWidth = generations >= 3 ? "8.5rem" : "10.5rem";
+    var style = "grid-template-columns:repeat(" + generations + ",minmax(" + colWidth + ",1fr));" +
+      "grid-template-rows:repeat(" + rows + ",minmax(2.5rem,auto));" +
+      "min-width:" + (generations * parseFloat(colWidth)) + "rem;";
+
+    return {
+      html: '<div class="pedigree" style="' + style + '">' + cells.join("") + "</div>",
+      filled: filled, total: total, generations: generations
+    };
   }
 
   /* --- Übersicht --- */
@@ -854,6 +883,27 @@
     els.result.textContent = list.length === 1 ? "1 Treffer" : list.length + " Treffer";
   }
 
+  /* Sagt, wie weit die Abstammung wirklich reicht. Bei vielen historischen
+     Pferden sind nur Vater und Mutter überliefert - das soll dastehen, statt
+     eine Vollständigkeit von "2 von 30" zu suggerieren. */
+  function pedigreeCaption(ped) {
+    if (ped.filled === 0) return "Zu diesem Pferd ist noch keine Abstammung erfasst.";
+
+    var depth = ped.generations === 1
+      ? "Bekannt sind Vater und Mutter"
+      : "Bekannt bis zur " + ped.generations + ". Generation";
+
+    var counted = ped.filled === ped.total
+      ? " – vollständig"
+      : " – " + ped.filled + " von " + ped.total + " Plätzen";
+
+    var hint = ped.generations < GENERATIONS
+      ? " Weitere Vorfahren fehlen noch im Verzeichnis."
+      : " Vorfahren mit eigenem Eintrag lassen sich anklicken.";
+
+    return depth + counted + "." + hint;
+  }
+
   /* --- Detailansicht --- */
 
   function renderDetail(h) {
@@ -917,12 +967,12 @@
             '<a href="' + esc(allbreedUrl(h.name)) + '" target="_blank" rel="noopener noreferrer nofollow" style="font-size:0.85rem;">' +
               "bei All Breed Pedigree ansehen ↗</a>" +
           "</div>" +
-          '<p class="meta" style="margin:0;">' + ped.filled + " von " + ped.total +
-            " Ahnenplätzen über " + GENERATIONS + " Generationen erfasst. " +
-            "Vorfahren mit eigenem Eintrag lassen sich anklicken.</p>" +
+          '<p class="meta" style="margin:0;">' + esc(pedigreeCaption(ped)) + "</p>" +
           (ped.filled === 0
             ? '<div class="empty">Zu diesem Pferd ist noch keine Abstammung hinterlegt.</div>'
-            : '<div class="pedigree-scroll">' + ped.html + "</div>") +
+            : '<div class="pedigree-scroll">' + ped.html + "</div>" +
+              '<p class="meta swipe-hint hidden" style="margin:0;">' +
+              "Seitlich wischen für die weiteren Generationen →</p>") +
           (h.note ? '<p class="meta" style="margin:0;">' + esc(h.note) + "</p>" : "") +
         "</section>" +
 
@@ -962,6 +1012,14 @@
       "</aside></div>";
 
     els.detailView.innerHTML = html;
+
+    // Den Wisch-Hinweis nur zeigen, wenn das Raster wirklich breiter ist als
+    // der Platz - auf dem Rechner passt es meistens.
+    var scroller = els.detailView.querySelector(".pedigree-scroll");
+    var hint = els.detailView.querySelector(".swipe-hint");
+    if (scroller && hint && scroller.scrollWidth > scroller.clientWidth + 4) {
+      hint.classList.remove("hidden");
+    }
   }
 
   /* --- Navigation über die Adresszeile --- */

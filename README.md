@@ -52,6 +52,19 @@ Vorlage.
 Ohne gesetztes `ADMIN_PASSWORD` bleibt `/admin` gesperrt – der öffentliche Teil
 funktioniert trotzdem.
 
+## Ansichts-Version ohne Installation
+
+`vorschau/westernhengste.html` ist das Verzeichnis als einzelne Datei: zum
+Doppelklicken, ohne Node.js und ohne Server. Enthalten sind Suche, Filter,
+Detailansichten und Stammbäume – nicht enthalten sind die Kontaktdaten der
+Besitzer, die Datei kann also frei weitergegeben werden.
+
+Neu bauen, wenn sich der Bestand geändert hat:
+
+```bash
+npm run vorschau
+```
+
 ## Die Startdaten – bitte lesen
 
 Der Grundbestand steht in [`src/lib/seed-data.ts`](src/lib/seed-data.ts).
@@ -79,6 +92,20 @@ vorliegt.
 Der Bestand ist bei Quarter Horses am dichtesten. Paint Horses, Appaloosas und
 vor allem die in Europa stehenden Hengste fehlen weitgehend – genau die sollen
 über die Selbsteintragung dazukommen.
+
+### Die Stammbäume sind noch flach
+
+Erfasst ist bei jedem Pferd nur Vater und Mutter. Tiefer wird der Baum genau
+dort, wo die Grosseltern zufällig selbst im Bestand stehen. Deshalb reicht die
+Abstammung bei rund der Hälfte der Pferde nur eine Generation weit – bei
+Hollywood Dun It etwa, dessen Vater Hollywood Jac 86 (noch) niemand angelegt
+hat.
+
+Das ist kein Anzeigefehler, sondern eine Datenlücke. Sie schliesst sich, sobald
+jemand die fehlenden Vorfahren als eigene Einträge anlegt: die Verknüpfung über
+den Namen passiert dann von selbst, rückwirkend für alle Nachkommen. Wer das
+nachträgt, sollte die Abstammung vorher gegen Papiere oder
+allbreedpedigree.com prüfen – geraten wird hier nichts.
 
 ### Startdaten erweitern
 

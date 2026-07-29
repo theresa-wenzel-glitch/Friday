@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { PedigreeNode } from "@/lib/types";
-import { pedigreeColumns } from "@/lib/pedigree";
+import { pedigreeColumns, usableGenerations } from "@/lib/pedigree";
 
 /**
  * Klassisches Pedigree-Raster: je Generation eine Spalte, Vaterlinie oben.
@@ -10,22 +10,30 @@ import { pedigreeColumns } from "@/lib/pedigree";
  */
 export function PedigreeChart({
   root,
-  generations = 4,
+  generations: maxGenerations = 4,
 }: {
   root: PedigreeNode;
   generations?: number;
 }) {
+  // Nur so viele Spalten zeichnen, wie tatsächlich Vorfahren bekannt sind.
+  const generations = usableGenerations(root, maxGenerations);
+  if (generations === 0) return null;
+
   const columns = pedigreeColumns(root, generations);
   const rows = 2 ** generations;
+
+  // Schmalere Spalten bei tiefen Bäumen, damit auf dem Handy mehr als eine
+  // Generation nebeneinander passt.
+  const columnWidth = generations >= 3 ? 8.5 : 10.5;
 
   return (
     <div className="scroll-x -mx-4 px-4 pb-2">
       <div
         className="grid gap-1.5"
         style={{
-          gridTemplateColumns: `repeat(${generations}, minmax(9.5rem, 1fr))`,
+          gridTemplateColumns: `repeat(${generations}, minmax(${columnWidth}rem, 1fr))`,
           gridTemplateRows: `repeat(${rows}, minmax(2.6rem, auto))`,
-          minWidth: `${generations * 10}rem`,
+          minWidth: `${generations * columnWidth}rem`,
         }}
       >
         {columns.map((column, genIndex) => {

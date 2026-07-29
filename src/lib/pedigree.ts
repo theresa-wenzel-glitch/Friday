@@ -77,6 +77,24 @@ export function pedigreeColumns(
   return columns;
 }
 
+/**
+ * Wie viele Generationen sind überhaupt belegt?
+ *
+ * Bei vielen historischen Pferden sind nur Vater und Mutter überliefert. Ein
+ * Raster über vier Generationen zu zeichnen ergäbe dann eine Wand aus leeren
+ * Kästchen - auf dem Handy füllt die den halben Bildschirm.
+ */
+export function usableGenerations(root: PedigreeNode, max: number): number {
+  const columns = pedigreeColumns(root, max);
+  let deepest = 0;
+
+  for (let gen = 0; gen < columns.length; gen++) {
+    if (columns[gen].some(Boolean)) deepest = gen + 1;
+  }
+
+  return deepest;
+}
+
 /** Zählt, wie viele Vorfahren-Plätze tatsächlich gefüllt sind. */
 export function pedigreeCompleteness(
   root: PedigreeNode,

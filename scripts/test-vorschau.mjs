@@ -61,7 +61,10 @@ try {
     "Stammbaum reicht vier Generationen tief",
     detail.includes("Doc Bar") && detail.includes("Lightning Bar") && detail.includes("Three Bars"),
   );
-  check("Ahnenzähler wird angezeigt", /\d+ von 30 Ahnenplätzen/.test(detail));
+  check(
+    "Tiefenangabe stimmt",
+    /Bekannt bis zur 4\. Generation – 18 von 30 Plätzen/.test(detail),
+  );
   check("Nachkommen werden gelistet", detail.includes("Smart Chic Olena"));
 
   const cells = await page.locator(".ped-cell").count();
@@ -123,6 +126,66 @@ try {
     () => document.documentElement.scrollWidth > window.innerWidth + 1,
   );
   check("Am Handy kein seitliches Scrollen der Seite", !overflow);
+
+  /* Dünne Abstammungen: genau der Fall, der auf dem Handy als
+     "kaum vorhanden" auffiel. Das Raster darf dann nicht 28 leere
+     Kästchen zeigen. */
+  await page.setViewportSize({ width: 390, height: 844 });
+
+  await page.goto(FILE + "#/hengst/hollywood-dun-it");
+  await page.waitForTimeout(400);
+  const duenn = await page.locator(".ped-cell").count();
+  const duennLeer = await page.locator(".ped-cell.ped-empty").count();
+  check(
+    "Nur Vater und Mutter bekannt: genau zwei Felder, keine leeren",
+    duenn === 2 && duennLeer === 0,
+    `${duenn} Felder, davon ${duennLeer} leer`,
+  );
+  check(
+    "Beschriftung nennt die tatsächliche Tiefe",
+    (await page.textContent("#detailView")).includes("Bekannt sind Vater und Mutter"),
+  );
+
+  await page.goto(FILE + "#/hengst/traveler");
+  await page.waitForTimeout(400);
+  check(
+    "Ohne Abstammung wird kein leeres Raster gezeichnet",
+    (await page.locator(".ped-cell").count()) === 0 &&
+      (await page.textContent("#detailView")).includes("noch keine Abstammung"),
+  );
+
+  /* Kein Pferd darf ein Raster mit überwiegend leeren Feldern in einer
+     komplett leeren letzten Spalte zeigen. */
+  const slugs = await page.evaluate(() =>
+    Array.from(document.querySelectorAll(".card")).map((c) => c.dataset.slug),
+  );
+  await page.goto(FILE);
+  await page.waitForTimeout(300);
+  const alle = await page.evaluate(() =>
+    Array.from(document.querySelectorAll(".card")).map((c) => c.dataset.slug),
+  );
+  let leereSpalte = [];
+  for (const slug of alle) {
+    await page.goto(FILE + "#/hengst/" + slug);
+    await page.waitForTimeout(60);
+    const letzteSpalteLeer = await page.evaluate(() => {
+      const grid = document.querySelector(".pedigree");
+      if (!grid) return false;
+      const spalten = Number(
+        (grid.style.gridTemplateColumns.match(/repeat\((\d+)/) || [])[1] || 0,
+      );
+      const inLetzter = Array.from(grid.children).filter(
+        (el) => Number(el.style.gridColumn) === spalten,
+      );
+      return inLetzter.length > 0 && inLetzter.every((el) => el.classList.contains("ped-empty"));
+    });
+    if (letzteSpalteLeer) leereSpalte.push(slug);
+  }
+  check(
+    "Keine komplett leere letzte Generation",
+    leereSpalte.length === 0,
+    leereSpalte.join(", "),
+  );
 
   check("Keine Skriptfehler im gesamten Ablauf", errors.length === 0, errors.join(" | "));
 } finally {

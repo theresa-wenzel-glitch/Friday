@@ -2,7 +2,11 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getHorseById, getHorseBySlug, getOffspring, hasContact } from "@/lib/db";
-import { buildPedigree, pedigreeCompleteness } from "@/lib/pedigree";
+import {
+  buildPedigree,
+  pedigreeCompleteness,
+  usableGenerations,
+} from "@/lib/pedigree";
 import { PedigreeChart } from "@/components/PedigreeChart";
 import { ContactReveal } from "@/components/ContactReveal";
 import { CorrectionForm } from "@/components/CorrectionForm";
@@ -46,7 +50,8 @@ export default async function HorsePage({
   if (!horse || horse.status !== "approved") notFound();
 
   const pedigree = buildPedigree(horse, GENERATIONS);
-  const { filled, total } = pedigreeCompleteness(pedigree, GENERATIONS);
+  const shownGenerations = usableGenerations(pedigree, GENERATIONS);
+  const { filled, total } = pedigreeCompleteness(pedigree, shownGenerations);
   const offspring = getOffspring(horse.id);
   const geneticEntries = GENETIC_TESTS.filter((t) => horse.genetics[t]);
 
@@ -76,6 +81,30 @@ export default async function HorsePage({
   ];
 
   const visibleFacts = facts.filter(([, value]) => value);
+
+  /**
+   * Sagt, wie weit die Abstammung wirklich reicht. Bei vielen historischen
+   * Pferden sind nur Vater und Mutter überliefert - das gehört so dagestanden,
+   * statt mit "2 von 30" eine Lücke zu suggerieren, die keine ist.
+   */
+  function pedigreeCaption(): string {
+    if (filled === 0) return "Zu diesem Pferd ist noch keine Abstammung erfasst.";
+
+    const depth =
+      shownGenerations === 1
+        ? "Bekannt sind Vater und Mutter"
+        : `Bekannt bis zur ${shownGenerations}. Generation`;
+
+    const counted =
+      filled === total ? " – vollständig" : ` – ${filled} von ${total} Plätzen`;
+
+    const hint =
+      shownGenerations < GENERATIONS
+        ? " Fehlende Vorfahren dürfen gern nachgetragen werden."
+        : " Angeklickt werden können alle Vorfahren, die selbst einen Eintrag haben.";
+
+    return depth + counted + "." + hint;
+  }
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-10">
@@ -172,11 +201,7 @@ export default async function HorsePage({
                 bei All Breed Pedigree ansehen ↗
               </a>
             </div>
-            <p className="text-sm muted mb-4">
-              {filled} von {total} Ahnenplätzen über {GENERATIONS} Generationen
-              erfasst. Angeklickt werden können alle Vorfahren, die selbst einen
-              Eintrag haben.
-            </p>
+            <p className="text-sm muted mb-4">{pedigreeCaption()}</p>
 
             {filled === 0 ? (
               <div className="surface rounded-xl p-6 text-sm muted">
