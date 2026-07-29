@@ -267,6 +267,8 @@ export const SEED_HORSES: SeedHorse[] = [
     damName: "Miss Taylor",
     description:
       "Erfolgreicher Cuttinghengst und einer der teuersten Quarter Horses seiner Zeit. Seine Töchter erwiesen sich als aussergewöhnliche Zuchtstuten - die Kombination Poco-Bueno-Stute x Doc Bar gilt als eine der wirkungsvollsten Anpaarungen der Rassegeschichte.",
+    bloodlineNote:
+      "Auf ihn wird die Erbkrankheit HERDA zurückgeführt. In dieser Linie gehört der HERDA-Status in jeden Eintrag.",
     isHistoric: true,
   },
   {
@@ -658,7 +660,7 @@ export const SEED_HORSES: SeedHorse[] = [
     sireName: "Spooks Gotta Gun",
     damName: "Prettywhizprettydoes",
     description:
-      "Erfolgreicher Reininghengst und Vererber der jüngeren Generation, der die Gunner- und die Whiz-Linie in sich vereint.",
+      "Erfolgreicher Reininghengst und Vererber der jüngeren Generation. Sein Vater Spooks Gotta Gun ist ein Halbbruder von Colonels Smoking Gun über die gemeinsame Mutter Katie Gun; über seine eigene Mutter kommt die Whiz-Linie dazu.",
     availability: "frozen",
   },
 
@@ -706,4 +708,405 @@ export const SEED_HORSES: SeedHorse[] = [
       "Ursprung der HYPP-Mutation. Bei allen Nachkommen bitte den HYPP-Status angeben.",
     isHistoric: true,
   },
+
+  /* ---------------------------------------------------------------- */
+  /* Vorfahren - im Juli 2026 per Websuche recherchiert                */
+  /*                                                                   */
+  /* Diese Einträge dienen vor allem der Abstammung: erst durch sie    */
+  /* reichen die Stammbäume der oben stehenden Pferde über die erste   */
+  /* Generation hinaus.                                                */
+  /*                                                                   */
+  /* Quellen waren Wikipedia, AQHA, Quarter Horse News, Western        */
+  /* Horseman, StallionCompare und rimondo. allbreedpedigree.com sperrt*/
+  /* automatisierte Zugriffe (HTTP 403) und konnte NICHT herangezogen  */
+  /* werden - bitte gegen die Papiere gegenprüfen, bevor ein Eintrag   */
+  /* als geprüft markiert wird. Wo eine Angabe unklar blieb, steht     */
+  /* weiterhin nichts.                                                 */
+  /* ---------------------------------------------------------------- */
+
+  /* --- Hollywood-Linie: schliesst Hollywood Dun It an King an ------ */
+  {
+    name: "Hollywood Jac 86",
+    yearOfBirth: 1967,
+    color: "Palomino",
+    country: "US",
+    disciplines: ["Reining"],
+    sireName: "Easter King",
+    damName: "Miss Hollywood",
+    description:
+      "Vater von Hollywood Dun It. Über seinen Vater Easter King führt die Linie zurück auf King P-234, über seine Mutter auf den Cuttingvererber Hollywood Gold.",
+    isHistoric: true,
+  },
+  {
+    name: "Easter King",
+    yearOfBirth: 1951,
+    country: "US",
+    sireName: "King",
+    description: "Sohn des King P-234 und Vater von Hollywood Jac 86.",
+    isHistoric: true,
+  },
+  {
+    name: "Miss Hollywood",
+    sex: "mare",
+    yearOfBirth: 1947,
+    country: "US",
+    sireName: "Hollywood Gold",
+    isHistoric: true,
+  },
+  {
+    name: "Hollywood Gold",
+    country: "US",
+    disciplines: ["Cutting"],
+    description:
+      "In den 1950er und 60er Jahren einer der wichtigsten Cuttingvererber.",
+    isHistoric: true,
+  },
+  {
+    name: "Blossom Berry",
+    sex: "mare",
+    country: "US",
+    disciplines: ["Reining"],
+    sireName: "Dun Berry",
+    damName: "Regina Bella",
+    description: "Mutter von Hollywood Dun It.",
+    isHistoric: true,
+  },
+
+  /* --- Pleasure: hängt Zippo Pine Bar an Three Bars und Leo -------- */
+  {
+    name: "Zippo Pat Bars",
+    yearOfBirth: 1964,
+    color: "Fuchs",
+    country: "US",
+    disciplines: ["Foundation / Zucht"],
+    sireName: "Three Bars",
+    damName: "Leo Pat",
+    description:
+      "Vater von Zippo Pine Bar. Verbindet das Three-Bars-Blut mit der Leo-Linie.",
+    isHistoric: true,
+  },
+  {
+    name: "Leo Pat",
+    sex: "mare",
+    country: "US",
+    sireName: "Leo",
+    isHistoric: true,
+  },
+
+  /* --- Reining: hängt Topsail Whiz an Doc Bar --------------------- */
+  {
+    name: "Topsail Cody",
+    yearOfBirth: 1977,
+    country: "US",
+    disciplines: ["Reining"],
+    sireName: "Joe Cody",
+    damName: "Doc Bar Linda",
+    description:
+      "NRHA-Futurity-Sieger 1980 und einer der ersten Millionen-Dollar-Vererber der NRHA. Vater von Topsail Whiz.",
+    isHistoric: true,
+  },
+  {
+    name: "Joe Cody",
+    country: "US",
+    isHistoric: true,
+  },
+  {
+    name: "Doc Bar Linda",
+    sex: "mare",
+    country: "US",
+    sireName: "Doc Bar",
+    isHistoric: true,
+  },
+  {
+    name: "Nu Chex To Cash",
+    yearOfBirth: 1990,
+    color: "Palomino",
+    country: "US",
+    disciplines: ["Reining", "Reined Cow Horse"],
+    sireName: "Nu Cash",
+    damName: "Amarilla Chex",
+    description:
+      "Vater von Wimpys Little Step. Gewann als einziges Pferd im selben Jahr die AQHA-High-Point-Titel in Reining und Working Cow Horse.",
+    isHistoric: true,
+  },
+  {
+    name: "Nu Cash",
+    yearOfBirth: 1984,
+    country: "US",
+    isHistoric: true,
+  },
+  {
+    name: "Amarilla Chex",
+    sex: "mare",
+    country: "US",
+    sireName: "Bueno Chex",
+    isHistoric: true,
+  },
+  {
+    name: "Spooks Gotta Gun",
+    yearOfBirth: 2002,
+    country: "US",
+    disciplines: ["Reining"],
+    sireName: "Grays Starlight",
+    damName: "Katie Gun",
+    description:
+      "Vater von Spooks Gotta Whiz. Über seine Mutter Katie Gun ein Halbbruder von Colonels Smoking Gun - nicht dessen Sohn, was oft verwechselt wird.",
+    isHistoric: true,
+  },
+  {
+    name: "Grays Starlight",
+    yearOfBirth: 1984,
+    country: "US",
+    disciplines: ["Cutting"],
+    isHistoric: true,
+  },
+  {
+    name: "Katie Gun",
+    sex: "mare",
+    yearOfBirth: 1987,
+    country: "US",
+    description:
+      "Mutter zweier prägender Reininghengste: Colonels Smoking Gun und Spooks Gotta Gun.",
+    isHistoric: true,
+  },
+  {
+    name: "Prettywhizprettydoes",
+    sex: "mare",
+    country: "US",
+    sireName: "Topsail Whiz",
+    isHistoric: true,
+  },
+  {
+    name: "Diamonds Sparkle",
+    sex: "mare",
+    yearOfBirth: 1974,
+    color: "Palomino",
+    country: "US",
+    disciplines: ["Reining", "Allround"],
+    sireName: "Mr Diamond Dude",
+    damName: "Pollyanna Rose",
+    description:
+      "AQHA Superhorse 1979 und Mutter von Shining Spark. Gilt als eine der erfolgreichsten Zuchtstuten der Rasse.",
+    isHistoric: true,
+  },
+  {
+    name: "Mr Diamond Dude",
+    country: "US",
+    isHistoric: true,
+  },
+
+  /* --- Cutting: schliesst High Brow Cat an Smart Little Lena an ---- */
+  {
+    name: "Smart Little Kitty",
+    sex: "mare",
+    yearOfBirth: 1984,
+    country: "US",
+    disciplines: ["Cutting"],
+    sireName: "Smart Little Lena",
+    damName: "Doc's Kitty",
+    description:
+      "Mutter von High Brow Cat. Über sie führt die heute dominierende Cuttinglinie zurück auf Smart Little Lena und Doc Bar.",
+    isHistoric: true,
+  },
+  {
+    name: "Doc's Kitty",
+    sex: "mare",
+    country: "US",
+    sireName: "Doc Bar",
+    isHistoric: true,
+  },
+  {
+    name: "Chers Shadow",
+    sex: "mare",
+    country: "US",
+    disciplines: ["Cutting"],
+    sireName: "Peptoboonsmal",
+    damName: "Shesa Smarty Lena",
+    description: "Mutter von Metallic Cat.",
+    isHistoric: true,
+  },
+  {
+    name: "Shesa Smarty Lena",
+    sex: "mare",
+    country: "US",
+    sireName: "Smart Little Lena",
+    isHistoric: true,
+  },
+  {
+    name: "Sugar Badger",
+    sex: "mare",
+    country: "US",
+    sireName: "Grey Badger III",
+    description: "Mutter von Peppy San Badger.",
+    isHistoric: true,
+  },
+  {
+    name: "Grey Badger III",
+    country: "US",
+    sireName: "Grey Badger II",
+    description:
+      "Vater der Zuchtstuten Sugar Badger und Triangle Tookie - und damit im Hintergrund zweier ganz unterschiedlicher Linien.",
+    isHistoric: true,
+  },
+  {
+    name: "Boon Bar",
+    country: "US",
+    disciplines: ["Cutting"],
+    description: "Vater von Royal Blue Boon.",
+    isHistoric: true,
+  },
+  {
+    name: "Royal Tincie",
+    sex: "mare",
+    country: "US",
+    sireName: "Royal King",
+    isHistoric: true,
+  },
+  {
+    name: "Royal King",
+    country: "US",
+    disciplines: ["Cutting"],
+    isHistoric: true,
+  },
+
+  /* --- Gründergenerationen ---------------------------------------- */
+  {
+    name: "Percentage",
+    breed: "Thoroughbred",
+    country: "US",
+    sireName: "Sir Gallahad III",
+    description: "Vater von Three Bars.",
+    isHistoric: true,
+  },
+  {
+    name: "Myrtle Dee",
+    sex: "mare",
+    breed: "Thoroughbred",
+    country: "US",
+    sireName: "Luke McLuke",
+    description: "Mutter von Three Bars.",
+    isHistoric: true,
+  },
+  {
+    name: "Luke McLuke",
+    breed: "Thoroughbred",
+    country: "US",
+    isHistoric: true,
+  },
+  {
+    name: "Dandy Doll",
+    sex: "mare",
+    country: "US",
+    sireName: "Texas Dandy",
+    description: "Mutter von Doc Bar.",
+    isHistoric: true,
+  },
+  {
+    name: "Texas Dandy",
+    country: "US",
+    isHistoric: true,
+  },
+  {
+    name: "Miss Taylor",
+    sex: "mare",
+    country: "US",
+    sireName: "Old Poco Bueno",
+    description: "Mutter von Poco Bueno.",
+    isHistoric: true,
+  },
+  {
+    name: "Sheilwin",
+    sex: "mare",
+    country: "US",
+    sireName: "Pretty Boy",
+    description: "Mutter von Poco Lena und Poco Tivio.",
+    isHistoric: true,
+  },
+  {
+    name: "Pretty Boy",
+    country: "US",
+    isHistoric: true,
+  },
+  {
+    name: "Peppy Belle",
+    sex: "mare",
+    yearOfBirth: 1955,
+    country: "US",
+    sireName: "Pep Up",
+    description:
+      "Mutter von Peppy San und Mr San Peppy - beide von Leo San, also Vollbrüder.",
+    isHistoric: true,
+  },
+  {
+    name: "Pep Up",
+    country: "US",
+    isHistoric: true,
+  },
+  {
+    name: "Solis",
+    country: "US",
+    sireName: "Old Sorrel",
+    description: "Sohn des Old Sorrel und Vater von Wimpy P-1.",
+    bloodlineNote:
+      "Mutter: unregistrierte Thoroughbred-Stute ohne Namen in den Unterlagen.",
+    isHistoric: true,
+  },
+  {
+    name: "Panda",
+    sex: "mare",
+    country: "US",
+    sireName: "Old Sorrel",
+    description:
+      "Mutter von Wimpy P-1. Wimpy führt Old Sorrel damit auf beiden Seiten.",
+    bloodlineNote: "Ihre Mutter war eine Roan-Stute von Hickory Bill.",
+    isHistoric: true,
+  },
+  {
+    name: "Two D Two",
+    yearOfBirth: 1957,
+    country: "US",
+    sireName: "Double Diamond",
+    damName: "Double Life",
+    description: "Vater von Two Eyed Jack.",
+    isHistoric: true,
+  },
+  {
+    name: "Double Diamond",
+    yearOfBirth: 1947,
+    country: "US",
+    isHistoric: true,
+  },
+  {
+    name: "Double Life",
+    sex: "mare",
+    country: "US",
+    sireName: "Pay Day",
+    isHistoric: true,
+  },
+  {
+    name: "Triangle Tookie",
+    sex: "mare",
+    yearOfBirth: 1951,
+    country: "US",
+    sireName: "Grey Badger III",
+    description:
+      "Mutter von Two Eyed Jack und insgesamt von fünf AQHA Champions.",
+    isHistoric: true,
+  },
+  {
+    name: "Lucky Bar",
+    yearOfBirth: 1954,
+    country: "US",
+    description: "Vater von Impressive.",
+    isHistoric: true,
+  },
+  {
+    name: "Glamour Bars",
+    sex: "mare",
+    yearOfBirth: 1960,
+    country: "US",
+    description: "Mutter von Impressive.",
+    isHistoric: true,
+  },
 ];
+

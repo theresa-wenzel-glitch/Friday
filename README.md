@@ -93,19 +93,26 @@ Der Bestand ist bei Quarter Horses am dichtesten. Paint Horses, Appaloosas und
 vor allem die in Europa stehenden Hengste fehlen weitgehend – genau die sollen
 über die Selbsteintragung dazukommen.
 
-### Die Stammbäume sind noch flach
+### Die Stammbäume wachsen mit dem Bestand
 
-Erfasst ist bei jedem Pferd nur Vater und Mutter. Tiefer wird der Baum genau
-dort, wo die Grosseltern zufällig selbst im Bestand stehen. Deshalb reicht die
-Abstammung bei rund der Hälfte der Pferde nur eine Generation weit – bei
-Hollywood Dun It etwa, dessen Vater Hollywood Jac 86 (noch) niemand angelegt
-hat.
+Ein Baum wird nur dort tief, wo die Vorfahren selbst als Eintrag existieren.
+Deshalb sind zu den bekannten Hengsten rund 45 Vorfahren mit erfasst – Väter,
+Mütter und Grosseltern, die selbst nie Deckhengste im Verzeichnis wären, den
+Stammbaum aber überhaupt erst entstehen lassen. Hollywood Dun It reicht damit
+zum Beispiel bis zu King P-234 zurück statt bei Vater und Mutter zu enden.
 
-Das ist kein Anzeigefehler, sondern eine Datenlücke. Sie schliesst sich, sobald
-jemand die fehlenden Vorfahren als eigene Einträge anlegt: die Verknüpfung über
-den Namen passiert dann von selbst, rückwirkend für alle Nachkommen. Wer das
-nachträgt, sollte die Abstammung vorher gegen Papiere oder
-allbreedpedigree.com prüfen – geraten wird hier nichts.
+Die Quellen dieser Recherche stehen in
+[`docs/quellen-vorfahren.md`](docs/quellen-vorfahren.md). **allbreedpedigree.com
+liess sich nicht heranziehen** – die Seite sperrt automatisierte Zugriffe
+(HTTP 403). Gearbeitet wurde daher mit Wikipedia, AQHA, Quarter Horse News,
+Western Horseman, StallionCompare und rimondo. Genau deshalb steht bei allen
+Einträgen weiterhin „ungeprüft“: bitte gegen die Papiere gegenlesen, bevor ihr
+sie im Moderationsbereich freigebt.
+
+Lücken bleiben. Sie schliessen sich, sobald jemand die fehlenden Vorfahren als
+eigene Einträge anlegt – die Verknüpfung über den Namen passiert von selbst,
+rückwirkend für alle Nachkommen. Geraten wird dabei nichts: lieber ein leeres
+Feld als eine erfundene Abstammung, die still in jeden Nachkommen wandert.
 
 ### Startdaten erweitern
 

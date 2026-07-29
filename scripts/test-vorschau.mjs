@@ -24,8 +24,8 @@ try {
 
   check("Seite lädt ohne Skriptfehler", errors.length === 0, errors.join(" | "));
   check(
-    "Alle 50 Hengste werden gelistet",
-    (await page.textContent("#resultLine")).includes("50"),
+    "Alle Pferde werden gelistet",
+    (await page.textContent("#resultLine")).includes("96"),
     await page.textContent("#resultLine"),
   );
 
@@ -63,7 +63,7 @@ try {
   );
   check(
     "Tiefenangabe stimmt",
-    /Bekannt bis zur 4\. Generation – 18 von 30 Plätzen/.test(detail),
+    /Bekannt bis zur 4\. Generation – 21 von 30 Plätzen/.test(detail),
   );
   check("Nachkommen werden gelistet", detail.includes("Smart Chic Olena"));
 
@@ -132,19 +132,41 @@ try {
      Kästchen zeigen. */
   await page.setViewportSize({ width: 390, height: 844 });
 
-  await page.goto(FILE + "#/hengst/hollywood-dun-it");
-  await page.waitForTimeout(400);
-  const duenn = await page.locator(".ped-cell").count();
-  const duennLeer = await page.locator(".ped-cell.ped-empty").count();
-  check(
-    "Nur Vater und Mutter bekannt: genau zwei Felder, keine leeren",
-    duenn === 2 && duennLeer === 0,
-    `${duenn} Felder, davon ${duennLeer} leer`,
-  );
-  check(
-    "Beschriftung nennt die tatsächliche Tiefe",
-    (await page.textContent("#detailView")).includes("Bekannt sind Vater und Mutter"),
-  );
+  // Ein Pferd suchen, von dem wirklich nur Vater und Mutter bekannt sind -
+  // welches das ist, ändert sich mit dem Datenbestand.
+  const nurElternSlug = await page.evaluate(() => {
+    const daten = window.__HORSES__ || [];
+    const byId = new Map(daten.map((h) => [h.id, h]));
+    for (const h of daten) {
+      if (!h.sireName && !h.damName) continue;
+      const eltern = [h.sireId, h.damId].map((id) => (id == null ? null : byId.get(id)));
+      const grosselternBekannt = eltern.some(
+        (e) => e && (e.sireName || e.damName),
+      );
+      if (!grosselternBekannt) return h.slug;
+    }
+    return null;
+  });
+
+  check("Ein Pferd mit nur einer bekannten Generation gefunden", Boolean(nurElternSlug));
+
+  if (nurElternSlug) {
+    await page.goto(FILE + "#/hengst/" + nurElternSlug);
+    await page.waitForTimeout(400);
+    const duenn = await page.locator(".ped-cell").count();
+    const duennLeer = await page.locator(".ped-cell.ped-empty").count();
+    // Ein leeres Feld ist in Ordnung, wenn nur ein Elternteil bekannt ist -
+    // die Wand aus 28 Strichen darf es nicht mehr geben.
+    check(
+      "Nur eine Generation bekannt: hoechstens zwei Felder",
+      duenn <= 2 && duenn > duennLeer,
+      `${nurElternSlug}: ${duenn} Felder, davon ${duennLeer} leer`,
+    );
+    check(
+      "Beschriftung nennt die tatsächliche Tiefe",
+      (await page.textContent("#detailView")).includes("Bekannt sind Vater und Mutter"),
+    );
+  }
 
   await page.goto(FILE + "#/hengst/traveler");
   await page.waitForTimeout(400);
