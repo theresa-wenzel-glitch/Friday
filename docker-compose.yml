@@ -1,0 +1,36 @@
+# Betrieb auf einem eigenen Server.
+#
+#   1. .env.production anlegen (siehe DEPLOY.md)
+#   2. docker compose up -d --build
+#
+# Die Datenbank liegt im benannten Volume "daten" und überlebt Neustarts
+# und Updates. Sie liegt bewusst NICHT im Image.
+
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    ports:
+      # Nur auf localhost - davor gehört ein Reverse Proxy mit HTTPS.
+      # Für einen Test ohne Proxy: "3000:3000"
+      - "127.0.0.1:3000:3000"
+    environment:
+      NODE_ENV: production
+      DATABASE_PATH: /data/westernhengste.db
+    env_file:
+      - .env.production
+    volumes:
+      - daten:/data
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:3000/').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+volumes:
+  daten:

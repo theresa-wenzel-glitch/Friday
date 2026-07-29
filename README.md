@@ -31,21 +31,23 @@ Hengst hat, schreibt den Besitzer direkt an; das Verzeichnis vermittelt nicht.
 
 ## Loslegen
 
+Voraussetzung: [Node.js](https://nodejs.org) in der LTS-Version.
+
 ```bash
 npm install
-cp .env.example .env.local     # ADMIN_PASSWORD und SESSION_SECRET setzen
+npm run setup     # legt .env.local mit Passwort und Zufallsschlüssel an
 npm run dev
 ```
 
-Die App läuft dann auf <http://localhost:3000>. Beim ersten Start legt sie die
-Datenbank unter `data/westernhengste.db` an und füllt sie mit rund 50 bekannten
-Gründer- und Vererberhengsten.
+Die App läuft dann auf <http://localhost:3000>, der Moderationsbereich unter
+<http://localhost:3000/admin>. Beim ersten Start legt sie die Datenbank unter
+`data/westernhengste.db` an und füllt sie mit rund 50 bekannten Gründer- und
+Vererberhengsten.
 
-`SESSION_SECRET` erzeugen:
-
-```bash
-node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
-```
+`npm run setup` fragt nach einem Passwort für den Moderationsbereich; mit Enter
+wird eines erzeugt. Eine vorhandene `.env.local` wird nie ohne Rückfrage
+überschrieben. Wer die Datei lieber von Hand anlegt, nimmt `.env.example` als
+Vorlage.
 
 Ohne gesetztes `ADMIN_PASSWORD` bleibt `/admin` gesperrt – der öffentliche Teil
 funktioniert trotzdem.
@@ -125,27 +127,30 @@ Screenshots zur Sichtprüfung (hell, dunkel, mobil):
 node scripts/screenshots.mjs
 ```
 
-## Betrieb
+## Online stellen
+
+Schritt für Schritt beschrieben in **[DEPLOY.md](DEPLOY.md)** – inklusive
+Datenschutz-Hinweisen, Sicherung und der Frage, welche Hoster in Frage kommen.
+
+Kurzfassung für einen eigenen Server mit Docker:
 
 ```bash
-docker build -t westernhengste .
-docker run -p 3000:3000 \
-  -e ADMIN_PASSWORD=... \
-  -e SESSION_SECRET=... \
-  -e NEXT_PUBLIC_SITE_URL=https://eure-domain.de \
-  -v westernhengste-data:/data \
-  westernhengste
+cat > .env.production <<'EOF'
+ADMIN_PASSWORD=dein-passwort
+SESSION_SECRET=dein-langer-zufallswert
+NEXT_PUBLIC_SITE_URL=https://eure-domain.de
+EOF
+chmod 600 .env.production
+
+docker compose up -d --build
 ```
 
 Das Volume auf `/data` ist Pflicht – dort liegt die Datenbank. Ohne Volume sind
-alle Einträge nach einem Neustart weg.
+alle Einträge nach einem Neustart weg. Die App braucht deshalb einen Hoster mit
+**dauerhaftem Dateispeicher**; Vercel und Netlify scheiden im Standardbetrieb
+aus.
 
-Wichtig für die Wahl des Hosters: Die App braucht einen **dauerhaften
-Dateispeicher**. Plattformen ohne persistente Festplatte (etwa Vercel im
-Standardbetrieb) funktionieren so nicht; dort müsste die Datenspeicherung auf
-eine externe Datenbank umgestellt werden.
-
-Sichert `data/westernhengste.db` regelmässig – das ist der gesamte Bestand.
+Sichert die Datenbank regelmässig – sie ist der gesamte Bestand.
 
 ## Vor dem Livegang
 

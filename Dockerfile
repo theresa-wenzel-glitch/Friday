@@ -35,14 +35,11 @@ ENV PORT=3000
 RUN useradd --system --uid 1001 nextjs \
  && mkdir -p /data && chown nextjs:nextjs /data
 
+# Der standalone-Build enthält better-sqlite3 samt vorkompiliertem Binary
+# bereits - es muss nichts zusätzlich kopiert werden.
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/public ./public
-
-# Das native Modul wird nicht mitgebündelt und muss daneben liegen.
-COPY --from=builder /app/node_modules/better-sqlite3 ./node_modules/better-sqlite3
-COPY --from=builder /app/node_modules/bindings ./node_modules/bindings
-COPY --from=builder /app/node_modules/file-uri-to-path ./node_modules/file-uri-to-path
 
 USER nextjs
 VOLUME ["/data"]

@@ -1,0 +1,24 @@
+# Nichts hiervon gehört ins Docker-Image.
+
+# Geheimnisse - würden sonst dauerhaft im Image landen!
+.env
+.env.local
+.env*.local
+
+# Laufzeitdaten: die Datenbank gehört ins Volume, nicht ins Image.
+data/
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+node_modules/
+.next/
+screenshots/
+
+.git/
+.gitignore
+README.md
+DEPLOY.md
+Dockerfile
+.dockerignore
