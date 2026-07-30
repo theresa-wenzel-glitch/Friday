@@ -1,0 +1,135 @@
+{
+  "intentKey": "founding.services.freelance",
+  "version": 1,
+  "region": "DE",
+  "title": "Nebenberuflich selbstständig als Dienstleister starten",
+  "sampleSize": 0,
+  "confidence": 0.5,
+  "source": "expert",
+  "reviewStatus": "unreviewed_draft",
+  "domainNotes": [
+    "Vor dem Start ist zu klären, ob der Arbeitsvertrag eine Nebentätigkeit einschränkt oder eine Anzeige verlangt.",
+    "Die Abgrenzung zwischen freiberuflicher und gewerblicher Tätigkeit hat steuerliche Folgen und gehört in eine Steuerberatung, nicht in einen automatisch erzeugten Plan.",
+    "Der häufigste Abbruchgrund ist nicht fehlendes Können, sondern das Ausbleiben des ersten zahlenden Auftrags.",
+    "Der erste Kunde kommt in der Regel aus dem bestehenden Netzwerk, nicht über Kaltakquise."
+  ],
+  "nodes": [
+    {
+      "id": "fl.positioning",
+      "title": "Angebot und Positionierung festlegen",
+      "definitionOfDone": "Eine schriftliche Leistungsbeschreibung benennt Zielkunde, konkretes Angebot, Preisrahmen und Abgrenzung zum Wettbewerb.",
+      "typicalDurationDays": 14,
+      "p10DurationDays": 5,
+      "p90DurationDays": 45,
+      "dropoutRate": 0.15,
+      "commonBlockers": ["unclear"],
+      "successCorrelates": [
+        "Angebot wurde mit mindestens drei potenziellen Kunden besprochen",
+        "Preis wurde vor dem ersten Angebot festgelegt, nicht im Gespräch"
+      ],
+      "requiredBefore": [],
+      "mandatory": true
+    },
+    {
+      "id": "fl.employment",
+      "title": "Nebentätigkeit arbeitsrechtlich klären",
+      "definitionOfDone": "Der Arbeitsvertrag wurde auf Nebentätigkeitsklauseln geprüft und die erforderliche Anzeige oder Genehmigung liegt vor.",
+      "typicalDurationDays": 14,
+      "p10DurationDays": 3,
+      "p90DurationDays": 40,
+      "dropoutRate": 0.06,
+      "commonBlockers": ["waiting", "unclear"],
+      "successCorrelates": [
+        "Klärung erfolgte vor der Gewerbeanmeldung"
+      ],
+      "requiredBefore": [],
+      "mandatory": true
+    },
+    {
+      "id": "fl.registration",
+      "title": "Anmeldung und steuerliche Einordnung",
+      "definitionOfDone": "Die Tätigkeit ist beim Finanzamt erfasst, die Steuernummer liegt vor und die Frage der Kleinunternehmerregelung ist mit einer Steuerberatung geklärt.",
+      "typicalDurationDays": 21,
+      "p10DurationDays": 7,
+      "p90DurationDays": 60,
+      "dropoutRate": 0.08,
+      "commonBlockers": ["waiting", "unclear"],
+      "successCorrelates": [
+        "Steuerliche Einordnung wurde fachlich geklärt statt selbst entschieden"
+      ],
+      "requiredBefore": ["fl.employment"],
+      "mandatory": true
+    },
+    {
+      "id": "fl.infrastructure",
+      "title": "Geschäftliche Grundausstattung",
+      "definitionOfDone": "Geschäftskonto, Rechnungsvorlage mit allen Pflichtangaben, einfache Buchhaltungslösung und Ablage für Belege sind eingerichtet.",
+      "typicalDurationDays": 10,
+      "p10DurationDays": 3,
+      "p90DurationDays": 30,
+      "dropoutRate": 0.04,
+      "commonBlockers": ["time"],
+      "successCorrelates": [
+        "Belegablage wurde vor dem ersten Auftrag eingerichtet"
+      ],
+      "requiredBefore": ["fl.registration"],
+      "mandatory": true
+    },
+    {
+      "id": "fl.presence",
+      "title": "Sichtbarkeit herstellen",
+      "definitionOfDone": "Eine Seite mit Angebot, Referenzen und Kontaktmöglichkeit ist online und über die eigene Berufsgruppe auffindbar.",
+      "typicalDurationDays": 21,
+      "p10DurationDays": 7,
+      "p90DurationDays": 60,
+      "dropoutRate": 0.11,
+      "commonBlockers": ["time", "motivation"],
+      "successCorrelates": [
+        "Seite enthält mindestens ein konkretes Arbeitsbeispiel"
+      ],
+      "requiredBefore": ["fl.positioning"],
+      "mandatory": false
+    },
+    {
+      "id": "fl.firstclients",
+      "title": "Erste zahlende Kunden gewinnen",
+      "definitionOfDone": "Mindestens drei bezahlte Aufträge wurden abgeschlossen und abgerechnet.",
+      "typicalDurationDays": 70,
+      "p10DurationDays": 21,
+      "p90DurationDays": 180,
+      "dropoutRate": 0.31,
+      "commonBlockers": ["motivation", "time", "unclear"],
+      "successCorrelates": [
+        "Erste Ansprache ging an das bestehende Netzwerk, nicht an Fremde",
+        "Es wurde ein fester wöchentlicher Zeitblock für Akquise eingeplant"
+      ],
+      "requiredBefore": ["fl.infrastructure"],
+      "mandatory": true
+    },
+    {
+      "id": "fl.stabilize",
+      "title": "Auslastung verstetigen",
+      "definitionOfDone": "Über drei aufeinanderfolgende Monate wurde ein zuvor definierter Mindestumsatz erreicht.",
+      "typicalDurationDays": 120,
+      "p10DurationDays": 90,
+      "p90DurationDays": 300,
+      "dropoutRate": 0.19,
+      "commonBlockers": ["time", "money"],
+      "successCorrelates": [
+        "Mindestens ein wiederkehrender Kunde",
+        "Preise wurden nach den ersten Aufträgen angepasst"
+      ],
+      "requiredBefore": ["fl.firstclients"],
+      "mandatory": false
+    }
+  ],
+  "edges": [
+    { "from": "fl.positioning", "to": "fl.employment", "frequency": 0.64, "medianGapDays": 5, "successDelta": 0.06 },
+    { "from": "fl.employment", "to": "fl.registration", "frequency": 0.89, "medianGapDays": 7, "successDelta": 0.09 },
+    { "from": "fl.registration", "to": "fl.infrastructure", "frequency": 0.92, "medianGapDays": 4, "successDelta": 0.05 },
+    { "from": "fl.positioning", "to": "fl.presence", "frequency": 0.71, "medianGapDays": 10, "successDelta": 0.04 },
+    { "from": "fl.infrastructure", "to": "fl.firstclients", "frequency": 0.86, "medianGapDays": 7, "successDelta": 0.12 },
+    { "from": "fl.presence", "to": "fl.firstclients", "frequency": 0.58, "medianGapDays": 14, "successDelta": 0.03 },
+    { "from": "fl.firstclients", "to": "fl.stabilize", "frequency": 0.81, "medianGapDays": 30, "successDelta": 0.08 }
+  ]
+}

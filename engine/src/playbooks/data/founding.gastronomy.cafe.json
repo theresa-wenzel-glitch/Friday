@@ -1,0 +1,174 @@
+{
+  "intentKey": "founding.gastronomy.cafe",
+  "version": 1,
+  "region": "DE",
+  "title": "Café mit Sitzplätzen eröffnen",
+  "sampleSize": 0,
+  "confidence": 0.5,
+  "source": "expert",
+  "reviewStatus": "unreviewed_draft",
+  "domainNotes": [
+    "Reihenfolge-Falle: Der Mietvertrag sollte erst nach der Vorabklärung der Nutzungsänderung und der gaststättenrechtlichen Anforderungen unterschrieben werden.",
+    "Die Bank erwartet den Businessplan inklusive Standortanalyse und Liquiditätsplanung, nicht nur eine Idee.",
+    "Die Gewerbeanmeldung ist ein kurzer Vorgang, aber sie setzt Fristen in Gang. Sie gehört nicht an den Anfang.",
+    "Behördenzuständigkeiten und Anforderungen unterscheiden sich je nach Bundesland und Kommune erheblich."
+  ],
+  "nodes": [
+    {
+      "id": "cafe.idea",
+      "title": "Konzept schärfen",
+      "definitionOfDone": "Ein einseitiges Konzeptpapier beschreibt Angebot, Zielgruppe, Preisniveau und Abgrenzung zum Wettbewerb.",
+      "typicalDurationDays": 21,
+      "p10DurationDays": 7,
+      "p90DurationDays": 60,
+      "dropoutRate": 0.12,
+      "commonBlockers": ["unclear", "motivation"],
+      "successCorrelates": [
+        "Konzept wurde mindestens drei Außenstehenden vorgestellt",
+        "Preisniveau ist an realen Wettbewerberpreisen kalibriert"
+      ],
+      "requiredBefore": [],
+      "mandatory": true
+    },
+    {
+      "id": "cafe.market",
+      "title": "Standort- und Marktanalyse",
+      "definitionOfDone": "Mindestens fünf vergleichbare Betriebe wurden besucht und ausgewertet; für zwei bis drei Standortoptionen liegen Passantenfrequenz, Miete und Umfeld vor.",
+      "typicalDurationDays": 28,
+      "p10DurationDays": 14,
+      "p90DurationDays": 70,
+      "dropoutRate": 0.09,
+      "commonBlockers": ["time"],
+      "successCorrelates": [
+        "Standortanalyse wurde VOR dem Businessplan gemacht",
+        "Frequenzzählung zu mindestens drei Tageszeiten"
+      ],
+      "requiredBefore": ["cafe.idea"],
+      "mandatory": true
+    },
+    {
+      "id": "cafe.businessplan",
+      "title": "Businessplan und Zahlenteil",
+      "definitionOfDone": "Businessplan mit Konzept, Marktanalyse, Investitionsplan, Rentabilitätsvorschau und Liquiditätsplanung liegt vor und wurde von einer dritten Person gegengelesen.",
+      "typicalDurationDays": 42,
+      "p10DurationDays": 21,
+      "p90DurationDays": 120,
+      "dropoutRate": 0.34,
+      "commonBlockers": ["unclear", "motivation", "time"],
+      "successCorrelates": [
+        "Zahlenteil wurde mit einer Steuerberatung oder Gründungsberatung besprochen",
+        "Standortanalyse lag zum Startzeitpunkt bereits vor"
+      ],
+      "requiredBefore": ["cafe.market"],
+      "mandatory": true
+    },
+    {
+      "id": "cafe.financing",
+      "title": "Finanzierung sichern",
+      "definitionOfDone": "Eine schriftliche Finanzierungszusage über den benötigten Betrag liegt vor, oder die Finanzierung ist vollständig aus Eigenmitteln gedeckt und nachgewiesen.",
+      "typicalDurationDays": 56,
+      "p10DurationDays": 21,
+      "p90DurationDays": 150,
+      "dropoutRate": 0.28,
+      "commonBlockers": ["waiting", "money"],
+      "successCorrelates": [
+        "Mehr als ein Kreditinstitut wurde angesprochen",
+        "Fördermöglichkeiten wurden vor dem Bankgespräch geprüft"
+      ],
+      "requiredBefore": ["cafe.businessplan"],
+      "mandatory": true
+    },
+    {
+      "id": "cafe.location",
+      "title": "Objekt sichern",
+      "definitionOfDone": "Ein Mietvertrag ist unterschrieben, nachdem Nutzungsänderung und gaststättenrechtliche Anforderungen vorab geklärt wurden.",
+      "typicalDurationDays": 49,
+      "p10DurationDays": 14,
+      "p90DurationDays": 180,
+      "dropoutRate": 0.18,
+      "commonBlockers": ["waiting", "money"],
+      "successCorrelates": [
+        "Vorabklärung mit Bauamt und Lebensmittelüberwachung erfolgte vor Vertragsunterschrift",
+        "Mietvertrag wurde anwaltlich geprüft"
+      ],
+      "requiredBefore": ["cafe.financing"],
+      "mandatory": true
+    },
+    {
+      "id": "cafe.permits",
+      "title": "Anmeldungen und Erlaubnisse",
+      "definitionOfDone": "Gewerbeanmeldung, steuerliche Erfassung, Anmeldungen bei Berufsgenossenschaft und Lebensmittelüberwachung sowie erforderliche Belehrungen und Schulungen sind erledigt.",
+      "typicalDurationDays": 35,
+      "p10DurationDays": 14,
+      "p90DurationDays": 90,
+      "dropoutRate": 0.07,
+      "commonBlockers": ["waiting", "unclear"],
+      "successCorrelates": [
+        "Zuständige Stellen wurden vorab telefonisch kontaktiert",
+        "Unterlagen wurden vollständig eingereicht"
+      ],
+      "requiredBefore": ["cafe.location"],
+      "mandatory": true
+    },
+    {
+      "id": "cafe.buildout",
+      "title": "Einrichtung und Ausstattung",
+      "definitionOfDone": "Küche, Tresen und Gastraum sind eingerichtet, die Ausstattung ist abgenommen und betriebsbereit.",
+      "typicalDurationDays": 63,
+      "p10DurationDays": 28,
+      "p90DurationDays": 160,
+      "dropoutRate": 0.06,
+      "commonBlockers": ["waiting", "money"],
+      "successCorrelates": [
+        "Angebote von mindestens drei Anbietern eingeholt",
+        "Gebrauchtmarkt für Großgeräte geprüft"
+      ],
+      "requiredBefore": ["cafe.permits"],
+      "mandatory": false
+    },
+    {
+      "id": "cafe.operations",
+      "title": "Betrieb vorbereiten",
+      "definitionOfDone": "Lieferanten sind ausgewählt, Kassensystem und Warenwirtschaft laufen, Personal ist eingestellt und eingearbeitet, ein Probebetrieb hat stattgefunden.",
+      "typicalDurationDays": 42,
+      "p10DurationDays": 21,
+      "p90DurationDays": 100,
+      "dropoutRate": 0.05,
+      "commonBlockers": ["time", "unclear"],
+      "successCorrelates": [
+        "Mindestens ein Probelauf mit geladenen Gästen vor der Eröffnung",
+        "Kalkulation je Produkt vor der Preisfestlegung"
+      ],
+      "requiredBefore": ["cafe.buildout"],
+      "mandatory": false
+    },
+    {
+      "id": "cafe.opening",
+      "title": "Eröffnung",
+      "definitionOfDone": "Das Café ist regulär geöffnet, die Eröffnung wurde lokal kommuniziert und die ersten Betriebstage sind ausgewertet.",
+      "typicalDurationDays": 21,
+      "p10DurationDays": 7,
+      "p90DurationDays": 45,
+      "dropoutRate": 0.02,
+      "commonBlockers": ["time"],
+      "successCorrelates": [
+        "Lokale Ankündigung mindestens zwei Wochen vor Eröffnung",
+        "Google-Unternehmensprofil vor Eröffnung angelegt"
+      ],
+      "requiredBefore": ["cafe.operations"],
+      "mandatory": true
+    }
+  ],
+  "edges": [
+    { "from": "cafe.idea", "to": "cafe.market", "frequency": 0.78, "medianGapDays": 5, "successDelta": 0.18 },
+    { "from": "cafe.idea", "to": "cafe.businessplan", "frequency": 0.22, "medianGapDays": 3, "successDelta": -0.18 },
+    { "from": "cafe.market", "to": "cafe.businessplan", "frequency": 0.91, "medianGapDays": 7, "successDelta": 0.11 },
+    { "from": "cafe.businessplan", "to": "cafe.financing", "frequency": 0.95, "medianGapDays": 10, "successDelta": 0.07 },
+    { "from": "cafe.financing", "to": "cafe.location", "frequency": 0.72, "medianGapDays": 14, "successDelta": 0.14 },
+    { "from": "cafe.location", "to": "cafe.financing", "frequency": 0.28, "medianGapDays": 21, "successDelta": -0.14 },
+    { "from": "cafe.location", "to": "cafe.permits", "frequency": 0.88, "medianGapDays": 7, "successDelta": 0.05 },
+    { "from": "cafe.permits", "to": "cafe.buildout", "frequency": 0.84, "medianGapDays": 5, "successDelta": 0.03 },
+    { "from": "cafe.buildout", "to": "cafe.operations", "frequency": 0.93, "medianGapDays": 3, "successDelta": 0.04 },
+    { "from": "cafe.operations", "to": "cafe.opening", "frequency": 0.97, "medianGapDays": 7, "successDelta": 0.02 }
+  ]
+}

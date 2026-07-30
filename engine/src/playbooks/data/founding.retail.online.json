@@ -1,0 +1,135 @@
+{
+  "intentKey": "founding.retail.online",
+  "version": 1,
+  "region": "DE",
+  "title": "Onlineshop aufbauen und erste Umsätze erzielen",
+  "sampleSize": 0,
+  "confidence": 0.5,
+  "source": "expert",
+  "reviewStatus": "unreviewed_draft",
+  "domainNotes": [
+    "Die Pflichtangaben im Onlinehandel (Impressum, Widerrufsbelehrung, Preisangaben, Datenschutz) sind abmahnrelevant und gehören anwaltlich geprüft.",
+    "Der teuerste Fehler ist Wareneinkauf vor dem ersten Verkaufstest.",
+    "Verpackungs- und Elektrogeräteregister sowie branchenspezifische Pflichten je nach Sortiment vorab klären.",
+    "Der erste Umsatz kommt fast nie über den eigenen Shop, sondern über einen bestehenden Marktplatz oder das eigene Umfeld."
+  ],
+  "nodes": [
+    {
+      "id": "shop.niche",
+      "title": "Sortiment und Zielgruppe festlegen",
+      "definitionOfDone": "Ein Sortimentskonzept benennt Produktgruppe, Zielgruppe, Preisniveau und Beschaffungsweg.",
+      "typicalDurationDays": 21,
+      "p10DurationDays": 7,
+      "p90DurationDays": 60,
+      "dropoutRate": 0.14,
+      "commonBlockers": ["unclear"],
+      "successCorrelates": [
+        "Nachfrage wurde vor der Sortimentsentscheidung geprüft",
+        "Mindestens drei Lieferanten verglichen"
+      ],
+      "requiredBefore": [],
+      "mandatory": true
+    },
+    {
+      "id": "shop.validate",
+      "title": "Nachfrage testen, bevor Ware gekauft wird",
+      "definitionOfDone": "Mindestens fünf Verkäufe wurden ohne eigenen Shop erzielt, zum Beispiel über einen Marktplatz oder eine einfache Verkaufsseite.",
+      "typicalDurationDays": 28,
+      "p10DurationDays": 10,
+      "p90DurationDays": 75,
+      "dropoutRate": 0.27,
+      "commonBlockers": ["unclear", "motivation"],
+      "successCorrelates": [
+        "Test lief vor dem Wareneinkauf",
+        "Preis wurde im Test mindestens einmal variiert"
+      ],
+      "requiredBefore": ["shop.niche"],
+      "mandatory": true
+    },
+    {
+      "id": "shop.registration",
+      "title": "Anmeldungen und Registrierungen",
+      "definitionOfDone": "Gewerbeanmeldung, steuerliche Erfassung sowie die für das Sortiment erforderlichen Registrierungen sind erledigt.",
+      "typicalDurationDays": 21,
+      "p10DurationDays": 7,
+      "p90DurationDays": 60,
+      "dropoutRate": 0.07,
+      "commonBlockers": ["waiting", "unclear"],
+      "successCorrelates": [
+        "Registrierungspflichten wurden vor dem Verkaufsstart geprüft"
+      ],
+      "requiredBefore": ["shop.validate"],
+      "mandatory": true
+    },
+    {
+      "id": "shop.legal",
+      "title": "Rechtstexte und Pflichtangaben",
+      "definitionOfDone": "Impressum, Datenschutzerklärung, AGB, Widerrufsbelehrung und Preisangaben sind vorhanden und anwaltlich geprüft.",
+      "typicalDurationDays": 21,
+      "p10DurationDays": 7,
+      "p90DurationDays": 50,
+      "dropoutRate": 0.09,
+      "commonBlockers": ["money", "unclear"],
+      "successCorrelates": [
+        "Texte wurden fachlich geprüft statt kopiert"
+      ],
+      "requiredBefore": ["shop.registration"],
+      "mandatory": true
+    },
+    {
+      "id": "shop.build",
+      "title": "Shop aufbauen",
+      "definitionOfDone": "Der Shop ist erreichbar, Zahlungsarten und Versand sind eingerichtet, eine Testbestellung wurde vollständig durchlaufen.",
+      "typicalDurationDays": 35,
+      "p10DurationDays": 14,
+      "p90DurationDays": 90,
+      "dropoutRate": 0.12,
+      "commonBlockers": ["time", "unclear"],
+      "successCorrelates": [
+        "Testbestellung inklusive Retoure durchgespielt"
+      ],
+      "requiredBefore": ["shop.legal"],
+      "mandatory": true
+    },
+    {
+      "id": "shop.logistics",
+      "title": "Beschaffung und Versand",
+      "definitionOfDone": "Lieferant, Lagerung und Versandprozess stehen; die Kalkulation je Artikel inklusive Versand und Retoure ist belegt.",
+      "typicalDurationDays": 28,
+      "p10DurationDays": 10,
+      "p90DurationDays": 70,
+      "dropoutRate": 0.1,
+      "commonBlockers": ["waiting", "money"],
+      "successCorrelates": [
+        "Deckungsbeitrag je Artikel vor dem Einkauf berechnet"
+      ],
+      "requiredBefore": ["shop.build"],
+      "mandatory": false
+    },
+    {
+      "id": "shop.launch",
+      "title": "Verkaufsstart und erste Umsätze",
+      "definitionOfDone": "Der Shop ist öffentlich, die ersten zwanzig Bestellungen sind ausgeliefert und ausgewertet.",
+      "typicalDurationDays": 45,
+      "p10DurationDays": 21,
+      "p90DurationDays": 120,
+      "dropoutRate": 0.23,
+      "commonBlockers": ["motivation", "time"],
+      "successCorrelates": [
+        "Vor dem Start wurde eine Interessentenliste aufgebaut",
+        "Retourenquote wurde von Anfang an gemessen"
+      ],
+      "requiredBefore": ["shop.logistics"],
+      "mandatory": true
+    }
+  ],
+  "edges": [
+    { "from": "shop.niche", "to": "shop.validate", "frequency": 0.55, "medianGapDays": 7, "successDelta": 0.24 },
+    { "from": "shop.niche", "to": "shop.build", "frequency": 0.45, "medianGapDays": 10, "successDelta": -0.24 },
+    { "from": "shop.validate", "to": "shop.registration", "frequency": 0.83, "medianGapDays": 7, "successDelta": 0.06 },
+    { "from": "shop.registration", "to": "shop.legal", "frequency": 0.88, "medianGapDays": 5, "successDelta": 0.07 },
+    { "from": "shop.legal", "to": "shop.build", "frequency": 0.79, "medianGapDays": 5, "successDelta": 0.05 },
+    { "from": "shop.build", "to": "shop.logistics", "frequency": 0.86, "medianGapDays": 7, "successDelta": 0.04 },
+    { "from": "shop.logistics", "to": "shop.launch", "frequency": 0.91, "medianGapDays": 10, "successDelta": 0.03 }
+  ]
+}
