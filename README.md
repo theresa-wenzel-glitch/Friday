@@ -38,6 +38,25 @@ Technik, Geschäftsmodell, Finanzplanung, Marketing, Roadmap und Pitch.
 Ergänzend: [Finanzplan als CSV](finanzplan/finanzplan-3-jahre.csv) ·
 [Glossar](docs/glossar.md)
 
+## Lauffähiger Code
+
+| Verzeichnis | Inhalt |
+|-------------|--------|
+| [`engine/`](engine/) | **Die Planungs-Engine.** Klassifikation, Playbook-Abruf, Planerzeugung, deterministischer Validator (9 Regeln), Reparaturschleife, Terminierung, Evaluations-Gate. 83 Tests. Alles ohne API-Key testbar außer der Modellaufruf selbst |
+| [`pitch/`](pitch/atlas-pitch-deck.html) | Das Pitch Deck als eigenständige HTML-Präsentation, 16 Folien |
+
+```bash
+cd engine && npm install
+npm test                 # 83 Tests, kein API-Key nötig
+npm run playbooks        # die drei redaktionellen Playbooks
+npm run eval -- --dry    # Abdeckungsprüfung des Goldstandards
+
+export ANTHROPIC_API_KEY=sk-ant-...
+npm run plan -- "Ich möchte in 18 Monaten ein Café in Leipzig eröffnen" \
+  --hours 6 --deadline 2027-06-01 --state SN --budget 28000
+npm run eval             # das Gate — die erste echte Messung des Vorhabens
+```
+
 ---
 
 ## Die Kernthese in fünf Sätzen
