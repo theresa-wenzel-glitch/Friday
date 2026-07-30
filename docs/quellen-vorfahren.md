@@ -92,3 +92,20 @@ Europa - er wird über Kataloge für den europäischen Markt vermarktet
 (Gefriersamen), das ist etwas anderes als "steht in Europa". Colonels Dancing
 Gun dagegen steht selbst in Italien (Quarter Dream Srl). Beides ist in
 seed-data.ts entsprechend unterschiedlich vermerkt (Land vs. Beschreibungstext).
+
+## Vierter Durchgang - Korrektur: Shiners Voodoo ist nicht Shiners Voodoo Dr
+
+Der Nutzer wies darauf hin, dass "Shiners Voodoo" ein eigenständiges Pferd
+ist - der Sohn von Shiners Voodoo Dr, nicht derselbe Hengst unter kürzerem
+Namen. Im vorherigen Durchgang stand "Shiners Voodoo" fälschlich als `aka`
+(Beiname) auf dem Eintrag von Shiners Voodoo Dr - das war falsch und wurde
+entfernt. Stattdessen jetzt ein eigener Eintrag:
+
+| Pferd | Jahr | Vater | Mutter | Steht wo | Quelle |
+|---|---|---|---|---|---|
+| Shiners Voodoo | 2013 | Shiners Voodoo Dr | BR China Rose | Frozen Partners, Kamp-Lintfort (Deutschland) | Websuche, u. a. eine frozen-partners.com-Trefferseite |
+| BR China Rose | | unbekannt | unbekannt | | - keine weitere Abstammung gefunden |
+
+Shiners Voodoo steht tatsächlich in Deutschland bei Frozen Partners - anders
+als sein Vater. NRHA European Futurity Open Champion 2017, European Open
+Derby Champion 2018.

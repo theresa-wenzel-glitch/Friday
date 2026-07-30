@@ -25,7 +25,7 @@ try {
   check("Seite lädt ohne Skriptfehler", errors.length === 0, errors.join(" | "));
   check(
     "Alle Pferde werden gelistet",
-    (await page.textContent("#resultLine")).includes("136"),
+    (await page.textContent("#resultLine")).includes("138"),
     await page.textContent("#resultLine"),
   );
 
@@ -61,10 +61,32 @@ try {
   check(
     "Land-Filter auf Deutschland zeigt die EU-Hengste",
     deNames.some((n) => n.includes("Custom Del Cielo")) &&
-      deNames.some((n) => n.includes("Platinum Vintage")),
+      deNames.some((n) => n.includes("Platinum Vintage")) &&
+      deNames.some((n) => n.includes("Shiners Voodoo")),
     deNames.join(", "),
   );
   await page.selectOption("#fCountry", "");
+
+  /* Shiners Voodoo (Sohn) darf nicht mit Shiners Voodoo Dr (Vater)
+     verwechselt werden - genau der Fehler, der korrigiert wurde. */
+  await page.goto(FILE + "#/hengst/shiners-voodoo");
+  await page.waitForTimeout(400);
+  const svDetail = await page.textContent("#detailView");
+  check(
+    "Shiners Voodoo (Sohn) ist ein eigener Eintrag mit Vater Shiners Voodoo Dr",
+    svDetail.includes("Shiners Voodoo") &&
+      /Shiners Voodoo Dr[\s\S]{0,40}x[\s\S]{0,40}BR China Rose/.test(svDetail),
+  );
+  check(
+    "Shiners Voodoo (Sohn) steht laut Eintrag in Deutschland",
+    svDetail.includes("Deutschland"),
+  );
+
+  // Zurück zur Übersicht, damit die nachfolgenden Prüfungen wieder die
+  // Listenansicht vorfinden - sonst bleibt die Suche wirkungslos (die
+  // Filterung reagiert nur, wenn listView sichtbar ist).
+  await page.goto(FILE);
+  await page.waitForTimeout(300);
 
   /* Detailseite + Stammbaum */
   await page.fill("#q", "Smart Little Lena");

@@ -46,7 +46,7 @@ npm run dev
 
 Die App läuft dann auf <http://localhost:3000>, der Moderationsbereich unter
 <http://localhost:3000/admin>. Beim ersten Start legt sie die Datenbank unter
-`data/westernhengste.db` an und füllt sie mit rund 135 Pferden: den bekannten
+`data/westernhengste.db` an und füllt sie mit rund 140 Pferden: den bekannten
 Gründer- und Vererberhengsten samt ihrer Vorfahren, dazu einige aktuell in
 Europa stehende bzw. dort vermarktete Hengste.
 
@@ -109,18 +109,21 @@ Neben den historischen US-Vererbern sind aktuell einige Hengste erfasst, die
 tatsächlich in Europa stehen: Custom Del Cielo und Platinum Vintage
 (Deutschland, DQHA-gekört bzw. bei Tiemann Performance Horses), AHF Rojo El
 Sueno, Jaz Poco Simpatico und Remington Steel Burn (Foundation Quarter Horses
-der Absarokee Horse Farm, Niedersachsen) sowie Colonels Dancing Gun (ein Sohn
-von Gunner, steht bei Quarter Dream in Italien).
+der Absarokee Horse Farm, Niedersachsen), Colonels Dancing Gun (ein Sohn von
+Gunner, steht bei Quarter Dream in Italien) sowie Shiners Voodoo (steht bei
+Frozen Partners in Kamp-Lintfort, Deutschland).
 
 **Wichtige Unterscheidung**, weil sie in Katalogen wie frozen-partners.com oft
 verschwimmt: "wird für den europäischen Markt vermarktet" ist nicht dasselbe
-wie "steht in Europa". HF Mobster und Shiners Voodoo Dr sind zwei bekannte
-Beispiele, die weiterhin in den USA stehen (Texas) - nur ihr Gefriersamen wird
-auch nach Europa verkauft. Beides ist im jeweiligen Eintrag (Land, Verfügbarkeit,
-Beschreibungstext) so unterschieden, nicht geglättet.
+wie "steht in Europa". HF Mobster und Shiners Voodoo **Dr** - der Vater von
+Shiners Voodoo, nicht dasselbe Pferd - sind zwei bekannte Beispiele, die
+weiterhin in den USA stehen (Texas). Nur ihr Gefriersamen wird auch nach
+Europa verkauft, ihre Söhne können trotzdem tatsächlich in Europa stehen (wie
+bei Shiners Voodoo). Beides ist im jeweiligen Eintrag (Land, Verfügbarkeit,
+Beschreibungstext) unterschieden, nicht geglättet.
 
 Filtern lässt sich das über **Land** in der Hengste-Übersicht bzw. in der
-Ansichts-Version - bei über 130 Einträgen sonst leicht zu übersehen.
+Ansichts-Version - bei über 135 Einträgen sonst leicht zu übersehen.
 
 Das sind bewusst nur wenige, konkret belegte Namen - keine erfundene
 Vollständigkeit. `frozen-partners.com` selbst liess sich nicht automatisiert

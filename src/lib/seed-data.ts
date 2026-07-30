@@ -1439,7 +1439,6 @@ export const SEED_HORSES: SeedHorse[] = [
   /* ---------------------------------------------------------------- */
   {
     name: "Shiners Voodoo Dr",
-    aka: "Shiners Voodoo",
     yearOfBirth: 2007,
     color: "Palomino",
     country: "US",
@@ -1447,9 +1446,30 @@ export const SEED_HORSES: SeedHorse[] = [
     sireName: "Shining Spark",
     damName: "Voodoo Chic",
     description:
-      "NRHA/NRCHA-Millionen-Dollar-Vererber in Reining und Working Cow Horse, seit 2022 unter den zehn führenden Vererbern seines Fachs. Steht bei Oswood Stallion Station in Weatherford, Texas - sein Gefriersamen wird über Kataloge auch für den europäischen Markt angeboten.",
+      "NRHA/NRCHA-Millionen-Dollar-Vererber in Reining und Working Cow Horse, seit 2022 unter den zehn führenden Vererbern seines Fachs. Steht bei Oswood Stallion Station in Weatherford, Texas - sein Gefriersamen wird über Kataloge auch für den europäischen Markt angeboten. Nicht zu verwechseln mit seinem Sohn Shiners Voodoo, der tatsächlich in Deutschland steht.",
     availability: "frozen",
     isHistoric: false,
+  },
+  {
+    name: "Shiners Voodoo",
+    yearOfBirth: 2013,
+    color: "Palomino",
+    country: "DE",
+    disciplines: ["Reining"],
+    sireName: "Shiners Voodoo Dr",
+    damName: "BR China Rose",
+    description:
+      "Sohn von Shiners Voodoo Dr. NRHA European Futurity Open Champion 2017 und European Open Derby Champion 2018. Steht bei Frozen Partners in Kamp-Lintfort, Deutschland.",
+    availability: "frozen",
+    isHistoric: false,
+  },
+  {
+    name: "BR China Rose",
+    sex: "mare",
+    country: "US",
+    description: "Mutter von Shiners Voodoo.",
+    bloodlineNote: "Weitere Abstammung noch nicht gesichert - bitte ergänzen.",
+    isHistoric: true,
   },
   {
     name: "Voodoo Chic",
