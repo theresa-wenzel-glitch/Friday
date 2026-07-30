@@ -17,18 +17,51 @@ Kein Frontend, keine Datenbank, kein Deployment. Nur der Kern.
 ```bash
 cd engine
 npm install
+npm start                # → http://localhost:4173
+```
 
-# Läuft ohne API-Key:
-npm test                 # 83 Tests: Validator, Terminierung, Schema, Playbooks
+Das ist die Oberfläche: Ziel eingeben, sechs Fragen beantworten, Plan bekommen,
+Aufgaben abhaken. **Ohne API-Key läuft sie im Demonstrationsbetrieb** — die
+Pläne kommen dann direkt aus den drei hinterlegten Playbooks statt aus dem
+Modell, sichtbar gekennzeichnet.
+
+Mit Schlüssel wird echt geplant:
+
+```bash
+export ANTHROPIC_API_KEY=sk-ant-...
+npm start
+```
+
+### Weitere Befehle
+
+```bash
+npm test                 # 100 Tests, kein API-Key nötig
 npm run playbooks        # geladene Playbooks anzeigen
 npm run eval -- --dry    # Struktur- und Abdeckungsprüfung des Goldstandards
 
-# Braucht einen API-Key:
-export ANTHROPIC_API_KEY=sk-ant-...
 npm run plan -- "Ich möchte in 18 Monaten ein Café in Leipzig eröffnen" \
   --hours 6 --deadline 2027-06-01 --state SN --budget 28000
 npm run eval             # vollständiger Evaluationslauf mit Gate
 ```
+
+---
+
+## Es gibt keine Anmeldung — mit Absicht
+
+Dieser Stand ist ein **Einzelplatzwerkzeug zum Selbstausprobieren**, kein
+Produkt für Nutzer. Konkret:
+
+- Kein Konto, kein Passwort, keine Registrierung
+- Alle Daten liegen in einer JSON-Datei auf dieser Maschine
+  (`~/.atlas/atlas.json`, änderbar über `ATLAS_DATA`)
+- Der Server hört nur auf `localhost` und hat keine Zugriffskontrolle —
+  **nicht ins Internet stellen**
+
+Für ein echtes Produkt mit Anmeldung fehlen: Konten und Sitzungen, Postgres
+statt JSON-Datei, Mandantentrennung, DSGVO-Vorgang (Einwilligungen, Export,
+Löschung), Zahlungsabwicklung, Hosting. Das Datenschema in `src/store.ts`
+entspricht bereits [docs/09](../docs/09-datenmodell.md) — der Umstieg auf
+Postgres ist damit ein Austausch dieser einen Datei, keine Produktumstellung.
 
 ---
 

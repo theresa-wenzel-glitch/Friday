@@ -1,0 +1,579 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Atlas</title>
+<style>
+  /* Designsystem aus docs/05-marke-und-design.md */
+  :root {
+    --bg: #FBFBFA; --elevated: #FFFFFF; --sunken: #F2F2F0;
+    --text: #111214; --text-2: #5C5F66; --text-3: #8E9199;
+    --line: #E6E6E3; --accent: #2F6F5E; --accent-soft: #E3EFEA;
+    --attention: #B4761E; --critical: #B3261E;
+    --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0E0F11; --elevated: #17191C; --sunken: #0A0B0C;
+      --text: #F2F3F5; --text-2: #A0A4AB; --text-3: #6E727A;
+      --line: #26282C; --accent: #5FB59B; --accent-soft: #16332C;
+      --attention: #D9A34A; --critical: #E0655C;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font-family: var(--sans); font-size: 16px; line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 640px; margin: 0 auto; padding: 32px 20px 80px; }
+
+  header {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px; margin-bottom: 40px;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 600; letter-spacing: -.02em; }
+  .brand svg { display: block; }
+
+  h1 { font-size: 30px; line-height: 1.15; letter-spacing: -.03em; font-weight: 600; margin: 0 0 12px; text-wrap: balance; }
+  h2 { font-size: 20px; line-height: 1.25; letter-spacing: -.02em; font-weight: 600; margin: 0; }
+  p  { margin: 0 0 16px; color: var(--text-2); }
+  .muted { color: var(--text-3); font-size: 14px; }
+
+  .label {
+    font-family: var(--mono); font-size: 11px; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--text-3); display: block; margin-bottom: 8px;
+  }
+
+  textarea, input, select {
+    width: 100%; font: inherit; color: var(--text);
+    background: var(--sunken); border: 1px solid var(--line);
+    border-radius: 10px; padding: 12px 14px;
+  }
+  textarea { min-height: 108px; resize: vertical; line-height: 1.5; }
+  input:focus, textarea:focus, select:focus {
+    outline: 2px solid var(--accent); outline-offset: 1px; border-color: transparent;
+  }
+  input[type=range] { padding: 0; background: none; border: none; accent-color: var(--accent); }
+
+  button {
+    font: inherit; font-weight: 600; cursor: pointer;
+    border-radius: 12px; padding: 13px 20px; border: 1px solid transparent;
+    transition: opacity .15s, transform .1s;
+  }
+  button:active { transform: scale(.985); }
+  button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  button[disabled] { opacity: .45; cursor: default; }
+  .primary { background: var(--accent); color: var(--bg); width: 100%; }
+  .ghost { background: transparent; color: var(--text-2); border-color: var(--line); }
+  .link {
+    background: none; border: none; color: var(--text-2); padding: 6px 0;
+    text-decoration: underline; text-underline-offset: 3px; font-weight: 400;
+  }
+  .row { display: flex; gap: 10px; align-items: center; }
+  .stack { display: flex; flex-direction: column; gap: 18px; }
+  .field { display: flex; flex-direction: column; }
+
+  .card {
+    background: var(--elevated); border: 1px solid var(--line);
+    border-radius: 16px; padding: 20px;
+  }
+  .chip {
+    display: inline-block; font-size: 13px; color: var(--text-2);
+    background: var(--sunken); border: 1px solid var(--line);
+    border-radius: 999px; padding: 7px 13px; cursor: pointer; margin: 0 6px 6px 0;
+  }
+  .chip:hover { border-color: var(--accent); color: var(--accent); }
+
+  .banner {
+    display: flex; gap: 10px; align-items: flex-start;
+    border: 1px solid var(--attention); color: var(--attention);
+    border-radius: 12px; padding: 12px 14px; font-size: 14px; margin-bottom: 24px;
+  }
+  .banner strong { display: block; color: var(--attention); }
+  .error { border-color: var(--critical); color: var(--critical); }
+
+  /* Pfad */
+  .path { display: flex; flex-direction: column; gap: 0; }
+  .node { display: grid; grid-template-columns: 24px 1fr; gap: 14px; }
+  .node .rail { display: flex; flex-direction: column; align-items: center; }
+  .node .dot {
+    width: 12px; height: 12px; border-radius: 50%; margin-top: 5px;
+    border: 1.5px solid var(--text-3); background: var(--bg); flex: none;
+  }
+  .node.done .dot { background: var(--accent); border-color: var(--accent); }
+  .node.now  .dot { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 0 5px var(--accent-soft); }
+  .node .stem { width: 1.5px; flex: 1; background: var(--line); margin: 6px 0; min-height: 20px; }
+  .node.done .stem { background: var(--accent); }
+  .node .body { padding-bottom: 26px; }
+  .node .title { font-weight: 600; letter-spacing: -.01em; }
+  .node .meta { font-family: var(--mono); font-size: 11.5px; color: var(--text-3); margin-top: 3px; }
+  .node .dod { font-size: 14px; color: var(--text-2); margin-top: 8px; }
+
+  /* Aufgaben */
+  .task {
+    display: grid; grid-template-columns: 24px 1fr; gap: 12px;
+    padding: 12px 0; border-bottom: 1px solid var(--line); align-items: start;
+  }
+  .task:last-child { border-bottom: none; }
+  .check {
+    width: 22px; height: 22px; border-radius: 7px; border: 1.5px solid var(--text-3);
+    background: none; padding: 0; cursor: pointer; margin-top: 1px;
+    display: grid; place-items: center; color: var(--bg); font-size: 13px;
+  }
+  .task.done .check { background: var(--accent); border-color: var(--accent); }
+  .task.done .t { text-decoration: line-through; color: var(--text-3); }
+  .task .t { font-size: 15px; line-height: 1.45; }
+  .task .m { font-family: var(--mono); font-size: 11px; color: var(--text-3); margin-top: 4px; }
+  .task .why { font-size: 13.5px; color: var(--text-2); margin-top: 5px; }
+
+  /* Heute */
+  .today .big { font-size: 22px; line-height: 1.3; letter-spacing: -.02em; font-weight: 600; }
+  .today .when { font-family: var(--mono); font-size: 12px; color: var(--text-3); margin-top: 10px; }
+
+  /* Zielkarte */
+  .goal-card {
+    display: block; width: 100%; text-align: left; background: var(--elevated);
+    border: 1px solid var(--line); border-radius: 16px; padding: 18px;
+    font: inherit; color: var(--text); cursor: pointer; margin-bottom: 12px;
+  }
+  .goal-card:hover { border-color: var(--accent); }
+  .bar { height: 4px; border-radius: 3px; background: var(--sunken); margin-top: 12px; overflow: hidden; }
+  .bar i { display: block; height: 100%; background: var(--accent); border-radius: 3px; transition: width .6s cubic-bezier(.32,.72,0,1); }
+
+  /* Erzeugung */
+  .gen { text-align: center; padding: 60px 0; }
+  .gen svg { margin-bottom: 28px; }
+  .gen .draw { stroke-dasharray: 220; stroke-dashoffset: 220; animation: draw 2.2s cubic-bezier(.32,.72,0,1) infinite; }
+  @keyframes draw { 0% { stroke-dashoffset: 220; } 60%,100% { stroke-dashoffset: 0; } }
+  .gen p { min-height: 24px; transition: opacity .3s; }
+
+  .tabs { display: flex; gap: 6px; margin-bottom: 24px; }
+  .tab {
+    background: transparent; border: 1px solid var(--line); color: var(--text-2);
+    border-radius: 999px; padding: 8px 16px; font-size: 14px; font-weight: 500;
+  }
+  .tab[aria-selected=true] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+
+  .hidden { display: none !important; }
+  footer { margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--line); }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <span class="brand">
+      <svg width="22" height="22" viewBox="0 0 86 86" aria-hidden="true">
+        <path d="M14 74 C 14 44, 40 52, 44 34 C 47 20, 60 16, 72 14" fill="none"
+              stroke="currentColor" stroke-width="6" stroke-linecap="round" opacity=".85"/>
+        <circle cx="72" cy="14" r="9" fill="currentColor"/>
+      </svg>
+      Atlas
+    </span>
+    <button class="link hidden" id="btn-home">Alle Ziele</button>
+  </header>
+
+  <div id="demo-banner" class="banner hidden">
+    <span aria-hidden="true">●</span>
+    <span>
+      <strong>Demonstrationsbetrieb</strong>
+      Kein API-Key gesetzt — die Pläne kommen direkt aus den drei hinterlegten
+      Playbooks statt aus dem Modell. Sie sind nicht auf deine Situation zugeschnitten.
+    </span>
+  </div>
+
+  <div id="error" class="banner error hidden"></div>
+
+  <!-- Zielübersicht -->
+  <section id="view-home" class="hidden">
+    <h1>Deine Ziele</h1>
+    <div id="goal-list"></div>
+    <button class="primary" id="btn-new" style="margin-top:20px">Neues Ziel</button>
+  </section>
+
+  <!-- Zieleingabe -->
+  <section id="view-goal" class="hidden">
+    <h1>Was möchtest du erreichen?</h1>
+    <p>Ein Satz reicht. Je konkreter, desto besser der Plan.</p>
+    <textarea id="goal-input" placeholder="z. B. Ich möchte in 18 Monaten ein Café in Leipzig eröffnen"></textarea>
+    <div style="margin:16px 0 24px">
+      <span class="label">Beispiele</span>
+      <span class="chip">Ich möchte in 18 Monaten ein Café in Leipzig eröffnen</span>
+      <span class="chip">Ich will nebenberuflich als Freelancer starten</span>
+      <span class="chip">Ich möchte einen Onlineshop aufbauen</span>
+    </div>
+    <button class="primary" id="btn-to-interview" disabled>Weiter</button>
+  </section>
+
+  <!-- Interview -->
+  <section id="view-interview" class="hidden">
+    <h1>Sechs Fragen.</h1>
+    <p>Danach steht dein Plan. Alles ist später änderbar.</p>
+    <div class="stack">
+      <div class="field">
+        <label class="label" for="f-hours">Zeit pro Woche — <span id="hours-out">6</span> Stunden</label>
+        <input type="range" id="f-hours" min="1" max="40" value="6">
+      </div>
+      <div class="field">
+        <label class="label" for="f-deadline">Bis wann?</label>
+        <input type="date" id="f-deadline">
+      </div>
+      <div class="field">
+        <label class="label" for="f-budget">Budget in Euro (optional)</label>
+        <input type="number" id="f-budget" min="0" step="500" placeholder="z. B. 28000">
+      </div>
+      <div class="field">
+        <label class="label" for="f-state">Bundesland</label>
+        <select id="f-state">
+          <option value="">— bitte wählen —</option>
+          <option value="BW">Baden-Württemberg</option><option value="BY">Bayern</option>
+          <option value="BE">Berlin</option><option value="BB">Brandenburg</option>
+          <option value="HB">Bremen</option><option value="HH">Hamburg</option>
+          <option value="HE">Hessen</option><option value="MV">Mecklenburg-Vorpommern</option>
+          <option value="NI">Niedersachsen</option><option value="NW">Nordrhein-Westfalen</option>
+          <option value="RP">Rheinland-Pfalz</option><option value="SL">Saarland</option>
+          <option value="SN">Sachsen</option><option value="ST">Sachsen-Anhalt</option>
+          <option value="SH">Schleswig-Holstein</option><option value="TH">Thüringen</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="label" for="f-exp">Vorerfahrung</label>
+        <select id="f-exp">
+          <option value="none">keine</option>
+          <option value="some" selected>etwas</option>
+          <option value="professional">beruflich</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="label" for="f-worry">Was macht dir am meisten Sorge? (optional)</label>
+        <input type="text" id="f-worry" placeholder="z. B. dass ich etwas Wichtiges übersehe">
+      </div>
+      <label class="row" style="font-size:15px; color:var(--text-2)">
+        <input type="checkbox" id="f-weekend" style="width:auto"> Ich arbeite auch am Wochenende daran
+      </label>
+      <button class="primary" id="btn-generate">Plan erstellen</button>
+      <button class="link" id="btn-back-goal">Zurück</button>
+    </div>
+  </section>
+
+  <!-- Planerstellung -->
+  <section id="view-generating" class="hidden">
+    <div class="gen">
+      <svg width="70" height="70" viewBox="0 0 86 86" aria-hidden="true">
+        <path class="draw" d="M14 74 C 14 44, 40 52, 44 34 C 47 20, 60 16, 72 14"
+              fill="none" stroke="var(--accent)" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+      <h2 id="gen-title">Ich baue deinen Plan</h2>
+      <p id="gen-step" style="margin-top:12px"></p>
+    </div>
+  </section>
+
+  <!-- Plan / Zielansicht -->
+  <section id="view-plan" class="hidden">
+    <h1 id="plan-title"></h1>
+    <p id="plan-summary"></p>
+    <div class="tabs" role="tablist">
+      <button class="tab" id="tab-today" role="tab" aria-selected="true">Heute</button>
+      <button class="tab" id="tab-path" role="tab" aria-selected="false">Pfad</button>
+    </div>
+    <div id="panel-today"></div>
+    <div id="panel-path" class="hidden"></div>
+    <footer>
+      <p class="muted" id="plan-meta"></p>
+      <button class="link" id="btn-delete">Dieses Ziel löschen</button>
+    </footer>
+  </section>
+
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const views = ["home", "goal", "interview", "generating", "plan"];
+let state = { demo: false, goals: [], current: null };
+
+function show(name) {
+  for (const v of views) $(`view-${v}`).classList.toggle("hidden", v !== name);
+  $("btn-home").classList.toggle("hidden", name === "home" || name === "generating");
+  window.scrollTo(0, 0);
+}
+
+function fail(message) {
+  const el = $("error");
+  el.textContent = message;
+  el.classList.remove("hidden");
+  setTimeout(() => el.classList.add("hidden"), 9000);
+}
+
+async function api(path, options) {
+  const res = await fetch(path, {
+    headers: { "content-type": "application/json" },
+    ...options,
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error ?? "Unbekannter Fehler.");
+  return data;
+}
+
+/* --- Übersicht ---------------------------------------------------------- */
+
+function renderHome() {
+  const list = $("goal-list");
+  list.innerHTML = "";
+
+  if (state.goals.length === 0) {
+    list.innerHTML = `<p class="muted">Noch kein Ziel. Fang mit einem an — mehr als drei
+      gleichzeitig sind selten realistisch.</p>`;
+  }
+
+  for (const goal of state.goals) {
+    const p = goal.progress;
+    const pct = p.tasksTotal ? Math.round((p.tasksDone / p.tasksTotal) * 100) : 0;
+    const btn = document.createElement("button");
+    btn.className = "goal-card";
+    btn.innerHTML = `
+      <div style="font-weight:600; letter-spacing:-.01em">${esc(goal.input.rawInput)}</div>
+      <div class="muted" style="margin-top:6px; font-family:var(--mono); font-size:11.5px">
+        ${p.milestonesDone}/${p.milestonesTotal} Meilensteine · ${p.tasksDone}/${p.tasksTotal} Aufgaben
+        ${goal.demo ? " · Demo" : ""}
+      </div>
+      <div class="bar"><i style="width:${pct}%"></i></div>`;
+    btn.onclick = () => openGoal(goal);
+    list.appendChild(btn);
+  }
+
+  show("home");
+}
+
+/* --- Planerstellung ----------------------------------------------------- */
+
+const STEPS = [
+  "Ich ordne dein Ziel ein …",
+  "Ich schaue mir an, wie andere das gemacht haben …",
+  "Ich passe die Zeiten an deine Wochenstunden an …",
+  "Ich prüfe die Reihenfolge und die Termine …",
+];
+
+async function generate() {
+  show("generating");
+  let i = 0;
+  $("gen-step").textContent = STEPS[0];
+  const ticker = setInterval(() => {
+    i = (i + 1) % STEPS.length;
+    $("gen-step").textContent = STEPS[i];
+  }, 2600);
+
+  try {
+    const goal = await api("/api/goals", {
+      method: "POST",
+      body: JSON.stringify({
+        rawInput: $("goal-input").value.trim(),
+        hours: Number($("f-hours").value),
+        targetDate: $("f-deadline").value || undefined,
+        budgetEur: $("f-budget").value || undefined,
+        state: $("f-state").value || undefined,
+        experience: $("f-exp").value,
+        biggestWorry: $("f-worry").value || undefined,
+        includeWeekends: $("f-weekend").checked,
+      }),
+    });
+    state.goals.unshift(goal);
+    openGoal(goal);
+  } catch (err) {
+    fail(err.message);
+    show("interview");
+  } finally {
+    clearInterval(ticker);
+  }
+}
+
+/* --- Zielansicht -------------------------------------------------------- */
+
+function openGoal(goal) {
+  state.current = goal;
+  $("plan-title").textContent = goal.input.rawInput;
+  $("plan-summary").textContent = goal.plan.summary;
+
+  const cost = goal.demo
+    ? "Direkt aus dem Playbook erzeugt (Demonstrationsbetrieb)."
+    : `Modellkosten dieses Plans: ${goal.costEur.toFixed(3)} €`;
+  $("plan-meta").textContent =
+    `${goal.plan.startDate} bis ${goal.plan.endDate} · ${goal.classification.intentKey} · ${cost}`;
+
+  selectTab("today");
+  show("plan");
+}
+
+function selectTab(which) {
+  $("tab-today").setAttribute("aria-selected", String(which === "today"));
+  $("tab-path").setAttribute("aria-selected", String(which === "path"));
+  $("panel-today").classList.toggle("hidden", which !== "today");
+  $("panel-path").classList.toggle("hidden", which !== "path");
+  which === "today" ? renderToday() : renderPath();
+}
+
+function renderToday() {
+  const goal = state.current;
+  const next = goal.progress.nextTask;
+  const panel = $("panel-today");
+
+  if (!next) {
+    panel.innerHTML = `<div class="card today">
+      <div class="big">Du hast alles erledigt.</div>
+      <p class="muted" style="margin-top:10px">
+        Vor ${daysSince(goal.createdAt)} Tagen war das ein Satz auf einem Bildschirm.</p>
+    </div>`;
+    return;
+  }
+
+  const milestone = goal.plan.milestones.find((m) => m.ref === next.milestoneRef);
+  const task = milestone.tasks.find((t) => t.title === next.title);
+
+  panel.innerHTML = `
+    <div class="card today">
+      <span class="label">${esc(milestone.title)}</span>
+      <div class="big">${esc(task.title)}</div>
+      <p style="margin:12px 0 0; font-size:15px">${esc(task.why)}</p>
+      <div class="when">fällig ${task.dueAt} · ca. ${task.estimatedMin} Minuten</div>
+      <div class="row" style="margin-top:20px">
+        <button class="primary" id="btn-done" style="flex:1">Erledigt</button>
+        <button class="ghost" id="btn-defer">Später</button>
+      </div>
+    </div>
+    <p class="muted" style="margin-top:18px">
+      Kein Rückstandszähler. Wenn eine Woche nichts geht, wird der Plan angepasst —
+      nicht rot markiert.</p>`;
+
+  const key = `${next.milestoneRef}::${next.title}`;
+  $("btn-done").onclick = () => setStatus(key, "done");
+  $("btn-defer").onclick = () => setStatus(key, "deferred");
+}
+
+function renderPath() {
+  const goal = state.current;
+  const panel = $("panel-path");
+  panel.innerHTML = "";
+
+  goal.plan.milestones.forEach((m, index) => {
+    const statuses = m.tasks.map((t) => goal.taskStatus[`${m.ref}::${t.title}`]);
+    const done = m.tasks.length > 0 && statuses.every((s) => s === "done");
+    const started = statuses.some((s) => s === "done");
+    const isNow = !done && (started || goal.progress.nextTask?.milestoneRef === m.ref);
+
+    const node = document.createElement("div");
+    node.className = `node ${done ? "done" : isNow ? "now" : ""}`;
+    node.innerHTML = `
+      <div class="rail"><span class="dot"></span>
+        ${index < goal.plan.milestones.length - 1 ? '<span class="stem"></span>' : ""}</div>
+      <div class="body">
+        <div class="title">${esc(m.title)}</div>
+        <div class="meta">${m.windowStart} → ${m.windowEnd} · ${m.durationDays} Tage
+          ${m.origin === "generated" ? " · generiert" : ""}</div>
+        <div class="dod">Fertig, wenn: ${esc(m.definitionOfDone)}</div>
+        <div class="tasks"></div>
+      </div>`;
+
+    const tasks = node.querySelector(".tasks");
+    tasks.style.marginTop = "14px";
+
+    for (const t of m.tasks) {
+      const key = `${m.ref}::${t.title}`;
+      const status = goal.taskStatus[key];
+      const row = document.createElement("div");
+      row.className = `task ${status === "done" ? "done" : ""}`;
+      row.innerHTML = `
+        <button class="check" aria-label="Aufgabe abhaken">${status === "done" ? "✓" : ""}</button>
+        <div>
+          <div class="t">${esc(t.title)}</div>
+          <div class="m">${t.dueAt} · ${t.estimatedMin} Min${t.blocking ? " · blockiert" : ""}</div>
+        </div>`;
+      row.querySelector(".check").onclick = () =>
+        setStatus(key, status === "done" ? "open" : "done");
+      tasks.appendChild(row);
+    }
+
+    panel.appendChild(node);
+  });
+
+  if (goal.plan.assumptions.length) {
+    const box = document.createElement("div");
+    box.className = "card";
+    box.style.marginTop = "12px";
+    box.innerHTML = `<span class="label">Annahmen</span>` +
+      goal.plan.assumptions.map((a) => `<div style="font-size:14px; color:var(--text-2); margin-top:6px">· ${esc(a)}</div>`).join("");
+    panel.appendChild(box);
+  }
+}
+
+async function setStatus(key, status) {
+  try {
+    const updated = await api(`/api/goals/${state.current.id}/task`, {
+      method: "POST",
+      body: JSON.stringify({ key, status }),
+    });
+    state.current = updated;
+    state.goals = state.goals.map((g) => (g.id === updated.id ? updated : g));
+    $("tab-today").getAttribute("aria-selected") === "true" ? renderToday() : renderPath();
+  } catch (err) {
+    fail(err.message);
+  }
+}
+
+/* --- Hilfen ------------------------------------------------------------- */
+
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, (c) =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+}
+
+function daysSince(iso) {
+  return Math.max(0, Math.round((Date.now() - new Date(iso)) / 86400000));
+}
+
+/* --- Verdrahtung -------------------------------------------------------- */
+
+$("goal-input").addEventListener("input", (e) => {
+  $("btn-to-interview").disabled = e.target.value.trim().length < 10;
+});
+document.querySelectorAll(".chip").forEach((chip) => {
+  chip.onclick = () => {
+    $("goal-input").value = chip.textContent.trim();
+    $("btn-to-interview").disabled = false;
+  };
+});
+$("f-hours").addEventListener("input", (e) => { $("hours-out").textContent = e.target.value; });
+$("btn-to-interview").onclick = () => show("interview");
+$("btn-back-goal").onclick = () => show("goal");
+$("btn-generate").onclick = generate;
+$("btn-new").onclick = () => { $("goal-input").value = ""; $("btn-to-interview").disabled = true; show("goal"); };
+$("btn-home").onclick = renderHome;
+$("tab-today").onclick = () => selectTab("today");
+$("tab-path").onclick = () => selectTab("path");
+$("btn-delete").onclick = async () => {
+  if (!confirm("Ziel und Fortschritt endgültig löschen?")) return;
+  await api(`/api/goals/${state.current.id}`, { method: "DELETE" });
+  state.goals = state.goals.filter((g) => g.id !== state.current.id);
+  renderHome();
+};
+
+(async function init() {
+  try {
+    const status = await api("/api/status");
+    state.demo = status.demo;
+    $("demo-banner").classList.toggle("hidden", !status.demo);
+    state.goals = await api("/api/goals");
+    state.goals.length ? renderHome() : show("goal");
+  } catch (err) {
+    fail(`Server nicht erreichbar: ${err.message}`);
+    show("goal");
+  }
+})();
+</script>
+</body>
+</html>
