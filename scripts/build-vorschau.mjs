@@ -32,7 +32,7 @@ const rows = db
     `SELECT id, slug, name, aka, sex, breed, registry_no, year_of_birth,
             year_of_death, color, country, disciplines, description,
             bloodline_note, sire_name, dam_name, sire_id, dam_id,
-            availability, is_historic
+            availability, is_historic, photo_url, photo_credit
      FROM horses
      WHERE status = 'approved'
      ORDER BY name COLLATE NOCASE`,
@@ -40,7 +40,9 @@ const rows = db
   .all();
 
 // Nur die öffentlichen Felder - Kontaktdaten gehören nicht in eine Datei,
-// die frei weitergegeben wird.
+// die frei weitergegeben wird. photoUrl wird nur übernommen, wenn es eine
+// vollständige http(s)-Adresse ist - ein selbst hochgeladenes Bild
+// (/api/uploads/…) gibt es in dieser losgelösten Datei ohne Server nicht.
 const horses = rows.map((r) => ({
   id: r.id,
   slug: r.slug,
@@ -54,6 +56,8 @@ const horses = rows.map((r) => ({
   color: r.color ?? null,
   country: r.country ?? null,
   disciplines: JSON.parse(r.disciplines || "[]"),
+  photoUrl: /^https?:\/\//i.test(r.photo_url ?? "") ? r.photo_url : null,
+  photoCredit: r.photo_credit ?? null,
   description: r.description ?? null,
   note: r.bloodline_note ?? null,
   sireName: r.sire_name ?? null,

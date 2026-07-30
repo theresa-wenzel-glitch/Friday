@@ -610,6 +610,66 @@
     GB: "Grossbritannien", AU: "Australien", BR: "Brasilien"
   };
 
+  /* Farbzuordnung fürs Platzhalter-Portrait - Pendant zu src/lib/coat-color.ts.
+     Reihenfolge wichtig: zusammengesetzte Begriffe vor den allgemeinen. */
+  var COLOR_RULES = [
+    [/blue\s*roan|blau.?roan/i, "#64748b"],
+    [/red\s*roan/i, "#a1615a"],
+    [/rot.?schimmel/i, "#b08a86"],
+    [/palomino/i, "#d3a53f"],
+    [/buckskin/i, "#c39a63"],
+    [/dunalino/i, "#c9a35f"],
+    [/red\s*dun/i, "#a86b3e"],
+    [/grullo|grulla|silber.?grullo/i, "#8c8070"],
+    [/\bdun\b/i, "#a08a5c"],
+    [/schimmel|grau|grey|gray/i, "#9c9690"],
+    [/schwarz|black/i, "#2c2621"],
+    [/braun|bay/i, "#5a3823"],
+    [/fuchs|sorrel|chestnut|rot(?!schimmel)/i, "#a4552c"],
+    [/roan/i, "#8a7a72"]
+  ];
+  var COLOR_DEFAULT = "#8d5a2c";
+  var COLOR_LIGHT = { "#d3a53f": 1, "#c39a63": 1, "#c9a35f": 1, "#9c9690": 1 };
+
+  function coatColorFill(color) {
+    var fill = COLOR_DEFAULT;
+    if (color) {
+      for (var i = 0; i < COLOR_RULES.length; i++) {
+        if (COLOR_RULES[i][0].test(color)) { fill = COLOR_RULES[i][1]; break; }
+      }
+    }
+    return { fill: fill, ink: COLOR_LIGHT[fill] ? "#241c16" : "#faf7f1" };
+  }
+
+  function initialsOf(name) {
+    var words = String(name || "").split(/\s+/).filter(Boolean);
+    if (words.length >= 2) return (words[0][0] + words[1][0]).toUpperCase();
+    return (words[0] || "?").slice(0, 2).toUpperCase();
+  }
+
+  /* Bild oder Platzhalter - Pendant zu HorsePortrait.tsx. */
+  function portraitHtml(h, variant) {
+    var aspect = variant === "hero" ? "aspect-ratio:16/10;" : "aspect-ratio:4/3;";
+    var rounded = variant === "hero" ? "0.75rem" : "0.5rem";
+    var common = "display:block;width:100%;" + aspect + "border-radius:" + rounded + ";border:1px solid var(--line);";
+
+    if (h.photoUrl) {
+      return '<img src="' + esc(h.photoUrl) + '" alt="' + esc(h.name) +
+        '" loading="lazy" referrerpolicy="no-referrer" style="' + common + 'object-fit:cover;">';
+    }
+
+    var c = coatColorFill(h.color);
+    var fontSize = variant === "hero" ? "3rem" : "1.5rem";
+    var caption = variant === "hero"
+      ? '<span style="position:absolute;bottom:0.5rem;right:0.75rem;font-size:0.75rem;color:' + c.ink + ';opacity:0.75;">kein Foto hinterlegt</span>'
+      : "";
+
+    return '<div role="img" aria-label="Kein Foto hinterlegt - Platzhalter für ' + esc(h.name) +
+      '" style="' + common + 'background:' + c.fill + ';position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;">' +
+      '<span style="color:' + c.ink + ';font-family:var(--display);font-size:' + fontSize + ';font-weight:600;opacity:0.9;">' +
+      esc(initialsOf(h.name)) + '</span>' + caption + '</div>';
+  }
+
   /* Vom Besucher hinzugefügte Pferde - nur für diese Sitzung. */
   var added = [];
   var nextId = -1;
@@ -851,6 +911,7 @@
     if (h.isNew) chips.unshift('<span class="chip chip-accent">dein Eintrag</span>');
 
     return '<button type="button" class="card" data-slug="' + esc(h.slug) + '">' +
+      portraitHtml(h, "card") +
       '<div class="card-head"><h3>' + esc(h.name) +
       (h.aka ? ' <span class="aka">„' + esc(h.aka) + '“</span>' : "") + "</h3>" +
       (h.historic ? '<span class="chip">historisch</span>' : "") + "</div>" +
@@ -947,6 +1008,8 @@
             ' <span style="color:var(--muted);">x</span> ' + parentLink(h.damId, h.damName) + "</p>"
           : "") +
       "</div>" +
+
+      portraitHtml(h, "hero") +
 
       '<div class="notice">' +
         "<strong>Angaben noch nicht geprüft.</strong> Sie stammen aus allgemein " +

@@ -8,6 +8,7 @@ import {
   type Sex,
 } from "./types";
 import { isValidAllbreedUrl } from "./allbreed";
+import { UPLOAD_FILENAME_RE } from "./upload-validate";
 import type { HorseInput } from "./db";
 
 export interface ValidationResult {
@@ -49,6 +50,17 @@ function safeUrl(value: string): string | null {
   } catch {
     return null;
   }
+}
+
+/**
+ * Ein selbst hochgeladenes Bild kommt als relativer Pfad vom eigenen
+ * Upload-Endpunkt (/api/uploads/<uuid>.<ext>) - der darf nicht durch die
+ * externe URL-Prüfung laufen, die sonst ein "https://" davorsetzt und den
+ * Pfad kaputt macht.
+ */
+function isOwnUpload(value: string): boolean {
+  const match = value.match(/^\/api\/uploads\/([^/?#]+)$/);
+  return match !== null && UPLOAD_FILENAME_RE.test(match[1]);
 }
 
 export function validateSubmission(form: FormData): ValidationResult {
@@ -182,7 +194,7 @@ export function validateSubmission(form: FormData): ValidationResult {
     errors.submitterEmail = "Diese E-Mail-Adresse sieht nicht gültig aus.";
   }
 
-  const photo = safeUrl(photoUrl);
+  const photo = isOwnUpload(photoUrl) ? photoUrl : safeUrl(photoUrl);
   if (photoUrl && !photo) errors.photoUrl = "Bitte eine gültige Bildadresse angeben.";
 
   const video = safeUrl(videoUrl);

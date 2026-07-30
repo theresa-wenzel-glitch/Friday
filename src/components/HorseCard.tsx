@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Horse } from "@/lib/types";
 import { countryLabel, pedigreeLine, summaryLine } from "@/lib/labels";
+import { HorsePortrait } from "./HorsePortrait";
 
 export function HorseCard({ horse }: { horse: Horse }) {
   const pedigree = pedigreeLine(horse);
@@ -11,6 +12,13 @@ export function HorseCard({ horse }: { horse: Horse }) {
       href={`/hengste/${horse.slug}`}
       className="surface rounded-xl p-4 no-underline flex flex-col gap-2 transition-shadow hover:shadow-md"
     >
+      <HorsePortrait
+        name={horse.name}
+        color={horse.color}
+        photoUrl={horse.photoUrl}
+        variant="card"
+      />
+
       <div className="flex items-start justify-between gap-3">
         <h3 className="text-lg leading-snug">
           {horse.name}

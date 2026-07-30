@@ -11,6 +11,7 @@ import {
   SEXES,
 } from "@/lib/types";
 import { AVAILABILITY_LABEL, SEX_LABEL } from "@/lib/labels";
+import { PhotoUpload } from "./PhotoUpload";
 
 export function SubmitForm() {
   const [state, formAction, pending] = useActionState<SubmitState, FormData>(
@@ -345,16 +346,10 @@ export function SubmitForm() {
 
       <Section
         title="Medien"
-        hint="Bitte nur Bilder verlinken, für die ihr die Rechte habt oder eine Erlaubnis vorliegt. Das Bild bleibt auf dem Ursprungsserver liegen."
+        hint="Bitte nur Bilder hochladen oder verlinken, für die ihr die Rechte habt oder eine Erlaubnis vorliegt."
       >
-        <Field label="Bild-Adresse (URL)" name="photoUrl" error={error("photoUrl")} wide>
-          <input
-            id="photoUrl"
-            name="photoUrl"
-            className="field"
-            defaultValue={value("photoUrl")}
-            placeholder="https://…/hengst.jpg"
-          />
+        <Field label="Bild" name="photoUrl" error={error("photoUrl")} wide>
+          <PhotoUpload id="photoUrl" name="photoUrl" defaultValue={value("photoUrl")} />
         </Field>
 
         <Field label="Bildnachweis" name="photoCredit" error={error("photoCredit")}>

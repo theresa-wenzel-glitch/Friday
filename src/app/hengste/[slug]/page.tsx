@@ -10,6 +10,7 @@ import {
 import { PedigreeChart } from "@/components/PedigreeChart";
 import { ContactReveal } from "@/components/ContactReveal";
 import { CorrectionForm } from "@/components/CorrectionForm";
+import { HorsePortrait } from "@/components/HorsePortrait";
 import { allbreedUrlFor } from "@/lib/allbreed";
 import {
   AVAILABILITY_LABEL,
@@ -159,27 +160,16 @@ export default async function HorsePage({
 
       <div className="grid gap-8 lg:grid-cols-[1fr_20rem] items-start">
         <div className="min-w-0 space-y-10">
-          {/* Foto */}
-          {horse.photoUrl && (
-            <figure>
-              {/* Bewusst ein einfaches img-Element: die Bilder liegen auf fremden
-                  Servern und sollen nicht über diesen Server geleitet werden. */}
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={horse.photoUrl}
-                alt={horse.name}
-                loading="lazy"
-                referrerPolicy="no-referrer"
-                className="w-full rounded-xl"
-                style={{ border: "1px solid var(--line)" }}
-              />
-              {horse.photoCredit && (
-                <figcaption className="text-xs muted mt-2">
-                  Foto: {horse.photoCredit}
-                </figcaption>
-              )}
-            </figure>
-          )}
+          {/* Foto oder Platzhalter - siehe HorsePortrait.tsx: Fotos bekannter
+              Hengste sind fast immer urheberrechtlich geschützt, darum zeigt
+              die App ohne Foto ein farbiges Monogramm statt einer Lücke. */}
+          <HorsePortrait
+            name={horse.name}
+            color={horse.color}
+            photoUrl={horse.photoUrl}
+            photoCredit={horse.photoCredit}
+            variant="hero"
+          />
 
           {horse.description && (
             <section>

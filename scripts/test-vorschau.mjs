@@ -25,7 +25,7 @@ try {
   check("Seite lädt ohne Skriptfehler", errors.length === 0, errors.join(" | "));
   check(
     "Alle Pferde werden gelistet",
-    (await page.textContent("#resultLine")).includes("118"),
+    (await page.textContent("#resultLine")).includes("130"),
     await page.textContent("#resultLine"),
   );
 
@@ -207,6 +207,24 @@ try {
     "Keine komplett leere letzte Generation",
     leereSpalte.length === 0,
     leereSpalte.join(", "),
+  );
+
+  /* Platzhalter-Portrait: jede Karte und jede Detailseite zeigt etwas,
+     nie eine Lücke - die Seed-Daten haben bewusst keine echten Fotos. */
+  await page.goto(FILE);
+  await page.waitForTimeout(300);
+  const placeholderCards = await page.locator('[role="img"][aria-label*="Kein Foto hinterlegt"]').count();
+  check(
+    "Karten ohne Foto zeigen ein Platzhalter-Monogramm",
+    placeholderCards > 0,
+    `${placeholderCards} Platzhalter sichtbar`,
+  );
+
+  await page.goto(FILE + "#/hengst/doc-bar");
+  await page.waitForTimeout(300);
+  check(
+    "Detailseite zeigt ebenfalls ein Platzhalter-Monogramm",
+    (await page.locator('[role="img"][aria-label*="Kein Foto hinterlegt"]').count()) > 0,
   );
 
   check("Keine Skriptfehler im gesamten Ablauf", errors.length === 0, errors.join(" | "));

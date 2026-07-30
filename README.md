@@ -18,9 +18,14 @@ Hengst hat, schreibt den Besitzer direkt an; das Verzeichnis vermittelt nicht.
 - **Direktlink zu allbreedpedigree.com** bei jedem Pferd. Es werden dort keine
   Daten ausgelesen, es ist ein normaler Verweis (optional kann pro Pferd eine
   konkrete Zielseite hinterlegt werden).
-- **Selbsteintragung**: Jeder kann seinen Hengst kostenlos eintragen. Auch
-  Stuten sind erlaubt – sie erscheinen nicht als Deckhengste, machen aber die
-  Stammbäume vollständiger.
+- **Selbsteintragung**: Jeder kann seinen Hengst kostenlos eintragen, inklusive
+  eines eigenen Fotos (Upload direkt im Formular, JPEG/PNG/WebP bis 8 MB - kein
+  Umweg über eine externe Bild-Adresse nötig). Auch Stuten sind erlaubt – sie
+  erscheinen nicht als Deckhengste, machen aber die Stammbäume vollständiger.
+- **Platzhalter-Portrait** für Pferde ohne Foto: ein farbiges Monogramm statt
+  einer Lücke, die Füllfarbe richtet sich nach der erfassten Fellfarbe. So hat
+  jeder Eintrag ein Bild - auch die historischen Hengste, für die es aus
+  urheberrechtlichen Gründen keine echten Fotos gibt (siehe unten).
 - **Besitzerkontakt**: Die E-Mail-Adresse wird erst auf Klick nachgeladen und
   steht nicht im Seitenquelltext, damit Adress-Sammler sie nicht abgreifen.
   Die Zahl der Abrufe pro Anschluss ist begrenzt.
@@ -85,13 +90,32 @@ Drei Dinge sind dabei wichtig:
    Fehlende Mutternamen und Ähnliches sind also Absicht und laden zum Ergänzen
    ein.
 
-Es sind **keine Fotos** hinterlegt: Bilder bekannter Hengste sind fast immer
-urheberrechtlich geschützt. Bitte nur Bilder einpflegen, für die eine Erlaubnis
-vorliegt.
+Es sind **keine echten Fotos** hinterlegt: Bilder bekannter Hengste sind fast
+immer urheberrechtlich geschützt, auch die auf den Seiten der jeweiligen
+Zuchtstationen. Statt eine Lücke zu zeigen, bekommt jedes Pferd ohne Foto ein
+farbcodiertes Monogramm (`src/components/HorsePortrait.tsx` bzw. das
+Gegenstück in `vorschau/_seite.html`) - die Füllfarbe richtet sich nach der
+erfassten Fellfarbe, ist also eine echte Angabe zum Pferd und keine Deko.
+Bitte nur echte Bilder einpflegen, für die eine Erlaubnis vorliegt - am besten
+über den Upload im Eintragungsformular, siehe unten.
 
-Der Bestand ist bei Quarter Horses am dichtesten. Paint Horses, Appaloosas und
-vor allem die in Europa stehenden Hengste fehlen weitgehend – genau die sollen
-über die Selbsteintragung dazukommen.
+Der Bestand ist bei Quarter Horses am dichtesten. Paint Horses und Appaloosas
+fehlen weitgehend – genau die sollen über die Selbsteintragung dazukommen.
+
+### In Europa stehende Hengste
+
+Neben den historischen US-Vererbern sind aktuell einige Hengste erfasst, die
+tatsächlich in Europa stehen bzw. dort vermarktet werden: Custom Del Cielo und
+Platinum Vintage (beide Deutschland, DQHA-gekört bzw. bei Tiemann Performance
+Horses), HF Mobster (ein Sohn von Gunner), sowie AHF Rojo El Sueno, Jaz Poco
+Simpatico und Remington Steel Burn (Foundation Quarter Horses der Absarokee
+Horse Farm, Niedersachsen). Auch hier: per Websuche recherchiert, nicht
+geprüft, Quellen in `docs/quellen-vorfahren.md`.
+
+Das sind bewusst nur wenige, konkret belegte Namen - keine erfundene
+Vollständigkeit. Wer weitere bekannte, in Europa stehende Hengste kennt: über
+`/admin/abstammung` (siehe unten) oder einfach als Nachricht durchgeben, dann
+werden sie sauber recherchiert nachgetragen.
 
 ### Die Stammbäume wachsen mit dem Bestand
 
@@ -103,11 +127,14 @@ zum Beispiel bis zu King P-234 zurück statt bei Vater und Mutter zu enden.
 
 Die Quellen dieser Recherche stehen in
 [`docs/quellen-vorfahren.md`](docs/quellen-vorfahren.md). **allbreedpedigree.com
-liess sich nicht heranziehen** – die Seite sperrt automatisierte Zugriffe
-(HTTP 403). Gearbeitet wurde daher mit Wikipedia, AQHA, Quarter Horse News,
-Western Horseman, StallionCompare und rimondo. Genau deshalb steht bei allen
+liess sich für diese Recherche nicht automatisiert abrufen** - das liegt an
+der Ausführungsumgebung, die für diese Arbeit genutzt wurde (sie darf nur eine
+feste Liste von Servern erreichen), nicht an einer Sperre der Seite selbst.
+Gearbeitet wurde stattdessen mit Wikipedia, AQHA, Quarter Horse News, Western
+Horseman, StallionCompare und rimondo. Genau deshalb steht bei allen
 Einträgen weiterhin „ungeprüft“: bitte gegen die Papiere gegenlesen, bevor ihr
-sie im Moderationsbereich freigebt.
+sie im Moderationsbereich freigebt - am einfachsten direkt über
+`/admin/abstammung`, siehe unten.
 
 Lücken bleiben. Sie schliessen sich, sobald jemand die fehlenden Vorfahren als
 eigene Einträge anlegt – die Verknüpfung über den Namen passiert von selbst,
@@ -133,6 +160,26 @@ Hengst oder Stute, ergibt sich aus der Spalte bzw. aus dem vorhandenen
 Bestand. **Vorhandene Angaben werden nur ergänzt, nie überschrieben**, und eine
 Vorschau zeigt vorher genau, was passieren würde.
 
+### Fotos hochladen
+
+Im Eintragungsformular lässt sich ein Foto direkt hochladen (JPEG, PNG oder
+WebP, bis 8 MB) - alternativ weiterhin eine externe Bild-Adresse eintragen.
+Hochgeladene Bilder landen unter `data/uploads/` (im selben Verzeichnis wie
+die Datenbank, damit ein einziges Volume beides sichert) und werden über
+`/api/uploads/<zufällige-id>.<endung>` ausgeliefert.
+
+Zur Sicherheit:
+
+- Der Dateityp wird anhand der ersten Bytes geprüft, nicht anhand des vom
+  Browser gemeldeten Typs - der liesse sich fälschen.
+- SVG ist bewusst nicht erlaubt: SVG-Dateien können Skript enthalten.
+- Der Dateiname wird bei jedem Upload komplett neu vergeben (Zufalls-UUID),
+  der vom Browser gemeldete Name wird nirgends übernommen.
+- Uploads sind pro Anschluss auf 15 pro Stunde begrenzt.
+
+Fehlt ein Foto, zeigt die Seite ein farbcodiertes Monogramm statt einer Lücke
+(siehe oben) - kein Umweg über einen externen Bilderdienst nötig.
+
 ### Startdaten erweitern
 
 Neue Pferde in `src/lib/seed-data.ts` eintragen und dann:
@@ -157,6 +204,9 @@ eingetragene Pferde bleiben unberührt.
 | `src/lib/pedigree.ts` | Aufbau des Stammbaums |
 | `src/lib/seed-data.ts` | Grundbestand bekannter Hengste |
 | `src/lib/validate.ts` | Prüfung der Formulareingaben |
+| `src/lib/coat-color.ts` | Farbzuordnung fürs Platzhalter-Portrait |
+| `src/components/HorsePortrait.tsx` | Foto oder Platzhalter-Monogramm |
+| `src/app/api/upload/` , `src/app/api/uploads/[filename]/` | Foto-Upload: annehmen und ausliefern |
 
 Technisch: Next.js (App Router) mit React Server Components, SQLite über
 `better-sqlite3`, Tailwind CSS. Kein externer Dienst nötig, die Datenbank ist
@@ -180,10 +230,11 @@ Screenshots zur Sichtprüfung (hell, dunkel, mobil):
 node scripts/screenshots.mjs
 ```
 
-Die weiteren Testläufe (Server muss laufen):
+Die weiteren Testläufe (Server muss laufen, ausser bei `test-vorschau.mjs`):
 
 ```bash
 node scripts/e2e-import.mjs     # Abstammungen stapelweise eintragen
+node scripts/e2e-upload.mjs     # Foto-Upload: echte Datei, gefälschter Typ, SVG, Pfad-Traversal
 node scripts/test-vorschau.mjs  # Ansichts-Version, direkt auf der Datei
 ```
 
@@ -215,7 +266,9 @@ alle Einträge nach einem Neustart weg. Die App braucht deshalb einen Hoster mit
 **dauerhaftem Dateispeicher**; Vercel und Netlify scheiden im Standardbetrieb
 aus.
 
-Sichert die Datenbank regelmässig – sie ist der gesamte Bestand.
+Sichert die Datenbank regelmässig – sie ist der gesamte Bestand. Hochgeladene
+Fotos liegen im selben Verzeichnis (`data/uploads/`) und gehören mit ins
+gesicherte Volume.
 
 ## Vor dem Livegang
 
@@ -229,9 +282,12 @@ Sichert die Datenbank regelmässig – sie ist der gesamte Bestand.
 ## Bekannte Grenzen
 
 - Die Ratenbegrenzung liegt im Arbeitsspeicher eines Prozesses. Bei mehreren
-  Instanzen müsste sie auf einen gemeinsamen Speicher umgestellt werden.
-- Bilder werden nur verlinkt, nicht hochgeladen. Ein echter Upload bräuchte
-  Speicher und eine Prüfung der Dateien.
+  Instanzen müsste sie auf einen gemeinsamen Speicher umgestellt werden - das
+  betrifft auch die Obergrenze für Foto-Uploads.
+- Hochgeladene Fotos landen unverändert auf der Platte, ohne serverseitige
+  Verkleinerung oder Neucodierung. Bei sehr vielen grossen Bildern wächst
+  `data/uploads/` entsprechend; es gibt noch keine automatische Aufräumung
+  für Uploads, deren Einsendung abgelehnt wurde.
 - Es gibt noch keine Benachrichtigung per E-Mail, wenn eine neue Einsendung
   eintrifft – die Moderation muss aktiv unter `/admin` nachsehen.
 - Die Oberfläche ist auf Deutsch. Für US-Besitzer, die ihren Hengst eintragen

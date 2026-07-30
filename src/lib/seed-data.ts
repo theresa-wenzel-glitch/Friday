@@ -1296,6 +1296,134 @@ export const SEED_HORSES: SeedHorse[] = [
     country: "US",
     isHistoric: true,
   },
+
+  /* ---------------------------------------------------------------- */
+  /* In Europa stehende Hengste - per Websuche recherchiert (Juli 2026)*/
+  /*                                                                    */
+  /* allbreedpedigree.com liess sich für diese Recherche nicht          */
+  /* heranziehen (siehe docs/quellen-vorfahren.md). Quellen waren       */
+  /* DQHA, StallionCompare, In Foal Partners, rimondo sowie die         */
+  /* Seiten der jeweiligen Zuchtstationen - dort aber ausdrücklich nur  */
+  /* für Fakten (Vater, Mutter, Jahrgang, Farbe), nie für Fototexte     */
+  /* oder Bilder. isHistoric ist hier bewusst false: es sind aktuell    */
+  /* stehende bzw. beworbene Hengste, keine verstorbenen Legenden.      */
+  /* ---------------------------------------------------------------- */
+  {
+    name: "Custom Del Cielo",
+    yearOfBirth: 2007,
+    color: "Fuchs",
+    country: "DE",
+    disciplines: ["Reining"],
+    sireName: "Custom Crome",
+    description:
+      "Von der DQHA gekört (Bewertung 8,0) und mehrfacher Erfolg bis zur FEI-Europameisterschaft. Steht bei Ludwig Quarter Horses in Bitz sowie zur Samenentnahme bei Dr. Gerhard Storch in Tannheim.",
+    bloodlineNote: "Gentests laut Züchterangabe negativ auf GBED, HYPP, MH, PSSM1 und HERDA.",
+    availability: "both",
+    isHistoric: false,
+  },
+  {
+    name: "Custom Crome",
+    country: "US",
+    disciplines: ["Reining"],
+    description: "Vater von Custom Del Cielo.",
+    isHistoric: true,
+  },
+  {
+    name: "Platinum Vintage",
+    country: "DE",
+    disciplines: ["Reining"],
+    sireName: "A Sparkling Vintage",
+    damName: "Starjac Miss",
+    description:
+      "Steht bei Torsten Tiemann (Tiemann Performance Horses) in Deutschland. Über seinen Vater führt die Abstammung zu Shining Spark, über seine Mutter zu Hollywood Jac 86.",
+    isHistoric: false,
+  },
+  {
+    name: "A Sparkling Vintage",
+    country: "US",
+    disciplines: ["Reining"],
+    sireName: "Shining Spark",
+    description: "Vater von Platinum Vintage.",
+    isHistoric: true,
+  },
+  {
+    name: "Starjac Miss",
+    sex: "mare",
+    country: "US",
+    sireName: "Hollywood Jac 86",
+    damName: "A Great Star",
+    description: "Mutter von Platinum Vintage.",
+    isHistoric: true,
+  },
+  {
+    name: "A Great Star",
+    sex: "mare",
+    country: "US",
+    sireName: "Great Pine",
+    isHistoric: true,
+  },
+  {
+    name: "HF Mobster",
+    aka: "Guns On The River",
+    yearOfBirth: 2008,
+    color: "Buckskin, Splash-White-gescheckt",
+    country: "US",
+    disciplines: ["Reining"],
+    sireName: "Colonels Smoking Gun",
+    damName: "Dun Its Black Gold",
+    description:
+      "Sohn von Gunner mit über 123.000 US-Dollar NRHA-Lifetime Earnings, unter anderem für den besten Ritt der 2013 NRHA Derby Finals. Auch über die Zuchtstation Tiemann Performance Horses in Deutschland vermarktet.",
+    isHistoric: false,
+  },
+  {
+    name: "Dun Its Black Gold",
+    sex: "mare",
+    country: "US",
+    sireName: "Hollywood Dun It",
+    description: "Mutter von HF Mobster.",
+    isHistoric: true,
+  },
+  {
+    name: "AHF Rojo El Sueno",
+    yearOfBirth: 2023,
+    color: "Red Dun",
+    country: "DE",
+    breed: "Quarter Horse",
+    disciplines: ["Foundation / Zucht"],
+    damName: "IJ Kings Breeze",
+    description:
+      "Foundation Quarter Horse mit rund 29 % Poco-Bueno- und 24 % King-Blutanteil. Seine Mutter wurde tragend aus Kanada importiert; geboren und aufgewachsen bei der Absarokee Horse Farm in Niedersachsen.",
+    isHistoric: false,
+  },
+  {
+    name: "IJ Kings Breeze",
+    sex: "mare",
+    country: "CA",
+    description: "Mutter von AHF Rojo El Sueno, tragend aus Kanada nach Deutschland importiert.",
+    isHistoric: true,
+  },
+  {
+    name: "Jaz Poco Simpatico",
+    color: "Silber-Grullo",
+    country: "DE",
+    breed: "Quarter Horse",
+    disciplines: ["Foundation / Zucht"],
+    description:
+      "Foundation Quarter Horse von der Jaz Ranch (USA) importiert, doppelt reinerbig für Schwarz- und Dun-Faktor. Steht bei der Absarokee Horse Farm in Niedersachsen.",
+    bloodlineNote: "Vater und Mutter laut Quelle noch nicht namentlich gesichert - bitte ergänzen.",
+    isHistoric: false,
+  },
+  {
+    name: "Remington Steel Burn",
+    color: "Silber-Grullo",
+    country: "DE",
+    breed: "Quarter Horse",
+    disciplines: ["Foundation / Zucht"],
+    description:
+      "Foundation Quarter Horse von der Blackburn Ranch in South Dakota (USA), rund 17 % King- und 27 % Poco-Bueno-Blutanteil. Steht bei der Absarokee Horse Farm in Niedersachsen.",
+    bloodlineNote: "Vater und Mutter laut Quelle noch nicht namentlich gesichert - bitte ergänzen.",
+    isHistoric: false,
+  },
 ];
 
 
