@@ -1,0 +1,1046 @@
+<title>Atlas — Vom Ziel zum ersten Schritt</title>
+
+<style>
+  /* ---------------------------------------------------------------------
+     Designsystem aus docs/05-marke-und-design.md.
+     Akzent: tiefes, ruhiges Grün — bewusst kein Tech-Blau, keine
+     Purple-Gradients. Zweitstimme: Monospace für Kennzahlen und Labels,
+     passend zum datengetriebenen Kern (Playbook-Graph, Metriken).
+     --------------------------------------------------------------------- */
+
+  :root {
+    --bg:            #0E0F11;
+    --bg-elevated:   #17191C;
+    --bg-sunken:     #0A0B0C;
+    --text:          #F2F3F5;
+    --text-2:        #A0A4AB;
+    --text-3:        #6E727A;
+    --line:          #26282C;
+    --accent:        #5FB59B;
+    --accent-soft:   #16332C;
+    --attention:     #D9A34A;
+    --critical:      #E0655C;
+
+    --display: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+               "Helvetica Neue", Arial, sans-serif;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+            "Liberation Mono", monospace;
+
+    --rail: 92px;
+    --pad: clamp(24px, 5vw, 96px);
+  }
+
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg:          #FBFBFA;
+      --bg-elevated: #FFFFFF;
+      --bg-sunken:   #F2F2F0;
+      --text:        #111214;
+      --text-2:      #5C5F66;
+      --text-3:      #8E9199;
+      --line:        #E6E6E3;
+      --accent:      #2F6F5E;
+      --accent-soft: #E3EFEA;
+      --attention:   #B4761E;
+      --critical:    #B3261E;
+    }
+  }
+
+  :root[data-theme="light"] {
+    --bg:          #FBFBFA;
+    --bg-elevated: #FFFFFF;
+    --bg-sunken:   #F2F2F0;
+    --text:        #111214;
+    --text-2:      #5C5F66;
+    --text-3:      #8E9199;
+    --line:        #E6E6E3;
+    --accent:      #2F6F5E;
+    --accent-soft: #E3EFEA;
+    --attention:   #B4761E;
+    --critical:    #B3261E;
+  }
+
+  :root[data-theme="dark"] {
+    --bg:          #0E0F11;
+    --bg-elevated: #17191C;
+    --bg-sunken:   #0A0B0C;
+    --text:        #F2F3F5;
+    --text-2:      #A0A4AB;
+    --text-3:      #6E727A;
+    --line:        #26282C;
+    --accent:      #5FB59B;
+    --accent-soft: #16332C;
+    --attention:   #D9A34A;
+    --critical:    #E0655C;
+  }
+
+  html {
+    scroll-snap-type: y mandatory;
+    scroll-behavior: smooth;
+    background: var(--bg);
+  }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--display);
+    font-size: 17px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* --- Der Pfad: die Navigation IST die Bildmarke des Produkts ---------- */
+
+  .path {
+    position: fixed;
+    left: 0; top: 0; bottom: 0;
+    width: var(--rail);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    z-index: 50;
+    border-right: 1px solid var(--line);
+    background: color-mix(in srgb, var(--bg) 86%, transparent);
+    backdrop-filter: blur(8px);
+  }
+
+  .path-line {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 1px;
+    height: min(62vh, 560px);
+    background: var(--line);
+  }
+
+  .path-line::after {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: var(--progress, 0%);
+    background: var(--accent);
+    transition: height .7s cubic-bezier(.32,.72,0,1);
+  }
+
+  .path-dots {
+    position: relative;
+    height: min(62vh, 560px);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .dot {
+    appearance: none;
+    border: 1px solid var(--text-3);
+    background: var(--bg);
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    padding: 0;
+    cursor: pointer;
+    transition: background .3s, border-color .3s, transform .3s;
+  }
+  .dot:hover { transform: scale(1.5); border-color: var(--accent); }
+  .dot:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  .dot[data-state="done"] { background: var(--accent); border-color: var(--accent); }
+  .dot[data-state="active"] {
+    background: var(--accent);
+    border-color: var(--accent);
+    transform: scale(1.8);
+    box-shadow: 0 0 0 4px var(--accent-soft);
+  }
+
+  .path-meta {
+    position: absolute;
+    bottom: 28px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-3);
+    letter-spacing: .04em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .brand {
+    position: absolute;
+    top: 26px;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+  }
+
+  /* --- Folien ----------------------------------------------------------- */
+
+  main { margin-left: var(--rail); }
+
+  .slide {
+    scroll-snap-align: start;
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding: var(--pad);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 28px;
+    border-bottom: 1px solid var(--line);
+    position: relative;
+  }
+
+  .slide > * { max-width: 1080px; }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0;
+  }
+
+  h1 {
+    font-size: clamp(38px, 6.2vw, 82px);
+    line-height: 1.02;
+    letter-spacing: -.035em;
+    font-weight: 600;
+    margin: 0;
+    text-wrap: balance;
+  }
+
+  h2 {
+    font-size: clamp(28px, 3.9vw, 50px);
+    line-height: 1.1;
+    letter-spacing: -.025em;
+    font-weight: 600;
+    margin: 0;
+    text-wrap: balance;
+    max-width: 20ch;
+  }
+
+  .lead {
+    font-size: clamp(17px, 1.5vw, 21px);
+    line-height: 1.6;
+    color: var(--text-2);
+    max-width: 62ch;
+    margin: 0;
+  }
+
+  .small { font-size: 15px; color: var(--text-2); max-width: 60ch; margin: 0; }
+  .note  { font-size: 13px; color: var(--text-3); max-width: 66ch; margin: 0; }
+
+  strong { color: var(--text); font-weight: 600; }
+
+  /* --- Bausteine -------------------------------------------------------- */
+
+  .grid { display: grid; gap: 18px; }
+  .g2 { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+  .g3 { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+  .g4 { grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
+
+  .card {
+    background: var(--bg-elevated);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .card h3 {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -.01em;
+  }
+  .card p { margin: 0; font-size: 14.5px; color: var(--text-2); line-height: 1.55; }
+
+  .card.accent { border-color: var(--accent); background: var(--accent-soft); }
+  .card.muted  { background: transparent; border-style: dashed; }
+
+  .label {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+
+  .stat { display: flex; flex-direction: column; gap: 4px; }
+  .stat .n {
+    font-family: var(--mono);
+    font-size: clamp(26px, 3.4vw, 44px);
+    font-weight: 600;
+    letter-spacing: -.03em;
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+  .stat .t { font-size: 14px; color: var(--text-2); }
+
+  .chain { display: flex; flex-wrap: wrap; gap: 10px; align-items: stretch; }
+  .link {
+    flex: 1 1 150px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 16px;
+    background: var(--bg-elevated);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .link .who { font-size: 13px; color: var(--text-3); line-height: 1.5; }
+  .link .step { font-weight: 600; font-size: 16px; letter-spacing: -.01em; }
+
+  .rows { display: flex; flex-direction: column; gap: 0; }
+  .row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 16px;
+    padding: 13px 0;
+    border-bottom: 1px solid var(--line);
+    align-items: baseline;
+  }
+  .row:last-child { border-bottom: none; }
+  .row .k { font-size: 15.5px; }
+  .row .v {
+    font-family: var(--mono);
+    font-size: 15px;
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .row .v.dim { color: var(--text-2); }
+
+  .bignum {
+    font-family: var(--mono);
+    font-size: clamp(40px, 7vw, 92px);
+    font-weight: 600;
+    letter-spacing: -.045em;
+    line-height: 1;
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .quote {
+    border-left: 2px solid var(--accent);
+    padding-left: 20px;
+    font-size: clamp(18px, 2vw, 24px);
+    line-height: 1.45;
+    letter-spacing: -.015em;
+    max-width: 46ch;
+    margin: 0;
+  }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    padding: 5px 11px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    color: var(--text-2);
+  }
+  .pill.on { border-color: var(--accent); color: var(--accent); }
+  .pill.warn { border-color: var(--attention); color: var(--attention); }
+
+  .tabs {
+    display: flex; flex-wrap: wrap; gap: 5px;
+    max-width: 520px;
+  }
+  .tab {
+    font-size: 11px;
+    font-family: var(--mono);
+    color: var(--text-3);
+    border: 1px solid var(--line);
+    border-radius: 5px;
+    padding: 4px 8px;
+    white-space: nowrap;
+    background: var(--bg-sunken);
+  }
+
+  .loop { display: flex; flex-direction: column; gap: 6px; max-width: 540px; }
+  .loop-step {
+    display: flex; gap: 14px; align-items: baseline;
+    padding: 11px 0;
+    border-bottom: 1px dashed var(--line);
+  }
+  .loop-step:last-child { border-bottom: none; }
+  .loop-step .i {
+    font-family: var(--mono); font-size: 11px; color: var(--accent);
+    min-width: 22px;
+  }
+  .loop-step .s { font-size: 15px; }
+
+  .gate {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 18px;
+    align-items: start;
+    padding: 16px 0;
+    border-top: 1px solid var(--line);
+  }
+  .gate .q { font-family: var(--mono); font-size: 12px; color: var(--accent); letter-spacing: .08em; }
+  .gate .body h3 { margin: 0 0 4px; font-size: 16px; font-weight: 600; }
+  .gate .body p { margin: 0; font-size: 14px; color: var(--text-2); }
+
+  .screens { display: flex; gap: 16px; flex-wrap: wrap; }
+  .screen {
+    width: 190px;
+    aspect-ratio: 9 / 17;
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    background: var(--bg-elevated);
+    padding: 16px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow: hidden;
+  }
+  .screen .cap { font-family: var(--mono); font-size: 9.5px; color: var(--text-3); letter-spacing: .1em; text-transform: uppercase; }
+  .screen .ttl { font-size: 14px; font-weight: 600; line-height: 1.25; letter-spacing: -.01em; }
+  .screen .bar { height: 7px; border-radius: 4px; background: var(--bg-sunken); }
+  .screen .bar.fill { background: var(--accent); opacity: .85; }
+  .screen .bar.half { width: 55%; }
+  .screen .bar.third { width: 34%; }
+  .screen .task {
+    border: 1px solid var(--line); border-radius: 10px; padding: 9px;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .screen .task .t { font-size: 11px; line-height: 1.35; }
+  .screen .task .m { font-family: var(--mono); font-size: 9px; color: var(--text-3); }
+  .screen .node { display: flex; align-items: center; gap: 8px; font-size: 10.5px; color: var(--text-2); }
+  .screen .node i {
+    width: 7px; height: 7px; border-radius: 50%; border: 1px solid var(--text-3);
+    flex: none; font-style: normal;
+  }
+  .screen .node.done i { background: var(--accent); border-color: var(--accent); }
+  .screen .node.now i { box-shadow: 0 0 0 3px var(--accent-soft); background: var(--accent); border-color: var(--accent); }
+
+  .kicker { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+
+  .footnote {
+    position: absolute;
+    bottom: calc(var(--pad) / 2);
+    left: var(--pad);
+    right: var(--pad);
+    font-family: var(--mono);
+    font-size: 10.5px;
+    color: var(--text-3);
+    letter-spacing: .06em;
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  /* --- Titelfolie ------------------------------------------------------- */
+
+  .title-slide { justify-content: center; gap: 34px; }
+  .title-mark { display: flex; align-items: center; gap: 16px; }
+  .title-mark svg { display: block; overflow: visible; }
+  .draw {
+    stroke-dasharray: 300;
+    stroke-dashoffset: 300;
+    animation: draw 1.9s cubic-bezier(.32,.72,0,1) .25s forwards;
+  }
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+
+  /* --- Einblenden ------------------------------------------------------- */
+
+  .reveal > * {
+    opacity: 0;
+    transform: translateY(14px);
+    transition: opacity .6s ease, transform .6s cubic-bezier(.32,.72,0,1);
+  }
+  .slide.seen.reveal > * { opacity: 1; transform: none; }
+  .slide.seen.reveal > *:nth-child(2) { transition-delay: .07s; }
+  .slide.seen.reveal > *:nth-child(3) { transition-delay: .14s; }
+  .slide.seen.reveal > *:nth-child(4) { transition-delay: .21s; }
+  .slide.seen.reveal > *:nth-child(5) { transition-delay: .28s; }
+  .slide.seen.reveal > *:nth-child(6) { transition-delay: .35s; }
+
+  .hint {
+    position: fixed;
+    right: 20px; bottom: 18px;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    color: var(--text-3);
+    letter-spacing: .06em;
+    z-index: 60;
+    background: color-mix(in srgb, var(--bg) 80%, transparent);
+    padding: 6px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    transition: opacity .4s;
+  }
+  .hint[hidden] { display: block; opacity: 0; pointer-events: none; }
+
+  @media (max-width: 760px) {
+    :root { --rail: 52px; }
+    .path-meta, .brand { display: none; }
+    .slide { gap: 20px; }
+    .footnote { position: static; margin-top: 8px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .draw { animation: none; stroke-dashoffset: 0; }
+    .reveal > * { opacity: 1; transform: none; transition: none; }
+    .path-line::after { transition: none; }
+    * { animation-duration: .01ms !important; }
+  }
+
+  @media print {
+    .path, .hint { display: none; }
+    main { margin-left: 0; }
+    .slide { break-after: page; min-height: auto; padding: 28px; }
+    .reveal > * { opacity: 1; transform: none; }
+  }
+</style>
+
+<nav class="path" aria-label="Foliennavigation">
+  <span class="brand">Atlas</span>
+  <div class="path-line" id="pathline"></div>
+  <div class="path-dots" id="dots"></div>
+  <span class="path-meta"><span id="counter">01</span> / 16</span>
+</nav>
+
+<main>
+
+  <!-- 01 ------------------------------------------------------------- -->
+  <section class="slide title-slide reveal" id="s1">
+    <p class="eyebrow">Gründungskonzept · Pre-Seed</p>
+    <div class="title-mark">
+      <svg width="86" height="86" viewBox="0 0 86 86" aria-hidden="true">
+        <path class="draw" d="M14 74 C 14 44, 40 52, 44 34 C 47 20, 60 16, 72 14"
+              fill="none" stroke="var(--accent)" stroke-width="2.5"
+              stroke-linecap="round" />
+        <circle cx="14" cy="74" r="4.5" fill="none" stroke="var(--text-3)" stroke-width="2"/>
+        <circle cx="72" cy="14" r="5.5" fill="var(--accent)"/>
+      </svg>
+      <h1>Vom Ziel zum<br>ersten Schritt.</h1>
+    </div>
+    <p class="lead">
+      Google beantwortet Fragen. Instagram zeigt Bilder. LinkedIn zeigt Lebensläufe.
+      Atlas bringt Menschen ans Ziel.
+    </p>
+    <div class="kicker">
+      <span class="pill on">Arbeitstitel</span>
+      <span class="pill">DACH</span>
+      <span class="pill">B2C + B2B</span>
+    </div>
+  </section>
+
+  <!-- 02 ------------------------------------------------------------- -->
+  <section class="slide reveal" id="s2">
+    <p class="eyebrow">Das Problem</p>
+    <h2>Der Weg vom Wunsch zum ersten Schritt ist die teuerste Lücke im Leben von Menschen.</h2>
+    <div class="grid g2">
+      <div>
+        <p class="label" style="margin-bottom:10px">Was Maja hat</p>
+        <div class="tabs">
+          <span class="tab">café eröffnen checkliste</span>
+          <span class="tab">businessplan gastronomie</span>
+          <span class="tab">ihk gründung</span>
+          <span class="tab">gewerbe anmelden</span>
+          <span class="tab">konzession gaststätte</span>
+          <span class="tab">kredit ohne eigenkapital</span>
+          <span class="tab">kassensystem vergleich</span>
+          <span class="tab">was kostet eine siebträger</span>
+          <span class="tab">mietvertrag gewerbe prüfen</span>
+          <span class="tab">+ 31 weitere</span>
+        </div>
+      </div>
+      <div>
+        <p class="label" style="margin-bottom:10px">Was Maja braucht</p>
+        <div class="card muted" style="min-height:150px; justify-content:center">
+          <p style="color:var(--text-3)">Was mache ich am Dienstag?</p>
+        </div>
+      </div>
+    </div>
+    <p class="lead">
+      Maja ist 34, Bäckereifachverkäuferin, will ein eigenes Café. Sie hat drei Bücher
+      gelesen und zwei Beratungstermine gehabt. Seit vier Monaten sitzt sie zweimal die
+      Woche abends am Küchentisch, recherchiert 45 Minuten — und macht den Laptop wieder
+      zu, ohne etwas entschieden zu haben. <strong>Es fehlt ihr nicht an Information.
+      Es fehlt an Sequenz.</strong>
+    </p>
+  </section>
+
+  <!-- 03 ------------------------------------------------------------- -->
+  <section class="slide reveal" id="s3">
+    <p class="eyebrow">Warum bestehende Lösungen nicht reichen</p>
+    <h2>Jeder besetzt ein Glied der Kette. Niemand die Kette.</h2>
+    <div class="chain">
+      <div class="link"><span class="step">Ziel</span><span class="who">—</span></div>
+      <div class="link"><span class="step">Plan</span><span class="who">Google, ChatGPT<br>Information ohne Sequenz</span></div>
+      <div class="link"><span class="step">Termin</span><span class="who">Notion, Todoist<br>leere Container</span></div>
+      <div class="link"><span class="step">Anpassung</span><span class="who">—</span></div>
+      <div class="link"><span class="step">Abschluss</span><span class="who">Coaching<br>150 €/Stunde</span></div>
+    </div>
+    <div class="card accent">
+      <h3>Atlas besetzt die Kette.</h3>
+      <p>Zwischen kostenlos-und-nutzlos und teuer-und-wirksam liegt bisher nichts.</p>
+    </div>
+  </section>
+
+  <!-- 04 ------------------------------------------------------------- -->
+  <section class="slide reveal" id="s4">
+    <p class="eyebrow">Die Lösung</p>
+    <h2>Ein Satz rein. Ein Plan mit Terminen raus. Und jemand, der dranbleibt.</h2>
+    <div class="screens">
+      <div class="screen">
+        <span class="cap">Zieleingabe</span>
+        <span class="ttl">Was möchtest du erreichen?</span>
+        <div class="bar half"></div>
+        <div class="bar third"></div>
+        <div style="flex:1"></div>
+        <div class="bar fill" style="height:26px; border-radius:9px"></div>
+      </div>
+      <div class="screen">
+        <span class="cap">Plan · 90 Sekunden</span>
+        <span class="ttl">7 Etappen · 18 Monate</span>
+        <div class="node done"><i></i>Konzept schärfen</div>
+        <div class="node done"><i></i>Standortanalyse</div>
+        <div class="node now"><i></i>Businessplan</div>
+        <div class="node"><i></i>Finanzierung</div>
+        <div class="node"><i></i>Objekt sichern</div>
+        <div class="node"><i></i>Anmeldungen</div>
+        <div class="node"><i></i>Eröffnung</div>
+      </div>
+      <div class="screen">
+        <span class="cap">Heute</span>
+        <div class="task">
+          <span class="t">5 vergleichbare Cafés besuchen und Checkliste ausfüllen</span>
+          <span class="m">bis Sonntag · ca. 3 Std.</span>
+        </div>
+        <div style="flex:1"></div>
+        <div class="bar fill" style="height:26px; border-radius:9px"></div>
+        <span class="m" style="font-family:var(--mono); font-size:9px; color:var(--text-3)">Kein Rückstandszähler.</span>
+      </div>
+    </div>
+    <p class="lead">
+      Sechs Fragen, 90 Sekunden, ein Plan — terminiert auf Majas sechs verfügbare Stunden
+      pro Woche, mit einem ersten Schritt, den sie heute Abend erledigen kann.
+      <strong>Und wenn sie eine Woche nichts schafft, bekommt sie nicht eine rote Liste,
+      sondern einen neuen Plan.</strong>
+    </p>
+  </section>
+
+  <!-- 05 ------------------------------------------------------------- -->
+  <section class="slide reveal" id="s5">
+    <p class="eyebrow">Demo</p>
+    <h1>90 Sekunden<br>live.</h1>
+    <p class="lead">
+      Zieleingabe → Interview → Planerstellung → Pfad → Heute → Replanning nach einer
+      verpassten Woche.
+    </p>
+    <p class="note">Führen, nicht erklären. Die Momente, die wirken, sind die
+      Planerstellungsanimation und der Replanning-Diff.</p>
+  </section>
+
+  <!-- 06 ------------------------------------------------------------- -->
+  <section class="slide reveal" id="s6">
+    <p class="eyebrow">Der häufigste Einwand</p>
+    <h2>Der Plan ist der billige Teil. Die Begleitung ist das Produkt.</h2>
+    <div class="grid g2">
+      <div class="card muted">
+        <p class="label">Ein Assistent</p>
+        <div class="rows">
+          <div class="row"><span class="k">Plan erzeugen</span><span class="v dim">✓</span></div>
+          <div class="row"><span class="k">Am Donnerstag erinnern</span><span class="v dim">—</span></div>
+          <div class="row"><span class="k">Nächste Woche wissen, wo du stehst</span><span class="v dim">—</span></div>
+          <div class="row"><span class="k">Termine im Kalender</span><span class="v dim">—</span></div>
+          <div class="row"><span class="k">Erfahrung aus 3.000 Verläufen</span><span class="v dim">—</span></div>
+          <div class="row"><span class="k">Menschen mit demselben Ziel</span><span class="v dim">—</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <p class="label" style="color:var(--accent)">Atlas</p>
+        <div class="rows">
+          <div class="row"><span class="k">Plan erzeugen</span><span class="v">✓</span></div>
+          <div class="row"><span class="k">Am Donnerstag erinnern</span><span class="v">✓</span></div>
+          <div class="row"><span class="k">Nächste Woche wissen, wo du stehst</span><span class="v">✓</span></div>
+          <div class="row"><span class="k">Termine im Kalender</span><span class="v">✓</span></div>
+          <div class="row"><span class="k">Erfahrung aus 3.000 Verläufen</span><span class="v">✓</span></div>
+          <div class="row"><span class="k">Menschen mit demselben Ziel</span><span class="v">✓</span></div>
+        </div>
+      </div>
+    </div>
+    <p class="lead">
+      Wir sind zum Assistenten das, was ein Fitnessstudio mit Trainer zu einem
+      Trainingsplan-PDF ist.
+    </p>
+  </section>
+
+  <!-- 07 ------------------------------------------------------------- -->
+  <section class="slide reveal" id="s7">
+    <p class="eyebrow">Der Verteidigungsgraben</p>
+    <h2>Wir bauen die Karte, die es noch nicht gibt.</h2>
+    <div class="grid g2">
+      <div class="card">
+        <p class="label">Playbook-Knoten · cafe.businessplan</p>
+        <div class="rows">
+          <div class="row"><span class="k">Dauer, Median</span><span class="v">23 Tage</span></div>
+          <div class="row"><span class="k">Dauer, p90</span><span class="v">61 Tage</span></div>
+          <div class="row"><span class="k">Abbruch an diesem Knoten</span><span class="v" style="color:var(--attention)">41 %</span></div>
+          <div class="row"><span class="k">Standortanalyse zuerst</span><span class="v">+18 Pp.</span></div>
+        </div>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:16px; justify-content:center">
+        <p class="lead">
+          Jeder kann dasselbe Modell mieten. <strong>Niemand kann mieten, was wir aus den
+          Verläufen unserer Nutzer lernen.</strong>
+        </p>
+        <p class="small">
+          Nach 3.000 Café-Gründungen erzeugen wir keinen KI-generierten Plan mehr, sondern
+          einen, der auf 3.000 realen Wegen beruht — inklusive der Stellen, an denen
+          Menschen aufgeben. Das wird mit jedem Nutzer besser und ist nicht kopierbar.
+        </p>
+      </div>
+    </div>
+    <p class="note">Zahlen illustrativ — der Graph entsteht erst im Betrieb. Genau deshalb
+      ist die Datensammlung ab Tag 1 Produktbestandteil, nicht Nachgedanke.</p>
+  </section>
+
+  <!-- 08 ------------------------------------------------------------- -->
+  <section class="slide reveal" id="s8">
+    <p class="eyebrow">Der Markt</p>
+    <h2>Wir brauchen 0,13 Prozent.</h2>
+    <div class="grid g3">
+      <div class="card"><div class="stat"><span class="n">720 Mio €</span><span class="t">TAM Europa, pro Jahr</span></div></div>
+      <div class="card"><div class="stat"><span class="n">180 Mio €</span><span class="t">SAM DACH, drei Domänen</span></div></div>
+      <div class="card"><div class="stat"><span class="n">5,4 Mio €</span><span class="t">SOM Jahr 3</span></div></div>
+    </div>
+    <div class="card accent">
+      <p class="label" style="color:var(--accent)">Die einzige Zahl, die zählt</p>
+      <p class="bignum">100.000 × 9,99 € = 12 Mio € ARR</p>
+      <p style="color:var(--text-2); font-size:15px; margin:0">
+        Das sind 0,13 % der erwachsenen DACH-Bevölkerung. Wir brauchen keinen Markt zu dominieren.
+      </p>
+    </div>
+    <p class="note">Bottom-up hergeleitete Annahmen mit offengelegten Eingangsgrößen,
+      keine recherchierten Marktdaten. Die Recherche ist als V-1 budgetiert.</p>
+  </section>
+
+  <!-- 09 ------------------------------------------------------------- -->
+  <section class="slide reveal" id="s9">
+    <p class="eyebrow">Der Startpunkt</p>
+    <h2>Wir starten dort, wo Menschen nicht aufhören können.</h2>
+    <div class="grid g4">
+      <div class="card"><h3>Fristen</h3><p>Behörden warten nicht.</p></div>
+      <div class="card"><h3>Verträge</h3><p>Miete läuft ab Unterschrift.</p></div>
+      <div class="card"><h3>Geld</h3><p>Investiert ist investiert.</p></div>
+      <div class="card"><h3>Öffentlichkeit</h3><p>Das Umfeld weiß Bescheid.</p></div>
+    </div>
+    <p class="lead">
+      Selbstverbesserungs-Software hat notorisch schlechte Bindung, weil Motivation
+      vergeht. Deshalb starten wir bei <strong>Gründungen im DACH-Raum</strong>: Der
+      externe Druck, den andere Produkte künstlich erzeugen müssen, ist hier eingebaut.
+      Dazu die höchste Zahlungsbereitschaft und die dichteste Partnerlandschaft im Markt.
+    </p>
+  </section>
+
+  <!-- 10 ------------------------------------------------------------- -->
+  <section class="slide reveal" id="s10">
+    <p class="eyebrow">Geschäftsmodell</p>
+    <h2>9,99 € im Monat. 81 % Rohmarge.</h2>
+    <div class="grid g2">
+      <div class="card">
+        <p class="label">Tarife</p>
+        <div class="rows">
+          <div class="row"><span class="k">Free — 1 Ziel</span><span class="v dim">0 €</span></div>
+          <div class="row"><span class="k">Plus — unbegrenzt, Replanning</span><span class="v">9,99 €</span></div>
+          <div class="row"><span class="k">Pro — + Expertensession</span><span class="v">29 €</span></div>
+          <div class="row"><span class="k">Business — ab 25 Plätzen</span><span class="v">8 €/Platz</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <p class="label">Rechnung je zahlendem Nutzer und Monat</p>
+        <div class="rows">
+          <div class="row"><span class="k">ARPU</span><span class="v">12,00 €</span></div>
+          <div class="row"><span class="k">davon KI-Kosten</span><span class="v dim">−0,70 €</span></div>
+          <div class="row"><span class="k">davon Zahlungsabwicklung</span><span class="v dim">−0,92 €</span></div>
+          <div class="row"><span class="k">übrige COGS</span><span class="v dim">−0,65 €</span></div>
+          <div class="row"><span class="k">Rohertrag</span><span class="v">9,73 €</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="grid g3">
+      <div class="card"><div class="stat"><span class="n">136 €</span><span class="t">LTV</span></div></div>
+      <div class="card"><div class="stat"><span class="n">22 €</span><span class="t">CAC, gemischt</span></div></div>
+      <div class="card"><div class="stat"><span class="n">2,3 Mon.</span><span class="t">Amortisation</span></div></div>
+    </div>
+    <p class="lead">
+      Die App-Store-Gebühr ist teurer als das Modell. Der interessantere Teil kommt später:
+      <strong>Wir wissen, dass Maja in vier Wochen ein Geschäftskonto braucht.</strong>
+      Das ist der wertvollste Vermittlungsmoment im Markt — und er nützt ihr, statt sie
+      zu unterbrechen.
+    </p>
+  </section>
+
+  <!-- 11 ------------------------------------------------------------- -->
+  <section class="slide reveal" id="s11">
+    <p class="eyebrow">Wachstum</p>
+    <h2>Der Nutzen ist eine Geschichte.</h2>
+    <div class="grid g2">
+      <div class="loop">
+        <div class="loop-step"><span class="i">↓</span><span class="s">Nutzer erreicht sein Ziel</span></div>
+        <div class="loop-step"><span class="i">↓</span><span class="s">Rückblick wird geteilt</span></div>
+        <div class="loop-step"><span class="i">↓</span><span class="s">Bekannte sehen ein reales Ergebnis</span></div>
+        <div class="loop-step"><span class="i">↓</span><span class="s">Neuer Nutzer startet ein Ziel</span></div>
+        <div class="loop-step"><span class="i">↺</span><span class="s">Playbook-Graph wird besser — Pläne werden besser</span></div>
+      </div>
+      <div class="card">
+        <p class="label">Kanalmix Jahr 1 · CAC</p>
+        <div class="rows">
+          <div class="row"><span class="k">Inhalte &amp; SEO — 32 %</span><span class="v">8 €</span></div>
+          <div class="row"><span class="k">TikTok / Instagram — 24 %</span><span class="v">14 €</span></div>
+          <div class="row"><span class="k">Bezahlt (ab Monat 7) — 20 %</span><span class="v">45 €</span></div>
+          <div class="row"><span class="k">Kooperationen — 10 %</span><span class="v">12 €</span></div>
+          <div class="row"><span class="k">Empfehlungen — 8 %</span><span class="v">6 €</span></div>
+        </div>
+      </div>
+    </div>
+    <p class="lead">
+      Niemand erzählt von seiner Aufgabenverwaltung. Aber jeder erzählt davon, dass er ein
+      Café eröffnet hat. Wer „Café eröffnen Checkliste" sucht, findet unseren Artikel — und
+      am Ende steht kein Newsletterformular, sondern ein Knopf:
+      <strong>„Diese Checkliste als persönlichen Plan mit Terminen."</strong>
+    </p>
+  </section>
+
+  <!-- 12 ------------------------------------------------------------- -->
+  <section class="slide reveal" id="s12">
+    <p class="eyebrow">Traktion</p>
+    <h2>Was wir bisher gebaut und gelernt haben.</h2>
+    <div class="grid g2">
+      <div class="card">
+        <p class="label">Gebaut</p>
+        <div class="rows">
+          <div class="row"><span class="k">Planungs-Engine, lauffähig</span><span class="v">✓</span></div>
+          <div class="row"><span class="k">Validator, 9 Regeln, deterministisch</span><span class="v">✓</span></div>
+          <div class="row"><span class="k">Terminierung inkl. Feiertage</span><span class="v">✓</span></div>
+          <div class="row"><span class="k">Evaluations-Gate mit Goldstandard</span><span class="v">✓</span></div>
+          <div class="row"><span class="k">Redaktionelle Playbooks</span><span class="v">3</span></div>
+          <div class="row"><span class="k">Tests</span><span class="v">83</span></div>
+        </div>
+      </div>
+      <div class="card muted">
+        <p class="label" style="color:var(--attention)">Noch nicht gemessen</p>
+        <div class="rows">
+          <div class="row"><span class="k">Planannahmequote</span><span class="v dim">offen</span></div>
+          <div class="row"><span class="k">Woche-8-Retention</span><span class="v dim">offen</span></div>
+          <div class="row"><span class="k">Konversion Free → Plus</span><span class="v dim">offen</span></div>
+          <div class="row"><span class="k">Nutzerinterviews</span><span class="v dim">0 / 15</span></div>
+        </div>
+      </div>
+    </div>
+    <p class="lead">
+      Wir zeigen keine Vanity-Metriken. Die Zahl, an der wir uns messen lassen, ist die
+      <strong>Planannahmequote</strong> — und sie ist noch nicht gemessen. Genau dafür
+      ist die erste Tranche.
+    </p>
+  </section>
+
+  <!-- 13 ------------------------------------------------------------- -->
+  <section class="slide reveal" id="s13">
+    <p class="eyebrow">Roadmap</p>
+    <h2>Vier Quartale, vier Beweise.</h2>
+    <div>
+      <div class="gate">
+        <span class="q">Q1</span>
+        <div class="body">
+          <h3>Können wir Pläne erzeugen, die Menschen annehmen?</h3>
+          <p>Gate: Annahmequote ≥ 65 % · Alpha mit 50 Gründenden</p>
+        </div>
+      </div>
+      <div class="gate">
+        <span class="q">Q2</span>
+        <div class="body">
+          <h3>Bleiben Menschen über den vierten Monat hinaus dabei?</h3>
+          <p>Gate: Woche-8-Retention ≥ 30 % · öffentliche Beta, 5.000 Nutzer</p>
+        </div>
+      </div>
+      <div class="gate">
+        <span class="q">Q3</span>
+        <div class="body">
+          <h3>Zahlen Menschen dafür?</h3>
+          <p>Gate: Konversion ≥ 8 % · 1.500 zahlende Abos · erster B2B-Pilot</p>
+        </div>
+      </div>
+      <div class="gate">
+        <span class="q">Q4</span>
+        <div class="body">
+          <h3>Trägt das Modell über eine Domäne hinaus?</h3>
+          <p>Gate: zweite Domäne bei ≥ 80 % der Aktivierung · 5.000 Abos · 720 T€ ARR</p>
+        </div>
+      </div>
+    </div>
+    <p class="lead">
+      Wir planen nach Beweisen, nicht nach Funktionen. <strong>Wird ein Gate verfehlt,
+      bauen wir nicht weiter, sondern korrigieren</strong> — das gilt auch für
+      Einstellungen.
+    </p>
+  </section>
+
+  <!-- 14 ------------------------------------------------------------- -->
+  <section class="slide reveal" id="s14">
+    <p class="eyebrow">Team</p>
+    <h2>Produkt, Domäne, Wachstum — alle drei von Anfang an.</h2>
+    <div class="grid g3">
+      <div class="card">
+        <p class="label">Rolle A</p>
+        <h3>Produkt &amp; Technik</h3>
+        <p>Planungs-Engine, Datenmodell, Evaluationssystem.</p>
+      </div>
+      <div class="card">
+        <p class="label">Rolle B</p>
+        <h3>Wachstum &amp; Betrieb</h3>
+        <p>Finanzierung, Marketing, Partner, B2B-Vertrieb.</p>
+      </div>
+      <div class="card accent">
+        <p class="label" style="color:var(--accent)">Rolle C</p>
+        <h3>Domäne &amp; Redaktion</h3>
+        <p>Playbook-Qualität, fachliche Richtigkeit, Expertennetzwerk.</p>
+      </div>
+    </div>
+    <p class="lead">
+      Die häufigste Fehlbesetzung in dieser Kategorie sind zwei Techniker und niemand, der
+      die Fachinhalte verantwortet. Das Ergebnis sind hübsche, generische Pläne.
+      <strong>Deshalb ist Domänenwissen bei uns eine Gründungsrolle mit Anteilen, keine
+      Anstellung.</strong>
+    </p>
+  </section>
+
+  <!-- 15 ------------------------------------------------------------- -->
+  <section class="slide reveal" id="s15">
+    <p class="eyebrow">Der Ask</p>
+    <h1>400.000 €<br>Pre-Seed.</h1>
+    <div class="grid g2">
+      <div class="card">
+        <p class="label">Mittelverwendung</p>
+        <div class="rows">
+          <div class="row"><span class="k">Team (auf 6 Personen)</span><span class="v">60 %</span></div>
+          <div class="row"><span class="k">Marketing</span><span class="v">22 %</span></div>
+          <div class="row"><span class="k">Inhalte &amp; Playbooks</span><span class="v">10 %</span></div>
+          <div class="row"><span class="k">Infrastruktur &amp; Recht</span><span class="v">8 %</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <p class="label">Was damit erreicht wird</p>
+        <div class="rows">
+          <div class="row"><span class="k">Öffentliche Beta, iOS + Web</span><span class="v">Q2</span></div>
+          <div class="row"><span class="k">Zahlende Abonnenten</span><span class="v">5.000</span></div>
+          <div class="row"><span class="k">ARR</span><span class="v">720 T€</span></div>
+          <div class="row"><span class="k">Seed-Reife</span><span class="v">Monat 14</span></div>
+        </div>
+      </div>
+    </div>
+    <p class="note">Kumulierter Kapitalbedarf bis Break-even ca. 1,25 Mio €,
+      Gesamtbedarf inkl. Puffer 2,2 Mio €. Break-even auf Monatsbasis: Monat 32.</p>
+  </section>
+
+  <!-- 16 ------------------------------------------------------------- -->
+  <section class="slide reveal" id="s16">
+    <p class="eyebrow">Die Vision</p>
+    <h2>Heute Pläne. Morgen die Ebene, auf der Zielerreichung stattfindet.</h2>
+    <div class="grid g3">
+      <div class="card">
+        <p class="label">Jahr 1–2</p>
+        <h3>Der Planer</h3>
+        <p>Pläne in drei Zieldomänen. Umsatz aus Abos.</p>
+      </div>
+      <div class="card">
+        <p class="label">Jahr 3–5</p>
+        <h3>Der Marktplatz</h3>
+        <p>Der Ort, an dem Menschen im richtigen Moment die richtige Dienstleistung finden.</p>
+      </div>
+      <div class="card">
+        <p class="label">Jahr 5–10</p>
+        <h3>Die Infrastruktur</h3>
+        <p>Der Graph als Ebene, auf der andere Zielerreichung anbieten.</p>
+      </div>
+    </div>
+    <p class="quote">
+      Stufe zwei beginnen wir erst, wenn Stufe eins nachweislich funktioniert.
+    </p>
+    <div class="footnote">
+      <span>Atlas · Gründungskonzept</span>
+      <span>Alle Zahlen sind gekennzeichnete Annahmen</span>
+    </div>
+  </section>
+
+</main>
+
+<div class="hint" id="hint">↑ ↓ oder scrollen</div>
+
+<script>
+  const slides = Array.from(document.querySelectorAll(".slide"));
+  const dotsEl = document.getElementById("dots");
+  const lineEl = document.getElementById("pathline");
+  const counterEl = document.getElementById("counter");
+  const hintEl = document.getElementById("hint");
+
+  slides.forEach((slide, i) => {
+    const dot = document.createElement("button");
+    dot.className = "dot";
+    dot.type = "button";
+    dot.setAttribute("aria-label", `Folie ${i + 1} von ${slides.length}`);
+    dot.addEventListener("click", () => goTo(i));
+    dotsEl.appendChild(dot);
+  });
+
+  const dots = Array.from(dotsEl.children);
+  let current = 0;
+
+  function setCurrent(index) {
+    current = index;
+    dots.forEach((dot, i) => {
+      dot.dataset.state = i < index ? "done" : i === index ? "active" : "";
+    });
+    const pct = slides.length > 1 ? (index / (slides.length - 1)) * 100 : 0;
+    lineEl.style.setProperty("--progress", pct + "%");
+    counterEl.textContent = String(index + 1).padStart(2, "0");
+  }
+
+  function goTo(index) {
+    const target = slides[Math.max(0, Math.min(slides.length - 1, index))];
+    target.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        entry.target.classList.add("seen");
+        setCurrent(slides.indexOf(entry.target));
+      }
+    },
+    { threshold: 0.55 },
+  );
+  slides.forEach((s) => observer.observe(s));
+
+  addEventListener("keydown", (e) => {
+    const next = ["ArrowDown", "ArrowRight", "PageDown", " "];
+    const prev = ["ArrowUp", "ArrowLeft", "PageUp"];
+    if (next.includes(e.key)) { e.preventDefault(); goTo(current + 1); }
+    else if (prev.includes(e.key)) { e.preventDefault(); goTo(current - 1); }
+    else if (e.key === "Home") { e.preventDefault(); goTo(0); }
+    else if (e.key === "End") { e.preventDefault(); goTo(slides.length - 1); }
+  });
+
+  setTimeout(() => hintEl.setAttribute("hidden", ""), 4200);
+  setCurrent(0);
+  slides[0].classList.add("seen");
+</script>
