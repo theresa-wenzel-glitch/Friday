@@ -25,7 +25,7 @@ try {
   check("Seite lädt ohne Skriptfehler", errors.length === 0, errors.join(" | "));
   check(
     "Alle Pferde werden gelistet",
-    (await page.textContent("#resultLine")).includes("130"),
+    (await page.textContent("#resultLine")).includes("136"),
     await page.textContent("#resultLine"),
   );
 
@@ -46,6 +46,25 @@ try {
   const reining = Number((await page.textContent("#resultLine")).match(/\d+/)[0]);
   check("Disziplin-Filter greift", reining > 0 && reining < 50, `${reining} Reiningpferde`);
   await page.selectOption("#fDiscipline", "");
+
+  /* Land-Filter: genau der Filter, der vorher fehlte und die in Europa
+     stehenden Hengste in der Namensliste untergehen liess. */
+  const countryOptions = await page.locator("#fCountry option").allTextContents();
+  check(
+    "Land-Filter bietet Deutschland an",
+    countryOptions.includes("Deutschland"),
+    countryOptions.join(", "),
+  );
+  await page.selectOption("#fCountry", "DE");
+  await page.waitForTimeout(300);
+  const deNames = await page.locator(".card h3").allTextContents();
+  check(
+    "Land-Filter auf Deutschland zeigt die EU-Hengste",
+    deNames.some((n) => n.includes("Custom Del Cielo")) &&
+      deNames.some((n) => n.includes("Platinum Vintage")),
+    deNames.join(", "),
+  );
+  await page.selectOption("#fCountry", "");
 
   /* Detailseite + Stammbaum */
   await page.fill("#q", "Smart Little Lena");

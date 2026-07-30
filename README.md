@@ -46,8 +46,9 @@ npm run dev
 
 Die App läuft dann auf <http://localhost:3000>, der Moderationsbereich unter
 <http://localhost:3000/admin>. Beim ersten Start legt sie die Datenbank unter
-`data/westernhengste.db` an und füllt sie mit rund 50 bekannten Gründer- und
-Vererberhengsten.
+`data/westernhengste.db` an und füllt sie mit rund 135 Pferden: den bekannten
+Gründer- und Vererberhengsten samt ihrer Vorfahren, dazu einige aktuell in
+Europa stehende bzw. dort vermarktete Hengste.
 
 `npm run setup` fragt nach einem Passwort für den Moderationsbereich; mit Enter
 wird eines erzeugt. Eine vorhandene `.env.local` wird nie ohne Rückfrage
@@ -102,20 +103,32 @@ Bitte nur echte Bilder einpflegen, für die eine Erlaubnis vorliegt - am besten
 Der Bestand ist bei Quarter Horses am dichtesten. Paint Horses und Appaloosas
 fehlen weitgehend – genau die sollen über die Selbsteintragung dazukommen.
 
-### In Europa stehende Hengste
+### In Europa stehende Hengste - und der Unterschied zu Gefriersamen-Katalogen
 
 Neben den historischen US-Vererbern sind aktuell einige Hengste erfasst, die
-tatsächlich in Europa stehen bzw. dort vermarktet werden: Custom Del Cielo und
-Platinum Vintage (beide Deutschland, DQHA-gekört bzw. bei Tiemann Performance
-Horses), HF Mobster (ein Sohn von Gunner), sowie AHF Rojo El Sueno, Jaz Poco
-Simpatico und Remington Steel Burn (Foundation Quarter Horses der Absarokee
-Horse Farm, Niedersachsen). Auch hier: per Websuche recherchiert, nicht
-geprüft, Quellen in `docs/quellen-vorfahren.md`.
+tatsächlich in Europa stehen: Custom Del Cielo und Platinum Vintage
+(Deutschland, DQHA-gekört bzw. bei Tiemann Performance Horses), AHF Rojo El
+Sueno, Jaz Poco Simpatico und Remington Steel Burn (Foundation Quarter Horses
+der Absarokee Horse Farm, Niedersachsen) sowie Colonels Dancing Gun (ein Sohn
+von Gunner, steht bei Quarter Dream in Italien).
+
+**Wichtige Unterscheidung**, weil sie in Katalogen wie frozen-partners.com oft
+verschwimmt: "wird für den europäischen Markt vermarktet" ist nicht dasselbe
+wie "steht in Europa". HF Mobster und Shiners Voodoo Dr sind zwei bekannte
+Beispiele, die weiterhin in den USA stehen (Texas) - nur ihr Gefriersamen wird
+auch nach Europa verkauft. Beides ist im jeweiligen Eintrag (Land, Verfügbarkeit,
+Beschreibungstext) so unterschieden, nicht geglättet.
+
+Filtern lässt sich das über **Land** in der Hengste-Übersicht bzw. in der
+Ansichts-Version - bei über 130 Einträgen sonst leicht zu übersehen.
 
 Das sind bewusst nur wenige, konkret belegte Namen - keine erfundene
-Vollständigkeit. Wer weitere bekannte, in Europa stehende Hengste kennt: über
-`/admin/abstammung` (siehe unten) oder einfach als Nachricht durchgeben, dann
-werden sie sauber recherchiert nachgetragen.
+Vollständigkeit. `frozen-partners.com` selbst liess sich nicht automatisiert
+abrufen (dieselbe Umgebungseinschränkung wie bei allbreedpedigree.com, siehe
+oben) - recherchiert wurde daher weiterhin per Websuche, Pferd für Pferd.
+Wer weitere bekannte Hengste aus solchen Katalogen nennt (auch gern einfach als
+Namen durchgeben): werden sauber recherchiert nachgetragen, über
+`/admin/abstammung` oder direkt in den Startdaten.
 
 ### Die Stammbäume wachsen mit dem Bestand
 

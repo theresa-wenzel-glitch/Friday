@@ -61,12 +61,34 @@ den Startdaten und ist eine sehr verbreitete Verwechslung.
 
 ## Was weiterhin fehlt
 
-allbreedpedigree.com bleibt für automatisierte Zugriffe gesperrt (HTTP 403,
-mehrfach geprüft). Ohne diese Quelle bleiben u. a. offen: Frontera Sugar,
-Miss Chickasha, Susie's Bay, Little Fanny, Nellene, Della Moore, Jabalina,
-Jeanette, San Sue Darks, Royal Smart, Miss Dual Doc, Miss Silver Pistol,
-Jeanie Whiz Bar, Gay Sugar Chic, A Little Starbert, Dollie Pine.
+allbreedpedigree.com liess sich für diese Recherche nicht automatisiert
+abrufen - Richtigstellung: das liegt an der Ausführungsumgebung dieser
+Sitzungen (feste Liste erlaubter Server), nicht an einer Sperre der Seite
+selbst. Ohne diese Quelle bleiben u. a. offen: Frontera Sugar, Miss Chickasha,
+Susie's Bay, Little Fanny, Nellene, Della Moore, Jabalina, Jeanette, San Sue
+Darks, Royal Smart, Miss Dual Doc, Miss Silver Pistol, Jeanie Whiz Bar, Gay
+Sugar Chic, A Little Starbert, Dollie Pine.
 
 Diese lassen sich am schnellsten schliessen, indem jemand die Abstammung bei
 allbreedpedigree.com nachschlägt und durchgibt - dann werden sie eingetragen,
 statt geraten.
+
+## Dritter Durchgang - auf Nutzerwunsch, Beispiele aus frozen-partners.com
+
+frozen-partners.com liess sich aus demselben Grund nicht automatisiert
+abrufen. Recherchiert wurde stattdessen Pferd für Pferd per Websuche.
+
+| Pferd | Jahr | Vater | Mutter | Steht wo | Quelle |
+|---|---|---|---|---|---|
+| Shiners Voodoo Dr | 2007 | Shining Spark | Voodoo Chic | Oswood Stallion Station, Weatherford TX (USA) | infoalpartners, oswoodstallionstation.com, StallionCompare |
+| Voodoo Chic | | - | - | | infoalpartners |
+| Colonels Dancing Gun | 2014 | Colonels Smoking Gun | Dance Little Spook | Quarter Dream Srl, Italien | quarterdream.com, infoalpartners |
+| Dance Little Spook | 2008 | Smart Spook | unbekannt | | quarterdream.com |
+| Smart Spook | 2001 | Smart Chic Olena | Sugarplum Spook | Sterling Ranch, Texas (USA) | rimondo, sterlingranchusa.com |
+| Sugarplum Spook | | Grays Starlight | | | quarterhorsenews.com |
+
+**Wichtig:** Shiners Voodoo Dr steht nach Quellenlage in Texas, nicht in
+Europa - er wird über Kataloge für den europäischen Markt vermarktet
+(Gefriersamen), das ist etwas anderes als "steht in Europa". Colonels Dancing
+Gun dagegen steht selbst in Italien (Quarter Dream Srl). Beides ist in
+seed-data.ts entsprechend unterschiedlich vermerkt (Land vs. Beschreibungstext).

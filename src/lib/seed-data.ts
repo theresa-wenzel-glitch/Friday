@@ -1424,6 +1424,85 @@ export const SEED_HORSES: SeedHorse[] = [
     bloodlineNote: "Vater und Mutter laut Quelle noch nicht namentlich gesichert - bitte ergänzen.",
     isHistoric: false,
   },
+
+  /* ---------------------------------------------------------------- */
+  /* Dritter Recherchedurchgang - auf Nutzerwunsch: Shiners Voodoo Dr  */
+  /* und Colonels Dancing Gun, wie sie auf Katalogseiten für den       */
+  /* europäischen Frozen-Semen-Handel geführt werden (z. B. In Foal    */
+  /* Partners).                                                        */
+  /*                                                                    */
+  /* WICHTIG: "im Frozen-Semen-Handel für Europa gelistet" ist nicht    */
+  /* dasselbe wie "steht in Europa". Shiners Voodoo Dr steht nach       */
+  /* Quellenlage weiterhin in Texas (USA) - nur sein Gefriersamen wird  */
+  /* nach Europa vermarktet. Colonels Dancing Gun dagegen steht selbst  */
+  /* in Italien. Beides ist unten so vermerkt, nichts wurde geglättet.  */
+  /* ---------------------------------------------------------------- */
+  {
+    name: "Shiners Voodoo Dr",
+    aka: "Shiners Voodoo",
+    yearOfBirth: 2007,
+    color: "Palomino",
+    country: "US",
+    disciplines: ["Reining", "Reined Cow Horse"],
+    sireName: "Shining Spark",
+    damName: "Voodoo Chic",
+    description:
+      "NRHA/NRCHA-Millionen-Dollar-Vererber in Reining und Working Cow Horse, seit 2022 unter den zehn führenden Vererbern seines Fachs. Steht bei Oswood Stallion Station in Weatherford, Texas - sein Gefriersamen wird über Kataloge auch für den europäischen Markt angeboten.",
+    availability: "frozen",
+    isHistoric: false,
+  },
+  {
+    name: "Voodoo Chic",
+    sex: "mare",
+    country: "US",
+    disciplines: ["Reined Cow Horse"],
+    description:
+      "NRCHA-Vizeweltmeisterin und AQHA-Superior-Stute im Working Cow Horse. Mutter von Shiners Voodoo Dr.",
+    isHistoric: true,
+  },
+  {
+    name: "Colonels Dancing Gun",
+    yearOfBirth: 2014,
+    color: "Fuchs",
+    country: "IT",
+    disciplines: ["Reining"],
+    sireName: "Colonels Smoking Gun",
+    damName: "Dance Little Spook",
+    description:
+      "Sohn von Gunner mit rund 250.000 US-Dollar NRHA-Erfolgen. Steht bei Quarter Dream in Italien und ist ausserhalb Europas nur über Gefriersamen erhältlich.",
+    availability: "frozen",
+    isHistoric: false,
+  },
+  {
+    name: "Dance Little Spook",
+    sex: "mare",
+    yearOfBirth: 2008,
+    color: "Braun",
+    country: "US",
+    sireName: "Smart Spook",
+    description: "Mutter von Colonels Dancing Gun.",
+    bloodlineNote: "Ihre eigene Mutter ist in den Quellen noch nicht sicher benannt.",
+    isHistoric: true,
+  },
+  {
+    name: "Smart Spook",
+    yearOfBirth: 2001,
+    color: "Fuchs",
+    country: "US",
+    disciplines: ["Reining", "Reined Cow Horse"],
+    sireName: "Smart Chic Olena",
+    damName: "Sugarplum Spook",
+    description:
+      "NRHA-Hall-of-Fame-Hengst und langjährig einer der erfolgreichsten Vererber der NRHA. Vater von Dance Little Spook.",
+    isHistoric: true,
+  },
+  {
+    name: "Sugarplum Spook",
+    sex: "mare",
+    country: "US",
+    sireName: "Grays Starlight",
+    isHistoric: true,
+  },
 ];
 
 

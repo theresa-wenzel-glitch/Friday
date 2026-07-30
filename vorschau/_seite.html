@@ -485,6 +485,9 @@
         fehlt: Hengste, die andere Leute dauerhaft eintragen, und die
         Kontaktadressen der Besitzer. Dafür muss die richtige App auf einem
         Server laufen – die liegt fertig im Projektordner.
+        Über den Filter „Land" lassen sich gezielt die Hengste anzeigen, die
+        tatsächlich in Europa stehen bzw. dort vermarktet werden - bei über
+        100 Einträgen sonst leicht zu übersehen.
         <br>
         <span style="opacity:0.85;">
           Alle Angaben stammen aus allgemeiner Rassegeschichte und sind
@@ -506,6 +509,10 @@
             <option value="historic">nur historische Vererber</option>
             <option value="current">nur aktuelle Hengste</option>
           </select>
+        </div>
+        <div>
+          <label class="label" for="fCountry">Land</label>
+          <select id="fCountry" class="field"><option value="">alle</option></select>
         </div>
         <div>
           <label class="label" for="fSex">Geschlecht</label>
@@ -856,6 +863,7 @@
     q: document.getElementById("q"),
     discipline: document.getElementById("fDiscipline"),
     bestand: document.getElementById("fBestand"),
+    country: document.getElementById("fCountry"),
     sex: document.getElementById("fSex"),
     sort: document.getElementById("fSort"),
     grid: document.getElementById("cardGrid"),
@@ -877,6 +885,23 @@
     els.discipline.value = current;
   }
 
+  /* Land-Filter: nur Länder, die im Bestand tatsächlich vorkommen - genau
+     der fehlende Filter, durch den die neu ergänzten, in Europa stehenden
+     Hengste in der langen Namensliste untergingen. */
+  function fillCountries() {
+    var seen = {};
+    horses().forEach(function (h) { if (h.country) seen[h.country] = true; });
+    var codes = Object.keys(seen).sort(function (a, b) {
+      return (COUNTRY[a] || a).localeCompare(COUNTRY[b] || b, "de");
+    });
+    var current = els.country.value;
+    els.country.innerHTML = '<option value="">alle</option>' +
+      codes.map(function (c) {
+        return '<option value="' + esc(c) + '">' + esc(COUNTRY[c] || c) + "</option>";
+      }).join("");
+    els.country.value = current;
+  }
+
   function matches(h) {
     var term = normalizeName(els.q.value);
     if (term) {
@@ -886,6 +911,7 @@
     if (els.discipline.value && (h.disciplines || []).indexOf(els.discipline.value) === -1) return false;
     if (els.bestand.value === "historic" && !h.historic) return false;
     if (els.bestand.value === "current" && h.historic) return false;
+    if (els.country.value && h.country !== els.country.value) return false;
     if (els.sex.value && h.sex !== els.sex.value) return false;
     return true;
   }
@@ -928,7 +954,7 @@
 
   function filterSignature() {
     return JSON.stringify([
-      els.q.value, els.discipline.value, els.bestand.value,
+      els.q.value, els.discipline.value, els.bestand.value, els.country.value,
       els.sex.value, els.sort.value, added.length
     ]);
   }
@@ -1131,7 +1157,7 @@
   // "change": das feuert beim Verlassen des Feldes - also genau dann, wenn
   // jemand eine Karte anklickt.
   els.q.addEventListener("input", onFilterChange);
-  [els.discipline, els.bestand, els.sex, els.sort].forEach(function (el) {
+  [els.discipline, els.bestand, els.country, els.sex, els.sort].forEach(function (el) {
     el.addEventListener("change", onFilterChange);
   });
 
@@ -1181,6 +1207,7 @@
   window.__HORSES__ = SEED;
 
   fillDisciplines();
+  fillCountries();
   route();
 })();
 </script>
