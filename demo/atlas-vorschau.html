@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
-<title>Atlas</title>
+<title>Atlas — vom Ziel zum Plan</title>
 <style>
   /* Designsystem aus docs/05-marke-und-design.md */
   :root {
@@ -22,6 +22,19 @@
       --line: #26282C; --accent: #5FB59B; --accent-soft: #16332C;
       --attention: #D9A34A; --critical: #E0655C;
     }
+  }
+  /* Explizite Umschaltung schlägt die Systemeinstellung — in beide Richtungen. */
+  :root[data-theme="dark"] {
+    --bg: #0E0F11; --elevated: #17191C; --sunken: #0A0B0C;
+    --text: #F2F3F5; --text-2: #A0A4AB; --text-3: #6E727A;
+    --line: #26282C; --accent: #5FB59B; --accent-soft: #16332C;
+    --attention: #D9A34A; --critical: #E0655C;
+  }
+  :root[data-theme="light"] {
+    --bg: #FBFBFA; --elevated: #FFFFFF; --sunken: #F2F2F0;
+    --text: #111214; --text-2: #5C5F66; --text-3: #8E9199;
+    --line: #E6E6E3; --accent: #2F6F5E; --accent-soft: #E3EFEA;
+    --attention: #B4761E; --critical: #B3261E;
   }
   * { box-sizing: border-box; }
   body {
@@ -302,6 +315,13 @@
         <span>Ein API-Key im Browser ist für den Eigengebrauch in Ordnung, für ein
           öffentliches Produkt nicht — dort gehört der Schlüssel auf den Server.
           Genau so macht es <code>engine/</code>.</span>
+      </div>
+      <div class="banner hidden" id="hosted-note">
+        <span aria-hidden="true">●</span>
+        <span><strong>Diese Seite läuft über eine Internetadresse</strong>
+          Der Aufruf an <code>api.anthropic.com</code> kann hier von der
+          Sicherheitsrichtlinie der Seite blockiert werden. Wenn er fehlschlägt:
+          die HTML-Datei herunterladen und lokal im Browser öffnen — dort geht es.</span>
       </div>
       <button class="primary" id="btn-save-key">Speichern</button>
       <button class="link danger" id="btn-clear-key">Schlüssel entfernen</button>
@@ -1668,6 +1688,9 @@ $("tab-check").onclick = () => selectTab("check");
 $("btn-settings").onclick = () => {
   $("s-key").value = state.settings.apiKey || "";
   $("s-model").value = state.settings.model || "claude-opus-5";
+  // Gehostete Seiten haben oft eine Content-Security-Policy, die fremde Ziele
+  // sperrt. Lokal geöffnet (file:) gibt es die Einschränkung nicht.
+  $("hosted-note").classList.toggle("hidden", location.protocol === "file:");
   show("settings");
 };
 $("btn-settings-back").onclick = () => renderHome();

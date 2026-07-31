@@ -74,8 +74,17 @@ if (!html.includes("<noscript>")) {
 const out = join(here, "atlas-vorschau.html");
 writeFileSync(out, html);
 
+// Zweite Fassung für gehostete Seiten, die das Dokumentgerüst selbst mitbringen:
+// nur <title>, <style>, Inhalt und <script> — ohne doctype, html, head, body.
+const head = html.slice(html.indexOf("<title>"), html.indexOf("</head>"));
+const body = html.slice(html.indexOf(">", html.indexOf("<body")) + 1, html.lastIndexOf("</body>"));
+const hosted = `${head.trim()}\n${body.trim()}\n`;
+const outHosted = join(here, "atlas-gehostet.html");
+writeFileSync(outHosted, hosted);
+
 const nodes = playbooks.reduce((n, p) => n + p.nodes.length, 0);
 console.log(
   `Geschrieben: ${out}\n` +
-    `  ${playbooks.length} Playbooks, ${nodes} Knoten, ${(html.length / 1024).toFixed(1)} KB`,
+    `  ${playbooks.length} Playbooks, ${nodes} Knoten, ${(html.length / 1024).toFixed(1)} KB\n` +
+    `Geschrieben: ${outHosted} (${(hosted.length / 1024).toFixed(1)} KB, ohne Dokumentgerüst)`,
 );
