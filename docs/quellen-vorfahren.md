@@ -109,3 +109,55 @@ entfernt. Stattdessen jetzt ein eigener Eintrag:
 Shiners Voodoo steht tatsächlich in Deutschland bei Frozen Partners - anders
 als sein Vater. NRHA European Futurity Open Champion 2017, European Open
 Derby Champion 2018.
+
+## Fünfter Durchgang - auf Nutzerwunsch, möglichst vollständige Übernahme von frozen-partners.com
+
+Der Nutzer bat darum, "einfach alle Frozen Partners Hengste" zu übernehmen, da
+sowohl EU- als auch US-Hengste unvollständig seien. frozen-partners.com liess
+sich weiterhin nicht direkt aufrufen (Ausführungsumgebung, siehe oben) - die
+Recherche lief über gezielte `site:frozen-partners.com`-Suchen plus
+Cross-Checks bei Oswood Stallion Station, StallionCompare, Quarter Horse News
+und weiteren Zuchtstationen.
+
+**Wichtige Erkenntnis zur Einordnung "EU" vs. "US":** Frozen Partners selbst
+ist ein deutscher Vermarkter für Gefriersamen (Sitz Kamp-Lintfort). Die
+Website sortiert Hengste in "US Stallions" und "EU Stallions" - das bezieht
+sich aber überwiegend auf die Verfügbarkeit von gelagertem Gefriersamen in
+Europa, NICHT zwingend auf den tatsächlichen Stallort des Pferdes. Beispiel:
+Flexing Guns N Town taucht sowohl auf der "EU Stallions"-Seite von
+frozen-partners.de als auch bei Oswood Stallion Station in Weatherford, Texas
+auf - er steht also physisch in den USA. Jeder Standort unten wurde deshalb
+einzeln über die Zuchtstation recherchiert, nicht aus der Website-Kategorie
+übernommen.
+
+| Pferd | Jahr | Farbe | Vater | Mutter | Steht wo | Quelle |
+|---|---|---|---|---|---|---|
+| Golden Coins | 2020 | Bay | Spooks Gotta Gun | Electric Cha Ching | Capital Quarter Horses, Pilot Point TX (USA) | frozen-partners.com, koleprice.com, Facebook |
+| Down Right Amazing | 2017 | Fuchs | Colonels Smoking Gun | Shesouttayourleague | Oswood Stallion Station, Weatherford TX (USA) | oswoodstallionstation.com, Quarter Horse News, Horse&Rider |
+| Patriot | | Fuchs | Smart Spook | Dunit A Lil Ruf | Brent Loseke Colt Company, Valley View TX (USA) | nrha.com, infoalpartners |
+| Flexing Guns N Town | 2019 | Palomino | Hollywoodstinseltown | Shesa Fashion Gun | Oswood Stallion Station, Weatherford TX (USA) | oswoodstallionstation.com, quarterhorseresource.com |
+| Americasnexttopgun | 2016 | Fuchs | Walla Walla Whiz | Americasnextgunmodel | Oswood Stallion Station, Weatherford TX (USA) | Quarter Horse News, oswoodstallionstation.com |
+| Modern Gun | 2013 | Palomino | Gunners Special Nite | Taris Modern Design | Foals-R-Us, Whitesboro TX (USA) | foals-r-us.com, infoalpartners |
+| Snip O Lution | 2011 | Palomino | Einsteins Revolution | Snip O Chex | (nur als "US Stallion" bei Frozen Partners gelistet) | frozen-partners.de, allbreedpedigree |
+| Inferno 66 | | | Gunnatrashya | Snip O Gun / Snip O Cash (Quellen uneinig) | Toyon Ranch LLC (Slide Or Die LLC), USA | Quarter Horse News, toyonranchllc.com |
+| Hollys Hijacker | | | HF Mobster | unbekannt | nicht sicher geklärt | gallopauction.org (nur Vaterlinie bestätigt) |
+| Customize My Dream | 2019 | Palomino | Magnum Chic Dream | Gunna Be Custom | Oswood Stallion Station, Weatherford TX (USA) | oswoodstallionstation.com, nrha.com |
+| Shining In Town | 2013 | Palomino, Dun-Faktor | Hollywoodstinseltown | Shine Ann | Heule Reining Horses, Abbotsford BC (Kanada) | aceofclubsquarterhorses.com, toyonranchllc.com |
+| Shine N Spook | 2011 | Fuchs | Smart Spook | Ebony Shines | nicht sicher geklärt (Besitz: Ubere Ranch) | stallioncompare.com |
+| Tinsel Whizington | 2016 | Buckskin | Tinsel Jac | Conquistador Sis | nicht bestätigt - bei Frozen Partners als "EU-Hengst" gelistet, aber kein eigener Stallort in Europa gefunden | frozen-partners.de, Facebook |
+
+**Was bewusst offen bleibt:** Bei Hollys Hijacker, Shine N Spook und Tinsel
+Whizington liess sich kein gesicherter aktueller Standort finden - diese drei
+stehen deshalb in seed-data.ts ohne `country`-Feld, mit `bloodlineNote` zur
+offenen Frage. Bei mehreren Müttern (Electric Cha Ching, Dunit A Lil Ruf,
+Taris Modern Design, Snip O Chex, Snip O Gun) sowie den Vätern Gunners
+Special Nite, Einsteins Revolution und Tinsel Jac war nur die direkte
+Verbindung (Sohn/Tochter), nicht aber deren eigene Abstammung auffindbar -
+auch das ist per `bloodlineNote` vermerkt statt geraten.
+
+**Vollständigkeit:** Auch dieser Durchgang kann nicht garantieren, wirklich
+*alle* Hengste von frozen-partners.com erfasst zu haben - die Suche findet
+nur, was Suchmaschinen indexiert und in Ausschnitten zurückgegeben haben,
+kein vollständiges Abgehen der Website (die bleibt aus der
+Ausführungsumgebung heraus weiterhin nicht direkt erreichbar). Wer weitere
+Namen von der Seite kennt, kann sie gerne durchgeben.

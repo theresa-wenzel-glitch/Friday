@@ -25,7 +25,7 @@ try {
   check("Seite lädt ohne Skriptfehler", errors.length === 0, errors.join(" | "));
   check(
     "Alle Pferde werden gelistet",
-    (await page.textContent("#resultLine")).includes("138"),
+    (await page.textContent("#resultLine")).includes("170"),
     await page.textContent("#resultLine"),
   );
 
@@ -64,6 +64,18 @@ try {
       deNames.some((n) => n.includes("Platinum Vintage")) &&
       deNames.some((n) => n.includes("Shiners Voodoo")),
     deNames.join(", "),
+  );
+  await page.selectOption("#fCountry", "");
+
+  /* Kanada ist ein neues Land im Bestand - Shining In Town steht tatsächlich
+     dort (Heule Reining Horses, Abbotsford BC), nicht nur "vermarktet". */
+  await page.selectOption("#fCountry", "CA");
+  await page.waitForTimeout(300);
+  const caNames = await page.locator(".card h3").allTextContents();
+  check(
+    "Land-Filter auf Kanada zeigt Shining In Town",
+    caNames.some((n) => n.includes("Shining In Town")),
+    caNames.join(", "),
   );
   await page.selectOption("#fCountry", "");
 

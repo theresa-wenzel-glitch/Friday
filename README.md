@@ -46,7 +46,7 @@ npm run dev
 
 Die App läuft dann auf <http://localhost:3000>, der Moderationsbereich unter
 <http://localhost:3000/admin>. Beim ersten Start legt sie die Datenbank unter
-`data/westernhengste.db` an und füllt sie mit rund 140 Pferden: den bekannten
+`data/westernhengste.db` an und füllt sie mit rund 170 Pferden: den bekannten
 Gründer- und Vererberhengsten samt ihrer Vorfahren, dazu einige aktuell in
 Europa stehende bzw. dort vermarktete Hengste.
 
@@ -123,7 +123,7 @@ bei Shiners Voodoo). Beides ist im jeweiligen Eintrag (Land, Verfügbarkeit,
 Beschreibungstext) unterschieden, nicht geglättet.
 
 Filtern lässt sich das über **Land** in der Hengste-Übersicht bzw. in der
-Ansichts-Version - bei über 135 Einträgen sonst leicht zu übersehen.
+Ansichts-Version - bei über 165 Einträgen sonst leicht zu übersehen.
 
 Das sind bewusst nur wenige, konkret belegte Namen - keine erfundene
 Vollständigkeit. `frozen-partners.com` selbst liess sich nicht automatisiert
@@ -132,6 +132,20 @@ oben) - recherchiert wurde daher weiterhin per Websuche, Pferd für Pferd.
 Wer weitere bekannte Hengste aus solchen Katalogen nennt (auch gern einfach als
 Namen durchgeben): werden sauber recherchiert nachgetragen, über
 `/admin/abstammung` oder direkt in den Startdaten.
+
+Auf Nutzerwunsch wurde der Bestand zusätzlich um rund 30 weitere über
+frozen-partners.com vermarktete Vererber samt Vorfahren ergänzt (u. a. Golden
+Coins, Down Right Amazing, Patriot, Flexing Guns N Town, Americasnexttopgun,
+Modern Gun, Snip O Lution, Inferno 66, Customize My Dream, Shining In Town,
+Shine N Spook, Tinsel Whizington). Die genaue Herkunftsprüfung zeigte dabei:
+die meisten davon stehen tatsächlich weiter in den USA (viele bei Oswood
+Stallion Station, Texas) - Frozen Partners vermarktet nur deren Gefriersamen
+zusätzlich in Europa. Einzige Ausnahme mit eigenem Stallort ausserhalb der
+USA: Shining In Town steht bei Heule Reining Horses in Abbotsford, British
+Columbia (Kanada). Details und Quellen je Pferd stehen in
+`docs/quellen-vorfahren.md` (Fünfter Durchgang) - inklusive der drei Fälle
+(Hollys Hijacker, Shine N Spook, Tinsel Whizington), bei denen sich der
+aktuelle Standort nicht sicher klären liess und deshalb bewusst offen bleibt.
 
 ### Die Stammbäume wachsen mit dem Bestand
 
