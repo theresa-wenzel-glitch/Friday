@@ -42,13 +42,13 @@ Ergänzend: [Finanzplan als CSV](finanzplan/finanzplan-3-jahre.csv) ·
 
 | Verzeichnis | Inhalt |
 |-------------|--------|
-| [`engine/`](engine/) | **Die Planungs-Engine.** Klassifikation, Playbook-Abruf, Planerzeugung, deterministischer Validator (9 Regeln), Reparaturschleife, Terminierung, Evaluations-Gate — plus lokale Oberfläche zum Selbstausprobieren. 100 Tests. Alles ohne API-Key testbar außer der Modellaufruf selbst |
+| [`engine/`](engine/) | **Die Planungs-Engine.** Klassifikation, Playbook-Abruf, Planerzeugung, deterministischer Validator (9 Regeln), Reparaturschleife, Terminierung, Evaluations-Gate — plus lokale App mit Konten, Anmeldung und getrennten Daten pro Person. 129 Tests. Alles ohne API-Key testbar außer der Modellaufruf selbst |
 | [`pitch/`](pitch/atlas-pitch-deck.html) | Das Pitch Deck als eigenständige HTML-Präsentation, 16 Folien |
 
 ```bash
 cd engine && npm install
 npm start                # Oberfläche → http://localhost:4173
-npm test                 # 100 Tests, kein API-Key nötig
+npm test                 # 129 Tests, kein API-Key nötig
 npm run playbooks        # die drei redaktionellen Playbooks
 npm run eval -- --dry    # Abdeckungsprüfung des Goldstandards
 

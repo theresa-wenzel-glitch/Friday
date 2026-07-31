@@ -35,7 +35,7 @@ npm start
 ### Weitere Befehle
 
 ```bash
-npm test                 # 100 Tests, kein API-Key nötig
+npm test                 # 129 Tests, kein API-Key nötig
 npm run playbooks        # geladene Playbooks anzeigen
 npm run eval -- --dry    # Struktur- und Abdeckungsprüfung des Goldstandards
 
@@ -46,22 +46,49 @@ npm run eval             # vollständiger Evaluationslauf mit Gate
 
 ---
 
-## Es gibt keine Anmeldung — mit Absicht
+## Anmeldung
 
-Dieser Stand ist ein **Einzelplatzwerkzeug zum Selbstausprobieren**, kein
-Produkt für Nutzer. Konkret:
+Beim ersten Aufruf legst du ein Konto an: Name, E-Mail-Adresse, Passwort,
+Einwilligung. Danach meldest du dich mit E-Mail und Passwort an. Mehrere
+Personen können denselben Server benutzen und sehen jeweils nur ihre eigenen
+Ziele.
 
-- Kein Konto, kein Passwort, keine Registrierung
-- Alle Daten liegen in einer JSON-Datei auf dieser Maschine
-  (`~/.atlas/atlas.json`, änderbar über `ATLAS_DATA`)
-- Der Server hört nur auf `localhost` und hat keine Zugriffskontrolle —
-  **nicht ins Internet stellen**
+### Wie das gebaut ist
 
-Für ein echtes Produkt mit Anmeldung fehlen: Konten und Sitzungen, Postgres
-statt JSON-Datei, Mandantentrennung, DSGVO-Vorgang (Einwilligungen, Export,
-Löschung), Zahlungsabwicklung, Hosting. Das Datenschema in `src/store.ts`
-entspricht bereits [docs/09](../docs/09-datenmodell.md) — der Umstieg auf
-Postgres ist damit ein Austausch dieser einen Datei, keine Produktumstellung.
+| | |
+|---|---|
+| Passwörter | scrypt mit individuellem Salt, Vergleich in konstanter Zeit. Nie im Klartext gespeichert |
+| Sitzungen | Zufallstoken im `HttpOnly`-Cookie, `SameSite=Lax`, 30 Tage. In der Datei liegt **nur der SHA-256-Hash** — wer sie liest, kann sich damit nicht anmelden |
+| Anmeldeversuche | 8 pro E-Mail-Adresse und Viertelstunde |
+| Fehlermeldung | Für unbekannte Adresse und falsches Passwort identisch, damit die Anmeldung nicht verrät, wer registriert ist |
+| Datentrennung | Jede Abfrage ist an die Konto-ID gebunden. Fremde Ziele sind nicht lesbar, nicht änderbar, nicht löschbar (durch Tests abgesichert) |
+| Passwortregeln | Mindestens 10 Zeichen, keine reinen Ziffern, keine Wörterlisten-Klassiker |
+
+### DSGVO-Grundfunktionen
+
+- **Einwilligung** wird bei der Registrierung einzeln erfasst und versioniert gespeichert
+- **Export** über „Alle Daten exportieren" — vollständiges JSON, ohne Nachfrage, ohne
+  Passwort-Hash (Art. 20)
+- **Löschung** über „Konto löschen" — entfernt Konto, Sitzungen und alle Ziele (Art. 17)
+
+### Was noch fehlt
+
+Für einen **öffentlichen Betrieb** reicht das nicht. Es fehlen:
+
+- HTTPS (das Sitzungs-Cookie setzt `Secure` nur mit `ATLAS_SECURE_COOKIES=1`)
+- E-Mail-Bestätigung und Passwort-zurücksetzen
+- Postgres statt JSON-Datei — bei gleichzeitigen Schreibvorgängen mehrerer
+  Personen ist eine Datei die falsche Ablage
+- CSRF-Token für zusätzlichen Schutz (aktuell `SameSite=Lax`)
+- Protokollierung, Sicherungen, Betriebsüberwachung
+- Zwei-Faktor-Anmeldung
+
+Der Server hört bewusst nur auf `127.0.0.1`. **Nicht ohne die obigen Punkte ins
+Internet stellen.**
+
+Das Datenschema in `src/store.ts` entspricht bereits
+[docs/09](../docs/09-datenmodell.md) — der Umstieg auf Postgres ist damit ein
+Austausch dieser einen Datei, keine Produktumstellung.
 
 ---
 

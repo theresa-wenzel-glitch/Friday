@@ -76,6 +76,8 @@ describe("Playbook-Direktplan (Rückfall und Demobetrieb)", () => {
   });
 });
 
+const USER = "user-1";
+
 describe("Lokale Persistenz", () => {
   let dir: string;
   const cafe = getPlaybook("founding.gastronomy.cafe")!;
@@ -83,6 +85,7 @@ describe("Lokale Persistenz", () => {
   function makeGoal() {
     const plan = schedulePlan(planFromPlaybook(cafe, input), input, new Date("2026-01-05"));
     return createGoal({
+      userId: USER,
       input,
       classification: {
         domain: "founding",
@@ -111,12 +114,12 @@ describe("Lokale Persistenz", () => {
 
   it("legt ein Ziel an und liest es zurück", () => {
     const goal = makeGoal();
-    expect(getGoal(goal.id)?.id).toBe(goal.id);
-    expect(listGoals()).toHaveLength(1);
+    expect(getGoal(USER, goal.id)?.id).toBe(goal.id);
+    expect(listGoals(USER)).toHaveLength(1);
   });
 
   it("gibt bei leerer Ablage eine leere Liste zurück", () => {
-    expect(listGoals()).toEqual([]);
+    expect(listGoals(USER)).toEqual([]);
   });
 
   it("speichert den Aufgabenstatus dauerhaft", () => {
@@ -124,8 +127,8 @@ describe("Lokale Persistenz", () => {
     const first = goal.plan.milestones[0]!;
     const key = taskKey(first.ref, first.tasks[0]!.title);
 
-    setTaskStatus(goal.id, key, "done");
-    expect(getGoal(goal.id)?.taskStatus[key]).toBe("done");
+    setTaskStatus(USER, goal.id, key, "done");
+    expect(getGoal(USER, goal.id)?.taskStatus[key]).toBe("done");
   });
 
   it("entfernt den Eintrag beim Zurücksetzen auf offen", () => {
@@ -133,16 +136,16 @@ describe("Lokale Persistenz", () => {
     const first = goal.plan.milestones[0]!;
     const key = taskKey(first.ref, first.tasks[0]!.title);
 
-    setTaskStatus(goal.id, key, "done");
-    setTaskStatus(goal.id, key, "open");
-    expect(getGoal(goal.id)?.taskStatus[key]).toBeUndefined();
+    setTaskStatus(USER, goal.id, key, "done");
+    setTaskStatus(USER, goal.id, key, "open");
+    expect(getGoal(USER, goal.id)?.taskStatus[key]).toBeUndefined();
   });
 
   it("löscht ein Ziel", () => {
     const goal = makeGoal();
-    expect(deleteGoal(goal.id)).toBe(true);
-    expect(deleteGoal(goal.id)).toBe(false);
-    expect(listGoals()).toHaveLength(0);
+    expect(deleteGoal(USER, goal.id)).toBe(true);
+    expect(deleteGoal(USER, goal.id)).toBe(false);
+    expect(listGoals(USER)).toHaveLength(0);
   });
 });
 
@@ -153,6 +156,7 @@ describe("Fortschritt", () => {
   function goalWith(taskStatus: Record<string, "done" | "deferred">) {
     return {
       id: "x",
+      userId: USER,
       createdAt: "2026-01-05T00:00:00Z",
       updatedAt: "2026-01-05T00:00:00Z",
       input,

@@ -28,14 +28,14 @@
     font-family: var(--sans); font-size: 16px; line-height: 1.5;
     -webkit-font-smoothing: antialiased;
   }
-  .wrap { max-width: 640px; margin: 0 auto; padding: 32px 20px 80px; }
+  .wrap { max-width: 640px; margin: 0 auto; padding: 28px 20px 80px; }
 
   header {
     display: flex; align-items: center; justify-content: space-between;
-    gap: 16px; margin-bottom: 40px;
+    gap: 16px; margin-bottom: 36px; min-height: 34px;
   }
   .brand { display: flex; align-items: center; gap: 10px; font-weight: 600; letter-spacing: -.02em; }
-  .brand svg { display: block; }
+  .who { display: flex; align-items: center; gap: 12px; font-size: 14px; color: var(--text-3); }
 
   h1 { font-size: 30px; line-height: 1.15; letter-spacing: -.03em; font-weight: 600; margin: 0 0 12px; text-wrap: balance; }
   h2 { font-size: 20px; line-height: 1.25; letter-spacing: -.02em; font-weight: 600; margin: 0; }
@@ -53,10 +53,11 @@
     border-radius: 10px; padding: 12px 14px;
   }
   textarea { min-height: 108px; resize: vertical; line-height: 1.5; }
-  input:focus, textarea:focus, select:focus {
-    outline: 2px solid var(--accent); outline-offset: 1px; border-color: transparent;
+  input:focus, textarea:focus, select:focus, button:focus-visible {
+    outline: 2px solid var(--accent); outline-offset: 1px;
   }
   input[type=range] { padding: 0; background: none; border: none; accent-color: var(--accent); }
+  input[type=checkbox] { width: auto; accent-color: var(--accent); }
 
   button {
     font: inherit; font-weight: 600; cursor: pointer;
@@ -64,14 +65,14 @@
     transition: opacity .15s, transform .1s;
   }
   button:active { transform: scale(.985); }
-  button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   button[disabled] { opacity: .45; cursor: default; }
   .primary { background: var(--accent); color: var(--bg); width: 100%; }
   .ghost { background: transparent; color: var(--text-2); border-color: var(--line); }
   .link {
     background: none; border: none; color: var(--text-2); padding: 6px 0;
-    text-decoration: underline; text-underline-offset: 3px; font-weight: 400;
+    text-decoration: underline; text-underline-offset: 3px; font-weight: 400; font-size: 14px;
   }
+  .link.danger { color: var(--critical); }
   .row { display: flex; gap: 10px; align-items: center; }
   .stack { display: flex; flex-direction: column; gap: 18px; }
   .field { display: flex; flex-direction: column; }
@@ -90,13 +91,13 @@
   .banner {
     display: flex; gap: 10px; align-items: flex-start;
     border: 1px solid var(--attention); color: var(--attention);
-    border-radius: 12px; padding: 12px 14px; font-size: 14px; margin-bottom: 24px;
+    border-radius: 12px; padding: 12px 14px; font-size: 14px; margin-bottom: 22px;
   }
-  .banner strong { display: block; color: var(--attention); }
-  .error { border-color: var(--critical); color: var(--critical); }
+  .banner strong { display: block; }
+  .banner.error { border-color: var(--critical); color: var(--critical); }
+  .banner.ok { border-color: var(--accent); color: var(--accent); }
 
   /* Pfad */
-  .path { display: flex; flex-direction: column; gap: 0; }
   .node { display: grid; grid-template-columns: 24px 1fr; gap: 14px; }
   .node .rail { display: flex; flex-direction: column; align-items: center; }
   .node .dot {
@@ -127,13 +128,10 @@
   .task.done .t { text-decoration: line-through; color: var(--text-3); }
   .task .t { font-size: 15px; line-height: 1.45; }
   .task .m { font-family: var(--mono); font-size: 11px; color: var(--text-3); margin-top: 4px; }
-  .task .why { font-size: 13.5px; color: var(--text-2); margin-top: 5px; }
 
-  /* Heute */
   .today .big { font-size: 22px; line-height: 1.3; letter-spacing: -.02em; font-weight: 600; }
   .today .when { font-family: var(--mono); font-size: 12px; color: var(--text-3); margin-top: 10px; }
 
-  /* Zielkarte */
   .goal-card {
     display: block; width: 100%; text-align: left; background: var(--elevated);
     border: 1px solid var(--line); border-radius: 16px; padding: 18px;
@@ -143,12 +141,9 @@
   .bar { height: 4px; border-radius: 3px; background: var(--sunken); margin-top: 12px; overflow: hidden; }
   .bar i { display: block; height: 100%; background: var(--accent); border-radius: 3px; transition: width .6s cubic-bezier(.32,.72,0,1); }
 
-  /* Erzeugung */
   .gen { text-align: center; padding: 60px 0; }
-  .gen svg { margin-bottom: 28px; }
   .gen .draw { stroke-dasharray: 220; stroke-dashoffset: 220; animation: draw 2.2s cubic-bezier(.32,.72,0,1) infinite; }
   @keyframes draw { 0% { stroke-dashoffset: 220; } 60%,100% { stroke-dashoffset: 0; } }
-  .gen p { min-height: 24px; transition: opacity .3s; }
 
   .tabs { display: flex; gap: 6px; margin-bottom: 24px; }
   .tab {
@@ -158,7 +153,8 @@
   .tab[aria-selected=true] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
 
   .hidden { display: none !important; }
-  footer { margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--line); }
+  footer { margin-top: 44px; padding-top: 20px; border-top: 1px solid var(--line); }
+  .footer-actions { display: flex; flex-wrap: wrap; gap: 18px; }
 
   @media (prefers-reduced-motion: reduce) {
     * { animation-duration: .01ms !important; transition-duration: .01ms !important; }
@@ -177,7 +173,11 @@
       </svg>
       Atlas
     </span>
-    <button class="link hidden" id="btn-home">Alle Ziele</button>
+    <span class="who hidden" id="who">
+      <button class="link hidden" id="btn-home">Ziele</button>
+      <span id="who-name"></span>
+      <button class="link" id="btn-logout">Abmelden</button>
+    </span>
   </header>
 
   <div id="demo-banner" class="banner hidden">
@@ -189,13 +189,60 @@
     </span>
   </div>
 
-  <div id="error" class="banner error hidden"></div>
+  <div id="notice" class="banner hidden"></div>
+
+  <!-- Anmeldung / Registrierung -->
+  <section id="view-auth" class="hidden">
+    <h1 id="auth-title">Willkommen bei Atlas</h1>
+    <p id="auth-sub">Melde dich an, um deine Ziele zu planen.</p>
+
+    <div class="tabs" role="tablist">
+      <button class="tab" id="tab-login" role="tab" aria-selected="true">Anmelden</button>
+      <button class="tab" id="tab-register" role="tab" aria-selected="false">Konto anlegen</button>
+    </div>
+
+    <form class="stack" id="auth-form" autocomplete="on">
+      <div class="field hidden" id="field-name">
+        <label class="label" for="a-name">Wie sollen wir dich nennen?</label>
+        <input type="text" id="a-name" autocomplete="nickname" placeholder="Vorname genügt">
+      </div>
+      <div class="field">
+        <label class="label" for="a-email">E-Mail-Adresse</label>
+        <input type="email" id="a-email" autocomplete="email" required placeholder="du@beispiel.de">
+      </div>
+      <div class="field">
+        <label class="label" for="a-pass">Passwort</label>
+        <input type="password" id="a-pass" required minlength="10"
+               autocomplete="current-password" placeholder="mindestens 10 Zeichen">
+        <span class="muted hidden" id="pass-hint" style="margin-top:8px">
+          Nimm eine Wortfolge, die du dir merken kannst — sie ist sicherer als ein kurzes
+          Passwort mit Sonderzeichen.
+        </span>
+      </div>
+      <label class="row hidden" id="field-consent" style="font-size:14px; color:var(--text-2); align-items:flex-start; gap:10px">
+        <input type="checkbox" id="a-consent" style="margin-top:3px">
+        <span>
+          Ich bin einverstanden, dass meine Ziele und Pläne zur Erbringung des Dienstes
+          verarbeitet werden. Ich kann meine Daten jederzeit exportieren und mein Konto
+          vollständig löschen.
+        </span>
+      </label>
+      <button class="primary" id="btn-auth" type="submit">Anmelden</button>
+    </form>
+  </section>
 
   <!-- Zielübersicht -->
   <section id="view-home" class="hidden">
-    <h1>Deine Ziele</h1>
+    <h1 id="home-title">Deine Ziele</h1>
     <div id="goal-list"></div>
     <button class="primary" id="btn-new" style="margin-top:20px">Neues Ziel</button>
+    <footer>
+      <span class="label">Dein Konto</span>
+      <div class="footer-actions">
+        <button class="link" id="btn-export">Alle Daten exportieren</button>
+        <button class="link danger" id="btn-delete-account">Konto löschen</button>
+      </div>
+    </footer>
   </section>
 
   <!-- Zieleingabe -->
@@ -256,7 +303,7 @@
         <input type="text" id="f-worry" placeholder="z. B. dass ich etwas Wichtiges übersehe">
       </div>
       <label class="row" style="font-size:15px; color:var(--text-2)">
-        <input type="checkbox" id="f-weekend" style="width:auto"> Ich arbeite auch am Wochenende daran
+        <input type="checkbox" id="f-weekend"> Ich arbeite auch am Wochenende daran
       </label>
       <button class="primary" id="btn-generate">Plan erstellen</button>
       <button class="link" id="btn-back-goal">Zurück</button>
@@ -270,12 +317,12 @@
         <path class="draw" d="M14 74 C 14 44, 40 52, 44 34 C 47 20, 60 16, 72 14"
               fill="none" stroke="var(--accent)" stroke-width="3" stroke-linecap="round"/>
       </svg>
-      <h2 id="gen-title">Ich baue deinen Plan</h2>
-      <p id="gen-step" style="margin-top:12px"></p>
+      <h2>Ich baue deinen Plan</h2>
+      <p id="gen-step" style="margin-top:12px; min-height:24px"></p>
     </div>
   </section>
 
-  <!-- Plan / Zielansicht -->
+  <!-- Zielansicht -->
   <section id="view-plan" class="hidden">
     <h1 id="plan-title"></h1>
     <p id="plan-summary"></p>
@@ -287,7 +334,7 @@
     <div id="panel-path" class="hidden"></div>
     <footer>
       <p class="muted" id="plan-meta"></p>
-      <button class="link" id="btn-delete">Dieses Ziel löschen</button>
+      <button class="link danger" id="btn-delete">Dieses Ziel löschen</button>
     </footer>
   </section>
 
@@ -295,37 +342,99 @@
 
 <script>
 const $ = (id) => document.getElementById(id);
-const views = ["home", "goal", "interview", "generating", "plan"];
-let state = { demo: false, goals: [], current: null };
+const views = ["auth", "home", "goal", "interview", "generating", "plan"];
+let state = { demo: false, user: null, goals: [], current: null, mode: "login" };
 
 function show(name) {
   for (const v of views) $(`view-${v}`).classList.toggle("hidden", v !== name);
-  $("btn-home").classList.toggle("hidden", name === "home" || name === "generating");
+  $("who").classList.toggle("hidden", !state.user);
+  $("btn-home").classList.toggle("hidden", !state.user || name === "home" || name === "generating");
   window.scrollTo(0, 0);
 }
 
-function fail(message) {
-  const el = $("error");
+function notice(message, kind = "error") {
+  const el = $("notice");
   el.textContent = message;
-  el.classList.remove("hidden");
+  el.className = `banner ${kind}`;
   setTimeout(() => el.classList.add("hidden"), 9000);
 }
 
 async function api(path, options) {
   const res = await fetch(path, {
     headers: { "content-type": "application/json" },
+    credentials: "same-origin",
     ...options,
   });
-  const data = await res.json();
+  const data = res.status === 204 ? {} : await res.json();
   if (!res.ok) throw new Error(data.error ?? "Unbekannter Fehler.");
   return data;
 }
+
+/* --- Anmeldung ---------------------------------------------------------- */
+
+function setAuthMode(mode) {
+  state.mode = mode;
+  const isRegister = mode === "register";
+
+  $("tab-login").setAttribute("aria-selected", String(!isRegister));
+  $("tab-register").setAttribute("aria-selected", String(isRegister));
+  $("field-name").classList.toggle("hidden", !isRegister);
+  $("field-consent").classList.toggle("hidden", !isRegister);
+  $("pass-hint").classList.toggle("hidden", !isRegister);
+  $("auth-title").textContent = isRegister ? "Konto anlegen" : "Willkommen bei Atlas";
+  $("auth-sub").textContent = isRegister
+    ? "Deine Ziele bleiben privat. Du kannst sie jederzeit exportieren oder löschen."
+    : "Melde dich an, um deine Ziele zu planen.";
+  $("btn-auth").textContent = isRegister ? "Konto anlegen" : "Anmelden";
+  $("a-pass").setAttribute("autocomplete", isRegister ? "new-password" : "current-password");
+}
+
+$("auth-form").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const isRegister = state.mode === "register";
+  const button = $("btn-auth");
+  button.disabled = true;
+
+  try {
+    const body = {
+      email: $("a-email").value.trim(),
+      password: $("a-pass").value,
+      displayName: $("a-name").value.trim(),
+      consent: $("a-consent").checked,
+    };
+    const result = await api(`/api/auth/${isRegister ? "register" : "login"}`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    });
+
+    state.user = result.user;
+    $("who-name").textContent = result.user.displayName;
+    $("a-pass").value = "";
+    state.goals = await api("/api/goals");
+    state.goals.length ? renderHome() : startNewGoal();
+  } catch (err) {
+    notice(err.message);
+  } finally {
+    button.disabled = false;
+  }
+});
+
+$("btn-logout").onclick = async () => {
+  await api("/api/auth/logout", { method: "POST" });
+  state = { ...state, user: null, goals: [], current: null };
+  $("a-email").value = "";
+  setAuthMode("login");
+  show("auth");
+};
 
 /* --- Übersicht ---------------------------------------------------------- */
 
 function renderHome() {
   const list = $("goal-list");
   list.innerHTML = "";
+  $("home-title").textContent = state.user
+    ? `Deine Ziele, ${state.user.displayName}`
+    : "Deine Ziele";
 
   if (state.goals.length === 0) {
     list.innerHTML = `<p class="muted">Noch kein Ziel. Fang mit einem an — mehr als drei
@@ -340,8 +449,7 @@ function renderHome() {
     btn.innerHTML = `
       <div style="font-weight:600; letter-spacing:-.01em">${esc(goal.input.rawInput)}</div>
       <div class="muted" style="margin-top:6px; font-family:var(--mono); font-size:11.5px">
-        ${p.milestonesDone}/${p.milestonesTotal} Meilensteine · ${p.tasksDone}/${p.tasksTotal} Aufgaben
-        ${goal.demo ? " · Demo" : ""}
+        ${p.milestonesDone}/${p.milestonesTotal} Meilensteine · ${p.tasksDone}/${p.tasksTotal} Aufgaben${goal.demo ? " · Demo" : ""}
       </div>
       <div class="bar"><i style="width:${pct}%"></i></div>`;
     btn.onclick = () => openGoal(goal);
@@ -349,6 +457,12 @@ function renderHome() {
   }
 
   show("home");
+}
+
+function startNewGoal() {
+  $("goal-input").value = "";
+  $("btn-to-interview").disabled = true;
+  show("goal");
 }
 
 /* --- Planerstellung ----------------------------------------------------- */
@@ -386,7 +500,7 @@ async function generate() {
     state.goals.unshift(goal);
     openGoal(goal);
   } catch (err) {
-    fail(err.message);
+    notice(err.message);
     show("interview");
   } finally {
     clearInterval(ticker);
@@ -399,12 +513,11 @@ function openGoal(goal) {
   state.current = goal;
   $("plan-title").textContent = goal.input.rawInput;
   $("plan-summary").textContent = goal.plan.summary;
-
-  const cost = goal.demo
-    ? "Direkt aus dem Playbook erzeugt (Demonstrationsbetrieb)."
-    : `Modellkosten dieses Plans: ${goal.costEur.toFixed(3)} €`;
   $("plan-meta").textContent =
-    `${goal.plan.startDate} bis ${goal.plan.endDate} · ${goal.classification.intentKey} · ${cost}`;
+    `${goal.plan.startDate} bis ${goal.plan.endDate} · ${goal.classification.intentKey} · ` +
+    (goal.demo
+      ? "direkt aus dem Playbook erzeugt (Demonstrationsbetrieb)"
+      : `Modellkosten ${goal.costEur.toFixed(3)} €`);
 
   selectTab("today");
   show("plan");
@@ -473,15 +586,12 @@ function renderPath() {
         ${index < goal.plan.milestones.length - 1 ? '<span class="stem"></span>' : ""}</div>
       <div class="body">
         <div class="title">${esc(m.title)}</div>
-        <div class="meta">${m.windowStart} → ${m.windowEnd} · ${m.durationDays} Tage
-          ${m.origin === "generated" ? " · generiert" : ""}</div>
+        <div class="meta">${m.windowStart} → ${m.windowEnd} · ${m.durationDays} Tage${m.origin === "generated" ? " · generiert" : ""}</div>
         <div class="dod">Fertig, wenn: ${esc(m.definitionOfDone)}</div>
-        <div class="tasks"></div>
+        <div class="tasks" style="margin-top:14px"></div>
       </div>`;
 
     const tasks = node.querySelector(".tasks");
-    tasks.style.marginTop = "14px";
-
     for (const t of m.tasks) {
       const key = `${m.ref}::${t.title}`;
       const status = goal.taskStatus[key];
@@ -504,9 +614,10 @@ function renderPath() {
   if (goal.plan.assumptions.length) {
     const box = document.createElement("div");
     box.className = "card";
-    box.style.marginTop = "12px";
     box.innerHTML = `<span class="label">Annahmen</span>` +
-      goal.plan.assumptions.map((a) => `<div style="font-size:14px; color:var(--text-2); margin-top:6px">· ${esc(a)}</div>`).join("");
+      goal.plan.assumptions
+        .map((a) => `<div style="font-size:14px; color:var(--text-2); margin-top:6px">· ${esc(a)}</div>`)
+        .join("");
     panel.appendChild(box);
   }
 }
@@ -521,7 +632,7 @@ async function setStatus(key, status) {
     state.goals = state.goals.map((g) => (g.id === updated.id ? updated : g));
     $("tab-today").getAttribute("aria-selected") === "true" ? renderToday() : renderPath();
   } catch (err) {
-    fail(err.message);
+    notice(err.message);
   }
 }
 
@@ -538,6 +649,8 @@ function daysSince(iso) {
 
 /* --- Verdrahtung -------------------------------------------------------- */
 
+$("tab-login").onclick = () => setAuthMode("login");
+$("tab-register").onclick = () => setAuthMode("register");
 $("goal-input").addEventListener("input", (e) => {
   $("btn-to-interview").disabled = e.target.value.trim().length < 10;
 });
@@ -551,10 +664,22 @@ $("f-hours").addEventListener("input", (e) => { $("hours-out").textContent = e.t
 $("btn-to-interview").onclick = () => show("interview");
 $("btn-back-goal").onclick = () => show("goal");
 $("btn-generate").onclick = generate;
-$("btn-new").onclick = () => { $("goal-input").value = ""; $("btn-to-interview").disabled = true; show("goal"); };
+$("btn-new").onclick = startNewGoal;
 $("btn-home").onclick = renderHome;
 $("tab-today").onclick = () => selectTab("today");
 $("tab-path").onclick = () => selectTab("path");
+
+$("btn-export").onclick = () => { window.location.href = "/api/me/export"; };
+
+$("btn-delete-account").onclick = async () => {
+  if (!confirm("Konto, alle Ziele und der gesamte Fortschritt werden endgültig gelöscht. Fortfahren?")) return;
+  await api("/api/me", { method: "DELETE" });
+  state = { ...state, user: null, goals: [], current: null };
+  setAuthMode("register");
+  show("auth");
+  notice("Konto und alle Daten wurden gelöscht.", "ok");
+};
+
 $("btn-delete").onclick = async () => {
   if (!confirm("Ziel und Fortschritt endgültig löschen?")) return;
   await api(`/api/goals/${state.current.id}`, { method: "DELETE" });
@@ -563,15 +688,23 @@ $("btn-delete").onclick = async () => {
 };
 
 (async function init() {
+  setAuthMode("login");
   try {
     const status = await api("/api/status");
     state.demo = status.demo;
     $("demo-banner").classList.toggle("hidden", !status.demo);
-    state.goals = await api("/api/goals");
-    state.goals.length ? renderHome() : show("goal");
+
+    if (status.signedIn) {
+      state.user = status.user;
+      $("who-name").textContent = status.user.displayName;
+      state.goals = await api("/api/goals");
+      state.goals.length ? renderHome() : startNewGoal();
+    } else {
+      show("auth");
+    }
   } catch (err) {
-    fail(`Server nicht erreichbar: ${err.message}`);
-    show("goal");
+    notice(`Server nicht erreichbar: ${err.message}`);
+    show("auth");
   }
 })();
 </script>
