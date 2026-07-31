@@ -1827,9 +1827,9 @@ export const SEED_HORSES: SeedHorse[] = [
   },
   {
     name: "Tinsel Jac",
-    country: "US",
     description: "Vater von Tinsel Whizington.",
-    bloodlineNote: "Weitere Abstammung noch nicht gesichert - bitte ergänzen.",
+    bloodlineNote:
+      "Weitere Abstammung sowie aktueller Standort nicht sicher geklärt - taucht (wie der bestätigt in den USA stehende Shine Chic Shine) in einem deutschen Vermarktungskatalog auf, das allein belegt aber keinen Stall in Europa.",
     isHistoric: true,
   },
   {
@@ -1852,6 +1852,115 @@ export const SEED_HORSES: SeedHorse[] = [
     bloodlineNote:
       "Aktueller Standort nicht abschliessend geklärt - in Katalogen als EU-Hengst geführt, ohne bestätigte eigene Stallmeldung in Europa.",
     availability: "frozen",
+    isHistoric: false,
+  },
+
+  /* Sechster Durchgang - auf Nutzerwunsch weitere Quellen neben
+     frozen-partners.com: deutsche Zuchtstationen wie Tiemann
+     Performancehorses. Auch hier gilt dieselbe Vorsicht wie beim fünften
+     Durchgang - manche dieser Stationen sind reine Samendepots/Vermarkter
+     (z. B. Freeze and Breed nennt sich selbst "EU-Hengstsamendepot"), andere
+     sind echte Zuchtbetriebe mit eigenen Pferden vor Ort. Nur Letzteres
+     wurde als Land "DE" übernommen. */
+  {
+    name: "Shining Summer Reins",
+    sex: "mare",
+    country: "US",
+    sireName: "Shining Spark",
+    description: "Mutter von ACE Mistr Tinseltown.",
+    isHistoric: true,
+  },
+  {
+    name: "ACE Mistr Tinseltown",
+    color: "Palomino",
+    country: "DE",
+    disciplines: ["Reining"],
+    sireName: "Hollywoodstinseltown",
+    damName: "Shining Summer Reins",
+    description:
+      "Sohn von Hollywoodstinseltown, väterlicherseits Enkel des NRHA-Hall-of-Fame-Hengstes Hollywood Dun It. Steht bei Gebauer Quarterhorses in Oberelsbach, Deutschland.",
+    isHistoric: false,
+  },
+  {
+    name: "Gunners Crome Son",
+    country: "US",
+    description: "Vater von Gunsparks.",
+    bloodlineNote: "Weitere Abstammung noch nicht gesichert - bitte ergänzen.",
+    isHistoric: true,
+  },
+  {
+    name: "Sparkles Pretty Gal",
+    sex: "mare",
+    country: "US",
+    description: "Mutter von Gunsparks.",
+    bloodlineNote: "Weitere Abstammung noch nicht gesichert - bitte ergänzen.",
+    isHistoric: true,
+  },
+  {
+    name: "Gunsparks",
+    country: "DE",
+    disciplines: ["Reining"],
+    sireName: "Gunners Crome Son",
+    damName: "Sparkles Pretty Gal",
+    description:
+      "Mehrfacher Europameister sowie mehrfacher Sieger und Platzierter bei Futurities und Maturities. Steht bei Lohrberg Ranch in Büdingen, Hessen - ein in Deutschland gezüchteter und stehender Hengst, keine reine Gefriersamen-Vermarktung.",
+    isHistoric: false,
+  },
+  {
+    name: "Splash N Blue",
+    country: "US",
+    description: "Vater von A Millennium Falcon.",
+    bloodlineNote: "Weitere Abstammung noch nicht gesichert - bitte ergänzen.",
+    isHistoric: true,
+  },
+  {
+    name: "Peppy Dash Cootney",
+    sex: "mare",
+    country: "US",
+    description: "Mutter von A Millennium Falcon.",
+    bloodlineNote: "Weitere Abstammung noch nicht gesichert - bitte ergänzen.",
+    isHistoric: true,
+  },
+  {
+    name: "A Millennium Falcon",
+    country: "DE",
+    disciplines: ["Ranch Riding", "Working Cow Horse"],
+    sireName: "Splash N Blue",
+    damName: "Peppy Dash Cootney",
+    description:
+      "Geht über die Mutterlinie u. a. auf Joe Hancock, Peppy San Badger und Dry Doc zurück. Steht bei Triple J Stables in Deutschland.",
+    isHistoric: false,
+  },
+  {
+    name: "IJ Rocky Steeldust",
+    color: "Grullo",
+    country: "DE",
+    breed: "Foundation Quarter Horse",
+    description:
+      "Foundation-Quarter-Horse-Hengst in seltener Grullo-Farbe. Steht bei Green Meadows Ranch in Heeslingen, Niedersachsen - der ersten staatlich anerkannten Zucht- und Besamungsstation für Quarter Horses in Niedersachsen.",
+    bloodlineNote: "Abstammung in den Quellen noch nicht sicher benannt - bitte ergänzen.",
+    isHistoric: false,
+  },
+  {
+    name: "Shine Chic Shine",
+    yearOfBirth: 2007,
+    color: "Palomino",
+    country: "US",
+    disciplines: ["Reining"],
+    sireName: "Smart Chic Olena",
+    damName: "Ebony Shines",
+    description:
+      "NRHA-Drei-Millionen-Dollar-Vererber, unter anderem Vater von Shine Colt Shine. Steht bei Alpha Quarter Horses in Purcell, Oklahoma - Gefriersamen wird u. a. über Tiemann Performancehorses auch für Europa angeboten.",
+    availability: "frozen",
+    isHistoric: false,
+  },
+  {
+    name: "Silver Prime",
+    color: "Silver Bay",
+    description:
+      "Einer von weltweit nur drei Quarter-Horse-Hengsten mit reinerbigem (homozygotem) Silberschimmel-Faktor - vererbt daher garantiert keine Fuchsfohlen. Laut Katalogangabe aus Kanada importiert. Gelistet bei Freeze and Breed, einem deutschen EU-Hengstsamendepot.",
+    bloodlineNote:
+      "Abstammung (Vater/Mutter) sowie aktueller eigener Stallort nicht sicher geklärt - Freeze and Breed bezeichnet sich selbst als Samendepot, das allein belegt keinen eigenen Stall in Deutschland.",
     isHistoric: false,
   },
 ];

@@ -46,7 +46,7 @@ npm run dev
 
 Die App läuft dann auf <http://localhost:3000>, der Moderationsbereich unter
 <http://localhost:3000/admin>. Beim ersten Start legt sie die Datenbank unter
-`data/westernhengste.db` an und füllt sie mit rund 170 Pferden: den bekannten
+`data/westernhengste.db` an und füllt sie mit rund 180 Pferden: den bekannten
 Gründer- und Vererberhengsten samt ihrer Vorfahren, dazu einige aktuell in
 Europa stehende bzw. dort vermarktete Hengste.
 
@@ -123,7 +123,7 @@ bei Shiners Voodoo). Beides ist im jeweiligen Eintrag (Land, Verfügbarkeit,
 Beschreibungstext) unterschieden, nicht geglättet.
 
 Filtern lässt sich das über **Land** in der Hengste-Übersicht bzw. in der
-Ansichts-Version - bei über 165 Einträgen sonst leicht zu übersehen.
+Ansichts-Version - bei über 175 Einträgen sonst leicht zu übersehen.
 
 Das sind bewusst nur wenige, konkret belegte Namen - keine erfundene
 Vollständigkeit. `frozen-partners.com` selbst liess sich nicht automatisiert
@@ -146,6 +146,20 @@ Columbia (Kanada). Details und Quellen je Pferd stehen in
 `docs/quellen-vorfahren.md` (Fünfter Durchgang) - inklusive der drei Fälle
 (Hollys Hijacker, Shine N Spook, Tinsel Whizington), bei denen sich der
 aktuelle Standort nicht sicher klären liess und deshalb bewusst offen bleibt.
+
+Auf weiteren Nutzerwunsch kamen Hengste aus anderen deutschen Zuchtstationen
+dazu, allen voran Tiemann Performancehorses: ACE Mistr Tinseltown (Gebauer
+Quarterhorses, Oberelsbach), Gunsparks (Lohrberg Ranch, Büdingen - eine
+eigene Zuchtstation, kein Depot), A Millennium Falcon (Triple J Stables) und
+IJ Rocky Steeldust (Green Meadows Ranch, Heeslingen) stehen alle tatsächlich
+in Deutschland. Auch hier zeigte die Prüfung, dass die blosse Nennung auf
+einer deutschen Vermarktungsseite nichts über den echten Stallort aussagt:
+Shine Chic Shine wird zwar über Tiemann gelistet, steht aber nachweislich in
+Purcell, Oklahoma (USA). Und Tinsel Jac (siehe oben) trug bisher fälschlich
+`country: "US"`, obwohl das nie belegt war - korrigiert auf "Standort
+unklar", da er ebenfalls nur bei Tiemann auftaucht, ohne eigene
+Stallmeldung. Details im "Sechsten Durchgang" von
+`docs/quellen-vorfahren.md`.
 
 ### Die Stammbäume wachsen mit dem Bestand
 

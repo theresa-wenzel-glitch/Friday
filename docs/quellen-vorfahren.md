@@ -161,3 +161,40 @@ nur, was Suchmaschinen indexiert und in Ausschnitten zurückgegeben haben,
 kein vollständiges Abgehen der Website (die bleibt aus der
 Ausführungsumgebung heraus weiterhin nicht direkt erreichbar). Wer weitere
 Namen von der Seite kennt, kann sie gerne durchgeben.
+
+## Sechster Durchgang - weitere Quellen neben frozen-partners.com (u. a. Tiemann)
+
+Auf Nutzerwunsch wurden weitere deutsche/europäische Zuchtstationen
+recherchiert, allen voran Tiemann Performancehorses (Bergen, Deutschland).
+Auch tiemann-performancehorses.de liess sich nicht direkt aufrufen (curl:
+`403`, dieselbe Ausführungsumgebungs-Einschränkung) - Recherche wieder per
+Websuche.
+
+**Wichtige Erkenntnis:** Auf Tiemanns eigener Website stehen sowohl Hengste,
+die tatsächlich dort in Deutschland stehen, als auch Hengste, die weiterhin
+in den USA stehen und nur mit ihrem Gefriersamen dort vertreten sind - z. B.
+taucht der bereits bekannte HF Mobster (steht in Texas, siehe oben) genauso
+in Tiemanns Hengstliste auf wie Shine Chic Shine, der nachweislich bei Alpha
+Quarter Horses in Purcell, Oklahoma steht. Die blosse Nennung auf einer
+deutschen Vermarktungsseite ist also kein Beleg für einen Stall in Europa -
+das gilt genauso für "EU-Hengstsamendepots" wie Freeze and Breed, die sich
+selbst ausdrücklich als Samendepot (Lagerung/Versand), nicht als Stall
+bezeichnen.
+
+| Pferd | Farbe | Vater | Mutter | Steht wo | Quelle |
+|---|---|---|---|---|---|
+| ACE Mistr Tinseltown | Palomino | Hollywoodstinseltown | Shining Summer Reins | Gebauer Quarterhorses, Oberelsbach (Deutschland) - eigene Adresse/Impressum bestätigt | gebauer-quarterhorses.de, mooshof-strasser.de |
+| Gunsparks | | Gunners Crome Son | Sparkles Pretty Gal | Lohrberg Ranch, Büdingen, Hessen (Deutschland) - eigene Zuchtstation, kein Depot | lohrberg-ranch.de, dreamquarters.de |
+| A Millennium Falcon | | Splash N Blue | Peppy Dash Cootney | Triple J Stables (Deutschland) | dreamquarters.de |
+| IJ Rocky Steeldust | Grullo | unbekannt | unbekannt | Green Meadows Ranch, Heeslingen, Niedersachsen (Deutschland) - erste staatlich anerkannte Zucht-/Besamungsstation für Quarter Horses in Niedersachsen | dreamquarters.de, westernwelten.de |
+| Shine Chic Shine | Palomino | Smart Chic Olena | Ebony Shines | Alpha Quarter Horses, Purcell, Oklahoma (USA) - bei Tiemann nur als Gefriersamen gelistet | quarterhorsenews.com, tiemann-performancehorses.de |
+| Silver Prime | Silver Bay | unbekannt | unbekannt | nicht sicher geklärt - bei Freeze and Breed (reines Samendepot) gelistet, laut Katalog aus Kanada importiert | freezeandbreed.de |
+
+**Korrektur an einem bestehenden Eintrag:** Tinsel Jac (Vater von Tinsel
+Whizington, siehe Fünfter Durchgang) stand bisher mit `country: "US"` in den
+Daten - das war eine unbelegte Annahme, keine bestätigte Quelle. Da Tinsel
+Jac ebenfalls bei Tiemann gelistet ist und Tiemann nachweislich auch
+US-Hengste führt (siehe Shine Chic Shine oben), wurde das Land entfernt und
+stattdessen ein `bloodlineNote` zur offenen Standortfrage ergänzt.
+
+Bestand nach diesem Durchgang: 181 Pferde.

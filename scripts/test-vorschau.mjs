@@ -25,7 +25,7 @@ try {
   check("Seite lädt ohne Skriptfehler", errors.length === 0, errors.join(" | "));
   check(
     "Alle Pferde werden gelistet",
-    (await page.textContent("#resultLine")).includes("170"),
+    (await page.textContent("#resultLine")).includes("181"),
     await page.textContent("#resultLine"),
   );
 
@@ -62,7 +62,9 @@ try {
     "Land-Filter auf Deutschland zeigt die EU-Hengste",
     deNames.some((n) => n.includes("Custom Del Cielo")) &&
       deNames.some((n) => n.includes("Platinum Vintage")) &&
-      deNames.some((n) => n.includes("Shiners Voodoo")),
+      deNames.some((n) => n.includes("Shiners Voodoo")) &&
+      deNames.some((n) => n.includes("Gunsparks")) &&
+      deNames.some((n) => n.includes("ACE Mistr Tinseltown")),
     deNames.join(", "),
   );
   await page.selectOption("#fCountry", "");
