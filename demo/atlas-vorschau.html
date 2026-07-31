@@ -1,0 +1,1315 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Atlas — Vorschau</title>
+<style>
+  /* Designsystem aus docs/05-marke-und-design.md */
+  :root {
+    --bg: #FBFBFA; --elevated: #FFFFFF; --sunken: #F2F2F0;
+    --text: #111214; --text-2: #5C5F66; --text-3: #8E9199;
+    --line: #E6E6E3; --accent: #2F6F5E; --accent-soft: #E3EFEA;
+    --attention: #B4761E; --critical: #B3261E;
+    --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0E0F11; --elevated: #17191C; --sunken: #0A0B0C;
+      --text: #F2F3F5; --text-2: #A0A4AB; --text-3: #6E727A;
+      --line: #26282C; --accent: #5FB59B; --accent-soft: #16332C;
+      --attention: #D9A34A; --critical: #E0655C;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font-family: var(--sans); font-size: 16px; line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 640px; margin: 0 auto; padding: 28px 20px 80px; }
+
+  header {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px; margin-bottom: 30px; min-height: 34px;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 600; letter-spacing: -.02em; }
+  .who { display: flex; align-items: center; gap: 12px; font-size: 14px; color: var(--text-3); }
+
+  h1 { font-size: 30px; line-height: 1.15; letter-spacing: -.03em; font-weight: 600; margin: 0 0 12px; text-wrap: balance; }
+  p  { margin: 0 0 16px; color: var(--text-2); }
+  .muted { color: var(--text-3); font-size: 14px; }
+
+  .label {
+    font-family: var(--mono); font-size: 11px; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--text-3); display: block; margin-bottom: 8px;
+  }
+
+  textarea, input, select {
+    width: 100%; font: inherit; color: var(--text);
+    background: var(--sunken); border: 1px solid var(--line);
+    border-radius: 10px; padding: 12px 14px;
+  }
+  textarea { min-height: 108px; resize: vertical; line-height: 1.5; }
+  input:focus, textarea:focus, select:focus, button:focus-visible {
+    outline: 2px solid var(--accent); outline-offset: 1px;
+  }
+  input[type=range] { padding: 0; background: none; border: none; accent-color: var(--accent); }
+  input[type=checkbox] { width: auto; accent-color: var(--accent); }
+
+  button {
+    font: inherit; font-weight: 600; cursor: pointer;
+    border-radius: 12px; padding: 13px 20px; border: 1px solid transparent;
+    transition: opacity .15s, transform .1s;
+  }
+  button:active { transform: scale(.985); }
+  button[disabled] { opacity: .45; cursor: default; }
+  .primary { background: var(--accent); color: var(--bg); width: 100%; }
+  .ghost { background: transparent; color: var(--text-2); border-color: var(--line); }
+  .link {
+    background: none; border: none; color: var(--text-2); padding: 6px 0;
+    text-decoration: underline; text-underline-offset: 3px; font-weight: 400; font-size: 14px;
+  }
+  .link.danger { color: var(--critical); }
+  .row { display: flex; gap: 10px; align-items: center; }
+  .stack { display: flex; flex-direction: column; gap: 18px; }
+  .field { display: flex; flex-direction: column; }
+
+  .card {
+    background: var(--elevated); border: 1px solid var(--line);
+    border-radius: 16px; padding: 20px;
+  }
+  .chip {
+    display: inline-block; font-size: 13px; color: var(--text-2);
+    background: var(--sunken); border: 1px solid var(--line);
+    border-radius: 999px; padding: 7px 13px; cursor: pointer; margin: 0 6px 6px 0;
+  }
+  .chip:hover { border-color: var(--accent); color: var(--accent); }
+
+  .banner {
+    display: flex; gap: 10px; align-items: flex-start;
+    border: 1px solid var(--attention); color: var(--attention);
+    border-radius: 12px; padding: 12px 14px; font-size: 14px; margin-bottom: 22px;
+  }
+  .banner strong { display: block; }
+  .banner.error { border-color: var(--critical); color: var(--critical); }
+  .banner.ok { border-color: var(--accent); color: var(--accent); }
+
+  .node { display: grid; grid-template-columns: 24px 1fr; gap: 14px; }
+  .node .rail { display: flex; flex-direction: column; align-items: center; }
+  .node .dot {
+    width: 12px; height: 12px; border-radius: 50%; margin-top: 5px;
+    border: 1.5px solid var(--text-3); background: var(--bg); flex: none;
+  }
+  .node.done .dot { background: var(--accent); border-color: var(--accent); }
+  .node.now  .dot { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 0 5px var(--accent-soft); }
+  .node .stem { width: 1.5px; flex: 1; background: var(--line); margin: 6px 0; min-height: 20px; }
+  .node.done .stem { background: var(--accent); }
+  .node .body { padding-bottom: 26px; }
+  .node .title { font-weight: 600; letter-spacing: -.01em; }
+  .node .meta { font-family: var(--mono); font-size: 11.5px; color: var(--text-3); margin-top: 3px; }
+  .node .dod { font-size: 14px; color: var(--text-2); margin-top: 8px; }
+
+  .task {
+    display: grid; grid-template-columns: 24px 1fr; gap: 12px;
+    padding: 12px 0; border-bottom: 1px solid var(--line); align-items: start;
+  }
+  .task:last-child { border-bottom: none; }
+  .check {
+    width: 22px; height: 22px; border-radius: 7px; border: 1.5px solid var(--text-3);
+    background: none; padding: 0; cursor: pointer; margin-top: 1px;
+    display: grid; place-items: center; color: var(--bg); font-size: 13px;
+  }
+  .task.done .check { background: var(--accent); border-color: var(--accent); }
+  .task.done .t { text-decoration: line-through; color: var(--text-3); }
+  .task .t { font-size: 15px; line-height: 1.45; }
+  .task .m { font-family: var(--mono); font-size: 11px; color: var(--text-3); margin-top: 4px; }
+
+  .today .big { font-size: 22px; line-height: 1.3; letter-spacing: -.02em; font-weight: 600; }
+  .today .when { font-family: var(--mono); font-size: 12px; color: var(--text-3); margin-top: 10px; }
+
+  .goal-card {
+    display: block; width: 100%; text-align: left; background: var(--elevated);
+    border: 1px solid var(--line); border-radius: 16px; padding: 18px;
+    font: inherit; color: var(--text); cursor: pointer; margin-bottom: 12px;
+  }
+  .goal-card:hover { border-color: var(--accent); }
+  .bar { height: 4px; border-radius: 3px; background: var(--sunken); margin-top: 12px; overflow: hidden; }
+  .bar i { display: block; height: 100%; background: var(--accent); border-radius: 3px; transition: width .6s cubic-bezier(.32,.72,0,1); }
+
+  .gen { text-align: center; padding: 60px 0; }
+  .gen .draw { stroke-dasharray: 220; stroke-dashoffset: 220; animation: draw 2.2s cubic-bezier(.32,.72,0,1) infinite; }
+  @keyframes draw { 0% { stroke-dashoffset: 220; } 60%,100% { stroke-dashoffset: 0; } }
+
+  .tabs { display: flex; gap: 6px; margin-bottom: 24px; }
+  .tab {
+    background: transparent; border: 1px solid var(--line); color: var(--text-2);
+    border-radius: 999px; padding: 8px 16px; font-size: 14px; font-weight: 500;
+  }
+  .tab[aria-selected=true] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+
+  .hidden { display: none !important; }
+  footer { margin-top: 44px; padding-top: 20px; border-top: 1px solid var(--line); }
+  .footer-actions { display: flex; flex-wrap: wrap; gap: 18px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <span class="brand">
+      <svg width="22" height="22" viewBox="0 0 86 86" aria-hidden="true">
+        <path d="M14 74 C 14 44, 40 52, 44 34 C 47 20, 60 16, 72 14" fill="none"
+              stroke="currentColor" stroke-width="6" stroke-linecap="round" opacity=".85"/>
+        <circle cx="72" cy="14" r="9" fill="currentColor"/>
+      </svg>
+      Atlas
+    </span>
+    <span class="who hidden" id="who">
+      <button class="link hidden" id="btn-home">Ziele</button>
+      <span id="who-name"></span>
+      <button class="link" id="btn-logout">Abmelden</button>
+    </span>
+  </header>
+
+  <div class="banner">
+    <span aria-hidden="true">●</span>
+    <span>
+      <strong>Vorschau ohne Server</strong>
+      Konto und Ziele liegen unverschlüsselt in diesem Browser (localStorage) und
+      verlassen ihn nicht. Die Pläne kommen direkt aus drei hinterlegten Playbooks,
+      nicht aus dem Modell — sie sind nicht auf deine Situation zugeschnitten.
+      Die richtige Anmeldung mit Passwort-Hashing und Sitzungen steckt in
+      <code>engine/</code>, nicht hier.
+    </span>
+  </div>
+
+  <div id="notice" class="banner hidden"></div>
+
+  <section id="view-auth" class="hidden">
+    <h1 id="auth-title">Willkommen bei Atlas</h1>
+    <p id="auth-sub">Melde dich an, um deine Ziele zu planen.</p>
+
+    <div class="tabs" role="tablist">
+      <button class="tab" id="tab-login" role="tab" aria-selected="true">Anmelden</button>
+      <button class="tab" id="tab-register" role="tab" aria-selected="false">Konto anlegen</button>
+    </div>
+
+    <form class="stack" id="auth-form">
+      <div class="field hidden" id="field-name">
+        <label class="label" for="a-name">Wie sollen wir dich nennen?</label>
+        <input type="text" id="a-name" placeholder="Vorname genügt">
+      </div>
+      <div class="field">
+        <label class="label" for="a-email">E-Mail-Adresse</label>
+        <input type="email" id="a-email" required placeholder="du@beispiel.de">
+      </div>
+      <div class="field">
+        <label class="label" for="a-pass">Passwort</label>
+        <input type="password" id="a-pass" required minlength="10" placeholder="mindestens 10 Zeichen">
+        <span class="muted hidden" id="pass-hint" style="margin-top:8px">
+          Nimm eine Wortfolge, die du dir merken kannst.
+        </span>
+      </div>
+      <label class="row hidden" id="field-consent" style="font-size:14px; color:var(--text-2); align-items:flex-start; gap:10px">
+        <input type="checkbox" id="a-consent" style="margin-top:3px">
+        <span>Ich bin einverstanden, dass meine Ziele und Pläne verarbeitet werden.
+          Ich kann sie jederzeit exportieren und mein Konto vollständig löschen.</span>
+      </label>
+      <button class="primary" id="btn-auth" type="submit">Anmelden</button>
+    </form>
+  </section>
+
+  <section id="view-home" class="hidden">
+    <h1 id="home-title">Deine Ziele</h1>
+    <div id="goal-list"></div>
+    <button class="primary" id="btn-new" style="margin-top:20px">Neues Ziel</button>
+    <footer>
+      <span class="label">Dein Konto</span>
+      <div class="footer-actions">
+        <button class="link" id="btn-export">Alle Daten exportieren</button>
+        <button class="link danger" id="btn-delete-account">Konto löschen</button>
+      </div>
+    </footer>
+  </section>
+
+  <section id="view-goal" class="hidden">
+    <h1>Was möchtest du erreichen?</h1>
+    <p>In dieser Vorschau gibt es Pläne zu drei Vorhaben: Café, Freelance, Onlineshop.</p>
+    <textarea id="goal-input" placeholder="z. B. Ich möchte in 18 Monaten ein Café in Leipzig eröffnen"></textarea>
+    <div style="margin:16px 0 24px">
+      <span class="label">Beispiele</span>
+      <span class="chip">Ich möchte in 18 Monaten ein Café in Leipzig eröffnen</span>
+      <span class="chip">Ich will nebenberuflich als Freelancer starten</span>
+      <span class="chip">Ich möchte einen Onlineshop aufbauen</span>
+    </div>
+    <button class="primary" id="btn-to-interview" disabled>Weiter</button>
+  </section>
+
+  <section id="view-interview" class="hidden">
+    <h1>Sechs Fragen.</h1>
+    <p>Danach steht dein Plan. Alles ist später änderbar.</p>
+    <div class="stack">
+      <div class="field">
+        <label class="label" for="f-hours">Zeit pro Woche — <span id="hours-out">6</span> Stunden</label>
+        <input type="range" id="f-hours" min="1" max="40" value="6">
+      </div>
+      <div class="field">
+        <label class="label" for="f-deadline">Bis wann?</label>
+        <input type="date" id="f-deadline">
+      </div>
+      <div class="field">
+        <label class="label" for="f-budget">Budget in Euro (optional)</label>
+        <input type="number" id="f-budget" min="0" step="500" placeholder="z. B. 28000">
+      </div>
+      <div class="field">
+        <label class="label" for="f-state">Bundesland</label>
+        <select id="f-state">
+          <option value="">— bitte wählen —</option>
+          <option value="BW">Baden-Württemberg</option><option value="BY">Bayern</option>
+          <option value="BE">Berlin</option><option value="BB">Brandenburg</option>
+          <option value="HB">Bremen</option><option value="HH">Hamburg</option>
+          <option value="HE">Hessen</option><option value="MV">Mecklenburg-Vorpommern</option>
+          <option value="NI">Niedersachsen</option><option value="NW">Nordrhein-Westfalen</option>
+          <option value="RP">Rheinland-Pfalz</option><option value="SL">Saarland</option>
+          <option value="SN">Sachsen</option><option value="ST">Sachsen-Anhalt</option>
+          <option value="SH">Schleswig-Holstein</option><option value="TH">Thüringen</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="label" for="f-exp">Vorerfahrung</label>
+        <select id="f-exp">
+          <option value="none">keine</option>
+          <option value="some" selected>etwas</option>
+          <option value="professional">beruflich</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="label" for="f-worry">Was macht dir am meisten Sorge? (optional)</label>
+        <input type="text" id="f-worry" placeholder="z. B. dass ich etwas Wichtiges übersehe">
+      </div>
+      <label class="row" style="font-size:15px; color:var(--text-2)">
+        <input type="checkbox" id="f-weekend"> Ich arbeite auch am Wochenende daran
+      </label>
+      <button class="primary" id="btn-generate">Plan erstellen</button>
+      <button class="link" id="btn-back-goal">Zurück</button>
+    </div>
+  </section>
+
+  <section id="view-generating" class="hidden">
+    <div class="gen">
+      <svg width="70" height="70" viewBox="0 0 86 86" aria-hidden="true">
+        <path class="draw" d="M14 74 C 14 44, 40 52, 44 34 C 47 20, 60 16, 72 14"
+              fill="none" stroke="var(--accent)" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+      <h2>Ich baue deinen Plan</h2>
+      <p id="gen-step" style="margin-top:12px; min-height:24px"></p>
+    </div>
+  </section>
+
+  <section id="view-plan" class="hidden">
+    <h1 id="plan-title"></h1>
+    <p id="plan-summary"></p>
+    <div class="tabs" role="tablist">
+      <button class="tab" id="tab-today" role="tab" aria-selected="true">Heute</button>
+      <button class="tab" id="tab-path" role="tab" aria-selected="false">Pfad</button>
+    </div>
+    <div id="panel-today"></div>
+    <div id="panel-path" class="hidden"></div>
+    <footer>
+      <p class="muted" id="plan-meta"></p>
+      <button class="link danger" id="btn-delete">Dieses Ziel löschen</button>
+    </footer>
+  </section>
+
+</div>
+
+<script>
+/* ==========================================================================
+   Atlas — Vorschau ohne Server.
+
+   Portierung von engine/src/fallback.ts, scheduler.ts und store.ts in den
+   Browser. Die Playbook-Daten unten sind unverändert aus
+   engine/src/playbooks/data/ eingesetzt (per Build-Skript, nicht abgetippt).
+
+   Was hier ANDERS ist als in engine/:
+     - Kein Modell. Pläne kommen aus dem Playbook-Direktplan (der in docs/08
+       dokumentierte Rückfallpfad), nie aus Claude.
+     - Keine echte Sicherheit. Passwörter werden zwar gehasht, aber alles liegt
+       im localStorage dieses Browsers. Das ist eine Vorschau, kein Betrieb.
+   ========================================================================== */
+
+const PLAYBOOKS = [
+  {
+    "intentKey": "founding.gastronomy.cafe",
+    "title": "Café mit Sitzplätzen eröffnen",
+    "sampleSize": 0,
+    "nodes": [
+      {
+        "id": "cafe.idea",
+        "title": "Konzept schärfen",
+        "definitionOfDone": "Ein einseitiges Konzeptpapier beschreibt Angebot, Zielgruppe, Preisniveau und Abgrenzung zum Wettbewerb.",
+        "typicalDurationDays": 21,
+        "dropoutRate": 0.12,
+        "successCorrelates": [
+          "Konzept wurde mindestens drei Außenstehenden vorgestellt",
+          "Preisniveau ist an realen Wettbewerberpreisen kalibriert"
+        ],
+        "requiredBefore": []
+      },
+      {
+        "id": "cafe.market",
+        "title": "Standort- und Marktanalyse",
+        "definitionOfDone": "Mindestens fünf vergleichbare Betriebe wurden besucht und ausgewertet; für zwei bis drei Standortoptionen liegen Passantenfrequenz, Miete und Umfeld vor.",
+        "typicalDurationDays": 28,
+        "dropoutRate": 0.09,
+        "successCorrelates": [
+          "Standortanalyse wurde VOR dem Businessplan gemacht",
+          "Frequenzzählung zu mindestens drei Tageszeiten"
+        ],
+        "requiredBefore": [
+          "cafe.idea"
+        ]
+      },
+      {
+        "id": "cafe.businessplan",
+        "title": "Businessplan und Zahlenteil",
+        "definitionOfDone": "Businessplan mit Konzept, Marktanalyse, Investitionsplan, Rentabilitätsvorschau und Liquiditätsplanung liegt vor und wurde von einer dritten Person gegengelesen.",
+        "typicalDurationDays": 42,
+        "dropoutRate": 0.34,
+        "successCorrelates": [
+          "Zahlenteil wurde mit einer Steuerberatung oder Gründungsberatung besprochen",
+          "Standortanalyse lag zum Startzeitpunkt bereits vor"
+        ],
+        "requiredBefore": [
+          "cafe.market"
+        ]
+      },
+      {
+        "id": "cafe.financing",
+        "title": "Finanzierung sichern",
+        "definitionOfDone": "Eine schriftliche Finanzierungszusage über den benötigten Betrag liegt vor, oder die Finanzierung ist vollständig aus Eigenmitteln gedeckt und nachgewiesen.",
+        "typicalDurationDays": 56,
+        "dropoutRate": 0.28,
+        "successCorrelates": [
+          "Mehr als ein Kreditinstitut wurde angesprochen",
+          "Fördermöglichkeiten wurden vor dem Bankgespräch geprüft"
+        ],
+        "requiredBefore": [
+          "cafe.businessplan"
+        ]
+      },
+      {
+        "id": "cafe.location",
+        "title": "Objekt sichern",
+        "definitionOfDone": "Ein Mietvertrag ist unterschrieben, nachdem Nutzungsänderung und gaststättenrechtliche Anforderungen vorab geklärt wurden.",
+        "typicalDurationDays": 49,
+        "dropoutRate": 0.18,
+        "successCorrelates": [
+          "Vorabklärung mit Bauamt und Lebensmittelüberwachung erfolgte vor Vertragsunterschrift",
+          "Mietvertrag wurde anwaltlich geprüft"
+        ],
+        "requiredBefore": [
+          "cafe.financing"
+        ]
+      },
+      {
+        "id": "cafe.permits",
+        "title": "Anmeldungen und Erlaubnisse",
+        "definitionOfDone": "Gewerbeanmeldung, steuerliche Erfassung, Anmeldungen bei Berufsgenossenschaft und Lebensmittelüberwachung sowie erforderliche Belehrungen und Schulungen sind erledigt.",
+        "typicalDurationDays": 35,
+        "dropoutRate": 0.07,
+        "successCorrelates": [
+          "Zuständige Stellen wurden vorab telefonisch kontaktiert",
+          "Unterlagen wurden vollständig eingereicht"
+        ],
+        "requiredBefore": [
+          "cafe.location"
+        ]
+      },
+      {
+        "id": "cafe.buildout",
+        "title": "Einrichtung und Ausstattung",
+        "definitionOfDone": "Küche, Tresen und Gastraum sind eingerichtet, die Ausstattung ist abgenommen und betriebsbereit.",
+        "typicalDurationDays": 63,
+        "dropoutRate": 0.06,
+        "successCorrelates": [
+          "Angebote von mindestens drei Anbietern eingeholt",
+          "Gebrauchtmarkt für Großgeräte geprüft"
+        ],
+        "requiredBefore": [
+          "cafe.permits"
+        ]
+      },
+      {
+        "id": "cafe.operations",
+        "title": "Betrieb vorbereiten",
+        "definitionOfDone": "Lieferanten sind ausgewählt, Kassensystem und Warenwirtschaft laufen, Personal ist eingestellt und eingearbeitet, ein Probebetrieb hat stattgefunden.",
+        "typicalDurationDays": 42,
+        "dropoutRate": 0.05,
+        "successCorrelates": [
+          "Mindestens ein Probelauf mit geladenen Gästen vor der Eröffnung",
+          "Kalkulation je Produkt vor der Preisfestlegung"
+        ],
+        "requiredBefore": [
+          "cafe.buildout"
+        ]
+      },
+      {
+        "id": "cafe.opening",
+        "title": "Eröffnung",
+        "definitionOfDone": "Das Café ist regulär geöffnet, die Eröffnung wurde lokal kommuniziert und die ersten Betriebstage sind ausgewertet.",
+        "typicalDurationDays": 21,
+        "dropoutRate": 0.02,
+        "successCorrelates": [
+          "Lokale Ankündigung mindestens zwei Wochen vor Eröffnung",
+          "Google-Unternehmensprofil vor Eröffnung angelegt"
+        ],
+        "requiredBefore": [
+          "cafe.operations"
+        ]
+      }
+    ]
+  },
+  {
+    "intentKey": "founding.retail.online",
+    "title": "Onlineshop aufbauen und erste Umsätze erzielen",
+    "sampleSize": 0,
+    "nodes": [
+      {
+        "id": "shop.niche",
+        "title": "Sortiment und Zielgruppe festlegen",
+        "definitionOfDone": "Ein Sortimentskonzept benennt Produktgruppe, Zielgruppe, Preisniveau und Beschaffungsweg.",
+        "typicalDurationDays": 21,
+        "dropoutRate": 0.14,
+        "successCorrelates": [
+          "Nachfrage wurde vor der Sortimentsentscheidung geprüft",
+          "Mindestens drei Lieferanten verglichen"
+        ],
+        "requiredBefore": []
+      },
+      {
+        "id": "shop.validate",
+        "title": "Nachfrage testen, bevor Ware gekauft wird",
+        "definitionOfDone": "Mindestens fünf Verkäufe wurden ohne eigenen Shop erzielt, zum Beispiel über einen Marktplatz oder eine einfache Verkaufsseite.",
+        "typicalDurationDays": 28,
+        "dropoutRate": 0.27,
+        "successCorrelates": [
+          "Test lief vor dem Wareneinkauf",
+          "Preis wurde im Test mindestens einmal variiert"
+        ],
+        "requiredBefore": [
+          "shop.niche"
+        ]
+      },
+      {
+        "id": "shop.registration",
+        "title": "Anmeldungen und Registrierungen",
+        "definitionOfDone": "Gewerbeanmeldung, steuerliche Erfassung sowie die für das Sortiment erforderlichen Registrierungen sind erledigt.",
+        "typicalDurationDays": 21,
+        "dropoutRate": 0.07,
+        "successCorrelates": [
+          "Registrierungspflichten wurden vor dem Verkaufsstart geprüft"
+        ],
+        "requiredBefore": [
+          "shop.validate"
+        ]
+      },
+      {
+        "id": "shop.legal",
+        "title": "Rechtstexte und Pflichtangaben",
+        "definitionOfDone": "Impressum, Datenschutzerklärung, AGB, Widerrufsbelehrung und Preisangaben sind vorhanden und anwaltlich geprüft.",
+        "typicalDurationDays": 21,
+        "dropoutRate": 0.09,
+        "successCorrelates": [
+          "Texte wurden fachlich geprüft statt kopiert"
+        ],
+        "requiredBefore": [
+          "shop.registration"
+        ]
+      },
+      {
+        "id": "shop.build",
+        "title": "Shop aufbauen",
+        "definitionOfDone": "Der Shop ist erreichbar, Zahlungsarten und Versand sind eingerichtet, eine Testbestellung wurde vollständig durchlaufen.",
+        "typicalDurationDays": 35,
+        "dropoutRate": 0.12,
+        "successCorrelates": [
+          "Testbestellung inklusive Retoure durchgespielt"
+        ],
+        "requiredBefore": [
+          "shop.legal"
+        ]
+      },
+      {
+        "id": "shop.logistics",
+        "title": "Beschaffung und Versand",
+        "definitionOfDone": "Lieferant, Lagerung und Versandprozess stehen; die Kalkulation je Artikel inklusive Versand und Retoure ist belegt.",
+        "typicalDurationDays": 28,
+        "dropoutRate": 0.1,
+        "successCorrelates": [
+          "Deckungsbeitrag je Artikel vor dem Einkauf berechnet"
+        ],
+        "requiredBefore": [
+          "shop.build"
+        ]
+      },
+      {
+        "id": "shop.launch",
+        "title": "Verkaufsstart und erste Umsätze",
+        "definitionOfDone": "Der Shop ist öffentlich, die ersten zwanzig Bestellungen sind ausgeliefert und ausgewertet.",
+        "typicalDurationDays": 45,
+        "dropoutRate": 0.23,
+        "successCorrelates": [
+          "Vor dem Start wurde eine Interessentenliste aufgebaut",
+          "Retourenquote wurde von Anfang an gemessen"
+        ],
+        "requiredBefore": [
+          "shop.logistics"
+        ]
+      }
+    ]
+  },
+  {
+    "intentKey": "founding.services.freelance",
+    "title": "Nebenberuflich selbstständig als Dienstleister starten",
+    "sampleSize": 0,
+    "nodes": [
+      {
+        "id": "fl.positioning",
+        "title": "Angebot und Positionierung festlegen",
+        "definitionOfDone": "Eine schriftliche Leistungsbeschreibung benennt Zielkunde, konkretes Angebot, Preisrahmen und Abgrenzung zum Wettbewerb.",
+        "typicalDurationDays": 14,
+        "dropoutRate": 0.15,
+        "successCorrelates": [
+          "Angebot wurde mit mindestens drei potenziellen Kunden besprochen",
+          "Preis wurde vor dem ersten Angebot festgelegt, nicht im Gespräch"
+        ],
+        "requiredBefore": []
+      },
+      {
+        "id": "fl.employment",
+        "title": "Nebentätigkeit arbeitsrechtlich klären",
+        "definitionOfDone": "Der Arbeitsvertrag wurde auf Nebentätigkeitsklauseln geprüft und die erforderliche Anzeige oder Genehmigung liegt vor.",
+        "typicalDurationDays": 14,
+        "dropoutRate": 0.06,
+        "successCorrelates": [
+          "Klärung erfolgte vor der Gewerbeanmeldung"
+        ],
+        "requiredBefore": []
+      },
+      {
+        "id": "fl.registration",
+        "title": "Anmeldung und steuerliche Einordnung",
+        "definitionOfDone": "Die Tätigkeit ist beim Finanzamt erfasst, die Steuernummer liegt vor und die Frage der Kleinunternehmerregelung ist mit einer Steuerberatung geklärt.",
+        "typicalDurationDays": 21,
+        "dropoutRate": 0.08,
+        "successCorrelates": [
+          "Steuerliche Einordnung wurde fachlich geklärt statt selbst entschieden"
+        ],
+        "requiredBefore": [
+          "fl.employment"
+        ]
+      },
+      {
+        "id": "fl.infrastructure",
+        "title": "Geschäftliche Grundausstattung",
+        "definitionOfDone": "Geschäftskonto, Rechnungsvorlage mit allen Pflichtangaben, einfache Buchhaltungslösung und Ablage für Belege sind eingerichtet.",
+        "typicalDurationDays": 10,
+        "dropoutRate": 0.04,
+        "successCorrelates": [
+          "Belegablage wurde vor dem ersten Auftrag eingerichtet"
+        ],
+        "requiredBefore": [
+          "fl.registration"
+        ]
+      },
+      {
+        "id": "fl.presence",
+        "title": "Sichtbarkeit herstellen",
+        "definitionOfDone": "Eine Seite mit Angebot, Referenzen und Kontaktmöglichkeit ist online und über die eigene Berufsgruppe auffindbar.",
+        "typicalDurationDays": 21,
+        "dropoutRate": 0.11,
+        "successCorrelates": [
+          "Seite enthält mindestens ein konkretes Arbeitsbeispiel"
+        ],
+        "requiredBefore": [
+          "fl.positioning"
+        ]
+      },
+      {
+        "id": "fl.firstclients",
+        "title": "Erste zahlende Kunden gewinnen",
+        "definitionOfDone": "Mindestens drei bezahlte Aufträge wurden abgeschlossen und abgerechnet.",
+        "typicalDurationDays": 70,
+        "dropoutRate": 0.31,
+        "successCorrelates": [
+          "Erste Ansprache ging an das bestehende Netzwerk, nicht an Fremde",
+          "Es wurde ein fester wöchentlicher Zeitblock für Akquise eingeplant"
+        ],
+        "requiredBefore": [
+          "fl.infrastructure"
+        ]
+      },
+      {
+        "id": "fl.stabilize",
+        "title": "Auslastung verstetigen",
+        "definitionOfDone": "Über drei aufeinanderfolgende Monate wurde ein zuvor definierter Mindestumsatz erreicht.",
+        "typicalDurationDays": 120,
+        "dropoutRate": 0.19,
+        "successCorrelates": [
+          "Mindestens ein wiederkehrender Kunde",
+          "Preise wurden nach den ersten Aufträgen angepasst"
+        ],
+        "requiredBefore": [
+          "fl.firstclients"
+        ]
+      }
+    ]
+  }
+];
+const STORAGE_KEY = "atlas.preview.v1";
+
+/* --- Playbook-Auswahl (Portierung von playbooks/index.ts) ---------------- */
+
+function tokenize(s) {
+  return new Set(String(s).toLowerCase().replace(/[^a-zäöüß0-9]+/g, " ").split(" ").filter((t) => t.length > 3));
+}
+
+function overlap(a, b) {
+  let hits = 0;
+  for (const t of a) if (b.has(t)) hits++;
+  return b.size === 0 ? 0 : hits / b.size;
+}
+
+function findPlaybook(query) {
+  const terms = tokenize(query);
+  const scored = PLAYBOOKS
+    .map((p) => ({ p, score: overlap(terms, tokenize(`${p.title} ${p.intentKey} ${p.nodes.map((n) => n.title).join(" ")}`)) }))
+    .sort((a, b) => b.score - a.score);
+  return scored[0] && scored[0].score > 0 ? scored[0].p : null;
+}
+
+/* --- Planerzeugung (Portierung von fallback.ts) -------------------------- */
+
+const MAX_TASK_MINUTES = 480;
+
+function orderNodes(template) {
+  const ids = new Set(template.nodes.map((n) => n.id));
+  const placed = new Set();
+  const ordered = [];
+  let progress = true;
+
+  while (progress && ordered.length < template.nodes.length) {
+    progress = false;
+    for (const node of template.nodes) {
+      if (placed.has(node.id)) continue;
+      if (node.requiredBefore.every((r) => placed.has(r) || !ids.has(r))) {
+        ordered.push(node);
+        placed.add(node.id);
+        progress = true;
+      }
+    }
+  }
+  for (const node of template.nodes) if (!placed.has(node.id)) ordered.push(node);
+  return ordered;
+}
+
+function shorten(s, max = 90) {
+  return s.length <= max ? s : s.slice(0, max - 1).trimEnd() + "…";
+}
+
+function buildTasks(node, input) {
+  const weeks = Math.max(node.typicalDurationDays / 7, 1);
+  const budget = Math.floor(input.weeklyCapacityMin * weeks * 0.7);
+
+  const drafts = [
+    { title: `${node.title}: Überblick verschaffen und Vorgehen festlegen`,
+      why: "Ein klarer Startpunkt verhindert, dass dieser Meilenstein liegen bleibt.", blocking: true },
+    ...node.successCorrelates.slice(0, 2).map((c) => ({
+      title: c,
+      why: "Das unterscheidet laut Playbook diejenigen, die abschließen, von denen, die aufgeben.",
+      blocking: false })),
+    { title: `Prüfen: ${shorten(node.definitionOfDone)}`,
+      why: "Der Meilenstein gilt erst als erledigt, wenn dieses Ergebnis vorliegt.", blocking: true },
+  ];
+
+  const perTask = Math.min(MAX_TASK_MINUTES, Math.max(30, Math.floor(budget / drafts.length)));
+
+  return drafts.map((d, i) => ({
+    title: d.title, why: d.why, blocking: d.blocking,
+    estimatedMin: i === 0 ? Math.min(perTask, 60) : perTask,
+  }));
+}
+
+function planFromPlaybook(template, input) {
+  const nodes = orderNodes(template);
+  const milestones = nodes.map((node) => ({
+    ref: node.id,
+    title: node.title,
+    definitionOfDone: node.definitionOfDone,
+    durationDays: node.typicalDurationDays,
+    dependsOn: node.requiredBefore,
+    playbookNodeId: node.id,
+    tasks: buildTasks(node, input),
+  }));
+
+  const totalDays = milestones.reduce((s, m) => s + m.durationDays, 0);
+
+  return {
+    summary: `${template.title} — strukturierter Plan aus dem Playbook „${template.intentKey}". ` +
+             `${milestones.length} Etappen über rund ${totalDays} Tage.`,
+    assumptions: [
+      "Dieser Plan stammt direkt aus dem Playbook und ist nicht auf deine Situation zugeschnitten.",
+      `Die Zeitangaben sind Mediandauern aus dem Playbook (Stichprobe: ${template.sampleSize}).`,
+      ...(input.experience === "none" ? ["Angenommen, du hast in diesem Bereich keine Vorerfahrung."] : []),
+    ],
+    risks: nodes.filter((n) => n.dropoutRate >= 0.2).map((n) => ({
+      milestoneRef: n.id,
+      risk: `An dieser Stelle geben laut Playbook ${Math.round(n.dropoutRate * 100)} % der Menschen auf.`,
+      mitigation: n.successCorrelates[0] || "Schneide diesen Meilenstein kleiner.",
+    })),
+    milestones,
+  };
+}
+
+/* --- Terminierung (Portierung von scheduler.ts) -------------------------- */
+
+const MS_DAY = 86400000;
+
+function isoDate(d) { return d.toISOString().slice(0, 10); }
+function addDays(d, n) { const x = new Date(d); x.setUTCDate(x.getUTCDate() + n); return x; }
+
+function easterSunday(year) {
+  const a = year % 19, b = Math.floor(year / 100), c = year % 100;
+  const d = Math.floor(b / 4), e = b % 4, f = Math.floor((b + 8) / 25);
+  const g = Math.floor((b - f + 1) / 3);
+  const h = (19 * a + b - d - g + 15) % 30;
+  const i = Math.floor(c / 4), k = c % 4;
+  const l = (32 + 2 * e + 2 * i - h - k) % 7;
+  const m = Math.floor((a + 11 * h + 22 * l) / 451);
+  const month = Math.floor((h + l - 7 * m + 114) / 31);
+  const day = ((h + l - 7 * m + 114) % 31) + 1;
+  return new Date(Date.UTC(year, month - 1, day));
+}
+
+function germanHolidays(from, to, state) {
+  const days = new Set();
+  for (let y = from; y <= to; y++) {
+    const easter = easterSunday(y);
+    for (const [mo, da] of [[0,1],[4,1],[9,3],[11,25],[11,26]]) days.add(isoDate(new Date(Date.UTC(y, mo, da))));
+    for (const off of [-2, 1, 39, 50]) days.add(isoDate(addDays(easter, off)));
+    if (state && ["BY","BW","NW","RP","SL","HE","SN","TH"].includes(state)) days.add(isoDate(addDays(easter, 60)));
+    if (state && ["BY","SL"].includes(state)) days.add(isoDate(new Date(Date.UTC(y, 7, 15))));
+    if (state && ["BB","MV","SN","ST","TH","HH","HB","NI","SH"].includes(state)) days.add(isoDate(new Date(Date.UTC(y, 9, 31))));
+    if (state && ["BW","BY","ST"].includes(state)) days.add(isoDate(new Date(Date.UTC(y, 0, 6))));
+  }
+  return days;
+}
+
+function topoOrder(milestones) {
+  const known = new Set(milestones.map((m) => m.ref));
+  const indeg = new Map(), deps = new Map();
+
+  for (const m of milestones) {
+    const d = m.dependsOn.filter((x) => known.has(x) && x !== m.ref);
+    indeg.set(m.ref, d.length);
+    for (const x of d) deps.set(x, [...(deps.get(x) || []), m.ref]);
+  }
+
+  const queue = milestones.filter((m) => indeg.get(m.ref) === 0).map((m) => m.ref);
+  const order = [];
+  while (queue.length) {
+    const ref = queue.shift();
+    order.push(ref);
+    for (const next of deps.get(ref) || []) {
+      indeg.set(next, indeg.get(next) - 1);
+      if (indeg.get(next) === 0) queue.push(next);
+    }
+  }
+  return order;
+}
+
+function workdays(from, to, input, holidays) {
+  const out = [];
+  for (let d = new Date(from); d <= to; d = addDays(d, 1)) {
+    const wd = d.getUTCDay();
+    if ((wd === 0 || wd === 6) && !input.includeWeekends) continue;
+    if (holidays.has(isoDate(d))) continue;
+    out.push(new Date(d));
+  }
+  return out;
+}
+
+function schedulePlan(plan, input, start) {
+  const holidays = germanHolidays(start.getUTCFullYear(), start.getUTCFullYear() + 4, input.state);
+  const byRef = new Map(plan.milestones.map((m) => [m.ref, m]));
+  const windows = new Map();
+
+  for (const ref of topoOrder(plan.milestones)) {
+    const m = byRef.get(ref);
+    let earliest = start;
+    for (const dep of m.dependsOn) {
+      const w = windows.get(dep);
+      if (w && w.end > earliest) earliest = w.end;
+    }
+    const s = addDays(earliest, m.dependsOn.length > 0 ? 1 : 0);
+    windows.set(ref, { start: s, end: addDays(s, m.durationDays) });
+  }
+
+  const milestones = plan.milestones.map((m) => {
+    const w = windows.get(m.ref);
+    const days = workdays(w.start, w.end, input, holidays);
+    const usable = input.weeklyCapacityMin * 0.8;
+    const perDay = Math.max(30, usable / (input.includeWeekends ? 7 : 5));
+
+    const ordered = [...m.tasks].sort((a, b) => Number(b.blocking) - Number(a.blocking));
+    const dated = [];
+    let idx = 0, used = 0;
+
+    for (const t of ordered) {
+      if (used > 0 && used + t.estimatedMin > perDay) { idx = Math.min(idx + 1, days.length - 1); used = 0; }
+      dated.push({ ...t, dueAt: days.length ? isoDate(days[idx]) : isoDate(w.end) });
+      used += t.estimatedMin;
+      if (used >= perDay) { idx = Math.min(idx + 1, days.length - 1); used = 0; }
+    }
+
+    return {
+      ...m,
+      windowStart: isoDate(w.start),
+      windowEnd: isoDate(w.end),
+      tasks: m.tasks.map((t) => dated.find((x) => x.title === t.title) || { ...t, dueAt: isoDate(w.end) }),
+    };
+  });
+
+  return {
+    ...plan,
+    milestones,
+    startDate: isoDate(start),
+    endDate: milestones.reduce((a, m) => (m.windowEnd > a ? m.windowEnd : a), isoDate(start)),
+  };
+}
+
+/* --- Ablage im Browser (Portierung von store.ts) ------------------------- */
+
+function db() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || { users: [], goals: [], session: null }; }
+  catch { return { users: [], goals: [], session: null }; }
+}
+function saveDb(d) { localStorage.setItem(STORAGE_KEY, JSON.stringify(d)); }
+
+/**
+ * Passwort-Hash. Nutzt SHA-256, wo verfügbar. Das ist KEIN Ersatz für scrypt —
+ * in der Serverfassung (engine/src/auth.ts) wird korrekt gehasht. Hier geht es
+ * nur darum, das Passwort nicht im Klartext im localStorage liegen zu lassen.
+ */
+async function hash(password, salt) {
+  const data = new TextEncoder().encode(`${salt}:${password}`);
+  if (globalThis.crypto && crypto.subtle) {
+    const buf = await crypto.subtle.digest("SHA-256", data);
+    return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
+  }
+  let h = 2166136261;
+  for (const byte of data) { h ^= byte; h = Math.imul(h, 16777619); }
+  return `weak-${(h >>> 0).toString(16)}`;
+}
+
+function uid() {
+  return (crypto.randomUUID ? crypto.randomUUID() : String(Date.now() + Math.random()));
+}
+
+function taskKey(ref, title) { return `${ref}::${title}`; }
+
+function progressOf(goal) {
+  let tasksDone = 0, tasksTotal = 0, milestonesDone = 0, nextTask = null;
+
+  for (const m of goal.plan.milestones) {
+    let done = 0;
+    for (const t of m.tasks) {
+      tasksTotal++;
+      const st = goal.taskStatus[taskKey(m.ref, t.title)];
+      if (st === "done") { tasksDone++; done++; }
+      else if (st !== "deferred" && !nextTask) {
+        nextTask = { milestoneRef: m.ref, title: t.title, dueAt: t.dueAt, estimatedMin: t.estimatedMin };
+      }
+    }
+    if (m.tasks.length && done === m.tasks.length) milestonesDone++;
+  }
+
+  return { tasksDone, tasksTotal, milestonesDone, milestonesTotal: goal.plan.milestones.length, nextTask };
+}
+
+/* --- Oberfläche ---------------------------------------------------------- */
+
+const $ = (id) => document.getElementById(id);
+const views = ["auth", "home", "goal", "interview", "generating", "plan"];
+let state = { user: null, goals: [], current: null, mode: "login" };
+
+function show(name) {
+  for (const v of views) $(`view-${v}`).classList.toggle("hidden", v !== name);
+  $("who").classList.toggle("hidden", !state.user);
+  $("btn-home").classList.toggle("hidden", !state.user || name === "home" || name === "generating");
+  window.scrollTo(0, 0);
+}
+
+function notice(msg, kind = "error") {
+  const el = $("notice");
+  el.textContent = msg;
+  el.className = `banner ${kind}`;
+  setTimeout(() => el.classList.add("hidden"), 9000);
+}
+
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, (c) => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" })[c]);
+}
+
+function loadGoals() {
+  state.goals = db().goals.filter((g) => g.userId === state.user.id)
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+    .map((g) => ({ ...g, progress: progressOf(g) }));
+}
+
+function setAuthMode(mode) {
+  state.mode = mode;
+  const reg = mode === "register";
+  $("tab-login").setAttribute("aria-selected", String(!reg));
+  $("tab-register").setAttribute("aria-selected", String(reg));
+  $("field-name").classList.toggle("hidden", !reg);
+  $("field-consent").classList.toggle("hidden", !reg);
+  $("pass-hint").classList.toggle("hidden", !reg);
+  $("auth-title").textContent = reg ? "Konto anlegen" : "Willkommen bei Atlas";
+  $("auth-sub").textContent = reg
+    ? "Deine Ziele bleiben in diesem Browser. Du kannst sie jederzeit exportieren oder löschen."
+    : "Melde dich an, um deine Ziele zu planen.";
+  $("btn-auth").textContent = reg ? "Konto anlegen" : "Anmelden";
+}
+
+$("auth-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const reg = state.mode === "register";
+  const email = $("a-email").value.trim().toLowerCase();
+  const password = $("a-pass").value;
+  const d = db();
+
+  try {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) throw new Error("Bitte gib eine gültige E-Mail-Adresse an.");
+
+    if (reg) {
+      if (password.length < 10) throw new Error("Das Passwort braucht mindestens 10 Zeichen.");
+      if (/^\d+$/.test(password)) throw new Error("Nur Ziffern ist zu leicht zu erraten.");
+      if (!$("a-consent").checked) throw new Error("Ohne Einwilligung in die Datenverarbeitung geht es nicht.");
+      if (d.users.some((u) => u.email === email)) throw new Error("Diese E-Mail-Adresse ist bereits registriert.");
+
+      const salt = uid();
+      const user = {
+        id: uid(), email, displayName: $("a-name").value.trim() || email.split("@")[0],
+        salt, passwordHash: await hash(password, salt),
+        createdAt: new Date().toISOString(),
+        consents: [{ key: "processing", version: "1.0", grantedAt: new Date().toISOString() }],
+      };
+      d.users.push(user);
+      d.session = user.id;
+      saveDb(d);
+      state.user = user;
+    } else {
+      const user = d.users.find((u) => u.email === email);
+      // Gleiche Meldung für unbekannte Adresse und falsches Passwort.
+      if (!user || (await hash(password, user.salt)) !== user.passwordHash) {
+        throw new Error("E-Mail-Adresse oder Passwort stimmt nicht.");
+      }
+      d.session = user.id;
+      saveDb(d);
+      state.user = user;
+    }
+
+    $("a-pass").value = "";
+    $("who-name").textContent = state.user.displayName;
+    loadGoals();
+    state.goals.length ? renderHome() : startNewGoal();
+  } catch (err) {
+    notice(err.message);
+  }
+});
+
+$("btn-logout").onclick = () => {
+  const d = db(); d.session = null; saveDb(d);
+  state = { user: null, goals: [], current: null, mode: "login" };
+  $("a-email").value = "";
+  setAuthMode("login");
+  show("auth");
+};
+
+function renderHome() {
+  const list = $("goal-list");
+  list.innerHTML = "";
+  $("home-title").textContent = `Deine Ziele, ${state.user.displayName}`;
+
+  if (!state.goals.length) {
+    list.innerHTML = `<p class="muted">Noch kein Ziel. Fang mit einem an — mehr als drei
+      gleichzeitig sind selten realistisch.</p>`;
+  }
+
+  for (const goal of state.goals) {
+    const p = goal.progress;
+    const pct = p.tasksTotal ? Math.round((p.tasksDone / p.tasksTotal) * 100) : 0;
+    const btn = document.createElement("button");
+    btn.className = "goal-card";
+    btn.innerHTML = `
+      <div style="font-weight:600; letter-spacing:-.01em">${esc(goal.input.rawInput)}</div>
+      <div class="muted" style="margin-top:6px; font-family:var(--mono); font-size:11.5px">
+        ${p.milestonesDone}/${p.milestonesTotal} Meilensteine · ${p.tasksDone}/${p.tasksTotal} Aufgaben
+      </div>
+      <div class="bar"><i style="width:${pct}%"></i></div>`;
+    btn.onclick = () => openGoal(goal);
+    list.appendChild(btn);
+  }
+  show("home");
+}
+
+function startNewGoal() {
+  $("goal-input").value = "";
+  $("btn-to-interview").disabled = true;
+  show("goal");
+}
+
+const STEPS = [
+  "Ich ordne dein Ziel ein …",
+  "Ich schaue mir an, wie andere das gemacht haben …",
+  "Ich passe die Zeiten an deine Wochenstunden an …",
+  "Ich prüfe die Reihenfolge und die Termine …",
+];
+
+function generate() {
+  const rawInput = $("goal-input").value.trim();
+  const template = findPlaybook(rawInput);
+
+  if (!template) {
+    notice("Diese Vorschau kennt nur Café, Freelance und Onlineshop. Für beliebige Ziele braucht es die Fassung in engine/ mit API-Key.");
+    return;
+  }
+
+  show("generating");
+  let i = 0;
+  $("gen-step").textContent = STEPS[0];
+  const ticker = setInterval(() => { i = (i + 1) % STEPS.length; $("gen-step").textContent = STEPS[i]; }, 900);
+
+  // Kurze Verzögerung, damit der Erstellungsmoment sichtbar ist.
+  setTimeout(() => {
+    clearInterval(ticker);
+
+    const input = {
+      rawInput,
+      weeklyCapacityMin: Math.max(30, Number($("f-hours").value) * 60),
+      targetDate: $("f-deadline").value || undefined,
+      budgetEur: $("f-budget").value ? Number($("f-budget").value) : undefined,
+      state: $("f-state").value || undefined,
+      experience: $("f-exp").value,
+      biggestWorry: $("f-worry").value || undefined,
+      includeWeekends: $("f-weekend").checked,
+    };
+
+    const plan = schedulePlan(planFromPlaybook(template, input), input, new Date());
+    const goal = {
+      id: uid(), userId: state.user.id,
+      createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
+      input, intentKey: template.intentKey, plan, taskStatus: {},
+    };
+
+    const d = db(); d.goals.push(goal); saveDb(d);
+    loadGoals();
+    openGoal(state.goals.find((g) => g.id === goal.id));
+  }, 2600);
+}
+
+function openGoal(goal) {
+  state.current = goal;
+  $("plan-title").textContent = goal.input.rawInput;
+  $("plan-summary").textContent = goal.plan.summary;
+  $("plan-meta").textContent =
+    `${goal.plan.startDate} bis ${goal.plan.endDate} · ${goal.intentKey} · direkt aus dem Playbook erzeugt`;
+  selectTab("today");
+  show("plan");
+}
+
+function selectTab(which) {
+  $("tab-today").setAttribute("aria-selected", String(which === "today"));
+  $("tab-path").setAttribute("aria-selected", String(which === "path"));
+  $("panel-today").classList.toggle("hidden", which !== "today");
+  $("panel-path").classList.toggle("hidden", which !== "path");
+  which === "today" ? renderToday() : renderPath();
+}
+
+function renderToday() {
+  const goal = state.current;
+  const next = goal.progress.nextTask;
+  const panel = $("panel-today");
+
+  if (!next) {
+    const days = Math.max(0, Math.round((Date.now() - new Date(goal.createdAt)) / MS_DAY));
+    panel.innerHTML = `<div class="card today">
+      <div class="big">Du hast alles erledigt.</div>
+      <p class="muted" style="margin-top:10px">Vor ${days} Tagen war das ein Satz auf einem Bildschirm.</p>
+    </div>`;
+    return;
+  }
+
+  const m = goal.plan.milestones.find((x) => x.ref === next.milestoneRef);
+  const t = m.tasks.find((x) => x.title === next.title);
+
+  panel.innerHTML = `
+    <div class="card today">
+      <span class="label">${esc(m.title)}</span>
+      <div class="big">${esc(t.title)}</div>
+      <p style="margin:12px 0 0; font-size:15px">${esc(t.why)}</p>
+      <div class="when">fällig ${t.dueAt} · ca. ${t.estimatedMin} Minuten</div>
+      <div class="row" style="margin-top:20px">
+        <button class="primary" id="btn-done" style="flex:1">Erledigt</button>
+        <button class="ghost" id="btn-defer">Später</button>
+      </div>
+    </div>
+    <p class="muted" style="margin-top:18px">
+      Kein Rückstandszähler. Wenn eine Woche nichts geht, wird der Plan angepasst —
+      nicht rot markiert.</p>`;
+
+  const key = taskKey(next.milestoneRef, next.title);
+  $("btn-done").onclick = () => setStatus(key, "done");
+  $("btn-defer").onclick = () => setStatus(key, "deferred");
+}
+
+function renderPath() {
+  const goal = state.current;
+  const panel = $("panel-path");
+  panel.innerHTML = "";
+
+  goal.plan.milestones.forEach((m, index) => {
+    const st = m.tasks.map((t) => goal.taskStatus[taskKey(m.ref, t.title)]);
+    const done = m.tasks.length > 0 && st.every((s) => s === "done");
+    const started = st.some((s) => s === "done");
+    const now = !done && (started || (goal.progress.nextTask && goal.progress.nextTask.milestoneRef === m.ref));
+
+    const node = document.createElement("div");
+    node.className = `node ${done ? "done" : now ? "now" : ""}`;
+    node.innerHTML = `
+      <div class="rail"><span class="dot"></span>
+        ${index < goal.plan.milestones.length - 1 ? '<span class="stem"></span>' : ""}</div>
+      <div class="body">
+        <div class="title">${esc(m.title)}</div>
+        <div class="meta">${m.windowStart} → ${m.windowEnd} · ${m.durationDays} Tage</div>
+        <div class="dod">Fertig, wenn: ${esc(m.definitionOfDone)}</div>
+        <div class="tasks" style="margin-top:14px"></div>
+      </div>`;
+
+    const tasks = node.querySelector(".tasks");
+    for (const t of m.tasks) {
+      const key = taskKey(m.ref, t.title);
+      const status = goal.taskStatus[key];
+      const row = document.createElement("div");
+      row.className = `task ${status === "done" ? "done" : ""}`;
+      row.innerHTML = `
+        <button class="check" aria-label="Aufgabe abhaken">${status === "done" ? "✓" : ""}</button>
+        <div>
+          <div class="t">${esc(t.title)}</div>
+          <div class="m">${t.dueAt} · ${t.estimatedMin} Min${t.blocking ? " · blockiert" : ""}</div>
+        </div>`;
+      row.querySelector(".check").onclick = () => setStatus(key, status === "done" ? "open" : "done");
+      tasks.appendChild(row);
+    }
+    panel.appendChild(node);
+  });
+
+  if (goal.plan.assumptions.length) {
+    const box = document.createElement("div");
+    box.className = "card";
+    box.innerHTML = `<span class="label">Annahmen</span>` +
+      goal.plan.assumptions.map((a) => `<div style="font-size:14px; color:var(--text-2); margin-top:6px">· ${esc(a)}</div>`).join("");
+    panel.appendChild(box);
+  }
+}
+
+function setStatus(key, status) {
+  const d = db();
+  const goal = d.goals.find((g) => g.id === state.current.id && g.userId === state.user.id);
+  if (!goal) return;
+
+  if (status === "open") delete goal.taskStatus[key];
+  else goal.taskStatus[key] = status;
+  goal.updatedAt = new Date().toISOString();
+  saveDb(d);
+
+  loadGoals();
+  state.current = state.goals.find((g) => g.id === goal.id);
+  $("tab-today").getAttribute("aria-selected") === "true" ? renderToday() : renderPath();
+}
+
+/* --- Verdrahtung --------------------------------------------------------- */
+
+$("tab-login").onclick = () => setAuthMode("login");
+$("tab-register").onclick = () => setAuthMode("register");
+$("goal-input").addEventListener("input", (e) => {
+  $("btn-to-interview").disabled = e.target.value.trim().length < 10;
+});
+document.querySelectorAll(".chip").forEach((chip) => {
+  chip.onclick = () => { $("goal-input").value = chip.textContent.trim(); $("btn-to-interview").disabled = false; };
+});
+$("f-hours").addEventListener("input", (e) => { $("hours-out").textContent = e.target.value; });
+$("btn-to-interview").onclick = () => show("interview");
+$("btn-back-goal").onclick = () => show("goal");
+$("btn-generate").onclick = generate;
+$("btn-new").onclick = startNewGoal;
+$("btn-home").onclick = () => { loadGoals(); renderHome(); };
+$("tab-today").onclick = () => selectTab("today");
+$("tab-path").onclick = () => selectTab("path");
+
+$("btn-export").onclick = () => {
+  const { salt, passwordHash, ...account } = state.user;
+  const payload = { exportedAt: new Date().toISOString(), account, goals: state.goals };
+  const url = URL.createObjectURL(new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" }));
+  const a = document.createElement("a");
+  a.href = url; a.download = "atlas-export.json"; a.click();
+  URL.revokeObjectURL(url);
+};
+
+$("btn-delete-account").onclick = () => {
+  if (!confirm("Konto, alle Ziele und der gesamte Fortschritt werden endgültig gelöscht. Fortfahren?")) return;
+  const d = db();
+  d.goals = d.goals.filter((g) => g.userId !== state.user.id);
+  d.users = d.users.filter((u) => u.id !== state.user.id);
+  d.session = null;
+  saveDb(d);
+  state = { user: null, goals: [], current: null, mode: "register" };
+  setAuthMode("register");
+  show("auth");
+  notice("Konto und alle Daten wurden gelöscht.", "ok");
+};
+
+$("btn-delete").onclick = () => {
+  if (!confirm("Ziel und Fortschritt endgültig löschen?")) return;
+  const d = db();
+  d.goals = d.goals.filter((g) => !(g.id === state.current.id && g.userId === state.user.id));
+  saveDb(d);
+  loadGoals();
+  renderHome();
+};
+
+(function init() {
+  setAuthMode("login");
+  const d = db();
+  const user = d.session ? d.users.find((u) => u.id === d.session) : null;
+
+  if (user) {
+    state.user = user;
+    $("who-name").textContent = user.displayName;
+    loadGoals();
+    state.goals.length ? renderHome() : startNewGoal();
+  } else {
+    show("auth");
+  }
+})();
+</script>
+</body>
+</html>
