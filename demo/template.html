@@ -2,8 +2,9 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Atlas — Vorschau</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>Atlas</title>
 <style>
   /* Designsystem aus docs/05-marke-und-design.md */
   :root {
@@ -26,20 +27,25 @@
   body {
     margin: 0; background: var(--bg); color: var(--text);
     font-family: var(--sans); font-size: 16px; line-height: 1.5;
-    -webkit-font-smoothing: antialiased;
+    -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: 100%;
   }
-  .wrap { max-width: 640px; margin: 0 auto; padding: 28px 20px 80px; }
+  .wrap {
+    max-width: 640px; margin: 0 auto;
+    padding: max(20px, env(safe-area-inset-top)) 20px 80px;
+  }
 
   header {
     display: flex; align-items: center; justify-content: space-between;
-    gap: 16px; margin-bottom: 30px; min-height: 34px;
+    gap: 16px; margin-bottom: 26px; min-height: 34px; flex-wrap: wrap;
   }
   .brand { display: flex; align-items: center; gap: 10px; font-weight: 600; letter-spacing: -.02em; }
-  .who { display: flex; align-items: center; gap: 12px; font-size: 14px; color: var(--text-3); }
+  .who { display: flex; align-items: center; gap: 12px; font-size: 14px; color: var(--text-3); flex-wrap: wrap; }
 
-  h1 { font-size: 30px; line-height: 1.15; letter-spacing: -.03em; font-weight: 600; margin: 0 0 12px; text-wrap: balance; }
+  h1 { font-size: clamp(26px, 6vw, 30px); line-height: 1.15; letter-spacing: -.03em; font-weight: 600; margin: 0 0 12px; text-wrap: balance; }
+  h2 { font-size: 20px; line-height: 1.3; letter-spacing: -.02em; font-weight: 600; margin: 0; }
   p  { margin: 0 0 16px; color: var(--text-2); }
   .muted { color: var(--text-3); font-size: 14px; }
+  code { font-family: var(--mono); font-size: .92em; }
 
   .label {
     font-family: var(--mono); font-size: 11px; letter-spacing: .12em;
@@ -47,7 +53,7 @@
   }
 
   textarea, input, select {
-    width: 100%; font: inherit; color: var(--text);
+    width: 100%; font: inherit; font-size: 16px; color: var(--text);
     background: var(--sunken); border: 1px solid var(--line);
     border-radius: 10px; padding: 12px 14px;
   }
@@ -61,7 +67,7 @@
   button {
     font: inherit; font-weight: 600; cursor: pointer;
     border-radius: 12px; padding: 13px 20px; border: 1px solid transparent;
-    transition: opacity .15s, transform .1s;
+    min-height: 44px; transition: opacity .15s, transform .1s;
   }
   button:active { transform: scale(.985); }
   button[disabled] { opacity: .45; cursor: default; }
@@ -69,7 +75,8 @@
   .ghost { background: transparent; color: var(--text-2); border-color: var(--line); }
   .link {
     background: none; border: none; color: var(--text-2); padding: 6px 0;
-    text-decoration: underline; text-underline-offset: 3px; font-weight: 400; font-size: 14px;
+    text-decoration: underline; text-underline-offset: 3px; font-weight: 400;
+    font-size: 14px; min-height: 0;
   }
   .link.danger { color: var(--critical); }
   .row { display: flex; gap: 10px; align-items: center; }
@@ -83,18 +90,19 @@
   .chip {
     display: inline-block; font-size: 13px; color: var(--text-2);
     background: var(--sunken); border: 1px solid var(--line);
-    border-radius: 999px; padding: 7px 13px; cursor: pointer; margin: 0 6px 6px 0;
+    border-radius: 999px; padding: 9px 14px; cursor: pointer; margin: 0 6px 6px 0;
   }
   .chip:hover { border-color: var(--accent); color: var(--accent); }
 
   .banner {
     display: flex; gap: 10px; align-items: flex-start;
     border: 1px solid var(--attention); color: var(--attention);
-    border-radius: 12px; padding: 12px 14px; font-size: 14px; margin-bottom: 22px;
+    border-radius: 12px; padding: 12px 14px; font-size: 14px; margin-bottom: 20px;
   }
   .banner strong { display: block; }
   .banner.error { border-color: var(--critical); color: var(--critical); }
   .banner.ok { border-color: var(--accent); color: var(--accent); }
+  .banner.info { border-color: var(--line); color: var(--text-2); }
 
   .node { display: grid; grid-template-columns: 24px 1fr; gap: 14px; }
   .node .rail { display: flex; flex-direction: column; align-items: center; }
@@ -106,7 +114,7 @@
   .node.now  .dot { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 0 5px var(--accent-soft); }
   .node .stem { width: 1.5px; flex: 1; background: var(--line); margin: 6px 0; min-height: 20px; }
   .node.done .stem { background: var(--accent); }
-  .node .body { padding-bottom: 26px; }
+  .node .body { padding-bottom: 26px; min-width: 0; }
   .node .title { font-weight: 600; letter-spacing: -.01em; }
   .node .meta { font-family: var(--mono); font-size: 11.5px; color: var(--text-3); margin-top: 3px; }
   .node .dod { font-size: 14px; color: var(--text-2); margin-top: 8px; }
@@ -117,9 +125,9 @@
   }
   .task:last-child { border-bottom: none; }
   .check {
-    width: 22px; height: 22px; border-radius: 7px; border: 1.5px solid var(--text-3);
-    background: none; padding: 0; cursor: pointer; margin-top: 1px;
-    display: grid; place-items: center; color: var(--bg); font-size: 13px;
+    width: 24px; height: 24px; min-height: 24px; border-radius: 7px;
+    border: 1.5px solid var(--text-3); background: none; padding: 0; cursor: pointer;
+    display: grid; place-items: center; color: var(--bg); font-size: 14px;
   }
   .task.done .check { background: var(--accent); border-color: var(--accent); }
   .task.done .t { text-decoration: line-through; color: var(--text-3); }
@@ -138,20 +146,27 @@
   .bar { height: 4px; border-radius: 3px; background: var(--sunken); margin-top: 12px; overflow: hidden; }
   .bar i { display: block; height: 100%; background: var(--accent); border-radius: 3px; transition: width .6s cubic-bezier(.32,.72,0,1); }
 
-  .gen { text-align: center; padding: 60px 0; }
+  .gen { text-align: center; padding: 56px 0; }
   .gen .draw { stroke-dasharray: 220; stroke-dashoffset: 220; animation: draw 2.2s cubic-bezier(.32,.72,0,1) infinite; }
   @keyframes draw { 0% { stroke-dashoffset: 220; } 60%,100% { stroke-dashoffset: 0; } }
 
-  .tabs { display: flex; gap: 6px; margin-bottom: 24px; }
+  .tabs { display: flex; gap: 6px; margin-bottom: 22px; flex-wrap: wrap; }
   .tab {
     background: transparent; border: 1px solid var(--line); color: var(--text-2);
-    border-radius: 999px; padding: 8px 16px; font-size: 14px; font-weight: 500;
+    border-radius: 999px; padding: 9px 16px; font-size: 14px; font-weight: 500; min-height: 0;
   }
   .tab[aria-selected=true] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
 
   .hidden { display: none !important; }
-  footer { margin-top: 44px; padding-top: 20px; border-top: 1px solid var(--line); }
+  footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--line); }
   .footer-actions { display: flex; flex-wrap: wrap; gap: 18px; }
+
+  .rules { display: flex; flex-direction: column; gap: 6px; }
+  .rule { display: flex; gap: 10px; font-size: 14px; align-items: baseline; }
+  .rule .mark { font-family: var(--mono); flex: none; }
+  .rule.ok .mark { color: var(--accent); }
+  .rule.warn .mark { color: var(--attention); }
+  .rule.bad .mark { color: var(--critical); }
 
   @media (prefers-reduced-motion: reduce) {
     * { animation-duration: .01ms !important; transition-duration: .01ms !important; }
@@ -177,21 +192,43 @@
     </span>
   </header>
 
-  <div class="banner">
+  <noscript>
+    <div class="banner">
+      <span aria-hidden="true">●</span>
+      <span>
+        <strong>Diese Vorschau führt kein JavaScript aus</strong>
+        Du siehst die Datei gerade in einem Vorschau-Fenster (Mail, Nachrichten,
+        Dateien-App), das Skripte blockiert — die App kann darin nicht laufen.
+        Öffne die Datei in einem richtigen Browser: Teilen-Symbol antippen →
+        „In Safari öffnen“ bzw. „In Chrome öffnen“. Am Rechner: Rechtsklick →
+        „Öffnen mit“ → Browser.
+      </span>
+    </div>
+  </noscript>
+
+  <div class="banner" id="mode-banner">
+    <span aria-hidden="true">●</span>
+    <span id="mode-text">
+      <strong>Ohne API-Key</strong>
+      Die Pläne kommen aus drei hinterlegten Playbooks und sind nicht auf deine
+      Situation zugeschnitten. Unter „Einstellungen“ kannst du einen
+      Anthropic-API-Key hinterlegen — dann plant Claude für beliebige Ziele.
+    </span>
+  </div>
+
+  <div id="storage-warning" class="banner error hidden">
     <span aria-hidden="true">●</span>
     <span>
-      <strong>Vorschau ohne Server</strong>
-      Konto und Ziele liegen unverschlüsselt in diesem Browser (localStorage) und
-      verlassen ihn nicht. Die Pläne kommen direkt aus drei hinterlegten Playbooks,
-      nicht aus dem Modell — sie sind nicht auf deine Situation zugeschnitten.
-      Die richtige Anmeldung mit Passwort-Hashing und Sitzungen steckt in
-      <code>engine/</code>, nicht hier.
+      <strong>Speichern nicht möglich</strong>
+      Dieser Browser lässt keinen dauerhaften Speicher zu. Du kannst alles
+      ausprobieren, aber beim Schließen des Tabs geht es verloren.
     </span>
   </div>
 
   <div id="notice" class="banner hidden"></div>
 
-  <section id="view-auth" class="hidden">
+  <!-- Anmeldung: standardmäßig sichtbar, damit ohne JavaScript etwas dasteht -->
+  <section id="view-auth">
     <h1 id="auth-title">Willkommen bei Atlas</h1>
     <p id="auth-sub">Melde dich an, um deine Ziele zu planen.</p>
 
@@ -232,15 +269,49 @@
     <footer>
       <span class="label">Dein Konto</span>
       <div class="footer-actions">
+        <button class="link" id="btn-settings">Einstellungen</button>
         <button class="link" id="btn-export">Alle Daten exportieren</button>
         <button class="link danger" id="btn-delete-account">Konto löschen</button>
       </div>
     </footer>
   </section>
 
+  <section id="view-settings" class="hidden">
+    <h1>Einstellungen</h1>
+    <p>Mit einem Anthropic-API-Key plant Claude für <strong>beliebige</strong> Ziele
+       statt nur für die drei hinterlegten Playbooks.</p>
+    <div class="stack">
+      <div class="field">
+        <label class="label" for="s-key">Anthropic API-Key</label>
+        <input type="password" id="s-key" placeholder="sk-ant-…" autocomplete="off">
+        <span class="muted" style="margin-top:8px">
+          Der Schlüssel bleibt in diesem Browser und wird nur an
+          <code>api.anthropic.com</code> gesendet. Jeder Plan kostet etwa 0,15–0,20 €
+          über deinen Anthropic-Account.
+        </span>
+      </div>
+      <div class="field">
+        <label class="label" for="s-model">Modell</label>
+        <select id="s-model">
+          <option value="claude-opus-5">Claude Opus 5 — beste Planqualität</option>
+          <option value="claude-sonnet-5">Claude Sonnet 5 — günstiger</option>
+        </select>
+      </div>
+      <div class="banner info">
+        <span aria-hidden="true">●</span>
+        <span>Ein API-Key im Browser ist für den Eigengebrauch in Ordnung, für ein
+          öffentliches Produkt nicht — dort gehört der Schlüssel auf den Server.
+          Genau so macht es <code>engine/</code>.</span>
+      </div>
+      <button class="primary" id="btn-save-key">Speichern</button>
+      <button class="link danger" id="btn-clear-key">Schlüssel entfernen</button>
+      <button class="link" id="btn-settings-back">Zurück</button>
+    </div>
+  </section>
+
   <section id="view-goal" class="hidden">
     <h1>Was möchtest du erreichen?</h1>
-    <p>In dieser Vorschau gibt es Pläne zu drei Vorhaben: Café, Freelance, Onlineshop.</p>
+    <p id="goal-hint">Ein Satz reicht. Je konkreter, desto besser der Plan.</p>
     <textarea id="goal-input" placeholder="z. B. Ich möchte in 18 Monaten ein Café in Leipzig eröffnen"></textarea>
     <div style="margin:16px 0 24px">
       <span class="label">Beispiele</span>
@@ -318,9 +389,11 @@
     <div class="tabs" role="tablist">
       <button class="tab" id="tab-today" role="tab" aria-selected="true">Heute</button>
       <button class="tab" id="tab-path" role="tab" aria-selected="false">Pfad</button>
+      <button class="tab" id="tab-check" role="tab" aria-selected="false">Prüfung</button>
     </div>
     <div id="panel-today"></div>
     <div id="panel-path" class="hidden"></div>
+    <div id="panel-check" class="hidden"></div>
     <footer>
       <p class="muted" id="plan-meta"></p>
       <button class="link danger" id="btn-delete">Dieses Ziel löschen</button>
@@ -331,23 +404,94 @@
 
 <script>
 /* ==========================================================================
-   Atlas — Vorschau ohne Server.
+   Atlas — eigenständige Fassung.
 
-   Portierung von engine/src/fallback.ts, scheduler.ts und store.ts in den
-   Browser. Die Playbook-Daten unten sind unverändert aus
-   engine/src/playbooks/data/ eingesetzt (per Build-Skript, nicht abgetippt).
+   Portierung aus engine/: fallback.ts (Playbook-Direktplan), scheduler.ts
+   (Terminierung inkl. deutscher Feiertage), validator.ts (die neun Regeln),
+   store.ts (Ablage), model/prompts.ts (System-Prompt).
 
-   Was hier ANDERS ist als in engine/:
-     - Kein Modell. Pläne kommen aus dem Playbook-Direktplan (der in docs/08
-       dokumentierte Rückfallpfad), nie aus Claude.
-     - Keine echte Sicherheit. Passwörter werden zwar gehasht, aber alles liegt
-       im localStorage dieses Browsers. Das ist eine Vorschau, kein Betrieb.
+   Zwei Betriebsarten:
+     ohne API-Key  → Pläne aus drei Playbooks, offline, nicht personalisiert
+     mit API-Key   → Claude plant beliebige Ziele, direkt aus dem Browser
+
+   Die Playbook-Daten unten sind per Build-Skript aus
+   engine/src/playbooks/data/ eingesetzt, nicht abgetippt.
    ========================================================================== */
 
 const PLAYBOOKS = /*__PLAYBOOKS__*/[];
-const STORAGE_KEY = "atlas.preview.v1";
+const STORAGE_KEY = "atlas.app.v2";
+const MAX_TASK_MINUTES = 480;
+const MS_DAY = 86400000;
 
-/* --- Playbook-Auswahl (Portierung von playbooks/index.ts) ---------------- */
+/* --- Ablage mit Rückfall auf Arbeitsspeicher ----------------------------- */
+
+let memoryStore = null;
+let storageWorks = true;
+
+function readRaw() {
+  if (memoryStore) return memoryStore;
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch (err) {
+    // Manche Vorschau-Fenster und der private Modus verbieten localStorage.
+    storageWorks = false;
+    return null;
+  }
+}
+
+function db() {
+  return readRaw() || { users: [], goals: [], session: null, settings: {} };
+}
+
+function saveDb(d) {
+  if (memoryStore) { memoryStore = d; return; }
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(d));
+  } catch (err) {
+    storageWorks = false;
+    memoryStore = d;
+    const w = document.getElementById("storage-warning");
+    if (w) w.classList.remove("hidden");
+  }
+}
+
+/* --- Kleine Helfer ------------------------------------------------------- */
+
+const hasCrypto = typeof crypto !== "undefined";
+
+function uid() {
+  if (hasCrypto && typeof crypto.randomUUID === "function") return crypto.randomUUID();
+  if (hasCrypto && typeof crypto.getRandomValues === "function") {
+    const a = new Uint8Array(16);
+    crypto.getRandomValues(a);
+    return [...a].map((b) => b.toString(16).padStart(2, "0")).join("");
+  }
+  return `id-${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
+}
+
+async function hashPassword(password, salt) {
+  const data = new TextEncoder().encode(`${salt}:${password}`);
+  if (hasCrypto && crypto.subtle && typeof crypto.subtle.digest === "function") {
+    try {
+      const buf = await crypto.subtle.digest("SHA-256", data);
+      return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
+    } catch (err) { /* fällt unten durch */ }
+  }
+  let h = 2166136261;
+  for (const byte of data) { h ^= byte; h = Math.imul(h, 16777619); }
+  return `weak-${(h >>> 0).toString(16)}`;
+}
+
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, (c) => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" })[c]);
+}
+
+function taskKey(ref, title) { return `${ref}::${title}`; }
+function isoDate(d) { return d.toISOString().slice(0, 10); }
+function addDays(d, n) { const x = new Date(d); x.setUTCDate(x.getUTCDate() + n); return x; }
+
+/* --- Playbook-Auswahl (playbooks/index.ts) ------------------------------- */
 
 function tokenize(s) {
   return new Set(String(s).toLowerCase().replace(/[^a-zäöüß0-9]+/g, " ").split(" ").filter((t) => t.length > 3));
@@ -361,15 +505,13 @@ function overlap(a, b) {
 
 function findPlaybook(query) {
   const terms = tokenize(query);
-  const scored = PLAYBOOKS
+  const best = PLAYBOOKS
     .map((p) => ({ p, score: overlap(terms, tokenize(`${p.title} ${p.intentKey} ${p.nodes.map((n) => n.title).join(" ")}`)) }))
-    .sort((a, b) => b.score - a.score);
-  return scored[0] && scored[0].score > 0 ? scored[0].p : null;
+    .sort((a, b) => b.score - a.score)[0];
+  return best && best.score > 0 ? best.p : null;
 }
 
-/* --- Planerzeugung (Portierung von fallback.ts) -------------------------- */
-
-const MAX_TASK_MINUTES = 480;
+/* --- Playbook-Direktplan (fallback.ts) ----------------------------------- */
 
 function orderNodes(template) {
   const ids = new Set(template.nodes.map((n) => n.id));
@@ -382,9 +524,7 @@ function orderNodes(template) {
     for (const node of template.nodes) {
       if (placed.has(node.id)) continue;
       if (node.requiredBefore.every((r) => placed.has(r) || !ids.has(r))) {
-        ordered.push(node);
-        placed.add(node.id);
-        progress = true;
+        ordered.push(node); placed.add(node.id); progress = true;
       }
     }
   }
@@ -404,9 +544,7 @@ function buildTasks(node, input) {
     { title: `${node.title}: Überblick verschaffen und Vorgehen festlegen`,
       why: "Ein klarer Startpunkt verhindert, dass dieser Meilenstein liegen bleibt.", blocking: true },
     ...node.successCorrelates.slice(0, 2).map((c) => ({
-      title: c,
-      why: "Das unterscheidet laut Playbook diejenigen, die abschließen, von denen, die aufgeben.",
-      blocking: false })),
+      title: c, why: "Das unterscheidet laut Playbook diejenigen, die abschließen, von denen, die aufgeben.", blocking: false })),
     { title: `Prüfen: ${shorten(node.definitionOfDone)}`,
       why: "Der Meilenstein gilt erst als erledigt, wenn dieses Ergebnis vorliegt.", blocking: true },
   ];
@@ -414,27 +552,24 @@ function buildTasks(node, input) {
   const perTask = Math.min(MAX_TASK_MINUTES, Math.max(30, Math.floor(budget / drafts.length)));
 
   return drafts.map((d, i) => ({
-    title: d.title, why: d.why, blocking: d.blocking,
+    title: d.title, why: d.why, how: null, blocking: d.blocking,
     estimatedMin: i === 0 ? Math.min(perTask, 60) : perTask,
+    origin: "playbook",
   }));
 }
 
 function planFromPlaybook(template, input) {
   const nodes = orderNodes(template);
   const milestones = nodes.map((node) => ({
-    ref: node.id,
-    title: node.title,
-    definitionOfDone: node.definitionOfDone,
-    durationDays: node.typicalDurationDays,
-    dependsOn: node.requiredBefore,
-    playbookNodeId: node.id,
-    tasks: buildTasks(node, input),
+    ref: node.id, title: node.title, definitionOfDone: node.definitionOfDone,
+    durationDays: node.typicalDurationDays, dependsOn: node.requiredBefore,
+    origin: "playbook", playbookNodeId: node.id, tasks: buildTasks(node, input),
   }));
 
   const totalDays = milestones.reduce((s, m) => s + m.durationDays, 0);
 
   return {
-    summary: `${template.title} — strukturierter Plan aus dem Playbook „${template.intentKey}". ` +
+    summary: `${template.title} — strukturierter Plan aus dem Playbook „${template.intentKey}“. ` +
              `${milestones.length} Etappen über rund ${totalDays} Tage.`,
     assumptions: [
       "Dieser Plan stammt direkt aus dem Playbook und ist nicht auf deine Situation zugeschnitten.",
@@ -450,12 +585,7 @@ function planFromPlaybook(template, input) {
   };
 }
 
-/* --- Terminierung (Portierung von scheduler.ts) -------------------------- */
-
-const MS_DAY = 86400000;
-
-function isoDate(d) { return d.toISOString().slice(0, 10); }
-function addDays(d, n) { const x = new Date(d); x.setUTCDate(x.getUTCDate() + n); return x; }
+/* --- Terminierung (scheduler.ts) ----------------------------------------- */
 
 function easterSunday(year) {
   const a = year % 19, b = Math.floor(year / 100), c = year % 100;
@@ -489,7 +619,7 @@ function topoOrder(milestones) {
   const indeg = new Map(), deps = new Map();
 
   for (const m of milestones) {
-    const d = m.dependsOn.filter((x) => known.has(x) && x !== m.ref);
+    const d = (m.dependsOn || []).filter((x) => known.has(x) && x !== m.ref);
     indeg.set(m.ref, d.length);
     for (const x of d) deps.set(x, [...(deps.get(x) || []), m.ref]);
   }
@@ -507,6 +637,17 @@ function topoOrder(milestones) {
   return order;
 }
 
+function criticalPathDays(milestones) {
+  const byRef = new Map(milestones.map((m) => [m.ref, m]));
+  const finish = new Map();
+  for (const ref of topoOrder(milestones)) {
+    const m = byRef.get(ref);
+    const start = Math.max(0, ...(m.dependsOn || []).map((d) => finish.get(d) || 0));
+    finish.set(ref, start + m.durationDays);
+  }
+  return finish.size ? Math.max(...finish.values()) : 0;
+}
+
 function workdays(from, to, input, holidays) {
   const out = [];
   for (let d = new Date(from); d <= to; d = addDays(d, 1)) {
@@ -522,15 +663,17 @@ function schedulePlan(plan, input, start) {
   const holidays = germanHolidays(start.getUTCFullYear(), start.getUTCFullYear() + 4, input.state);
   const byRef = new Map(plan.milestones.map((m) => [m.ref, m]));
   const windows = new Map();
+  const order = topoOrder(plan.milestones);
+  const rest = plan.milestones.filter((m) => !order.includes(m.ref)).map((m) => m.ref);
 
-  for (const ref of topoOrder(plan.milestones)) {
+  for (const ref of [...order, ...rest]) {
     const m = byRef.get(ref);
     let earliest = start;
-    for (const dep of m.dependsOn) {
+    for (const dep of (m.dependsOn || [])) {
       const w = windows.get(dep);
       if (w && w.end > earliest) earliest = w.end;
     }
-    const s = addDays(earliest, m.dependsOn.length > 0 ? 1 : 0);
+    const s = addDays(earliest, (m.dependsOn || []).length > 0 ? 1 : 0);
     windows.set(ref, { start: s, end: addDays(s, m.durationDays) });
   }
 
@@ -546,56 +689,236 @@ function schedulePlan(plan, input, start) {
 
     for (const t of ordered) {
       if (used > 0 && used + t.estimatedMin > perDay) { idx = Math.min(idx + 1, days.length - 1); used = 0; }
-      dated.push({ ...t, dueAt: days.length ? isoDate(days[idx]) : isoDate(w.end) });
+      dated.push({ ...t, dueAt: days.length ? isoDate(days[Math.max(idx, 0)]) : isoDate(w.end) });
       used += t.estimatedMin;
       if (used >= perDay) { idx = Math.min(idx + 1, days.length - 1); used = 0; }
     }
 
     return {
       ...m,
-      windowStart: isoDate(w.start),
-      windowEnd: isoDate(w.end),
+      windowStart: isoDate(w.start), windowEnd: isoDate(w.end),
       tasks: m.tasks.map((t) => dated.find((x) => x.title === t.title) || { ...t, dueAt: isoDate(w.end) }),
     };
   });
 
   return {
-    ...plan,
-    milestones,
+    ...plan, milestones,
     startDate: isoDate(start),
     endDate: milestones.reduce((a, m) => (m.windowEnd > a ? m.windowEnd : a), isoDate(start)),
   };
 }
 
-/* --- Ablage im Browser (Portierung von store.ts) ------------------------- */
+/* --- Validator: die neun Regeln (validator.ts) --------------------------- */
 
-function db() {
-  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || { users: [], goals: [], session: null }; }
-  catch { return { users: [], goals: [], session: null }; }
+const CAPACITY_TOLERANCE = 1.2;
+
+function weeklyLoadMinutes(m) {
+  const total = m.tasks.reduce((s, t) => s + t.estimatedMin, 0);
+  return total / Math.max(m.durationDays / 7, 1 / 7);
 }
-function saveDb(d) { localStorage.setItem(STORAGE_KEY, JSON.stringify(d)); }
 
-/**
- * Passwort-Hash. Nutzt SHA-256, wo verfügbar. Das ist KEIN Ersatz für scrypt —
- * in der Serverfassung (engine/src/auth.ts) wird korrekt gehasht. Hier geht es
- * nur darum, das Passwort nicht im Klartext im localStorage liegen zu lassen.
- */
-async function hash(password, salt) {
-  const data = new TextEncoder().encode(`${salt}:${password}`);
-  if (globalThis.crypto && crypto.subtle) {
-    const buf = await crypto.subtle.digest("SHA-256", data);
-    return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
+function validatePlan(plan, input, startDate) {
+  const issues = [];
+  const refs = new Set(plan.milestones.map((m) => m.ref));
+  const seen = new Set();
+
+  for (const m of plan.milestones) {
+    if (seen.has(m.ref)) issues.push({ rule: 3, severity: "error", message: `Kennung „${m.ref}“ kommt mehrfach vor.` });
+    seen.add(m.ref);
+
+    for (const dep of (m.dependsOn || [])) {
+      if (dep === m.ref) issues.push({ rule: 3, severity: "error", message: `„${m.ref}“ hängt von sich selbst ab.` });
+      else if (!refs.has(dep)) issues.push({ rule: 3, severity: "error", message: `„${m.ref}“ verweist auf „${dep}“, das es nicht gibt.` });
+    }
   }
-  let h = 2166136261;
-  for (const byte of data) { h ^= byte; h = Math.imul(h, 16777619); }
-  return `weak-${(h >>> 0).toString(16)}`;
+
+  if (topoOrder(plan.milestones).length !== plan.milestones.length) {
+    issues.push({ rule: 2, severity: "error", message: "Die Meilensteine bilden einen Zyklus — keine gültige Reihenfolge." });
+  }
+
+  if (input.targetDate) {
+    const available = Math.floor((new Date(input.targetDate) - startDate) / MS_DAY);
+    const required = criticalPathDays(plan.milestones);
+    if (required > available) {
+      issues.push({ rule: 4, severity: "error",
+        message: `Der Plan braucht ${required} Tage, bis zum Zieltermin sind ${available} verfügbar — es fehlen ${required - available}.` });
+    }
+  }
+
+  const limit = input.weeklyCapacityMin * CAPACITY_TOLERANCE;
+  for (const m of plan.milestones) {
+    const load = weeklyLoadMinutes(m);
+    if (load > limit) {
+      issues.push({ rule: 5, severity: "error",
+        message: `„${m.title}“ verlangt ${Math.round(load)} Min/Woche, verfügbar sind ${input.weeklyCapacityMin}.` });
+    }
+    if (m.definitionOfDone.trim().length < 15) {
+      issues.push({ rule: 6, severity: "error", message: `„${m.title}“ hat keine prüfbare Ergebnisdefinition.` });
+    }
+    for (const t of m.tasks) {
+      if (t.estimatedMin > MAX_TASK_MINUTES) {
+        issues.push({ rule: 7, severity: "error", message: `„${t.title}“ dauert ${t.estimatedMin} Min — mehr als ein Arbeitstag.` });
+      }
+    }
+  }
+
+  const patterns = [
+    { re: /\b\d{1,4}(?:[.,]\d{2})?\s?(?:€|EUR|Euro)\b/, hint: "Betragsangabe" },
+    { re: /\binnerhalb\s+von\s+\d+\s+(?:Tagen|Wochen|Monaten)\b/i, hint: "Frist" },
+    { re: /§\s?\d+/, hint: "Paragrafenverweis" },
+  ];
+  for (const m of plan.milestones) {
+    const texts = [m.definitionOfDone, ...m.tasks.flatMap((t) => [t.title, t.why, t.how || ""])];
+    for (const { re, hint } of patterns) {
+      const hit = texts.find((t) => re.test(t));
+      if (hit) {
+        issues.push({ rule: 9, severity: "warning",
+          message: `„${m.title}“ enthält eine ${hint} („${hit.match(re)[0]}“), die nicht aus einer geprüften Quelle stammt.` });
+      }
+    }
+  }
+
+  return { valid: !issues.some((i) => i.severity === "error"), issues };
 }
 
-function uid() {
-  return (crypto.randomUUID ? crypto.randomUUID() : String(Date.now() + Math.random()));
+/* --- Claude-Planung, wenn ein API-Key hinterlegt ist --------------------- */
+
+const PLAN_SCHEMA = {
+  type: "json_schema",
+  schema: {
+    type: "object", additionalProperties: false,
+    required: ["summary", "assumptions", "risks", "milestones"],
+    properties: {
+      summary: { type: "string" },
+      assumptions: { type: "array", items: { type: "string" } },
+      risks: { type: "array", items: { type: "object", additionalProperties: false,
+        required: ["milestone_ref", "risk", "mitigation"],
+        properties: { milestone_ref: { type: "string" }, risk: { type: "string" }, mitigation: { type: "string" } } } },
+      milestones: { type: "array", minItems: 5, maxItems: 10, items: {
+        type: "object", additionalProperties: false,
+        required: ["ref","title","definition_of_done","duration_days","depends_on","origin","tasks"],
+        properties: {
+          ref: { type: "string" }, title: { type: "string" },
+          definition_of_done: { type: "string" },
+          duration_days: { type: "integer", minimum: 1 },
+          depends_on: { type: "array", items: { type: "string" } },
+          origin: { type: "string", enum: ["playbook", "generated"] },
+          tasks: { type: "array", minItems: 2, maxItems: 12, items: {
+            type: "object", additionalProperties: false,
+            required: ["title","why","estimated_min","difficulty","blocking"],
+            properties: {
+              title: { type: "string" }, why: { type: "string" },
+              how: { type: ["string","null"] },
+              estimated_min: { type: "integer", minimum: 5, maximum: MAX_TASK_MINUTES },
+              difficulty: { type: "string", enum: ["micro","small","medium","large"] },
+              blocking: { type: "boolean" },
+            } } },
+        } } },
+    },
+  },
+};
+
+const SYSTEM_PROMPT = `Du bist die Planungs-Engine von Atlas. Du zerlegst ein Lebensziel in einen
+konkreten, terminierbaren, realistischen Plan.
+
+# Haltung
+Du bist Planer, nicht Motivationstrainer. Sei realistisch, nicht ermutigend.
+Ein zu optimistischer Plan schadet mehr als ein ernüchternder.
+
+# Qualitätsregeln
+1. Jeder Meilenstein hat eine PRÜFBARE Ergebnisdefinition ("Fertig, wenn ...").
+2. Die Reihenfolge folgt echten Abhängigkeiten; Vorbedingungen stehen in depends_on.
+3. Aufgaben sind an einem Nachmittag erledigbar (höchstens 480 Minuten).
+4. Die Wochenlast darf die angegebene Kapazität nicht überschreiten. Rechne nach:
+   Summe der Aufgabenminuten eines Meilensteins geteilt durch seine Dauer in Wochen.
+5. Der allererste Schritt ist klein (unter 60 Minuten) und heute beginnbar.
+
+# Verbote
+- Keine Rechts-, Steuer- oder Medizinberatung im Einzelfall. Formuliere stattdessen
+  eine Aufgabe wie "Kläre mit einer Steuerberatung, ob X für dich passt".
+- Erfinde NIEMALS konkrete Fristen, Gebührenhöhen, Formularnummern, Paragrafen oder
+  Behördennamen. Formuliere solche Stellen als Rechercheschritt.
+- Keine Erfolgsversprechen, keine Motivationsfloskeln, keine Emoji.
+
+# Annahmen
+Liste in assumptions alle Annahmen auf, auf denen der Plan beruht.
+
+# Sprache
+Deutsch, Anrede "du", sachlich. Keine Wörter, die Aufwand verharmlosen
+("einfach", "nur", "schnell").`;
+
+async function planWithClaude(input, settings, onStep) {
+  const context = [
+    `Heutiges Datum: ${isoDate(new Date())}`,
+    `Verfügbare Zeit: ${input.weeklyCapacityMin} Minuten pro Woche`,
+    input.targetDate ? `Zieltermin: ${input.targetDate}` : null,
+    input.budgetEur ? `Budget: ${input.budgetEur} Euro` : null,
+    input.state ? `Bundesland: ${input.state}` : null,
+    input.experience ? `Vorerfahrung: ${{none:"keine",some:"etwas",professional:"beruflich"}[input.experience]}` : null,
+    input.biggestWorry ? `Größte Sorge: ${input.biggestWorry}` : null,
+    input.includeWeekends ? "Wochenenden stehen zur Verfügung." : null,
+  ].filter(Boolean).join("\n");
+
+  onStep("Claude erstellt den Plan …");
+
+  const res = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      "x-api-key": settings.apiKey,
+      "anthropic-version": "2023-06-01",
+      "anthropic-dangerous-direct-browser-access": "true",
+    },
+    body: JSON.stringify({
+      model: settings.model || "claude-opus-5",
+      max_tokens: 16000,
+      system: [
+        { type: "text", text: SYSTEM_PROMPT, cache_control: { type: "ephemeral" } },
+        { type: "text", text: `# Kontext dieser Anfrage\n${context}` },
+      ],
+      output_config: { format: PLAN_SCHEMA, effort: "high" },
+      messages: [{ role: "user", content: `Erstelle einen Plan für dieses Ziel:\n\n${input.rawInput}` }],
+    }),
+  });
+
+  if (!res.ok) {
+    const body = await res.text();
+    let message = `Die Anfrage an Claude ist fehlgeschlagen (${res.status}).`;
+    try { const j = JSON.parse(body); if (j.error && j.error.message) message += ` ${j.error.message}`; } catch {}
+    if (res.status === 401) message = "Der API-Key wurde nicht akzeptiert. Prüfe ihn unter Einstellungen.";
+    throw new Error(message);
+  }
+
+  const data = await res.json();
+
+  // Vor dem Lesen des Inhalts immer stop_reason prüfen.
+  if (data.stop_reason === "refusal") {
+    throw new Error("Für dieses Ziel wurde aus Sicherheitsgründen kein Plan erstellt.");
+  }
+
+  const text = (data.content || []).filter((b) => b.type === "text").map((b) => b.text).join("");
+  if (!text.trim()) throw new Error("Claude hat keinen Plan geliefert. Versuch es noch einmal.");
+
+  const raw = JSON.parse(text);
+
+  return {
+    summary: raw.summary,
+    assumptions: raw.assumptions || [],
+    risks: (raw.risks || []).map((r) => ({ milestoneRef: r.milestone_ref, risk: r.risk, mitigation: r.mitigation })),
+    milestones: raw.milestones.map((m) => ({
+      ref: m.ref, title: m.title, definitionOfDone: m.definition_of_done,
+      durationDays: m.duration_days, dependsOn: m.depends_on || [],
+      origin: m.origin, playbookNodeId: null,
+      tasks: m.tasks.map((t) => ({
+        title: t.title, why: t.why, how: t.how || null,
+        estimatedMin: t.estimated_min, difficulty: t.difficulty,
+        blocking: t.blocking, origin: m.origin,
+      })),
+    })),
+  };
 }
 
-function taskKey(ref, title) { return `${ref}::${title}`; }
+/* --- Fortschritt (store.ts) ---------------------------------------------- */
 
 function progressOf(goal) {
   let tasksDone = 0, tasksTotal = 0, milestonesDone = 0, nextTask = null;
@@ -619,11 +942,14 @@ function progressOf(goal) {
 /* --- Oberfläche ---------------------------------------------------------- */
 
 const $ = (id) => document.getElementById(id);
-const views = ["auth", "home", "goal", "interview", "generating", "plan"];
-let state = { user: null, goals: [], current: null, mode: "login" };
+const views = ["auth", "home", "settings", "goal", "interview", "generating", "plan"];
+let state = { user: null, goals: [], current: null, mode: "login", settings: {} };
 
 function show(name) {
-  for (const v of views) $(`view-${v}`).classList.toggle("hidden", v !== name);
+  for (const v of views) {
+    const el = $(`view-${v}`);
+    if (el) el.classList.toggle("hidden", v !== name);
+  }
   $("who").classList.toggle("hidden", !state.user);
   $("btn-home").classList.toggle("hidden", !state.user || name === "home" || name === "generating");
   window.scrollTo(0, 0);
@@ -633,11 +959,24 @@ function notice(msg, kind = "error") {
   const el = $("notice");
   el.textContent = msg;
   el.className = `banner ${kind}`;
-  setTimeout(() => el.classList.add("hidden"), 9000);
+  clearTimeout(notice.timer);
+  notice.timer = setTimeout(() => el.classList.add("hidden"), 10000);
 }
 
-function esc(s) {
-  return String(s).replace(/[&<>"']/g, (c) => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" })[c]);
+function refreshModeBanner() {
+  const withKey = !!state.settings.apiKey;
+  $("mode-banner").className = withKey ? "banner ok" : "banner";
+  $("mode-text").innerHTML = withKey
+    ? `<strong>Mit Claude verbunden</strong>
+       Pläne werden für beliebige Ziele erzeugt (${esc(state.settings.model || "claude-opus-5")}).
+       Jeder Plan kostet etwa 0,15–0,20 € über deinen Anthropic-Account.`
+    : `<strong>Ohne API-Key</strong>
+       Die Pläne kommen aus drei hinterlegten Playbooks und sind nicht auf deine
+       Situation zugeschnitten. Unter „Einstellungen“ kannst du einen
+       Anthropic-API-Key hinterlegen — dann plant Claude für beliebige Ziele.`;
+  $("goal-hint").textContent = withKey
+    ? "Ein Satz reicht. Je konkreter, desto besser der Plan."
+    : "Ohne API-Key gibt es Pläne zu drei Vorhaben: Café, Freelance, Onlineshop.";
 }
 
 function loadGoals() {
@@ -680,22 +1019,18 @@ $("auth-form").addEventListener("submit", async (e) => {
       const salt = uid();
       const user = {
         id: uid(), email, displayName: $("a-name").value.trim() || email.split("@")[0],
-        salt, passwordHash: await hash(password, salt),
+        salt, passwordHash: await hashPassword(password, salt),
         createdAt: new Date().toISOString(),
         consents: [{ key: "processing", version: "1.0", grantedAt: new Date().toISOString() }],
       };
-      d.users.push(user);
-      d.session = user.id;
-      saveDb(d);
+      d.users.push(user); d.session = user.id; saveDb(d);
       state.user = user;
     } else {
       const user = d.users.find((u) => u.email === email);
-      // Gleiche Meldung für unbekannte Adresse und falsches Passwort.
-      if (!user || (await hash(password, user.salt)) !== user.passwordHash) {
+      if (!user || (await hashPassword(password, user.salt)) !== user.passwordHash) {
         throw new Error("E-Mail-Adresse oder Passwort stimmt nicht.");
       }
-      d.session = user.id;
-      saveDb(d);
+      d.session = user.id; saveDb(d);
       state.user = user;
     }
 
@@ -710,7 +1045,7 @@ $("auth-form").addEventListener("submit", async (e) => {
 
 $("btn-logout").onclick = () => {
   const d = db(); d.session = null; saveDb(d);
-  state = { user: null, goals: [], current: null, mode: "login" };
+  state = { user: null, goals: [], current: null, mode: "login", settings: state.settings };
   $("a-email").value = "";
   setAuthMode("login");
   show("auth");
@@ -734,7 +1069,7 @@ function renderHome() {
     btn.innerHTML = `
       <div style="font-weight:600; letter-spacing:-.01em">${esc(goal.input.rawInput)}</div>
       <div class="muted" style="margin-top:6px; font-family:var(--mono); font-size:11.5px">
-        ${p.milestonesDone}/${p.milestonesTotal} Meilensteine · ${p.tasksDone}/${p.tasksTotal} Aufgaben
+        ${p.milestonesDone}/${p.milestonesTotal} Meilensteine · ${p.tasksDone}/${p.tasksTotal} Aufgaben${goal.source === "claude" ? " · Claude" : ""}
       </div>
       <div class="bar"><i style="width:${pct}%"></i></div>`;
     btn.onclick = () => openGoal(goal);
@@ -749,53 +1084,75 @@ function startNewGoal() {
   show("goal");
 }
 
-const STEPS = [
+const STEPS_LOCAL = [
   "Ich ordne dein Ziel ein …",
   "Ich schaue mir an, wie andere das gemacht haben …",
   "Ich passe die Zeiten an deine Wochenstunden an …",
   "Ich prüfe die Reihenfolge und die Termine …",
 ];
 
-function generate() {
+async function generate() {
   const rawInput = $("goal-input").value.trim();
-  const template = findPlaybook(rawInput);
+  const input = {
+    rawInput,
+    weeklyCapacityMin: Math.max(30, Number($("f-hours").value) * 60),
+    targetDate: $("f-deadline").value || undefined,
+    budgetEur: $("f-budget").value ? Number($("f-budget").value) : undefined,
+    state: $("f-state").value || undefined,
+    experience: $("f-exp").value,
+    biggestWorry: $("f-worry").value || undefined,
+    includeWeekends: $("f-weekend").checked,
+  };
 
-  if (!template) {
-    notice("Diese Vorschau kennt nur Café, Freelance und Onlineshop. Für beliebige Ziele braucht es die Fassung in engine/ mit API-Key.");
+  const useClaude = !!state.settings.apiKey;
+  const template = useClaude ? null : findPlaybook(rawInput);
+
+  if (!useClaude && !template) {
+    notice("Ohne API-Key kennt Atlas nur Café, Freelance und Onlineshop. Hinterlege unter „Einstellungen“ einen Schlüssel für beliebige Ziele.");
     return;
   }
 
   show("generating");
   let i = 0;
-  $("gen-step").textContent = STEPS[0];
-  const ticker = setInterval(() => { i = (i + 1) % STEPS.length; $("gen-step").textContent = STEPS[i]; }, 900);
+  $("gen-step").textContent = useClaude ? "Ich sende dein Ziel an Claude …" : STEPS_LOCAL[0];
+  const ticker = useClaude ? null : setInterval(() => {
+    i = (i + 1) % STEPS_LOCAL.length;
+    $("gen-step").textContent = STEPS_LOCAL[i];
+  }, 900);
 
-  // Kurze Verzögerung, damit der Erstellungsmoment sichtbar ist.
-  setTimeout(() => {
-    clearInterval(ticker);
+  try {
+    let plan, source;
 
-    const input = {
-      rawInput,
-      weeklyCapacityMin: Math.max(30, Number($("f-hours").value) * 60),
-      targetDate: $("f-deadline").value || undefined,
-      budgetEur: $("f-budget").value ? Number($("f-budget").value) : undefined,
-      state: $("f-state").value || undefined,
-      experience: $("f-exp").value,
-      biggestWorry: $("f-worry").value || undefined,
-      includeWeekends: $("f-weekend").checked,
-    };
+    if (useClaude) {
+      plan = await planWithClaude(input, state.settings, (msg) => { $("gen-step").textContent = msg; });
+      source = "claude";
+    } else {
+      await new Promise((r) => setTimeout(r, 2400));
+      plan = planFromPlaybook(template, input);
+      source = "playbook";
+    }
 
-    const plan = schedulePlan(planFromPlaybook(template, input), input, new Date());
+    const start = new Date();
+    const scheduled = schedulePlan(plan, input, start);
+    const validation = validatePlan(plan, input, start);
+
     const goal = {
       id: uid(), userId: state.user.id,
       createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
-      input, intentKey: template.intentKey, plan, taskStatus: {},
+      input, source,
+      intentKey: template ? template.intentKey : "claude",
+      plan: scheduled, validation, taskStatus: {},
     };
 
     const d = db(); d.goals.push(goal); saveDb(d);
     loadGoals();
     openGoal(state.goals.find((g) => g.id === goal.id));
-  }, 2600);
+  } catch (err) {
+    notice(err.message);
+    show("interview");
+  } finally {
+    if (ticker) clearInterval(ticker);
+  }
 }
 
 function openGoal(goal) {
@@ -803,17 +1160,20 @@ function openGoal(goal) {
   $("plan-title").textContent = goal.input.rawInput;
   $("plan-summary").textContent = goal.plan.summary;
   $("plan-meta").textContent =
-    `${goal.plan.startDate} bis ${goal.plan.endDate} · ${goal.intentKey} · direkt aus dem Playbook erzeugt`;
+    `${goal.plan.startDate} bis ${goal.plan.endDate} · ` +
+    (goal.source === "claude" ? "von Claude erzeugt" : `aus dem Playbook ${goal.intentKey}`);
   selectTab("today");
   show("plan");
 }
 
 function selectTab(which) {
-  $("tab-today").setAttribute("aria-selected", String(which === "today"));
-  $("tab-path").setAttribute("aria-selected", String(which === "path"));
-  $("panel-today").classList.toggle("hidden", which !== "today");
-  $("panel-path").classList.toggle("hidden", which !== "path");
-  which === "today" ? renderToday() : renderPath();
+  for (const t of ["today", "path", "check"]) {
+    $(`tab-${t}`).setAttribute("aria-selected", String(t === which));
+    $(`panel-${t}`).classList.toggle("hidden", t !== which);
+  }
+  if (which === "today") renderToday();
+  else if (which === "path") renderPath();
+  else renderCheck();
 }
 
 function renderToday() {
@@ -838,6 +1198,7 @@ function renderToday() {
       <span class="label">${esc(m.title)}</span>
       <div class="big">${esc(t.title)}</div>
       <p style="margin:12px 0 0; font-size:15px">${esc(t.why)}</p>
+      ${t.how ? `<p class="muted" style="margin:10px 0 0">${esc(t.how)}</p>` : ""}
       <div class="when">fällig ${t.dueAt} · ca. ${t.estimatedMin} Minuten</div>
       <div class="row" style="margin-top:20px">
         <button class="primary" id="btn-done" style="flex:1">Erledigt</button>
@@ -871,7 +1232,7 @@ function renderPath() {
         ${index < goal.plan.milestones.length - 1 ? '<span class="stem"></span>' : ""}</div>
       <div class="body">
         <div class="title">${esc(m.title)}</div>
-        <div class="meta">${m.windowStart} → ${m.windowEnd} · ${m.durationDays} Tage</div>
+        <div class="meta">${m.windowStart} → ${m.windowEnd} · ${m.durationDays} Tage${m.origin === "generated" ? " · generiert" : ""}</div>
         <div class="dod">Fertig, wenn: ${esc(m.definitionOfDone)}</div>
         <div class="tasks" style="margin-top:14px"></div>
       </div>`;
@@ -893,14 +1254,51 @@ function renderPath() {
     }
     panel.appendChild(node);
   });
+}
 
-  if (goal.plan.assumptions.length) {
-    const box = document.createElement("div");
-    box.className = "card";
-    box.innerHTML = `<span class="label">Annahmen</span>` +
-      goal.plan.assumptions.map((a) => `<div style="font-size:14px; color:var(--text-2); margin-top:6px">· ${esc(a)}</div>`).join("");
-    panel.appendChild(box);
-  }
+function renderCheck() {
+  const goal = state.current;
+  const panel = $("panel-check");
+  const v = goal.validation || { valid: true, issues: [] };
+  const errors = v.issues.filter((i) => i.severity === "error");
+  const warnings = v.issues.filter((i) => i.severity === "warning");
+
+  const rules = [
+    [2, "Reihenfolge ohne Zyklen"], [3, "Alle Verweise existieren"],
+    [4, "Passt in den Zeitraum"], [5, "Wochenlast im Rahmen"],
+    [6, "Prüfbare Ergebnisdefinitionen"], [7, "Aufgaben höchstens ein Arbeitstag"],
+    [9, "Keine unbelegten Zahlen und Fristen"],
+  ];
+
+  panel.innerHTML = `
+    <div class="card">
+      <span class="label">Deterministische Prüfung</span>
+      <div class="rules" style="margin-top:8px">
+        ${rules.map(([n, label]) => {
+          const err = errors.some((i) => i.rule === n);
+          const warn = warnings.some((i) => i.rule === n);
+          const cls = err ? "bad" : warn ? "warn" : "ok";
+          const mark = err ? "✗" : warn ? "!" : "✓";
+          return `<div class="rule ${cls}"><span class="mark">${mark}</span><span>Regel ${n} — ${label}</span></div>`;
+        }).join("")}
+      </div>
+    </div>
+    ${v.issues.length ? `<div class="card" style="margin-top:12px">
+      <span class="label">Befunde</span>
+      ${v.issues.map((i) => `<div style="font-size:14px; color:var(--text-2); margin-top:8px">
+        <span style="color:${i.severity === "error" ? "var(--critical)" : "var(--attention)"}">
+          ${i.severity === "error" ? "Fehler" : "Hinweis"}</span> · Regel ${i.rule}: ${esc(i.message)}</div>`).join("")}
+    </div>` : ""}
+    ${goal.plan.assumptions && goal.plan.assumptions.length ? `<div class="card" style="margin-top:12px">
+      <span class="label">Annahmen</span>
+      ${goal.plan.assumptions.map((a) => `<div style="font-size:14px; color:var(--text-2); margin-top:6px">· ${esc(a)}</div>`).join("")}
+    </div>` : ""}
+    ${goal.plan.risks && goal.plan.risks.length ? `<div class="card" style="margin-top:12px">
+      <span class="label">Risiken</span>
+      ${goal.plan.risks.map((r) => `<div style="margin-top:10px">
+        <div style="font-size:14px">${esc(r.risk)}</div>
+        <div class="muted" style="margin-top:3px">→ ${esc(r.mitigation)}</div></div>`).join("")}
+    </div>` : ""}`;
 }
 
 function setStatus(key, status) {
@@ -915,7 +1313,8 @@ function setStatus(key, status) {
 
   loadGoals();
   state.current = state.goals.find((g) => g.id === goal.id);
-  $("tab-today").getAttribute("aria-selected") === "true" ? renderToday() : renderPath();
+  const active = ["today", "path", "check"].find((t) => $(`tab-${t}`).getAttribute("aria-selected") === "true");
+  selectTab(active || "today");
 }
 
 /* --- Verdrahtung --------------------------------------------------------- */
@@ -936,6 +1335,39 @@ $("btn-new").onclick = startNewGoal;
 $("btn-home").onclick = () => { loadGoals(); renderHome(); };
 $("tab-today").onclick = () => selectTab("today");
 $("tab-path").onclick = () => selectTab("path");
+$("tab-check").onclick = () => selectTab("check");
+
+$("btn-settings").onclick = () => {
+  $("s-key").value = state.settings.apiKey || "";
+  $("s-model").value = state.settings.model || "claude-opus-5";
+  show("settings");
+};
+$("btn-settings-back").onclick = () => renderHome();
+
+$("btn-save-key").onclick = () => {
+  const key = $("s-key").value.trim();
+  if (key && !key.startsWith("sk-ant-")) {
+    notice("Ein Anthropic-Schlüssel beginnt mit „sk-ant-“. Prüf das bitte noch einmal.");
+    return;
+  }
+  const d = db();
+  d.settings = { ...(d.settings || {}), apiKey: key || undefined, model: $("s-model").value };
+  saveDb(d);
+  state.settings = d.settings;
+  refreshModeBanner();
+  notice(key ? "Schlüssel gespeichert. Pläne kommen ab jetzt von Claude." : "Kein Schlüssel hinterlegt.", "ok");
+  renderHome();
+};
+
+$("btn-clear-key").onclick = () => {
+  const d = db();
+  d.settings = { ...(d.settings || {}), apiKey: undefined };
+  saveDb(d);
+  state.settings = d.settings;
+  $("s-key").value = "";
+  refreshModeBanner();
+  notice("Schlüssel entfernt.", "ok");
+};
 
 $("btn-export").onclick = () => {
   const { salt, passwordHash, ...account } = state.user;
@@ -953,7 +1385,7 @@ $("btn-delete-account").onclick = () => {
   d.users = d.users.filter((u) => u.id !== state.user.id);
   d.session = null;
   saveDb(d);
-  state = { user: null, goals: [], current: null, mode: "register" };
+  state.user = null; state.goals = []; state.current = null;
   setAuthMode("register");
   show("auth");
   notice("Konto und alle Daten wurden gelöscht.", "ok");
@@ -969,17 +1401,30 @@ $("btn-delete").onclick = () => {
 };
 
 (function init() {
-  setAuthMode("login");
-  const d = db();
-  const user = d.session ? d.users.find((u) => u.id === d.session) : null;
+  try {
+    setAuthMode("login");
+    const d = db();
+    state.settings = d.settings || {};
+    refreshModeBanner();
 
-  if (user) {
-    state.user = user;
-    $("who-name").textContent = user.displayName;
-    loadGoals();
-    state.goals.length ? renderHome() : startNewGoal();
-  } else {
-    show("auth");
+    if (!storageWorks) {
+      memoryStore = d;
+      $("storage-warning").classList.remove("hidden");
+    }
+
+    const user = d.session ? d.users.find((u) => u.id === d.session) : null;
+    if (user) {
+      state.user = user;
+      $("who-name").textContent = user.displayName;
+      loadGoals();
+      state.goals.length ? renderHome() : startNewGoal();
+    } else {
+      show("auth");
+    }
+  } catch (err) {
+    // Selbst wenn hier etwas schiefgeht, bleibt die Anmeldemaske sichtbar.
+    console.error(err);
+    notice("Beim Start ist etwas schiefgegangen. Die Anmeldung funktioniert trotzdem.");
   }
 })();
 </script>
