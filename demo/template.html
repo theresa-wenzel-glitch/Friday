@@ -117,6 +117,7 @@
   .banner.error { border-color: var(--critical); color: var(--critical); }
   .banner.ok { border-color: var(--accent); color: var(--accent); }
   .banner.info { border-color: var(--line); color: var(--text-2); }
+  .banner.attention { border-color: var(--attention); color: var(--text); background: var(--elevated); }
 
   .node { display: grid; grid-template-columns: 24px 1fr; gap: 14px; }
   .node .rail { display: flex; flex-direction: column; align-items: center; }
@@ -224,9 +225,10 @@
     <span aria-hidden="true">●</span>
     <span id="mode-text">
       <strong>Ohne API-Key</strong>
-      Die Pläne kommen aus drei hinterlegten Playbooks und sind nicht auf deine
-      Situation zugeschnitten. Unter „Einstellungen“ kannst du einen
-      Anthropic-API-Key hinterlegen — dann plant Claude für beliebige Ziele.
+      Atlas plant jedes Ziel — nach Regeln, nicht mit einem Sprachmodell. Der Plan
+      nennt die Schritte, die für Ziele dieser Art typisch sind, aber nicht die
+      Besonderheiten deiner Lage. Mit einem eigenen Anthropic-API-Key übernimmt
+      Claude und plant auf dich zugeschnitten.
     </span>
   </div>
 
@@ -293,7 +295,8 @@
   <section id="view-settings" class="hidden">
     <h1>Einstellungen</h1>
     <p>Mit einem Anthropic-API-Key plant Claude für <strong>beliebige</strong> Ziele
-       statt nur für die drei hinterlegten Playbooks.</p>
+       Ziele auf deine Lage zugeschnitten. Ohne Schlüssel plant Atlas ebenfalls
+       jedes Ziel, aber nach allgemeinen Regeln.</p>
     <div class="card" style="margin-bottom:24px">
       <span class="label">So kommst du an einen Schlüssel</span>
       <ol style="margin:0; padding-left:20px; color:var(--text-2); font-size:15px; line-height:1.7">
@@ -348,8 +351,11 @@
     <div style="margin:16px 0 24px">
       <span class="label">Beispiele</span>
       <span class="chip">Ich möchte in 18 Monaten ein Café in Leipzig eröffnen</span>
-      <span class="chip">Ich will nebenberuflich als Freelancer starten</span>
-      <span class="chip">Ich möchte einen Onlineshop aufbauen</span>
+      <span class="chip">Ich will in einem Jahr einen Marathon laufen</span>
+      <span class="chip">Ich möchte fließend Spanisch sprechen</span>
+      <span class="chip">Ich will mit dem Rauchen aufhören</span>
+      <span class="chip">Ich möchte einen Roman schreiben</span>
+      <span class="chip">Ich will meine Schulden abbauen</span>
     </div>
     <button class="primary" id="btn-to-interview" disabled>Weiter</button>
   </section>
@@ -443,15 +449,19 @@
    store.ts (Ablage), model/prompts.ts (System-Prompt).
 
    Zwei Betriebsarten:
-     ohne API-Key  → Pläne aus drei Playbooks, offline, nicht personalisiert
-     mit API-Key   → Claude plant beliebige Ziele, direkt aus dem Browser
+     ohne API-Key  → regelbasierter Planer, offline, für jedes Ziel
+     mit API-Key   → Claude plant zusätzlich auf die eigene Lage zugeschnitten
 
-   Die Playbook-Daten unten sind per Build-Skript aus
-   engine/src/playbooks/data/ eingesetzt, nicht abgetippt.
+   Playbook-Daten, Fachmodule, Grundmuster und der Planer-Code sind per
+   Build-Skript eingesetzt, nicht abgetippt — dieselben Dateien prüft
+   demo/test/planner.test.mjs.
    ========================================================================== */
 
 const PLAYBOOKS = /*__PLAYBOOKS__*/[];
-const STORAGE_KEY = "atlas.app.v2";
+const ARCHETYPES = /*__ARCHETYPES__*/[];
+const DOMAINS = /*__DOMAINS__*/[];
+
+const STORAGE_KEY = "atlas.app.v3";
 const MAX_TASK_MINUTES = 480;
 const MS_DAY = 86400000;
 
@@ -523,100 +533,9 @@ function taskKey(ref, title) { return `${ref}::${title}`; }
 function isoDate(d) { return d.toISOString().slice(0, 10); }
 function addDays(d, n) { const x = new Date(d); x.setUTCDate(x.getUTCDate() + n); return x; }
 
-/* --- Playbook-Auswahl (playbooks/index.ts) ------------------------------- */
+/* --- Regelbasierter Planer (demo/planner/planner.js) -------------------- */
 
-function tokenize(s) {
-  return new Set(String(s).toLowerCase().replace(/[^a-zäöüß0-9]+/g, " ").split(" ").filter((t) => t.length > 3));
-}
-
-function overlap(a, b) {
-  let hits = 0;
-  for (const t of a) if (b.has(t)) hits++;
-  return b.size === 0 ? 0 : hits / b.size;
-}
-
-function findPlaybook(query) {
-  const terms = tokenize(query);
-  const best = PLAYBOOKS
-    .map((p) => ({ p, score: overlap(terms, tokenize(`${p.title} ${p.intentKey} ${p.nodes.map((n) => n.title).join(" ")}`)) }))
-    .sort((a, b) => b.score - a.score)[0];
-  return best && best.score > 0 ? best.p : null;
-}
-
-/* --- Playbook-Direktplan (fallback.ts) ----------------------------------- */
-
-function orderNodes(template) {
-  const ids = new Set(template.nodes.map((n) => n.id));
-  const placed = new Set();
-  const ordered = [];
-  let progress = true;
-
-  while (progress && ordered.length < template.nodes.length) {
-    progress = false;
-    for (const node of template.nodes) {
-      if (placed.has(node.id)) continue;
-      if (node.requiredBefore.every((r) => placed.has(r) || !ids.has(r))) {
-        ordered.push(node); placed.add(node.id); progress = true;
-      }
-    }
-  }
-  for (const node of template.nodes) if (!placed.has(node.id)) ordered.push(node);
-  return ordered;
-}
-
-function shorten(s, max = 90) {
-  return s.length <= max ? s : s.slice(0, max - 1).trimEnd() + "…";
-}
-
-function buildTasks(node, input) {
-  const weeks = Math.max(node.typicalDurationDays / 7, 1);
-  const budget = Math.floor(input.weeklyCapacityMin * weeks * 0.7);
-
-  const drafts = [
-    { title: `${node.title}: Überblick verschaffen und Vorgehen festlegen`,
-      why: "Ein klarer Startpunkt verhindert, dass dieser Meilenstein liegen bleibt.", blocking: true },
-    ...node.successCorrelates.slice(0, 2).map((c) => ({
-      title: c, why: "Das unterscheidet laut Playbook diejenigen, die abschließen, von denen, die aufgeben.", blocking: false })),
-    { title: `Prüfen: ${shorten(node.definitionOfDone)}`,
-      why: "Der Meilenstein gilt erst als erledigt, wenn dieses Ergebnis vorliegt.", blocking: true },
-  ];
-
-  const perTask = Math.min(MAX_TASK_MINUTES, Math.max(30, Math.floor(budget / drafts.length)));
-
-  return drafts.map((d, i) => ({
-    title: d.title, why: d.why, how: null, blocking: d.blocking,
-    estimatedMin: i === 0 ? Math.min(perTask, 60) : perTask,
-    origin: "playbook",
-  }));
-}
-
-function planFromPlaybook(template, input) {
-  const nodes = orderNodes(template);
-  const milestones = nodes.map((node) => ({
-    ref: node.id, title: node.title, definitionOfDone: node.definitionOfDone,
-    durationDays: node.typicalDurationDays, dependsOn: node.requiredBefore,
-    origin: "playbook", playbookNodeId: node.id, tasks: buildTasks(node, input),
-  }));
-
-  const totalDays = milestones.reduce((s, m) => s + m.durationDays, 0);
-
-  return {
-    summary: `${template.title} — strukturierter Plan aus dem Playbook „${template.intentKey}“. ` +
-             `${milestones.length} Etappen über rund ${totalDays} Tage.`,
-    assumptions: [
-      "Dieser Plan stammt direkt aus dem Playbook und ist nicht auf deine Situation zugeschnitten.",
-      `Die Zeitangaben sind Mediandauern aus dem Playbook (Stichprobe: ${template.sampleSize}).`,
-      ...(input.experience === "none" ? ["Angenommen, du hast in diesem Bereich keine Vorerfahrung."] : []),
-    ],
-    risks: nodes.filter((n) => n.dropoutRate >= 0.2).map((n) => ({
-      milestoneRef: n.id,
-      risk: `An dieser Stelle geben laut Playbook ${Math.round(n.dropoutRate * 100)} % der Menschen auf.`,
-      mitigation: n.successCorrelates[0] || "Schneide diesen Meilenstein kleiner.",
-    })),
-    milestones,
-  };
-}
-
+/*__PLANNER__*/
 /* --- Terminierung (scheduler.ts) ----------------------------------------- */
 
 function easterSunday(year) {
@@ -987,12 +906,13 @@ function show(name) {
   window.scrollTo(0, 0);
 }
 
-function notice(msg, kind = "error") {
+function notice(msg, kind = "error", persist = false) {
   const el = $("notice");
   el.textContent = msg;
   el.className = `banner ${kind}`;
   clearTimeout(notice.timer);
-  notice.timer = setTimeout(() => el.classList.add("hidden"), 10000);
+  // Hinweise auf Hilfsangebote dürfen nicht wegblenden, während man sie liest.
+  if (!persist) notice.timer = setTimeout(() => el.classList.add("hidden"), 10000);
 }
 
 function refreshModeBanner() {
@@ -1000,18 +920,16 @@ function refreshModeBanner() {
   $("mode-banner").className = withKey ? "banner ok" : "banner";
   $("mode-text").innerHTML = withKey
     ? `<strong>Mit Claude verbunden</strong>
-       Pläne werden für beliebige Ziele erzeugt (${esc(state.settings.model || "claude-opus-5")}).
+       Pläne werden auf deine Lage zugeschnitten erzeugt (${esc(state.settings.model || "claude-opus-5")}).
        Jeder Plan kostet etwa 0,15–0,20 € über deinen Anthropic-Account.`
     : `<strong>Ohne API-Key</strong>
-       Die Pläne kommen aus drei hinterlegten Playbooks und sind nicht auf deine
-       Situation zugeschnitten. Mit einem eigenen Anthropic-API-Key plant Claude
-       für beliebige Ziele.
+       Atlas plant jedes Ziel — nach Regeln, aus ${PLAYBOOKS.length} geprüften Playbooks,
+       ${DOMAINS.length} Fachmodulen und ${ARCHETYPES.length} Grundmustern. Was der Plan
+       nicht kann: auf deine Besonderheiten eingehen. Dafür braucht es Claude.
        <button class="link" id="btn-banner-key" style="display:block; margin-top:10px">Schlüssel hinterlegen</button>`;
   const jump = $("btn-banner-key");
   if (jump) jump.onclick = () => { if (state.user) openSettings(); };
-  $("goal-hint").textContent = withKey
-    ? "Ein Satz reicht. Je konkreter, desto besser der Plan."
-    : "Ohne API-Key gibt es Pläne zu drei Vorhaben: Café, Freelance, Onlineshop.";
+  $("goal-hint").textContent = "Ein Satz reicht. Je konkreter, desto besser der Plan.";
 }
 
 function loadGoals() {
@@ -1139,13 +1057,15 @@ async function generate() {
     includeWeekends: $("f-weekend").checked,
   };
 
-  const useClaude = !!state.settings.apiKey;
-  const template = useClaude ? null : findPlaybook(rawInput);
-
-  if (!useClaude && !template) {
-    notice("Ohne API-Key kennt Atlas nur Café, Freelance und Onlineshop. Hinterlege unter „Einstellungen“ einen Schlüssel für beliebige Ziele.");
+  // Krisen, Essstörungen und unzulässige Ziele: hier ist eine Aufgabenliste
+  // die falsche Antwort — auch dann, wenn ein Schlüssel hinterlegt ist.
+  const blocked = safetyCheck(rawInput);
+  if (blocked) {
+    notice(blocked.message, "attention", true);
     return;
   }
+
+  const useClaude = !!state.settings.apiKey;
 
   show("generating");
   let i = 0;
@@ -1156,15 +1076,18 @@ async function generate() {
   }, 900);
 
   try {
-    let plan, source;
+    let plan, source, herkunft;
 
     if (useClaude) {
       plan = await planWithClaude(input, state.settings, (msg) => { $("gen-step").textContent = msg; });
       source = "claude";
+      herkunft = "von Claude erzeugt";
     } else {
-      await new Promise((r) => setTimeout(r, 2400));
-      plan = planFromPlaybook(template, input);
-      source = "playbook";
+      await new Promise((r) => setTimeout(r, 1800));
+      const built = buildPlan(input, PLAYBOOKS);
+      plan = built.plan;
+      source = built.match.kind;                       // playbook | domain | archetype
+      herkunft = describeMatch(built.match);
     }
 
     const start = new Date();
@@ -1174,8 +1097,8 @@ async function generate() {
     const goal = {
       id: uid(), userId: state.user.id,
       createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
-      input, source,
-      intentKey: template ? template.intentKey : "claude",
+      input, source, herkunft,
+      intentKey: (plan.meta && (plan.meta.playbookKey || plan.meta.domainKey || plan.meta.archetypeKey)) || "claude",
       plan: scheduled, validation, taskStatus: {},
     };
 
@@ -1190,13 +1113,20 @@ async function generate() {
   }
 }
 
+/** Sagt in einem Halbsatz, woher der Plan kommt — das gehört unter jeden Plan. */
+function describeMatch(match) {
+  if (match.kind === "playbook") return `aus dem geprüften Playbook ${match.playbook.intentKey}`;
+  if (match.kind === "domain") return `aus dem Fachmodul „${match.domain.label}“`;
+  return `nach dem Grundmuster „${match.archetype.label}“`;
+}
+
 function openGoal(goal) {
   state.current = goal;
   $("plan-title").textContent = goal.input.rawInput;
   $("plan-summary").textContent = goal.plan.summary;
   $("plan-meta").textContent =
     `${goal.plan.startDate} bis ${goal.plan.endDate} · ` +
-    (goal.source === "claude" ? "von Claude erzeugt" : `aus dem Playbook ${goal.intentKey}`);
+    (goal.herkunft || (goal.source === "claude" ? "von Claude erzeugt" : `aus dem Playbook ${goal.intentKey}`));
   selectTab("today");
   show("plan");
 }

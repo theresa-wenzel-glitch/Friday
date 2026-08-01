@@ -1,0 +1,440 @@
+[
+  {
+    "key": "faehigkeit",
+    "label": "etwas lernen und können",
+    "horizonDays": 180,
+    "detect": ["lernen", "erlernen", "können", "beherrschen", "verstehen", "üben", "sprechen", "studieren", "kurs", "prüfung", "schein", "zertifikat", "ausbildung", "weiterbildung", "fortbildung", "sprache", "instrument", "programmieren", "fahren"],
+    "stages": [
+      {
+        "ref": "standort",
+        "title": "Standort bestimmen",
+        "definitionOfDone": "Es steht schriftlich, was du heute schon kannst, was konkret fehlt und woran du merkst, dass du es kannst.",
+        "share": 0.1,
+        "tasks": [
+          { "title": "Aufschreiben, was „{ziel}“ konkret bedeutet", "why": "Solange das Ziel unscharf ist, weißt du nie, ob du fertig bist.", "how": "Ein Satz in der Form: Ich kann es, wenn ich ohne Hilfe … schaffe.", "min": 45, "blocking": true },
+          { "title": "Ehrlich notieren, was du heute schon kannst", "why": "Der Abstand zwischen heute und dem Ziel bestimmt, wie lange es dauert.", "how": null, "min": 30, "blocking": true },
+          { "title": "Ein Lernmaterial auswählen — und nur dieses", "why": "Wer mit fünf Kursen gleichzeitig anfängt, beendet keinen.", "how": "Buch, Kurs oder App. Eines. Die anderen kannst du später immer noch anfangen.", "min": 60, "blocking": false }
+        ]
+      },
+      {
+        "ref": "grundlagen",
+        "title": "Grundlagen aufbauen",
+        "definitionOfDone": "Die Grundlagen sitzen so weit, dass du ohne Anleitung weiterüben kannst.",
+        "share": 0.25,
+        "tasks": [
+          { "title": "Feste Übungszeiten in den Kalender eintragen", "why": "Was keinen Termin hat, findet nicht statt.", "how": "Lieber drei kurze feste Termine als ein langer beweglicher.", "min": 20, "blocking": true },
+          { "title": "Den Grundlagenteil des Materials durcharbeiten", "why": "Ohne Fundament wird jede spätere Übung mühsamer, als sie sein müsste.", "how": null, "min": 240, "blocking": true },
+          { "title": "Eine erste Übung ohne Vorlage machen", "why": "Nachmachen fühlt sich nach Können an, ist aber noch keins.", "how": null, "min": 60, "blocking": false }
+        ]
+      },
+      {
+        "ref": "uebung",
+        "title": "Regelmäßig üben",
+        "definitionOfDone": "Du hast über mehrere Wochen geübt, ohne dass eine Lücke länger als eine Woche entstanden ist.",
+        "share": 0.28,
+        "tasks": [
+          { "title": "Übungsprotokoll anlegen", "why": "Sichtbarer Fortschritt trägt durch die Phase, in der es sich nicht nach Fortschritt anfühlt.", "how": "Datum, Dauer, was geübt. Drei Zeilen reichen.", "min": 20, "blocking": false },
+          { "title": "Jemanden finden, der nachfragt", "why": "Rechenschaft gegenüber einem Menschen wirkt stärker als jeder Vorsatz.", "how": "Kurs, Lerngruppe, eine Person, der du wöchentlich Bescheid gibst.", "min": 45, "blocking": false },
+          { "title": "Nach der Hälfte der Zeit den eigenen Stand prüfen", "why": "Wer nie misst, übt womöglich seit Wochen das Falsche.", "how": null, "min": 60, "blocking": true }
+        ]
+      },
+      {
+        "ref": "anwendung",
+        "title": "Im Ernstfall anwenden",
+        "definitionOfDone": "Du hast das Gelernte mindestens einmal außerhalb der Übungssituation eingesetzt.",
+        "share": 0.22,
+        "tasks": [
+          { "title": "Eine echte Gelegenheit suchen", "why": "Der Sprung von der Übung in den Ernstfall ist der Punkt, an dem die meisten stehen bleiben.", "how": null, "min": 60, "blocking": true },
+          { "title": "Einmal anwenden und danach notieren, was gefehlt hat", "why": "Der Ernstfall zeigt Lücken, die keine Übung zeigt.", "how": null, "min": 120, "blocking": true },
+          { "title": "Die aufgefallenen Lücken gezielt nachüben", "why": "Diese Lücken sind wertvoller als jedes Lehrbuchkapitel — sie sind deine.", "how": null, "min": 180, "blocking": false }
+        ]
+      },
+      {
+        "ref": "nachweis",
+        "title": "Festhalten, dass du es kannst",
+        "definitionOfDone": "Es gibt etwas Vorzeigbares: ein Zeugnis, ein Werkstück, eine Aufnahme, ein geführtes Gespräch.",
+        "share": 0.15,
+        "tasks": [
+          { "title": "Festlegen, was als Nachweis gilt", "why": "Ohne Nachweis bleibt das Ziel gefühlt offen, egal wie gut du geworden bist.", "how": null, "min": 30, "blocking": true },
+          { "title": "Den Nachweis erbringen", "why": "Das ist der Punkt, an dem aus Üben Können wird.", "how": null, "min": 180, "blocking": true },
+          { "title": "Entscheiden: nächstes Niveau oder bewusst abschließen", "why": "Beides ist in Ordnung. Unentschieden weiterlaufen zu lassen ist es nicht.", "how": null, "min": 30, "blocking": false }
+        ]
+      }
+    ]
+  },
+
+  {
+    "key": "vorhaben",
+    "label": "etwas aufbauen oder erschaffen",
+    "horizonDays": 240,
+    "detect": ["aufbauen", "gründen", "starten", "erstellen", "bauen", "schreiben", "entwickeln", "eröffnen", "aufziehen", "projekt", "umsetzen", "verwirklichen", "produzieren"],
+    "stages": [
+      {
+        "ref": "klaeren",
+        "title": "Vorhaben klären",
+        "definitionOfDone": "Es steht schriftlich, was am Ende fertig sein soll — und was ausdrücklich nicht dazugehört.",
+        "share": 0.15,
+        "tasks": [
+          { "title": "In fünf Sätzen aufschreiben, was am Ende dasteht", "why": "Ein Vorhaben, das man nicht in fünf Sätzen erklären kann, ist noch nicht entschieden.", "how": null, "min": 60, "blocking": true },
+          { "title": "Aufschreiben, was ausdrücklich nicht dazugehört", "why": "Vorhaben scheitern seltener an zu wenig als an ständig wachsendem Umfang.", "how": null, "min": 30, "blocking": true },
+          { "title": "Drei Menschen fragen, die so etwas schon gemacht haben", "why": "Eine Stunde Gespräch spart regelmäßig Wochen an Irrwegen.", "how": "Auch lose Kontakte antworten häufiger, als man denkt.", "min": 120, "blocking": false }
+        ]
+      },
+      {
+        "ref": "pruefen",
+        "title": "Machbarkeit prüfen",
+        "definitionOfDone": "Aufwand, Kosten und die drei größten Unbekannten sind grob beziffert und schriftlich festgehalten.",
+        "share": 0.15,
+        "tasks": [
+          { "title": "Die drei größten Unbekannten benennen", "why": "Was ein Vorhaben kippt, steht fast nie im Plan — sondern in dem, was man nicht wusste.", "how": null, "min": 45, "blocking": true },
+          { "title": "Grob überschlagen, was es kostet und wie lange es dauert", "why": "Eine grobe Zahl früh ist mehr wert als eine genaue Zahl zu spät.", "how": "Großzügig schätzen und dann verdoppeln — das trifft es erfahrungsgemäß besser.", "min": 90, "blocking": true },
+          { "title": "Die kleinstmögliche Version des Vorhabens beschreiben", "why": "Wenn die Zeit knapp wird, brauchst du eine Fassung, die trotzdem fertig wird.", "how": null, "min": 45, "blocking": false }
+        ]
+      },
+      {
+        "ref": "vorbereiten",
+        "title": "Vorbereiten und beschaffen",
+        "definitionOfDone": "Alles, was eine Vorlaufzeit hat, ist bestellt, gebucht oder beantragt.",
+        "share": 0.2,
+        "tasks": [
+          { "title": "Auflisten, was Vorlaufzeit hat", "why": "Wartezeiten kann man nicht aufholen — nur früh genug anstoßen.", "how": "Genehmigungen, Lieferzeiten, Termine bei anderen Menschen.", "min": 45, "blocking": true },
+          { "title": "Alles mit Vorlaufzeit anstoßen", "why": "Solange etwas läuft, kostet es dich keine Zeit mehr.", "how": null, "min": 180, "blocking": true },
+          { "title": "Den Arbeitsplatz oder die Werkzeuge einrichten", "why": "Reibung beim Anfangen ist der häufigste Grund, warum ein Vorhaben liegen bleibt.", "how": null, "min": 120, "blocking": false }
+        ]
+      },
+      {
+        "ref": "umsetzen",
+        "title": "Umsetzen",
+        "definitionOfDone": "Der Hauptteil steht — unfertig an den Rändern, aber im Kern vollständig.",
+        "share": 0.35,
+        "tasks": [
+          { "title": "Die Arbeit in Wochenpakete schneiden", "why": "Ein Vorhaben, das nur als Ganzes existiert, lässt sich nie anfangen.", "how": "Jedes Paket so groß, dass es in eine Woche deiner Zeit passt.", "min": 60, "blocking": true },
+          { "title": "Jede Woche ein Paket abschließen", "why": "Abgeschlossene Pakete tragen durch die lange Mitte.", "how": null, "min": 480, "blocking": true },
+          { "title": "Nach einem Drittel jemandem den Zwischenstand zeigen", "why": "Früh gezeigte Arbeit spart die Korrektur, die sonst am Ende fällig wird.", "how": null, "min": 90, "blocking": false }
+        ]
+      },
+      {
+        "ref": "abschliessen",
+        "title": "Abschließen und übergeben",
+        "definitionOfDone": "Das Vorhaben ist fertig, jemand anderes hat es gesehen, und die Restpunkte sind entweder erledigt oder bewusst gestrichen.",
+        "share": 0.15,
+        "tasks": [
+          { "title": "Restpunkteliste anlegen und halbieren", "why": "Die Hälfte der Restpunkte merkt außer dir niemand.", "how": null, "min": 45, "blocking": true },
+          { "title": "Die verbliebenen Restpunkte erledigen", "why": "Der letzte Rest entscheidet, ob es als fertig gilt.", "how": null, "min": 300, "blocking": true },
+          { "title": "Aufschreiben, was du beim nächsten Mal anders machst", "why": "Sonst machst du beim nächsten Mal dieselben Umwege.", "how": null, "min": 30, "blocking": false }
+        ]
+      }
+    ]
+  },
+
+  {
+    "key": "ereignis",
+    "label": "auf einen festen Termin hinarbeiten",
+    "horizonDays": 200,
+    "detect": ["hochzeit", "feier", "fest", "veranstaltung", "wettkampf", "turnier", "auftritt", "konzert", "vortrag", "prüfungstermin", "reise", "urlaub", "umzugstermin", "geburtstag", "jubiläum", "messe", "eröffnungstag"],
+    "stages": [
+      {
+        "ref": "rahmen",
+        "title": "Termin und Rahmen festlegen",
+        "definitionOfDone": "Datum, Ort, ungefähre Größe und Budgetrahmen stehen fest und sind mit allen Beteiligten abgestimmt.",
+        "share": 0.12,
+        "tasks": [
+          { "title": "Datum verbindlich festlegen", "why": "Alles andere hängt daran. Solange das Datum wackelt, kann nichts gebucht werden.", "how": null, "min": 45, "blocking": true },
+          { "title": "Budgetrahmen festlegen und aufschreiben", "why": "Ein nicht ausgesprochenes Budget wird zuverlässig überschritten.", "how": null, "min": 45, "blocking": true },
+          { "title": "Mit allen Beteiligten abstimmen, wer was übernimmt", "why": "Unklare Zuständigkeit ist der häufigste Grund für Ärger kurz vor dem Termin.", "how": null, "min": 60, "blocking": false }
+        ]
+      },
+      {
+        "ref": "buchen",
+        "title": "Das Unverschiebbare buchen",
+        "definitionOfDone": "Alles mit langer Vorlaufzeit ist verbindlich gebucht und schriftlich bestätigt.",
+        "share": 0.23,
+        "tasks": [
+          { "title": "Auflisten, was lange im Voraus ausgebucht ist", "why": "Ort, Termine bei gefragten Menschen und Reisen sind Monate vorher weg.", "how": null, "min": 45, "blocking": true },
+          { "title": "Die drei wichtigsten Posten verbindlich buchen", "why": "Ohne diese Zusagen ist der Termin nicht abgesichert.", "how": "Schriftliche Bestätigung kommen lassen, mündlich reicht nicht.", "min": 240, "blocking": true },
+          { "title": "Anzahlungen und Fristen in den Kalender eintragen", "why": "Eine verpasste Zahlungsfrist kann eine Buchung kosten.", "how": null, "min": 30, "blocking": false }
+        ]
+      },
+      {
+        "ref": "vorbereiten",
+        "title": "Vorbereiten",
+        "definitionOfDone": "Alle Beteiligten sind eingeladen oder informiert, und der Ablauf steht schriftlich.",
+        "share": 0.3,
+        "tasks": [
+          { "title": "Ablaufplan mit Uhrzeiten schreiben", "why": "Am Tag selbst hat niemand Kopf für Entscheidungen.", "how": null, "min": 90, "blocking": true },
+          { "title": "Alle Beteiligten einladen oder informieren", "why": "Menschen brauchen Vorlauf, um zuzusagen.", "how": null, "min": 120, "blocking": true },
+          { "title": "Die Details erledigen, die kein Warten erzeugen", "why": "Diese Dinge stauen sich sonst in der letzten Woche.", "how": null, "min": 300, "blocking": false }
+        ]
+      },
+      {
+        "ref": "probe",
+        "title": "Generalprobe",
+        "definitionOfDone": "Der Ablauf ist einmal durchgespielt, und die dabei gefundenen Lücken sind geschlossen.",
+        "share": 0.2,
+        "tasks": [
+          { "title": "Den Ablauf einmal durchspielen", "why": "Fast jede Probe fördert mindestens einen Punkt zutage, an den niemand gedacht hat.", "how": null, "min": 180, "blocking": true },
+          { "title": "Die gefundenen Lücken schließen", "why": "Eine Probe ohne Nacharbeit war nur Beruhigung.", "how": null, "min": 180, "blocking": true },
+          { "title": "Einen Plan B für das Wahrscheinlichste aufschreiben", "why": "Wetter, Krankheit, Absagen — je einen Satz, was dann gilt.", "how": null, "min": 45, "blocking": false }
+        ]
+      },
+      {
+        "ref": "durchfuehren",
+        "title": "Durchführen und nachbereiten",
+        "definitionOfDone": "Der Termin ist vorbei, Rechnungen sind bezahlt, Geliehenes ist zurück.",
+        "share": 0.15,
+        "tasks": [
+          { "title": "Am Tag davor alles bereitlegen", "why": "Was am Vorabend gepackt ist, fehlt am Tag selbst nicht.", "how": null, "min": 120, "blocking": true },
+          { "title": "Den Termin durchführen", "why": "Darauf lief alles zu.", "how": null, "min": 480, "blocking": true },
+          { "title": "Nachbereiten: Rechnungen, Rückgaben, Dank", "why": "Das bleibt sonst wochenlang liegen und trübt die Erinnerung.", "how": null, "min": 120, "blocking": false }
+        ]
+      }
+    ]
+  },
+
+  {
+    "key": "koerper",
+    "label": "ein körperliches Ziel erreichen",
+    "horizonDays": 168,
+    "detect": ["abnehmen", "zunehmen", "kilo", "gewicht", "fit", "fitness", "laufen", "joggen", "marathon", "trainieren", "training", "muskeln", "kraft", "ausdauer", "sport", "beweglich", "rücken", "gesünder", "schwimmen", "radfahren", "klettern", "yoga"],
+    "stages": [
+      {
+        "ref": "ausgangswert",
+        "title": "Ausgangswert feststellen",
+        "definitionOfDone": "Ein messbarer Startwert ist notiert, und gesundheitliche Einschränkungen sind geklärt.",
+        "share": 0.1,
+        "tasks": [
+          { "title": "Startwert messen und aufschreiben", "why": "Ohne Startwert lässt sich später kein Fortschritt zeigen — und Fortschritt ist das, was durchträgt.", "how": null, "min": 30, "blocking": true },
+          { "title": "Gesundheitliche Einschränkungen klären", "why": "Bei Vorerkrankungen, längerer Pause oder Beschwerden gehört das vor den ersten Trainingstag.", "how": "Im Zweifel ärztlich abklären lassen. Diese App ersetzt keine medizinische Beratung.", "min": 60, "blocking": true },
+          { "title": "Feste Trainingstage festlegen", "why": "Wer nach Lust trainiert, trainiert im dritten Monat nicht mehr.", "how": null, "min": 20, "blocking": false }
+        ]
+      },
+      {
+        "ref": "basis",
+        "title": "Basis aufbauen",
+        "definitionOfDone": "Du hast über mehrere Wochen regelmäßig trainiert, ohne dich zu überlasten.",
+        "share": 0.25,
+        "tasks": [
+          { "title": "Bewusst unter der eigenen Grenze anfangen", "why": "Die häufigste Ursache für Abbruch ist nicht zu wenig Ehrgeiz, sondern zu viel am Anfang.", "how": "Wenn du dich nach dem Training fragst, ob das genug war: es war genug.", "min": 180, "blocking": true },
+          { "title": "Jede Einheit kurz protokollieren", "why": "Das Protokoll zeigt Muster, die das Gefühl nicht zeigt.", "how": null, "min": 20, "blocking": false },
+          { "title": "Auf Schlaf und Essen achten wie auf das Training", "why": "Der Körper baut nicht beim Training auf, sondern zwischen den Einheiten.", "how": null, "min": 45, "blocking": false }
+        ]
+      },
+      {
+        "ref": "steigern",
+        "title": "Steigern",
+        "definitionOfDone": "Der Umfang oder die Intensität liegt spürbar über dem Startpunkt, ohne dass Beschwerden aufgetreten sind.",
+        "share": 0.3,
+        "tasks": [
+          { "title": "In kleinen Schritten steigern", "why": "Kleine Steigerungen halten der Körper und der Alltag aus, große keins von beidem.", "how": "Als Faustregel gilt: nicht mehr als etwa ein Zehntel Zuwachs pro Woche.", "min": 300, "blocking": true },
+          { "title": "Alle vier Wochen eine leichtere Woche einlegen", "why": "Erholung ist Teil des Trainings, nicht dessen Unterbrechung.", "how": null, "min": 120, "blocking": true },
+          { "title": "Zwischenstand messen und mit dem Startwert vergleichen", "why": "Der Vergleich mit dem eigenen Startpunkt motiviert, der Vergleich mit anderen nicht.", "how": null, "min": 30, "blocking": false }
+        ]
+      },
+      {
+        "ref": "hoehepunkt",
+        "title": "Belastungsspitze",
+        "definitionOfDone": "Die höchste geplante Belastung ist einmal absolviert.",
+        "share": 0.2,
+        "tasks": [
+          { "title": "Die härteste Einheit planen und durchführen", "why": "Wer die Belastung einmal geschafft hat, weiß, dass das Ziel trägt.", "how": null, "min": 300, "blocking": true },
+          { "title": "Danach bewusst zurückfahren", "why": "Nach der Spitze braucht der Körper mehr Erholung als sonst.", "how": null, "min": 120, "blocking": true },
+          { "title": "Ausrüstung und Ablauf im Ernstfall testen", "why": "Neues am entscheidenden Tag auszuprobieren ist die klassische Falle.", "how": null, "min": 90, "blocking": false }
+        ]
+      },
+      {
+        "ref": "halten",
+        "title": "Erreichen und halten",
+        "definitionOfDone": "Das Ziel ist erreicht, und es steht fest, was danach an Regelmäßigkeit bleibt.",
+        "share": 0.15,
+        "tasks": [
+          { "title": "Das Ziel erreichen und den Wert notieren", "why": "Der Vergleich mit dem Startwert ist der eigentliche Lohn.", "how": null, "min": 240, "blocking": true },
+          { "title": "Festlegen, was danach bleibt", "why": "Ohne Anschlussplan ist der Startwert in einem halben Jahr wieder da.", "how": "Ein kleineres, dauerhaft machbares Maß schlägt jedes Programm, das nach vier Wochen endet.", "min": 45, "blocking": true }
+        ]
+      }
+    ]
+  },
+
+  {
+    "key": "gewohnheit",
+    "label": "eine Gewohnheit ändern",
+    "horizonDays": 120,
+    "detect": ["gewohnheit", "regelmäßig", "jeden tag", "jede woche", "jeden monat", "wöchentlich", "täglich", "aufhören", "weniger", "mehr schlafen", "meditieren", "rauchen", "alkohol", "handy", "aufräumen", "routine", "durchhalten", "dranbleiben", "öfter"],
+    "stages": [
+      {
+        "ref": "verstehen",
+        "title": "Ist-Zustand verstehen",
+        "definitionOfDone": "Du hast mindestens eine Woche lang mitgeschrieben, wann und in welcher Situation das Verhalten auftritt.",
+        "share": 0.12,
+        "tasks": [
+          { "title": "Eine Woche lang nur mitschreiben, nichts ändern", "why": "Fast jeder schätzt das eigene Verhalten falsch ein. Messen kommt vor Ändern.", "how": "Uhrzeit, Situation, Stimmung. Ein Stichwort reicht.", "min": 45, "blocking": true },
+          { "title": "Die drei häufigsten Auslöser markieren", "why": "Nicht der Wille entscheidet, sondern die Situation, in der du stehst.", "how": null, "min": 30, "blocking": true }
+        ]
+      },
+      {
+        "ref": "klein",
+        "title": "Die kleinste Version etablieren",
+        "definitionOfDone": "Eine so kleine Version, dass sie auch an schlechten Tagen gelingt, läuft zwei Wochen durch.",
+        "share": 0.23,
+        "tasks": [
+          { "title": "Die lächerlich kleine Version festlegen", "why": "Zwei Minuten täglich schlagen dreißig Minuten, die dreimal ausfallen.", "how": "So klein, dass du dich fast schämst, sie aufzuschreiben. Genau das ist der Punkt.", "min": 20, "blocking": true },
+          { "title": "Zwei Wochen lang nur diese kleine Version", "why": "Erst die Regelmäßigkeit, dann die Größe.", "how": null, "min": 120, "blocking": true },
+          { "title": "Sichtbar abhaken", "why": "Eine sichtbare Kette will man nicht abreißen lassen.", "how": "Kalender an der Wand, Häkchen. Analog wirkt hier besser als digital.", "min": 15, "blocking": false }
+        ]
+      },
+      {
+        "ref": "kopplung",
+        "title": "An einen festen Auslöser koppeln",
+        "definitionOfDone": "Das Verhalten hängt an einem festen Punkt im Tag und braucht keine tägliche Entscheidung mehr.",
+        "share": 0.2,
+        "tasks": [
+          { "title": "Einen festen Ankerpunkt im Tag wählen", "why": "Was an etwas hängt, das ohnehin jeden Tag passiert, braucht keinen Vorsatz.", "how": "Nach dem Zähneputzen, nach dem ersten Kaffee, direkt nach Feierabend.", "min": 20, "blocking": true },
+          { "title": "Die Umgebung anpassen", "why": "Es ist leichter, die Umgebung zu ändern als sich selbst.", "how": "Das Gewünschte in Reichweite legen, das Unerwünschte aus der Reichweite nehmen.", "min": 60, "blocking": true }
+        ]
+      },
+      {
+        "ref": "ausweiten",
+        "title": "Ausweiten",
+        "definitionOfDone": "Der Umfang liegt deutlich über der kleinsten Version und hält seit mehreren Wochen.",
+        "share": 0.25,
+        "tasks": [
+          { "title": "Alle zwei Wochen ein kleines Stück draufsetzen", "why": "Wachstum in kleinen Schritten hält, Sprünge halten nicht.", "how": null, "min": 120, "blocking": true },
+          { "title": "Jemandem wöchentlich Bescheid geben", "why": "Rechenschaft gegenüber einem Menschen trägt weiter als jede App.", "how": null, "min": 30, "blocking": false }
+        ]
+      },
+      {
+        "ref": "verankern",
+        "title": "Rückfälle einplanen",
+        "definitionOfDone": "Es steht schriftlich, was bei einem Rückfall gilt — und der Plan hat mindestens einen Rückfall überstanden.",
+        "share": 0.2,
+        "tasks": [
+          { "title": "Die Nie-zweimal-Regel aufschreiben", "why": "Nicht der Ausrutscher beendet eine Gewohnheit, sondern der zweite direkt danach.", "how": "Einmal aussetzen ist ein Ausrutscher. Zweimal hintereinander ist der Anfang vom Ende.", "min": 20, "blocking": true },
+          { "title": "Die schwierigsten Situationen vorher durchdenken", "why": "Urlaub, Krankheit, Stress — für jede Situation ein Satz, was dann die Mindestversion ist.", "how": null, "min": 45, "blocking": true },
+          { "title": "Nach drei Monaten Bilanz ziehen", "why": "Erst nach Monaten zeigt sich, ob es eine Gewohnheit ist oder eine lange Anstrengung war.", "how": null, "min": 30, "blocking": false }
+        ]
+      }
+    ]
+  },
+
+  {
+    "key": "finanzen",
+    "label": "ein finanzielles Ziel erreichen",
+    "horizonDays": 365,
+    "detect": ["sparen", "geld", "euro", "schulden", "kredit", "finanzieren", "kaufen", "anschaffung", "vermögen", "anlegen", "investieren", "rente", "altersvorsorge", "budget", "haushalt", "einkommen", "gehalt"],
+    "stages": [
+      {
+        "ref": "ueberblick",
+        "title": "Überblick verschaffen",
+        "definitionOfDone": "Alle Einnahmen und alle laufenden Ausgaben stehen in einer Liste, und der monatliche Überschuss ist bekannt.",
+        "share": 0.15,
+        "tasks": [
+          { "title": "Alle Einnahmen und Fixkosten auflisten", "why": "Fast jeder unterschätzt die eigenen Fixkosten. Die Liste ist der ganze Trick.", "how": "Kontoauszüge der letzten drei Monate durchgehen.", "min": 120, "blocking": true },
+          { "title": "Den monatlichen Überschuss ausrechnen", "why": "Diese eine Zahl entscheidet, ob das Ziel in der gewünschten Zeit erreichbar ist.", "how": null, "min": 45, "blocking": true },
+          { "title": "Alle Abos und Verträge einmal durchgehen", "why": "Hier liegt fast immer Geld, das niemandem fehlt.", "how": null, "min": 90, "blocking": false }
+        ]
+      },
+      {
+        "ref": "ziel",
+        "title": "Zielbetrag und Frist festlegen",
+        "definitionOfDone": "Zielbetrag, Frist und die daraus folgende Monatsrate stehen schriftlich fest.",
+        "share": 0.15,
+        "tasks": [
+          { "title": "Den Zielbetrag genau beziffern", "why": "„Mehr sparen“ ist kein Ziel. Ein Betrag ist eins.", "how": "Nebenkosten mit einrechnen — bei Anschaffungen sind es oft 10 bis 20 Prozent obendrauf.", "min": 60, "blocking": true },
+          { "title": "Monatsrate ausrechnen und mit dem Überschuss vergleichen", "why": "Wenn die Rate über dem Überschuss liegt, muss die Frist oder der Betrag angepasst werden — nicht die Disziplin.", "how": null, "min": 45, "blocking": true },
+          { "title": "Einen Notgroschen von drei Monatsausgaben einplanen", "why": "Ohne Puffer zerstört die erste kaputte Waschmaschine den ganzen Plan.", "how": null, "min": 30, "blocking": false }
+        ]
+      },
+      {
+        "ref": "spielraum",
+        "title": "Spielraum schaffen",
+        "definitionOfDone": "Die Monatsrate ist im Budget frei — durch gesenkte Ausgaben, höhere Einnahmen oder beides.",
+        "share": 0.25,
+        "tasks": [
+          { "title": "Die drei größten senkbaren Posten angehen", "why": "Bei Wohnen, Mobilität und Versicherungen liegt mehr als bei allem Kleinkram zusammen.", "how": null, "min": 240, "blocking": true },
+          { "title": "Prüfen, ob die Einnahmenseite Spielraum hat", "why": "Sparen hat eine Untergrenze, Verdienen nicht.", "how": null, "min": 120, "blocking": false }
+        ]
+      },
+      {
+        "ref": "automatisieren",
+        "title": "Automatisieren",
+        "definitionOfDone": "Ein Dauerauftrag läuft am Tag nach dem Gehaltseingang, und die Zwischenstände werden monatlich geprüft.",
+        "share": 0.25,
+        "tasks": [
+          { "title": "Dauerauftrag auf ein getrenntes Konto einrichten", "why": "Was am Monatsanfang weg ist, wird nicht ausgegeben.", "how": "Am Tag nach dem Gehaltseingang, nicht am Monatsende.", "min": 45, "blocking": true },
+          { "title": "Einen festen Monatstermin zum Nachschauen setzen", "why": "Fünfzehn Minuten im Monat verhindern das böse Erwachen nach einem Jahr.", "how": null, "min": 30, "blocking": true }
+        ]
+      },
+      {
+        "ref": "abschluss",
+        "title": "Abschließen",
+        "definitionOfDone": "Der Zielbetrag ist erreicht und das Geld ist zweckgebunden verwendet oder sicher angelegt.",
+        "share": 0.2,
+        "tasks": [
+          { "title": "Vor der Entscheidung mindestens drei Angebote vergleichen", "why": "Bei großen Beträgen entscheidet der Vergleich über mehr Geld als ein Jahr Sparen.", "how": null, "min": 180, "blocking": true },
+          { "title": "Bei größeren Summen unabhängig gegenprüfen lassen", "why": "Wer am Abschluss verdient, berät nicht unabhängig.", "how": "Verbraucherzentrale oder Honorarberatung. Diese App ist keine Finanzberatung.", "min": 120, "blocking": true }
+        ]
+      }
+    ]
+  },
+
+  {
+    "key": "wechsel",
+    "label": "eine Lebenssituation verändern",
+    "horizonDays": 210,
+    "detect": ["wechseln", "kündigen", "umziehen", "umzug", "auswandern", "neuanfang", "verändern", "jobwechsel", "arbeitsplatz", "quereinstieg", "trennen", "trennung", "selbstständig machen", "ausland"],
+    "stages": [
+      {
+        "ref": "standortbestimmung",
+        "title": "Standortbestimmung",
+        "definitionOfDone": "Es steht schriftlich, was du hinter dir lassen willst und was auf keinen Fall verloren gehen darf.",
+        "share": 0.15,
+        "tasks": [
+          { "title": "Aufschreiben, was sich ändern soll — und was bleiben muss", "why": "Wer nur weg will, landet oft in etwas, das dieselben Probleme hat.", "how": "Zwei Spalten. Die rechte ist die wichtigere.", "min": 60, "blocking": true },
+          { "title": "Die harten Rahmenbedingungen notieren", "why": "Geld, Kündigungsfristen, Menschen, die mithängen — das bestimmt, was überhaupt geht.", "how": null, "min": 45, "blocking": true }
+        ]
+      },
+      {
+        "ref": "optionen",
+        "title": "Optionen sammeln und einengen",
+        "definitionOfDone": "Aus einer breiten Sammlung sind zwei oder drei ernsthafte Optionen übrig, jede mit Vor- und Nachteilen schriftlich.",
+        "share": 0.2,
+        "tasks": [
+          { "title": "Breit sammeln, ohne zu bewerten", "why": "Zu früh zu bewerten streicht genau die Möglichkeit, die es geworden wäre.", "how": null, "min": 90, "blocking": true },
+          { "title": "Mit Menschen sprechen, die den Schritt gegangen sind", "why": "Ihre Auskunft ist ehrlicher als jede Recherche — vor allem über das, was danach schwer war.", "how": null, "min": 180, "blocking": true },
+          { "title": "Auf zwei oder drei Optionen einengen", "why": "Mehr Optionen führen nicht zu besseren Entscheidungen, sondern zu keiner.", "how": null, "min": 60, "blocking": false }
+        ]
+      },
+      {
+        "ref": "vorbereiten",
+        "title": "Den Wechsel vorbereiten",
+        "definitionOfDone": "Fristen, Finanzen und Formalitäten für die gewählte Option sind geklärt und terminiert.",
+        "share": 0.25,
+        "tasks": [
+          { "title": "Alle Fristen und Formalitäten auflisten", "why": "Kündigungsfristen und Behördenwege bestimmen den Zeitplan, nicht der eigene Wunsch.", "how": null, "min": 90, "blocking": true },
+          { "title": "Die Finanzierung des Übergangs klären", "why": "Der Zwischenraum kostet fast immer mehr Geld und Zeit als gedacht.", "how": "Drei bis sechs Monate Puffer sind die übliche Empfehlung.", "min": 120, "blocking": true },
+          { "title": "Die Entscheidung mit den Betroffenen besprechen", "why": "Ein Wechsel betrifft selten nur eine Person.", "how": null, "min": 90, "blocking": false }
+        ]
+      },
+      {
+        "ref": "vollzug",
+        "title": "Vollziehen",
+        "definitionOfDone": "Der Schritt ist getan: gekündigt, unterschrieben, umgezogen, angemeldet.",
+        "share": 0.2,
+        "tasks": [
+          { "title": "Den Termin für den Schritt festlegen", "why": "Ein Wechsel ohne Datum verschiebt sich unendlich.", "how": null, "min": 30, "blocking": true },
+          { "title": "Den Schritt vollziehen", "why": "Ab hier ist es entschieden.", "how": null, "min": 240, "blocking": true },
+          { "title": "Formalitäten nachziehen", "why": "Ummeldungen und Verträge haben eigene Fristen, die schnell verstreichen.", "how": null, "min": 180, "blocking": false }
+        ]
+      },
+      {
+        "ref": "ankommen",
+        "title": "Ankommen",
+        "definitionOfDone": "Nach dem Wechsel steht ein Alltag, und du hast einmal bewusst Bilanz gezogen.",
+        "share": 0.2,
+        "tasks": [
+          { "title": "Die ersten Wochen bewusst leichter planen", "why": "Ein Wechsel kostet Kraft, auch wenn er richtig war.", "how": null, "min": 60, "blocking": true },
+          { "title": "Nach drei Monaten Bilanz ziehen", "why": "Erst dann zeigt sich, ob der Schritt getragen hat.", "how": "Was ist besser, was ist schlechter, was fehlt noch.", "min": 45, "blocking": true }
+        ]
+      }
+    ]
+  }
+]

@@ -111,6 +111,7 @@
   .banner.error { border-color: var(--critical); color: var(--critical); }
   .banner.ok { border-color: var(--accent); color: var(--accent); }
   .banner.info { border-color: var(--line); color: var(--text-2); }
+  .banner.attention { border-color: var(--attention); color: var(--text); background: var(--elevated); }
 
   .node { display: grid; grid-template-columns: 24px 1fr; gap: 14px; }
   .node .rail { display: flex; flex-direction: column; align-items: center; }
@@ -216,9 +217,10 @@
     <span aria-hidden="true">●</span>
     <span id="mode-text">
       <strong>Ohne API-Key</strong>
-      Die Pläne kommen aus drei hinterlegten Playbooks und sind nicht auf deine
-      Situation zugeschnitten. Unter „Einstellungen“ kannst du einen
-      Anthropic-API-Key hinterlegen — dann plant Claude für beliebige Ziele.
+      Atlas plant jedes Ziel — nach Regeln, nicht mit einem Sprachmodell. Der Plan
+      nennt die Schritte, die für Ziele dieser Art typisch sind, aber nicht die
+      Besonderheiten deiner Lage. Mit einem eigenen Anthropic-API-Key übernimmt
+      Claude und plant auf dich zugeschnitten.
     </span>
   </div>
 
@@ -285,7 +287,8 @@
   <section id="view-settings" class="hidden">
     <h1>Einstellungen</h1>
     <p>Mit einem Anthropic-API-Key plant Claude für <strong>beliebige</strong> Ziele
-       statt nur für die drei hinterlegten Playbooks.</p>
+       Ziele auf deine Lage zugeschnitten. Ohne Schlüssel plant Atlas ebenfalls
+       jedes Ziel, aber nach allgemeinen Regeln.</p>
     <div class="card" style="margin-bottom:24px">
       <span class="label">So kommst du an einen Schlüssel</span>
       <ol style="margin:0; padding-left:20px; color:var(--text-2); font-size:15px; line-height:1.7">
@@ -340,8 +343,11 @@
     <div style="margin:16px 0 24px">
       <span class="label">Beispiele</span>
       <span class="chip">Ich möchte in 18 Monaten ein Café in Leipzig eröffnen</span>
-      <span class="chip">Ich will nebenberuflich als Freelancer starten</span>
-      <span class="chip">Ich möchte einen Onlineshop aufbauen</span>
+      <span class="chip">Ich will in einem Jahr einen Marathon laufen</span>
+      <span class="chip">Ich möchte fließend Spanisch sprechen</span>
+      <span class="chip">Ich will mit dem Rauchen aufhören</span>
+      <span class="chip">Ich möchte einen Roman schreiben</span>
+      <span class="chip">Ich will meine Schulden abbauen</span>
     </div>
     <button class="primary" id="btn-to-interview" disabled>Weiter</button>
   </section>
@@ -435,11 +441,12 @@
    store.ts (Ablage), model/prompts.ts (System-Prompt).
 
    Zwei Betriebsarten:
-     ohne API-Key  → Pläne aus drei Playbooks, offline, nicht personalisiert
-     mit API-Key   → Claude plant beliebige Ziele, direkt aus dem Browser
+     ohne API-Key  → regelbasierter Planer, offline, für jedes Ziel
+     mit API-Key   → Claude plant zusätzlich auf die eigene Lage zugeschnitten
 
-   Die Playbook-Daten unten sind per Build-Skript aus
-   engine/src/playbooks/data/ eingesetzt, nicht abgetippt.
+   Playbook-Daten, Fachmodule, Grundmuster und der Planer-Code sind per
+   Build-Skript eingesetzt, nicht abgetippt — dieselben Dateien prüft
+   demo/test/planner.test.mjs.
    ========================================================================== */
 
 const PLAYBOOKS = [
@@ -771,7 +778,1003 @@ const PLAYBOOKS = [
     ]
   }
 ];
-const STORAGE_KEY = "atlas.app.v2";
+const ARCHETYPES = [
+  {
+    "key": "faehigkeit",
+    "label": "etwas lernen und können",
+    "horizonDays": 180,
+    "detect": ["lernen", "erlernen", "können", "beherrschen", "verstehen", "üben", "sprechen", "studieren", "kurs", "prüfung", "schein", "zertifikat", "ausbildung", "weiterbildung", "fortbildung", "sprache", "instrument", "programmieren", "fahren"],
+    "stages": [
+      {
+        "ref": "standort",
+        "title": "Standort bestimmen",
+        "definitionOfDone": "Es steht schriftlich, was du heute schon kannst, was konkret fehlt und woran du merkst, dass du es kannst.",
+        "share": 0.1,
+        "tasks": [
+          { "title": "Aufschreiben, was „{ziel}“ konkret bedeutet", "why": "Solange das Ziel unscharf ist, weißt du nie, ob du fertig bist.", "how": "Ein Satz in der Form: Ich kann es, wenn ich ohne Hilfe … schaffe.", "min": 45, "blocking": true },
+          { "title": "Ehrlich notieren, was du heute schon kannst", "why": "Der Abstand zwischen heute und dem Ziel bestimmt, wie lange es dauert.", "how": null, "min": 30, "blocking": true },
+          { "title": "Ein Lernmaterial auswählen — und nur dieses", "why": "Wer mit fünf Kursen gleichzeitig anfängt, beendet keinen.", "how": "Buch, Kurs oder App. Eines. Die anderen kannst du später immer noch anfangen.", "min": 60, "blocking": false }
+        ]
+      },
+      {
+        "ref": "grundlagen",
+        "title": "Grundlagen aufbauen",
+        "definitionOfDone": "Die Grundlagen sitzen so weit, dass du ohne Anleitung weiterüben kannst.",
+        "share": 0.25,
+        "tasks": [
+          { "title": "Feste Übungszeiten in den Kalender eintragen", "why": "Was keinen Termin hat, findet nicht statt.", "how": "Lieber drei kurze feste Termine als ein langer beweglicher.", "min": 20, "blocking": true },
+          { "title": "Den Grundlagenteil des Materials durcharbeiten", "why": "Ohne Fundament wird jede spätere Übung mühsamer, als sie sein müsste.", "how": null, "min": 240, "blocking": true },
+          { "title": "Eine erste Übung ohne Vorlage machen", "why": "Nachmachen fühlt sich nach Können an, ist aber noch keins.", "how": null, "min": 60, "blocking": false }
+        ]
+      },
+      {
+        "ref": "uebung",
+        "title": "Regelmäßig üben",
+        "definitionOfDone": "Du hast über mehrere Wochen geübt, ohne dass eine Lücke länger als eine Woche entstanden ist.",
+        "share": 0.28,
+        "tasks": [
+          { "title": "Übungsprotokoll anlegen", "why": "Sichtbarer Fortschritt trägt durch die Phase, in der es sich nicht nach Fortschritt anfühlt.", "how": "Datum, Dauer, was geübt. Drei Zeilen reichen.", "min": 20, "blocking": false },
+          { "title": "Jemanden finden, der nachfragt", "why": "Rechenschaft gegenüber einem Menschen wirkt stärker als jeder Vorsatz.", "how": "Kurs, Lerngruppe, eine Person, der du wöchentlich Bescheid gibst.", "min": 45, "blocking": false },
+          { "title": "Nach der Hälfte der Zeit den eigenen Stand prüfen", "why": "Wer nie misst, übt womöglich seit Wochen das Falsche.", "how": null, "min": 60, "blocking": true }
+        ]
+      },
+      {
+        "ref": "anwendung",
+        "title": "Im Ernstfall anwenden",
+        "definitionOfDone": "Du hast das Gelernte mindestens einmal außerhalb der Übungssituation eingesetzt.",
+        "share": 0.22,
+        "tasks": [
+          { "title": "Eine echte Gelegenheit suchen", "why": "Der Sprung von der Übung in den Ernstfall ist der Punkt, an dem die meisten stehen bleiben.", "how": null, "min": 60, "blocking": true },
+          { "title": "Einmal anwenden und danach notieren, was gefehlt hat", "why": "Der Ernstfall zeigt Lücken, die keine Übung zeigt.", "how": null, "min": 120, "blocking": true },
+          { "title": "Die aufgefallenen Lücken gezielt nachüben", "why": "Diese Lücken sind wertvoller als jedes Lehrbuchkapitel — sie sind deine.", "how": null, "min": 180, "blocking": false }
+        ]
+      },
+      {
+        "ref": "nachweis",
+        "title": "Festhalten, dass du es kannst",
+        "definitionOfDone": "Es gibt etwas Vorzeigbares: ein Zeugnis, ein Werkstück, eine Aufnahme, ein geführtes Gespräch.",
+        "share": 0.15,
+        "tasks": [
+          { "title": "Festlegen, was als Nachweis gilt", "why": "Ohne Nachweis bleibt das Ziel gefühlt offen, egal wie gut du geworden bist.", "how": null, "min": 30, "blocking": true },
+          { "title": "Den Nachweis erbringen", "why": "Das ist der Punkt, an dem aus Üben Können wird.", "how": null, "min": 180, "blocking": true },
+          { "title": "Entscheiden: nächstes Niveau oder bewusst abschließen", "why": "Beides ist in Ordnung. Unentschieden weiterlaufen zu lassen ist es nicht.", "how": null, "min": 30, "blocking": false }
+        ]
+      }
+    ]
+  },
+
+  {
+    "key": "vorhaben",
+    "label": "etwas aufbauen oder erschaffen",
+    "horizonDays": 240,
+    "detect": ["aufbauen", "gründen", "starten", "erstellen", "bauen", "schreiben", "entwickeln", "eröffnen", "aufziehen", "projekt", "umsetzen", "verwirklichen", "produzieren"],
+    "stages": [
+      {
+        "ref": "klaeren",
+        "title": "Vorhaben klären",
+        "definitionOfDone": "Es steht schriftlich, was am Ende fertig sein soll — und was ausdrücklich nicht dazugehört.",
+        "share": 0.15,
+        "tasks": [
+          { "title": "In fünf Sätzen aufschreiben, was am Ende dasteht", "why": "Ein Vorhaben, das man nicht in fünf Sätzen erklären kann, ist noch nicht entschieden.", "how": null, "min": 60, "blocking": true },
+          { "title": "Aufschreiben, was ausdrücklich nicht dazugehört", "why": "Vorhaben scheitern seltener an zu wenig als an ständig wachsendem Umfang.", "how": null, "min": 30, "blocking": true },
+          { "title": "Drei Menschen fragen, die so etwas schon gemacht haben", "why": "Eine Stunde Gespräch spart regelmäßig Wochen an Irrwegen.", "how": "Auch lose Kontakte antworten häufiger, als man denkt.", "min": 120, "blocking": false }
+        ]
+      },
+      {
+        "ref": "pruefen",
+        "title": "Machbarkeit prüfen",
+        "definitionOfDone": "Aufwand, Kosten und die drei größten Unbekannten sind grob beziffert und schriftlich festgehalten.",
+        "share": 0.15,
+        "tasks": [
+          { "title": "Die drei größten Unbekannten benennen", "why": "Was ein Vorhaben kippt, steht fast nie im Plan — sondern in dem, was man nicht wusste.", "how": null, "min": 45, "blocking": true },
+          { "title": "Grob überschlagen, was es kostet und wie lange es dauert", "why": "Eine grobe Zahl früh ist mehr wert als eine genaue Zahl zu spät.", "how": "Großzügig schätzen und dann verdoppeln — das trifft es erfahrungsgemäß besser.", "min": 90, "blocking": true },
+          { "title": "Die kleinstmögliche Version des Vorhabens beschreiben", "why": "Wenn die Zeit knapp wird, brauchst du eine Fassung, die trotzdem fertig wird.", "how": null, "min": 45, "blocking": false }
+        ]
+      },
+      {
+        "ref": "vorbereiten",
+        "title": "Vorbereiten und beschaffen",
+        "definitionOfDone": "Alles, was eine Vorlaufzeit hat, ist bestellt, gebucht oder beantragt.",
+        "share": 0.2,
+        "tasks": [
+          { "title": "Auflisten, was Vorlaufzeit hat", "why": "Wartezeiten kann man nicht aufholen — nur früh genug anstoßen.", "how": "Genehmigungen, Lieferzeiten, Termine bei anderen Menschen.", "min": 45, "blocking": true },
+          { "title": "Alles mit Vorlaufzeit anstoßen", "why": "Solange etwas läuft, kostet es dich keine Zeit mehr.", "how": null, "min": 180, "blocking": true },
+          { "title": "Den Arbeitsplatz oder die Werkzeuge einrichten", "why": "Reibung beim Anfangen ist der häufigste Grund, warum ein Vorhaben liegen bleibt.", "how": null, "min": 120, "blocking": false }
+        ]
+      },
+      {
+        "ref": "umsetzen",
+        "title": "Umsetzen",
+        "definitionOfDone": "Der Hauptteil steht — unfertig an den Rändern, aber im Kern vollständig.",
+        "share": 0.35,
+        "tasks": [
+          { "title": "Die Arbeit in Wochenpakete schneiden", "why": "Ein Vorhaben, das nur als Ganzes existiert, lässt sich nie anfangen.", "how": "Jedes Paket so groß, dass es in eine Woche deiner Zeit passt.", "min": 60, "blocking": true },
+          { "title": "Jede Woche ein Paket abschließen", "why": "Abgeschlossene Pakete tragen durch die lange Mitte.", "how": null, "min": 480, "blocking": true },
+          { "title": "Nach einem Drittel jemandem den Zwischenstand zeigen", "why": "Früh gezeigte Arbeit spart die Korrektur, die sonst am Ende fällig wird.", "how": null, "min": 90, "blocking": false }
+        ]
+      },
+      {
+        "ref": "abschliessen",
+        "title": "Abschließen und übergeben",
+        "definitionOfDone": "Das Vorhaben ist fertig, jemand anderes hat es gesehen, und die Restpunkte sind entweder erledigt oder bewusst gestrichen.",
+        "share": 0.15,
+        "tasks": [
+          { "title": "Restpunkteliste anlegen und halbieren", "why": "Die Hälfte der Restpunkte merkt außer dir niemand.", "how": null, "min": 45, "blocking": true },
+          { "title": "Die verbliebenen Restpunkte erledigen", "why": "Der letzte Rest entscheidet, ob es als fertig gilt.", "how": null, "min": 300, "blocking": true },
+          { "title": "Aufschreiben, was du beim nächsten Mal anders machst", "why": "Sonst machst du beim nächsten Mal dieselben Umwege.", "how": null, "min": 30, "blocking": false }
+        ]
+      }
+    ]
+  },
+
+  {
+    "key": "ereignis",
+    "label": "auf einen festen Termin hinarbeiten",
+    "horizonDays": 200,
+    "detect": ["hochzeit", "feier", "fest", "veranstaltung", "wettkampf", "turnier", "auftritt", "konzert", "vortrag", "prüfungstermin", "reise", "urlaub", "umzugstermin", "geburtstag", "jubiläum", "messe", "eröffnungstag"],
+    "stages": [
+      {
+        "ref": "rahmen",
+        "title": "Termin und Rahmen festlegen",
+        "definitionOfDone": "Datum, Ort, ungefähre Größe und Budgetrahmen stehen fest und sind mit allen Beteiligten abgestimmt.",
+        "share": 0.12,
+        "tasks": [
+          { "title": "Datum verbindlich festlegen", "why": "Alles andere hängt daran. Solange das Datum wackelt, kann nichts gebucht werden.", "how": null, "min": 45, "blocking": true },
+          { "title": "Budgetrahmen festlegen und aufschreiben", "why": "Ein nicht ausgesprochenes Budget wird zuverlässig überschritten.", "how": null, "min": 45, "blocking": true },
+          { "title": "Mit allen Beteiligten abstimmen, wer was übernimmt", "why": "Unklare Zuständigkeit ist der häufigste Grund für Ärger kurz vor dem Termin.", "how": null, "min": 60, "blocking": false }
+        ]
+      },
+      {
+        "ref": "buchen",
+        "title": "Das Unverschiebbare buchen",
+        "definitionOfDone": "Alles mit langer Vorlaufzeit ist verbindlich gebucht und schriftlich bestätigt.",
+        "share": 0.23,
+        "tasks": [
+          { "title": "Auflisten, was lange im Voraus ausgebucht ist", "why": "Ort, Termine bei gefragten Menschen und Reisen sind Monate vorher weg.", "how": null, "min": 45, "blocking": true },
+          { "title": "Die drei wichtigsten Posten verbindlich buchen", "why": "Ohne diese Zusagen ist der Termin nicht abgesichert.", "how": "Schriftliche Bestätigung kommen lassen, mündlich reicht nicht.", "min": 240, "blocking": true },
+          { "title": "Anzahlungen und Fristen in den Kalender eintragen", "why": "Eine verpasste Zahlungsfrist kann eine Buchung kosten.", "how": null, "min": 30, "blocking": false }
+        ]
+      },
+      {
+        "ref": "vorbereiten",
+        "title": "Vorbereiten",
+        "definitionOfDone": "Alle Beteiligten sind eingeladen oder informiert, und der Ablauf steht schriftlich.",
+        "share": 0.3,
+        "tasks": [
+          { "title": "Ablaufplan mit Uhrzeiten schreiben", "why": "Am Tag selbst hat niemand Kopf für Entscheidungen.", "how": null, "min": 90, "blocking": true },
+          { "title": "Alle Beteiligten einladen oder informieren", "why": "Menschen brauchen Vorlauf, um zuzusagen.", "how": null, "min": 120, "blocking": true },
+          { "title": "Die Details erledigen, die kein Warten erzeugen", "why": "Diese Dinge stauen sich sonst in der letzten Woche.", "how": null, "min": 300, "blocking": false }
+        ]
+      },
+      {
+        "ref": "probe",
+        "title": "Generalprobe",
+        "definitionOfDone": "Der Ablauf ist einmal durchgespielt, und die dabei gefundenen Lücken sind geschlossen.",
+        "share": 0.2,
+        "tasks": [
+          { "title": "Den Ablauf einmal durchspielen", "why": "Fast jede Probe fördert mindestens einen Punkt zutage, an den niemand gedacht hat.", "how": null, "min": 180, "blocking": true },
+          { "title": "Die gefundenen Lücken schließen", "why": "Eine Probe ohne Nacharbeit war nur Beruhigung.", "how": null, "min": 180, "blocking": true },
+          { "title": "Einen Plan B für das Wahrscheinlichste aufschreiben", "why": "Wetter, Krankheit, Absagen — je einen Satz, was dann gilt.", "how": null, "min": 45, "blocking": false }
+        ]
+      },
+      {
+        "ref": "durchfuehren",
+        "title": "Durchführen und nachbereiten",
+        "definitionOfDone": "Der Termin ist vorbei, Rechnungen sind bezahlt, Geliehenes ist zurück.",
+        "share": 0.15,
+        "tasks": [
+          { "title": "Am Tag davor alles bereitlegen", "why": "Was am Vorabend gepackt ist, fehlt am Tag selbst nicht.", "how": null, "min": 120, "blocking": true },
+          { "title": "Den Termin durchführen", "why": "Darauf lief alles zu.", "how": null, "min": 480, "blocking": true },
+          { "title": "Nachbereiten: Rechnungen, Rückgaben, Dank", "why": "Das bleibt sonst wochenlang liegen und trübt die Erinnerung.", "how": null, "min": 120, "blocking": false }
+        ]
+      }
+    ]
+  },
+
+  {
+    "key": "koerper",
+    "label": "ein körperliches Ziel erreichen",
+    "horizonDays": 168,
+    "detect": ["abnehmen", "zunehmen", "kilo", "gewicht", "fit", "fitness", "laufen", "joggen", "marathon", "trainieren", "training", "muskeln", "kraft", "ausdauer", "sport", "beweglich", "rücken", "gesünder", "schwimmen", "radfahren", "klettern", "yoga"],
+    "stages": [
+      {
+        "ref": "ausgangswert",
+        "title": "Ausgangswert feststellen",
+        "definitionOfDone": "Ein messbarer Startwert ist notiert, und gesundheitliche Einschränkungen sind geklärt.",
+        "share": 0.1,
+        "tasks": [
+          { "title": "Startwert messen und aufschreiben", "why": "Ohne Startwert lässt sich später kein Fortschritt zeigen — und Fortschritt ist das, was durchträgt.", "how": null, "min": 30, "blocking": true },
+          { "title": "Gesundheitliche Einschränkungen klären", "why": "Bei Vorerkrankungen, längerer Pause oder Beschwerden gehört das vor den ersten Trainingstag.", "how": "Im Zweifel ärztlich abklären lassen. Diese App ersetzt keine medizinische Beratung.", "min": 60, "blocking": true },
+          { "title": "Feste Trainingstage festlegen", "why": "Wer nach Lust trainiert, trainiert im dritten Monat nicht mehr.", "how": null, "min": 20, "blocking": false }
+        ]
+      },
+      {
+        "ref": "basis",
+        "title": "Basis aufbauen",
+        "definitionOfDone": "Du hast über mehrere Wochen regelmäßig trainiert, ohne dich zu überlasten.",
+        "share": 0.25,
+        "tasks": [
+          { "title": "Bewusst unter der eigenen Grenze anfangen", "why": "Die häufigste Ursache für Abbruch ist nicht zu wenig Ehrgeiz, sondern zu viel am Anfang.", "how": "Wenn du dich nach dem Training fragst, ob das genug war: es war genug.", "min": 180, "blocking": true },
+          { "title": "Jede Einheit kurz protokollieren", "why": "Das Protokoll zeigt Muster, die das Gefühl nicht zeigt.", "how": null, "min": 20, "blocking": false },
+          { "title": "Auf Schlaf und Essen achten wie auf das Training", "why": "Der Körper baut nicht beim Training auf, sondern zwischen den Einheiten.", "how": null, "min": 45, "blocking": false }
+        ]
+      },
+      {
+        "ref": "steigern",
+        "title": "Steigern",
+        "definitionOfDone": "Der Umfang oder die Intensität liegt spürbar über dem Startpunkt, ohne dass Beschwerden aufgetreten sind.",
+        "share": 0.3,
+        "tasks": [
+          { "title": "In kleinen Schritten steigern", "why": "Kleine Steigerungen halten der Körper und der Alltag aus, große keins von beidem.", "how": "Als Faustregel gilt: nicht mehr als etwa ein Zehntel Zuwachs pro Woche.", "min": 300, "blocking": true },
+          { "title": "Alle vier Wochen eine leichtere Woche einlegen", "why": "Erholung ist Teil des Trainings, nicht dessen Unterbrechung.", "how": null, "min": 120, "blocking": true },
+          { "title": "Zwischenstand messen und mit dem Startwert vergleichen", "why": "Der Vergleich mit dem eigenen Startpunkt motiviert, der Vergleich mit anderen nicht.", "how": null, "min": 30, "blocking": false }
+        ]
+      },
+      {
+        "ref": "hoehepunkt",
+        "title": "Belastungsspitze",
+        "definitionOfDone": "Die höchste geplante Belastung ist einmal absolviert.",
+        "share": 0.2,
+        "tasks": [
+          { "title": "Die härteste Einheit planen und durchführen", "why": "Wer die Belastung einmal geschafft hat, weiß, dass das Ziel trägt.", "how": null, "min": 300, "blocking": true },
+          { "title": "Danach bewusst zurückfahren", "why": "Nach der Spitze braucht der Körper mehr Erholung als sonst.", "how": null, "min": 120, "blocking": true },
+          { "title": "Ausrüstung und Ablauf im Ernstfall testen", "why": "Neues am entscheidenden Tag auszuprobieren ist die klassische Falle.", "how": null, "min": 90, "blocking": false }
+        ]
+      },
+      {
+        "ref": "halten",
+        "title": "Erreichen und halten",
+        "definitionOfDone": "Das Ziel ist erreicht, und es steht fest, was danach an Regelmäßigkeit bleibt.",
+        "share": 0.15,
+        "tasks": [
+          { "title": "Das Ziel erreichen und den Wert notieren", "why": "Der Vergleich mit dem Startwert ist der eigentliche Lohn.", "how": null, "min": 240, "blocking": true },
+          { "title": "Festlegen, was danach bleibt", "why": "Ohne Anschlussplan ist der Startwert in einem halben Jahr wieder da.", "how": "Ein kleineres, dauerhaft machbares Maß schlägt jedes Programm, das nach vier Wochen endet.", "min": 45, "blocking": true }
+        ]
+      }
+    ]
+  },
+
+  {
+    "key": "gewohnheit",
+    "label": "eine Gewohnheit ändern",
+    "horizonDays": 120,
+    "detect": ["gewohnheit", "regelmäßig", "jeden tag", "jede woche", "jeden monat", "wöchentlich", "täglich", "aufhören", "weniger", "mehr schlafen", "meditieren", "rauchen", "alkohol", "handy", "aufräumen", "routine", "durchhalten", "dranbleiben", "öfter"],
+    "stages": [
+      {
+        "ref": "verstehen",
+        "title": "Ist-Zustand verstehen",
+        "definitionOfDone": "Du hast mindestens eine Woche lang mitgeschrieben, wann und in welcher Situation das Verhalten auftritt.",
+        "share": 0.12,
+        "tasks": [
+          { "title": "Eine Woche lang nur mitschreiben, nichts ändern", "why": "Fast jeder schätzt das eigene Verhalten falsch ein. Messen kommt vor Ändern.", "how": "Uhrzeit, Situation, Stimmung. Ein Stichwort reicht.", "min": 45, "blocking": true },
+          { "title": "Die drei häufigsten Auslöser markieren", "why": "Nicht der Wille entscheidet, sondern die Situation, in der du stehst.", "how": null, "min": 30, "blocking": true }
+        ]
+      },
+      {
+        "ref": "klein",
+        "title": "Die kleinste Version etablieren",
+        "definitionOfDone": "Eine so kleine Version, dass sie auch an schlechten Tagen gelingt, läuft zwei Wochen durch.",
+        "share": 0.23,
+        "tasks": [
+          { "title": "Die lächerlich kleine Version festlegen", "why": "Zwei Minuten täglich schlagen dreißig Minuten, die dreimal ausfallen.", "how": "So klein, dass du dich fast schämst, sie aufzuschreiben. Genau das ist der Punkt.", "min": 20, "blocking": true },
+          { "title": "Zwei Wochen lang nur diese kleine Version", "why": "Erst die Regelmäßigkeit, dann die Größe.", "how": null, "min": 120, "blocking": true },
+          { "title": "Sichtbar abhaken", "why": "Eine sichtbare Kette will man nicht abreißen lassen.", "how": "Kalender an der Wand, Häkchen. Analog wirkt hier besser als digital.", "min": 15, "blocking": false }
+        ]
+      },
+      {
+        "ref": "kopplung",
+        "title": "An einen festen Auslöser koppeln",
+        "definitionOfDone": "Das Verhalten hängt an einem festen Punkt im Tag und braucht keine tägliche Entscheidung mehr.",
+        "share": 0.2,
+        "tasks": [
+          { "title": "Einen festen Ankerpunkt im Tag wählen", "why": "Was an etwas hängt, das ohnehin jeden Tag passiert, braucht keinen Vorsatz.", "how": "Nach dem Zähneputzen, nach dem ersten Kaffee, direkt nach Feierabend.", "min": 20, "blocking": true },
+          { "title": "Die Umgebung anpassen", "why": "Es ist leichter, die Umgebung zu ändern als sich selbst.", "how": "Das Gewünschte in Reichweite legen, das Unerwünschte aus der Reichweite nehmen.", "min": 60, "blocking": true }
+        ]
+      },
+      {
+        "ref": "ausweiten",
+        "title": "Ausweiten",
+        "definitionOfDone": "Der Umfang liegt deutlich über der kleinsten Version und hält seit mehreren Wochen.",
+        "share": 0.25,
+        "tasks": [
+          { "title": "Alle zwei Wochen ein kleines Stück draufsetzen", "why": "Wachstum in kleinen Schritten hält, Sprünge halten nicht.", "how": null, "min": 120, "blocking": true },
+          { "title": "Jemandem wöchentlich Bescheid geben", "why": "Rechenschaft gegenüber einem Menschen trägt weiter als jede App.", "how": null, "min": 30, "blocking": false }
+        ]
+      },
+      {
+        "ref": "verankern",
+        "title": "Rückfälle einplanen",
+        "definitionOfDone": "Es steht schriftlich, was bei einem Rückfall gilt — und der Plan hat mindestens einen Rückfall überstanden.",
+        "share": 0.2,
+        "tasks": [
+          { "title": "Die Nie-zweimal-Regel aufschreiben", "why": "Nicht der Ausrutscher beendet eine Gewohnheit, sondern der zweite direkt danach.", "how": "Einmal aussetzen ist ein Ausrutscher. Zweimal hintereinander ist der Anfang vom Ende.", "min": 20, "blocking": true },
+          { "title": "Die schwierigsten Situationen vorher durchdenken", "why": "Urlaub, Krankheit, Stress — für jede Situation ein Satz, was dann die Mindestversion ist.", "how": null, "min": 45, "blocking": true },
+          { "title": "Nach drei Monaten Bilanz ziehen", "why": "Erst nach Monaten zeigt sich, ob es eine Gewohnheit ist oder eine lange Anstrengung war.", "how": null, "min": 30, "blocking": false }
+        ]
+      }
+    ]
+  },
+
+  {
+    "key": "finanzen",
+    "label": "ein finanzielles Ziel erreichen",
+    "horizonDays": 365,
+    "detect": ["sparen", "geld", "euro", "schulden", "kredit", "finanzieren", "kaufen", "anschaffung", "vermögen", "anlegen", "investieren", "rente", "altersvorsorge", "budget", "haushalt", "einkommen", "gehalt"],
+    "stages": [
+      {
+        "ref": "ueberblick",
+        "title": "Überblick verschaffen",
+        "definitionOfDone": "Alle Einnahmen und alle laufenden Ausgaben stehen in einer Liste, und der monatliche Überschuss ist bekannt.",
+        "share": 0.15,
+        "tasks": [
+          { "title": "Alle Einnahmen und Fixkosten auflisten", "why": "Fast jeder unterschätzt die eigenen Fixkosten. Die Liste ist der ganze Trick.", "how": "Kontoauszüge der letzten drei Monate durchgehen.", "min": 120, "blocking": true },
+          { "title": "Den monatlichen Überschuss ausrechnen", "why": "Diese eine Zahl entscheidet, ob das Ziel in der gewünschten Zeit erreichbar ist.", "how": null, "min": 45, "blocking": true },
+          { "title": "Alle Abos und Verträge einmal durchgehen", "why": "Hier liegt fast immer Geld, das niemandem fehlt.", "how": null, "min": 90, "blocking": false }
+        ]
+      },
+      {
+        "ref": "ziel",
+        "title": "Zielbetrag und Frist festlegen",
+        "definitionOfDone": "Zielbetrag, Frist und die daraus folgende Monatsrate stehen schriftlich fest.",
+        "share": 0.15,
+        "tasks": [
+          { "title": "Den Zielbetrag genau beziffern", "why": "„Mehr sparen“ ist kein Ziel. Ein Betrag ist eins.", "how": "Nebenkosten mit einrechnen — bei Anschaffungen sind es oft 10 bis 20 Prozent obendrauf.", "min": 60, "blocking": true },
+          { "title": "Monatsrate ausrechnen und mit dem Überschuss vergleichen", "why": "Wenn die Rate über dem Überschuss liegt, muss die Frist oder der Betrag angepasst werden — nicht die Disziplin.", "how": null, "min": 45, "blocking": true },
+          { "title": "Einen Notgroschen von drei Monatsausgaben einplanen", "why": "Ohne Puffer zerstört die erste kaputte Waschmaschine den ganzen Plan.", "how": null, "min": 30, "blocking": false }
+        ]
+      },
+      {
+        "ref": "spielraum",
+        "title": "Spielraum schaffen",
+        "definitionOfDone": "Die Monatsrate ist im Budget frei — durch gesenkte Ausgaben, höhere Einnahmen oder beides.",
+        "share": 0.25,
+        "tasks": [
+          { "title": "Die drei größten senkbaren Posten angehen", "why": "Bei Wohnen, Mobilität und Versicherungen liegt mehr als bei allem Kleinkram zusammen.", "how": null, "min": 240, "blocking": true },
+          { "title": "Prüfen, ob die Einnahmenseite Spielraum hat", "why": "Sparen hat eine Untergrenze, Verdienen nicht.", "how": null, "min": 120, "blocking": false }
+        ]
+      },
+      {
+        "ref": "automatisieren",
+        "title": "Automatisieren",
+        "definitionOfDone": "Ein Dauerauftrag läuft am Tag nach dem Gehaltseingang, und die Zwischenstände werden monatlich geprüft.",
+        "share": 0.25,
+        "tasks": [
+          { "title": "Dauerauftrag auf ein getrenntes Konto einrichten", "why": "Was am Monatsanfang weg ist, wird nicht ausgegeben.", "how": "Am Tag nach dem Gehaltseingang, nicht am Monatsende.", "min": 45, "blocking": true },
+          { "title": "Einen festen Monatstermin zum Nachschauen setzen", "why": "Fünfzehn Minuten im Monat verhindern das böse Erwachen nach einem Jahr.", "how": null, "min": 30, "blocking": true }
+        ]
+      },
+      {
+        "ref": "abschluss",
+        "title": "Abschließen",
+        "definitionOfDone": "Der Zielbetrag ist erreicht und das Geld ist zweckgebunden verwendet oder sicher angelegt.",
+        "share": 0.2,
+        "tasks": [
+          { "title": "Vor der Entscheidung mindestens drei Angebote vergleichen", "why": "Bei großen Beträgen entscheidet der Vergleich über mehr Geld als ein Jahr Sparen.", "how": null, "min": 180, "blocking": true },
+          { "title": "Bei größeren Summen unabhängig gegenprüfen lassen", "why": "Wer am Abschluss verdient, berät nicht unabhängig.", "how": "Verbraucherzentrale oder Honorarberatung. Diese App ist keine Finanzberatung.", "min": 120, "blocking": true }
+        ]
+      }
+    ]
+  },
+
+  {
+    "key": "wechsel",
+    "label": "eine Lebenssituation verändern",
+    "horizonDays": 210,
+    "detect": ["wechseln", "kündigen", "umziehen", "umzug", "auswandern", "neuanfang", "verändern", "jobwechsel", "arbeitsplatz", "quereinstieg", "trennen", "trennung", "selbstständig machen", "ausland"],
+    "stages": [
+      {
+        "ref": "standortbestimmung",
+        "title": "Standortbestimmung",
+        "definitionOfDone": "Es steht schriftlich, was du hinter dir lassen willst und was auf keinen Fall verloren gehen darf.",
+        "share": 0.15,
+        "tasks": [
+          { "title": "Aufschreiben, was sich ändern soll — und was bleiben muss", "why": "Wer nur weg will, landet oft in etwas, das dieselben Probleme hat.", "how": "Zwei Spalten. Die rechte ist die wichtigere.", "min": 60, "blocking": true },
+          { "title": "Die harten Rahmenbedingungen notieren", "why": "Geld, Kündigungsfristen, Menschen, die mithängen — das bestimmt, was überhaupt geht.", "how": null, "min": 45, "blocking": true }
+        ]
+      },
+      {
+        "ref": "optionen",
+        "title": "Optionen sammeln und einengen",
+        "definitionOfDone": "Aus einer breiten Sammlung sind zwei oder drei ernsthafte Optionen übrig, jede mit Vor- und Nachteilen schriftlich.",
+        "share": 0.2,
+        "tasks": [
+          { "title": "Breit sammeln, ohne zu bewerten", "why": "Zu früh zu bewerten streicht genau die Möglichkeit, die es geworden wäre.", "how": null, "min": 90, "blocking": true },
+          { "title": "Mit Menschen sprechen, die den Schritt gegangen sind", "why": "Ihre Auskunft ist ehrlicher als jede Recherche — vor allem über das, was danach schwer war.", "how": null, "min": 180, "blocking": true },
+          { "title": "Auf zwei oder drei Optionen einengen", "why": "Mehr Optionen führen nicht zu besseren Entscheidungen, sondern zu keiner.", "how": null, "min": 60, "blocking": false }
+        ]
+      },
+      {
+        "ref": "vorbereiten",
+        "title": "Den Wechsel vorbereiten",
+        "definitionOfDone": "Fristen, Finanzen und Formalitäten für die gewählte Option sind geklärt und terminiert.",
+        "share": 0.25,
+        "tasks": [
+          { "title": "Alle Fristen und Formalitäten auflisten", "why": "Kündigungsfristen und Behördenwege bestimmen den Zeitplan, nicht der eigene Wunsch.", "how": null, "min": 90, "blocking": true },
+          { "title": "Die Finanzierung des Übergangs klären", "why": "Der Zwischenraum kostet fast immer mehr Geld und Zeit als gedacht.", "how": "Drei bis sechs Monate Puffer sind die übliche Empfehlung.", "min": 120, "blocking": true },
+          { "title": "Die Entscheidung mit den Betroffenen besprechen", "why": "Ein Wechsel betrifft selten nur eine Person.", "how": null, "min": 90, "blocking": false }
+        ]
+      },
+      {
+        "ref": "vollzug",
+        "title": "Vollziehen",
+        "definitionOfDone": "Der Schritt ist getan: gekündigt, unterschrieben, umgezogen, angemeldet.",
+        "share": 0.2,
+        "tasks": [
+          { "title": "Den Termin für den Schritt festlegen", "why": "Ein Wechsel ohne Datum verschiebt sich unendlich.", "how": null, "min": 30, "blocking": true },
+          { "title": "Den Schritt vollziehen", "why": "Ab hier ist es entschieden.", "how": null, "min": 240, "blocking": true },
+          { "title": "Formalitäten nachziehen", "why": "Ummeldungen und Verträge haben eigene Fristen, die schnell verstreichen.", "how": null, "min": 180, "blocking": false }
+        ]
+      },
+      {
+        "ref": "ankommen",
+        "title": "Ankommen",
+        "definitionOfDone": "Nach dem Wechsel steht ein Alltag, und du hast einmal bewusst Bilanz gezogen.",
+        "share": 0.2,
+        "tasks": [
+          { "title": "Die ersten Wochen bewusst leichter planen", "why": "Ein Wechsel kostet Kraft, auch wenn er richtig war.", "how": null, "min": 60, "blocking": true },
+          { "title": "Nach drei Monaten Bilanz ziehen", "why": "Erst dann zeigt sich, ob der Schritt getragen hat.", "how": "Was ist besser, was ist schlechter, was fehlt noch.", "min": 45, "blocking": true }
+        ]
+      }
+    ]
+  }
+];
+const DOMAINS = [
+  {
+    "key": "sport.marathon",
+    "label": "Marathon",
+    "archetype": "koerper",
+    "keywords": ["marathon", "42 km", "42km", "42,195", "ultralauf"],
+    "horizonDays": 210,
+    "titles": { "hoehepunkt": "Der lange Lauf", "halten": "Wettkampf und danach" },
+    "inserts": {
+      "ausgangswert": [
+        { "title": "Startplatz suchen und anmelden", "why": "Eine bezahlte Anmeldung ist der stärkste Grund, an einem verregneten Dienstag trotzdem zu laufen.", "how": "Beliebte Läufe sind ein halbes Jahr vorher ausgebucht.", "min": 60, "blocking": true }
+      ],
+      "steigern": [
+        { "title": "Wöchentlich einen langen Lauf einbauen", "why": "Der lange Lauf ist die eine Einheit, die über die Distanz entscheidet.", "how": "Langsam. Deutlich langsamer, als es sich richtig anfühlt.", "min": 150, "blocking": true },
+        { "title": "Verpflegung unterwegs im Training üben", "why": "Der Magen muss trainiert werden wie die Beine — im Wettkampf ist es dafür zu spät.", "how": null, "min": 60, "blocking": false }
+      ],
+      "hoehepunkt": [
+        { "title": "Einen Lauf über etwa 30 Kilometer absolvieren", "why": "Ab hier weiß der Kopf, dass die Distanz machbar ist.", "how": "Drei bis vier Wochen vor dem Wettkampf, danach nicht mehr.", "min": 240, "blocking": true },
+        { "title": "Die letzten zwei Wochen den Umfang halbieren", "why": "Die Form entsteht in der Erholung, nicht im letzten Training.", "how": null, "min": 120, "blocking": true }
+      ]
+    },
+    "risks": [
+      { "stage": "steigern", "risk": "Zu schnelle Steigerung ist die häufigste Ursache für Verletzungen im Marathontraining.", "mitigation": "Wochenumfang um höchstens ein Zehntel pro Woche steigern, jede vierte Woche reduzieren." }
+    ],
+    "assumptions": ["Angenommen, du kannst zu Beginn bereits etwa 30 Minuten am Stück laufen. Wenn nicht, kommt davor eine Aufbauphase von rund acht Wochen."]
+  },
+
+  {
+    "key": "sport.laufen",
+    "label": "Laufen",
+    "archetype": "koerper",
+    "keywords": ["laufen", "joggen", "5 km", "10 km", "halbmarathon", "läufer"],
+    "horizonDays": 120,
+    "inserts": {
+      "basis": [
+        { "title": "Nach dem Wechsel von Gehen und Laufen vorgehen", "why": "Der Kreislauf ist schneller bereit als Sehnen und Gelenke — der Wechsel schützt genau die.", "how": "Zum Beispiel eine Minute laufen, zwei Minuten gehen, insgesamt zwanzig Minuten.", "min": 120, "blocking": true },
+        { "title": "Laufschuhe im Fachgeschäft anpassen lassen", "why": "Die häufigsten Anfängerbeschwerden hängen am falschen Schuh.", "how": null, "min": 90, "blocking": false }
+      ],
+      "steigern": [
+        { "title": "Die Gehpausen Woche für Woche verkürzen", "why": "Der Übergang zum Durchlaufen gelingt so fast von selbst.", "how": null, "min": 180, "blocking": true }
+      ]
+    },
+    "risks": [
+      { "stage": "basis", "risk": "Die meisten Laufanfänger hören in den ersten sechs Wochen auf — fast immer, weil sie zu schnell gelaufen sind.", "mitigation": "So langsam laufen, dass ein Gespräch in ganzen Sätzen möglich bleibt." }
+    ],
+    "assumptions": []
+  },
+
+  {
+    "key": "sport.kraft",
+    "label": "Krafttraining",
+    "archetype": "koerper",
+    "keywords": ["krafttraining", "muskeln", "muskelaufbau", "hanteln", "fitnessstudio", "klimmzüge", "liegestütze", "stark werden"],
+    "horizonDays": 180,
+    "inserts": {
+      "basis": [
+        { "title": "Die Grundübungen sauber lernen — mit Anleitung", "why": "Falsche Technik unter Last ist der schnellste Weg zu einer langen Pause.", "how": "Eine oder zwei bezahlte Einheiten mit einem Trainer sind hier gut angelegtes Geld.", "min": 120, "blocking": true }
+      ],
+      "steigern": [
+        { "title": "Trainingsgewichte mitschreiben und stetig erhöhen", "why": "Ohne steigende Belastung passiert nichts — daran hängt der gesamte Fortschritt.", "how": null, "min": 240, "blocking": true },
+        { "title": "Auf ausreichend Eiweiß und Schlaf achten", "why": "Muskeln wachsen zwischen den Einheiten, nicht während.", "how": null, "min": 60, "blocking": false }
+      ]
+    },
+    "risks": [],
+    "assumptions": []
+  },
+
+  {
+    "key": "gesundheit.gewicht",
+    "label": "Gewicht verändern",
+    "archetype": "koerper",
+    "keywords": ["abnehmen", "zunehmen", "gewicht", "kilo", "schlanker", "diät", "figur"],
+    "horizonDays": 180,
+    "titles": { "steigern": "Stetig verändern", "halten": "Halten" },
+    "inserts": {
+      "ausgangswert": [
+        { "title": "Ein realistisches Tempo festlegen", "why": "Schnelle Erfolge kommen fast vollständig zurück — langsame bleiben.", "how": "Etwa ein halbes Kilo pro Woche gilt als gut haltbar.", "min": 30, "blocking": true }
+      ],
+      "basis": [
+        { "title": "Eine Woche lang alles mitschreiben, ohne etwas zu ändern", "why": "Fast jeder schätzt die eigene Menge deutlich falsch ein.", "how": null, "min": 90, "blocking": true },
+        { "title": "Zwei bis drei feste Änderungen wählen statt eines ganzen Programms", "why": "Wer alles gleichzeitig umstellt, hält es keine drei Wochen durch.", "how": null, "min": 45, "blocking": true }
+      ],
+      "halten": [
+        { "title": "Den Plan für danach schreiben", "why": "Ohne Plan für die Zeit danach ist das Ausgangsgewicht in einem Jahr wieder da.", "how": null, "min": 45, "blocking": true }
+      ]
+    },
+    "risks": [
+      { "stage": "basis", "risk": "Sehr strenge Vorgaben führen häufiger zum Abbruch als zum Ziel.", "mitigation": "Lieber kleiner ansetzen und dafür durchhalten." }
+    ],
+    "assumptions": ["Dieser Plan ist keine Ernährungsberatung. Bei Vorerkrankungen, Medikamenten oder einem gestörten Verhältnis zum Essen gehört das ärztlich begleitet."]
+  },
+
+  {
+    "key": "gesundheit.rauchen",
+    "label": "Rauchen aufgeben",
+    "archetype": "gewohnheit",
+    "keywords": ["rauchen", "zigaretten", "nikotin", "rauchfrei", "dampfen"],
+    "horizonDays": 120,
+    "inserts": {
+      "verstehen": [
+        { "title": "Einen Schlusstag festlegen", "why": "Ein festes Datum wirkt nachweislich besser als schrittweises Reduzieren.", "how": "Zwei bis vier Wochen in der Zukunft, nicht in einer besonders stressigen Woche.", "min": 30, "blocking": true }
+      ],
+      "kopplung": [
+        { "title": "Über Nikotinersatz oder ärztliche Unterstützung entscheiden", "why": "Unterstützung verdoppelt die Erfolgsaussicht gegenüber dem reinen Willensweg.", "how": "Hausarztpraxis oder Apotheke ansprechen. Die Krankenkasse zahlt oft einen Kurs.", "min": 60, "blocking": true },
+        { "title": "Alle Rauchutensilien aus Wohnung und Auto entfernen", "why": "Die ersten Tage entscheidet die Reichweite, nicht die Entschlossenheit.", "min": 45, "how": null, "blocking": true }
+      ],
+      "verankern": [
+        { "title": "Die drei riskantesten Situationen vorher durchspielen", "why": "Rückfälle passieren fast immer in denselben drei Situationen: Alkohol, Streit, Pause mit Rauchern.", "how": null, "min": 45, "blocking": true }
+      ]
+    },
+    "risks": [
+      { "stage": "klein", "risk": "Die ersten drei Tage sind körperlich am härtesten, die Wochen vier bis acht psychisch.", "mitigation": "Für beide Phasen vorher festlegen, wen du anrufst." }
+    ],
+    "assumptions": ["Kostenlose Beratung in Deutschland: Rauchfrei-Telefon der Bundeszentrale für gesundheitliche Aufklärung."]
+  },
+
+  {
+    "key": "gesundheit.alkohol",
+    "label": "Alkohol reduzieren",
+    "archetype": "gewohnheit",
+    "keywords": ["alkohol", "trinken", "nüchtern", "wein", "bier", "trocken werden"],
+    "horizonDays": 120,
+    "inserts": {
+      "verstehen": [
+        { "title": "Ehrlich mitschreiben, wie viel tatsächlich zusammenkommt", "why": "Die geschätzte Menge liegt fast immer deutlich unter der tatsächlichen.", "how": null, "min": 45, "blocking": true }
+      ],
+      "kopplung": [
+        { "title": "Feste alkoholfreie Tage in der Woche festlegen", "why": "Feste Tage sind leichter zu halten als eine Höchstmenge.", "how": null, "min": 30, "blocking": true }
+      ]
+    },
+    "risks": [
+      { "stage": "verstehen", "risk": "Bei körperlicher Abhängigkeit kann ein plötzlicher Entzug gefährlich sein.", "mitigation": "Wenn morgens Zittern, Schwitzen oder Unruhe auftreten: nicht allein aufhören, sondern ärztlich begleiten lassen." }
+    ],
+    "assumptions": ["Diese App ist keine Suchtberatung. Kostenlos und anonym: Sucht-und-Drogen-Hotline, 01806 313031."]
+  },
+
+  {
+    "key": "gesundheit.schlaf",
+    "label": "Besser schlafen",
+    "archetype": "gewohnheit",
+    "keywords": ["schlaf", "schlafen", "müde", "einschlafen", "durchschlafen", "früher ins bett"],
+    "horizonDays": 90,
+    "inserts": {
+      "kopplung": [
+        { "title": "Eine feste Aufstehzeit setzen — auch am Wochenende", "why": "Die Aufstehzeit steuert den Rhythmus stärker als die Zubettgehzeit.", "how": null, "min": 20, "blocking": true },
+        { "title": "Bildschirme aus dem Schlafzimmer verbannen", "why": "Das ist die Änderung mit dem größten Effekt bei geringstem Aufwand.", "how": null, "min": 45, "blocking": false }
+      ]
+    },
+    "risks": [],
+    "assumptions": ["Bei anhaltender Schlaflosigkeit über mehrere Wochen gehört das ärztlich abgeklärt."]
+  },
+
+  {
+    "key": "lernen.sprache",
+    "label": "Eine Sprache lernen",
+    "archetype": "faehigkeit",
+    "keywords": ["sprache", "englisch", "spanisch", "französisch", "italienisch", "japanisch", "chinesisch", "russisch", "vokabeln", "fließend sprechen"],
+    "horizonDays": 300,
+    "inserts": {
+      "standort": [
+        { "title": "Das Zielniveau festlegen", "why": "„Fließend“ ist kein Niveau. B1 oder B2 sind eins — und man merkt, wann man dort ist.", "how": "Ein kostenloser Einstufungstest zeigt in zwanzig Minuten, wo du stehst.", "min": 45, "blocking": true }
+      ],
+      "uebung": [
+        { "title": "Täglich zwanzig Minuten Vokabeln mit Wiederholungssystem", "why": "Verteiltes Wiederholen schlägt jede Lernmethode, die auf Menge setzt.", "how": null, "min": 140, "blocking": true },
+        { "title": "Wöchentlich mit einem Menschen sprechen", "why": "Sprechen lernt man nur durch Sprechen. Alles andere ist Vorbereitung darauf.", "how": "Sprachtandem, Tandem-App oder bezahlter Gesprächspartner.", "min": 60, "blocking": true }
+      ],
+      "anwendung": [
+        { "title": "Etwas konsumieren, das dich wirklich interessiert", "why": "Ab hier wird Lernen zum Nebenprodukt statt zur Aufgabe.", "how": "Serie, Podcast oder Nachrichten in der Zielsprache.", "min": 180, "blocking": false }
+      ]
+    },
+    "risks": [
+      { "stage": "uebung", "risk": "Die meisten bleiben im Anfängerbereich stecken, weil sie nie sprechen.", "mitigation": "Ab Woche vier wöchentlich sprechen, auch wenn es sich noch zu früh anfühlt." }
+    ],
+    "assumptions": ["Für ein solides B1 rechnet man üblicherweise mit 350 bis 400 Lernstunden."]
+  },
+
+  {
+    "key": "lernen.programmieren",
+    "label": "Programmieren lernen",
+    "archetype": "faehigkeit",
+    "keywords": ["programmieren", "coden", "entwickler", "python", "javascript", "software", "informatik", "app entwickeln"],
+    "horizonDays": 270,
+    "inserts": {
+      "standort": [
+        { "title": "Eine Sprache wählen und dabei bleiben", "why": "Der Wechsel zwischen Sprachen ist der häufigste Grund, warum Anfänger nach drei Monaten wieder am Anfang stehen.", "how": "Python für den Einstieg, JavaScript wenn es ums Web geht.", "min": 45, "blocking": true }
+      ],
+      "uebung": [
+        { "title": "Ein eigenes kleines Projekt bauen, statt weiter Kurse zu schauen", "why": "Kurse erzeugen das Gefühl von Fortschritt, Projekte erzeugen Fortschritt.", "how": "Etwas, das du selbst benutzen würdest. Klein.", "min": 480, "blocking": true },
+        { "title": "Den eigenen Code veröffentlichen", "why": "Was öffentlich steht, schreibt man sorgfältiger.", "how": null, "min": 90, "blocking": false }
+      ],
+      "nachweis": [
+        { "title": "Drei abgeschlossene Projekte vorzeigbar machen", "why": "Bei Bewerbungen zählen gezeigte Projekte mehr als Kurszertifikate.", "how": null, "min": 240, "blocking": true }
+      ]
+    },
+    "risks": [
+      { "stage": "grundlagen", "risk": "Die Phase, in der man Kurse sammelt, ohne selbst zu bauen, kann Monate verschlingen.", "mitigation": "Spätestens nach dem ersten Grundlagenkurs ein eigenes Projekt anfangen." }
+    ],
+    "assumptions": []
+  },
+
+  {
+    "key": "lernen.instrument",
+    "label": "Ein Instrument lernen",
+    "archetype": "faehigkeit",
+    "keywords": ["instrument", "gitarre", "klavier", "piano", "schlagzeug", "geige", "singen", "musik machen"],
+    "horizonDays": 240,
+    "inserts": {
+      "standort": [
+        { "title": "Instrument beschaffen und stimmen lassen", "why": "Ein schlecht klingendes Instrument bremst mehr als fehlende Zeit.", "how": "Mieten ist am Anfang oft die klügere Wahl.", "min": 120, "blocking": true }
+      ],
+      "uebung": [
+        { "title": "Lieber täglich fünfzehn Minuten als einmal die Woche zwei Stunden", "why": "Motorisches Lernen braucht Häufigkeit, nicht Dauer.", "how": null, "min": 105, "blocking": true },
+        { "title": "Ein Stück wählen, das du unbedingt spielen willst", "why": "Ein Stück, auf das man Lust hat, trägt durch die zähen Wochen.", "how": null, "min": 60, "blocking": false }
+      ],
+      "nachweis": [
+        { "title": "Einmal vor anderen Menschen spielen", "why": "Vorspielen ist eine eigene Fähigkeit — und der Moment, in dem es sich lohnt.", "how": null, "min": 120, "blocking": true }
+      ]
+    },
+    "risks": [],
+    "assumptions": []
+  },
+
+  {
+    "key": "lernen.pruefung",
+    "label": "Eine Prüfung bestehen",
+    "archetype": "ereignis",
+    "keywords": ["prüfung", "klausur", "examen", "abschluss", "test bestehen", "zertifizierung", "ihk"],
+    "horizonDays": 120,
+    "titles": { "buchen": "Anmelden und Stoff sichten", "probe": "Probeklausur" },
+    "inserts": {
+      "rahmen": [
+        { "title": "Prüfungsordnung und Stoffumfang beschaffen", "why": "Was geprüft wird, steht schriftlich fest — Vermutungen kosten Wochen.", "how": null, "min": 60, "blocking": true }
+      ],
+      "buchen": [
+        { "title": "Den Stoff in Wochenportionen aufteilen", "why": "Ohne Aufteilung wächst der Stoff in der Vorstellung ins Unendliche.", "how": null, "min": 90, "blocking": true },
+        { "title": "Altklausuren oder Musteraufgaben beschaffen", "why": "Nichts zeigt so genau, was verlangt wird.", "how": null, "min": 60, "blocking": true }
+      ],
+      "probe": [
+        { "title": "Eine vollständige Probeklausur unter echten Bedingungen", "why": "Zeitdruck ist ein eigener Prüfungsteil, den man üben muss.", "how": "Gleiche Uhrzeit, gleiche Dauer, keine Hilfsmittel, die es nicht gibt.", "min": 240, "blocking": true }
+      ]
+    },
+    "risks": [
+      { "stage": "vorbereiten", "risk": "Wiederholtes Lesen fühlt sich nach Lernen an, bringt aber am wenigsten.", "mitigation": "Stattdessen abfragen: zuklappen und aus dem Kopf aufschreiben." }
+    ],
+    "assumptions": []
+  },
+
+  {
+    "key": "lernen.fuehrerschein",
+    "label": "Führerschein",
+    "archetype": "faehigkeit",
+    "keywords": ["führerschein", "fahrschule", "fahrprüfung", "autofahren lernen", "motorrad"],
+    "horizonDays": 150,
+    "inserts": {
+      "standort": [
+        { "title": "Drei Fahrschulen vergleichen und anmelden", "why": "Preise und Wartezeiten unterscheiden sich erheblich.", "how": "Nach dem Preis pro Fahrstunde und der Wartezeit auf Prüfungstermine fragen.", "min": 120, "blocking": true },
+        { "title": "Sehtest, Erste-Hilfe-Kurs und Passbild erledigen", "why": "Ohne diese Unterlagen läuft der Antrag nicht an — und der braucht Wochen.", "how": null, "min": 240, "blocking": true }
+      ],
+      "nachweis": [
+        { "title": "Theorieprüfung ablegen, dann praktische Prüfung", "why": "Die Theorie muss bestanden sein, bevor die praktische Prüfung möglich ist.", "how": null, "min": 180, "blocking": true }
+      ]
+    },
+    "risks": [],
+    "assumptions": ["Die Bearbeitung des Antrags bei der Behörde dauert je nach Ort mehrere Wochen."]
+  },
+
+  {
+    "key": "karriere.bewerbung",
+    "label": "Neue Stelle finden",
+    "archetype": "wechsel",
+    "keywords": ["bewerbung", "neuer job", "neuen job", "job finden", "jobwechsel", "stelle finden", "arbeitsstelle", "arbeitgeber", "bewerben", "lebenslauf", "vorstellungsgespräch", "arbeitsplatz wechseln"],
+    "horizonDays": 150,
+    "titles": { "vollzug": "Zusage und Kündigung" },
+    "inserts": {
+      "optionen": [
+        { "title": "Lebenslauf und Profil überarbeiten", "why": "Beides wird in Sekunden überflogen — die Struktur entscheidet mehr als der Inhalt.", "how": "Ergebnisse statt Aufgaben: nicht „zuständig für“, sondern was dabei herauskam.", "min": 180, "blocking": true }
+      ],
+      "vorbereiten": [
+        { "title": "Wöchentlich eine feste Anzahl Bewerbungen abschicken", "why": "Bewerben ist ein Zahlenspiel mit langen Wartezeiten.", "how": "Lieber fünf sorgfältige pro Woche als dreißig gleichlautende.", "min": 240, "blocking": true },
+        { "title": "Gespräche üben, bevor das erste wichtige kommt", "why": "Das erste Gespräch ist immer das schlechteste — besser, es ist eins, das dir nicht so wichtig ist.", "how": null, "min": 120, "blocking": false }
+      ],
+      "vollzug": [
+        { "title": "Erst kündigen, wenn der neue Vertrag unterschrieben ist", "why": "Mündliche Zusagen platzen häufiger, als man denkt.", "how": null, "min": 60, "blocking": true }
+      ]
+    },
+    "risks": [
+      { "stage": "vorbereiten", "risk": "Bewerbungsverfahren dauern in vielen Branchen zwei bis vier Monate.", "mitigation": "Den Zeitplan darauf auslegen und parallel mehrere Verfahren laufen lassen." }
+    ],
+    "assumptions": []
+  },
+
+  {
+    "key": "karriere.gehalt",
+    "label": "Mehr verdienen",
+    "archetype": "vorhaben",
+    "keywords": ["gehalt", "gehaltserhöhung", "mehr verdienen", "beförderung", "verhandeln"],
+    "horizonDays": 120,
+    "inserts": {
+      "pruefen": [
+        { "title": "Marktübliches Gehalt für die eigene Rolle recherchieren", "why": "Ohne Vergleichszahl verhandelt man gegen das eigene Bauchgefühl.", "how": "Gehaltsvergleiche, Tarifverträge, Menschen in ähnlichen Rollen fragen.", "min": 120, "blocking": true }
+      ],
+      "vorbereiten": [
+        { "title": "Die eigenen Ergebnisse der letzten zwölf Monate aufschreiben", "why": "Verhandelt wird über Beiträge, nicht über Bedürfnisse.", "how": "Wo möglich mit Zahlen.", "min": 90, "blocking": true },
+        { "title": "Das Gespräch mit jemandem üben", "why": "Die entscheidenden zehn Minuten laufen besser, wenn man sie einmal gesprochen hat.", "how": null, "min": 60, "blocking": false }
+      ]
+    },
+    "risks": [],
+    "assumptions": []
+  },
+
+  {
+    "key": "finanzen.sparen",
+    "label": "Auf etwas sparen",
+    "archetype": "finanzen",
+    "keywords": ["sparen", "ansparen", "rücklage", "notgroschen", "geld zurücklegen"],
+    "horizonDays": 365,
+    "inserts": {},
+    "risks": [],
+    "assumptions": []
+  },
+
+  {
+    "key": "finanzen.schulden",
+    "label": "Schulden abbauen",
+    "archetype": "finanzen",
+    "keywords": ["schulden", "kredit abbezahlen", "dispo", "mahnung", "raten", "entschulden", "inkasso"],
+    "horizonDays": 540,
+    "titles": { "abschluss": "Schuldenfrei" },
+    "inserts": {
+      "ueberblick": [
+        { "title": "Alle Forderungen mit Betrag, Zins und Gläubiger auflisten", "why": "Der Überblick ist der schwerste und der wichtigste Schritt.", "how": "Auch die unangenehmen. Vollständigkeit ist entscheidend.", "min": 180, "blocking": true }
+      ],
+      "spielraum": [
+        { "title": "Die teuerste Schuld zuerst tilgen", "why": "Beim Zins liegt das meiste Geld — Dispokredite sind fast immer die teuersten.", "how": null, "min": 90, "blocking": true }
+      ],
+      "abschluss": [
+        { "title": "Kostenlose Schuldnerberatung aufsuchen", "why": "Anerkannte Stellen verhandeln mit Gläubigern und kennen Wege, die Privatpersonen nicht offenstehen.", "how": "Caritas, Diakonie, Verbraucherzentrale — kostenlos und vertraulich.", "min": 180, "blocking": true }
+      ]
+    },
+    "risks": [
+      { "stage": "ueberblick", "risk": "Unbeantwortete Post führt zu Titeln, Zwangsvollstreckung und wachsenden Kosten.", "mitigation": "Jede Forderung öffnen und beantworten, auch wenn nicht gezahlt werden kann." }
+    ],
+    "assumptions": ["Diese App ist keine Schuldnerberatung. Bei Überschuldung ist eine anerkannte Beratungsstelle der richtige erste Schritt — sie ist kostenlos."]
+  },
+
+  {
+    "key": "finanzen.immobilie",
+    "label": "Immobilie kaufen",
+    "archetype": "finanzen",
+    "keywords": ["haus kaufen", "wohnung kaufen", "immobilie", "eigenheim", "eigentumswohnung", "hauskauf", "baufinanzierung"],
+    "horizonDays": 400,
+    "inserts": {
+      "ziel": [
+        { "title": "Kaufnebenkosten mit einrechnen", "why": "Grunderwerbsteuer, Notar und Makler machen in Deutschland grob 10 bis 15 Prozent aus — sie werden meist nicht mitfinanziert.", "how": null, "min": 60, "blocking": true }
+      ],
+      "abschluss": [
+        { "title": "Mindestens drei Finanzierungsangebote vergleichen", "why": "Ein Zehntelprozent Unterschied macht über die Laufzeit einen fünfstelligen Betrag aus.", "how": "Hausbank, Vermittler und eine Direktbank gegeneinander stellen.", "min": 240, "blocking": true },
+        { "title": "Vor dem Kauf unabhängig begutachten lassen", "why": "Ein Gutachten kostet einige hundert Euro und verhindert regelmäßig sechsstellige Fehler.", "how": null, "min": 180, "blocking": true }
+      ]
+    },
+    "risks": [],
+    "assumptions": ["Die genannten Größenordnungen sind grobe Anhaltspunkte und je nach Bundesland verschieden. Diese App ist keine Finanzberatung."]
+  },
+
+  {
+    "key": "leben.umzug",
+    "label": "Umzug",
+    "archetype": "ereignis",
+    "keywords": ["umzug", "umziehen", "wohnung wechseln", "neue wohnung beziehen"],
+    "horizonDays": 90,
+    "titles": { "buchen": "Kündigen und Transport buchen", "durchfuehren": "Umzugstag und Ummeldungen" },
+    "inserts": {
+      "buchen": [
+        { "title": "Alte Wohnung fristgerecht kündigen", "why": "Die Kündigungsfrist bestimmt den ganzen Zeitplan.", "how": "Schriftlich, mit Nachweis des Zugangs.", "min": 60, "blocking": true },
+        { "title": "Umzugswagen oder Firma buchen", "why": "An Monatsenden und im Sommer ist alles Wochen vorher vergeben.", "how": null, "min": 90, "blocking": true }
+      ],
+      "durchfuehren": [
+        { "title": "Ummelden: Einwohnermeldeamt, Post, Verträge", "why": "Die Anmeldung beim Meldeamt ist Pflicht und hat eine kurze Frist.", "how": "In Deutschland üblicherweise innerhalb von zwei Wochen nach Einzug.", "min": 180, "blocking": true },
+        { "title": "Übergabeprotokolle mit Fotos anfertigen", "why": "Das entscheidet später über die Kaution.", "how": null, "min": 90, "blocking": true }
+      ]
+    },
+    "risks": [],
+    "assumptions": []
+  },
+
+  {
+    "key": "leben.wohnung",
+    "label": "Wohnung finden",
+    "archetype": "vorhaben",
+    "keywords": ["wohnung suchen", "wohnungssuche", "mietwohnung", "wg", "wohnung finden"],
+    "horizonDays": 120,
+    "inserts": {
+      "vorbereiten": [
+        { "title": "Bewerbungsmappe vorbereiten", "why": "Wer die Unterlagen erst nach der Besichtigung zusammensucht, ist zu spät.", "how": "Schufa-Auskunft, Gehaltsnachweise, Mietschuldenfreiheit, kurzes Anschreiben.", "min": 180, "blocking": true }
+      ],
+      "umsetzen": [
+        { "title": "Täglich zu einer festen Zeit die Portale durchgehen", "why": "In angespannten Märkten entscheidet die Geschwindigkeit der Antwort.", "how": null, "min": 300, "blocking": true }
+      ]
+    },
+    "risks": [],
+    "assumptions": []
+  },
+
+  {
+    "key": "leben.hochzeit",
+    "label": "Hochzeit",
+    "archetype": "ereignis",
+    "keywords": ["hochzeit", "heiraten", "trauung", "standesamt", "verlobung"],
+    "horizonDays": 330,
+    "inserts": {
+      "buchen": [
+        { "title": "Standesamt- oder Trautermin verbindlich buchen", "why": "Beliebte Termine sind ein Jahr im Voraus vergeben.", "how": null, "min": 120, "blocking": true },
+        { "title": "Location und die wichtigsten Dienstleister buchen", "why": "Ort, Fotografie und Essen sind die Posten mit der längsten Vorlaufzeit.", "how": null, "min": 300, "blocking": true }
+      ],
+      "vorbereiten": [
+        { "title": "Unterlagen beim Standesamt einreichen", "why": "Die Anmeldung zur Eheschließung hat eigene Fristen und braucht beglaubigte Dokumente.", "how": null, "min": 180, "blocking": true }
+      ]
+    },
+    "risks": [],
+    "assumptions": []
+  },
+
+  {
+    "key": "leben.reise",
+    "label": "Größere Reise",
+    "archetype": "ereignis",
+    "keywords": ["reise", "urlaub", "weltreise", "backpacking", "sabbatical", "roadtrip", "auszeit"],
+    "horizonDays": 180,
+    "inserts": {
+      "rahmen": [
+        { "title": "Route, Zeitraum und Budget grob festlegen", "why": "Diese drei bedingen einander — eines davon muss nachgeben.", "how": null, "min": 120, "blocking": true }
+      ],
+      "buchen": [
+        { "title": "Visa, Impfungen und Pass prüfen", "why": "Visa und Impfungen haben Vorlaufzeiten von Wochen bis Monaten.", "how": "Reisehinweise des Auswärtigen Amts prüfen.", "min": 120, "blocking": true },
+        { "title": "Die teuersten Verbindungen zuerst buchen", "why": "Flüge werden näher am Termin meist teurer, nicht billiger.", "how": null, "min": 180, "blocking": true }
+      ]
+    },
+    "risks": [],
+    "assumptions": []
+  },
+
+  {
+    "key": "leben.aufraeumen",
+    "label": "Ordnung schaffen",
+    "archetype": "vorhaben",
+    "keywords": ["aufräumen", "ausmisten", "entrümpeln", "ordnung", "keller", "dachboden", "minimalismus"],
+    "horizonDays": 60,
+    "inserts": {
+      "umsetzen": [
+        { "title": "Raum für Raum vorgehen, nie mehrere gleichzeitig", "why": "Wer überall anfängt, hat überall Baustellen und nirgends ein Ergebnis.", "how": null, "min": 480, "blocking": true },
+        { "title": "Für Aussortiertes gleich einen Abholtermin vereinbaren", "why": "Kisten im Flur wandern erfahrungsgemäß zurück.", "how": null, "min": 60, "blocking": true }
+      ]
+    },
+    "risks": [],
+    "assumptions": []
+  },
+
+  {
+    "key": "leben.garten",
+    "label": "Garten anlegen",
+    "archetype": "vorhaben",
+    "keywords": ["garten", "beet", "gemüse anbauen", "hochbeet", "balkon bepflanzen", "gärtnern"],
+    "horizonDays": 210,
+    "inserts": {
+      "vorbereiten": [
+        { "title": "Den Pflanzkalender auf die Fläche anwenden", "why": "Im Garten bestimmt die Jahreszeit den Zeitplan, nicht der eigene Kalender.", "how": null, "min": 90, "blocking": true }
+      ]
+    },
+    "risks": [],
+    "assumptions": ["Der Zeitplan hängt an der Jahreszeit — bei Aussaatterminen geht die Natur vor."]
+  },
+
+  {
+    "key": "kreativ.buch",
+    "label": "Ein Buch schreiben",
+    "archetype": "vorhaben",
+    "keywords": ["buch schreiben", "roman", "manuskript", "autor", "veröffentlichen", "sachbuch"],
+    "horizonDays": 365,
+    "titles": { "umsetzen": "Die Rohfassung schreiben", "abschliessen": "Überarbeiten und veröffentlichen" },
+    "inserts": {
+      "klaeren": [
+        { "title": "In drei Sätzen sagen, wovon das Buch handelt", "why": "Wer das nicht kann, schreibt sich in der Mitte fest.", "how": null, "min": 90, "blocking": true }
+      ],
+      "umsetzen": [
+        { "title": "Ein tägliches Wortziel setzen und protokollieren", "why": "Rohfassungen entstehen durch Menge, nicht durch Inspiration.", "how": "Fünfhundert Wörter am Tag ergeben in sechs Monaten ein Buch.", "min": 420, "blocking": true },
+        { "title": "Beim Schreiben nicht überarbeiten", "why": "Gleichzeitiges Schreiben und Korrigieren bringt beides zum Stehen.", "how": null, "min": 60, "blocking": false }
+      ],
+      "abschliessen": [
+        { "title": "Die Rohfassung vier Wochen liegen lassen", "why": "Abstand zeigt Schwächen, die frisch unsichtbar sind.", "how": null, "min": 30, "blocking": true },
+        { "title": "Drei Testleser suchen und ihre Rückmeldung einarbeiten", "why": "Was drei Menschen unabhängig anmerken, ist ein echtes Problem.", "how": null, "min": 240, "blocking": true }
+      ]
+    },
+    "risks": [
+      { "stage": "umsetzen", "risk": "Die meisten Manuskripte bleiben im mittleren Drittel liegen.", "mitigation": "Vorher aufschreiben, was im Mittelteil passiert — dann gibt es dort nichts mehr zu entscheiden." }
+    ],
+    "assumptions": []
+  },
+
+  {
+    "key": "kreativ.kanal",
+    "label": "Podcast oder Kanal aufbauen",
+    "archetype": "vorhaben",
+    "keywords": ["podcast", "youtube", "kanal", "videos", "streaming", "newsletter", "blog"],
+    "horizonDays": 240,
+    "inserts": {
+      "klaeren": [
+        { "title": "Thema und Zielgruppe in einem Satz festlegen", "why": "Kanäle ohne klares Thema wachsen nicht, egal wie gut die Einzelfolgen sind.", "how": null, "min": 60, "blocking": true }
+      ],
+      "umsetzen": [
+        { "title": "Zehn Folgen vorproduzieren, bevor die erste erscheint", "why": "Der Vorrat trägt über die Wochen, in denen noch niemand zuhört.", "how": null, "min": 480, "blocking": true },
+        { "title": "Einen festen Veröffentlichungsrhythmus einhalten", "why": "Regelmäßigkeit schlägt Perfektion — bei Publikum und bei den Algorithmen.", "how": null, "min": 240, "blocking": true }
+      ]
+    },
+    "risks": [
+      { "stage": "umsetzen", "risk": "Die meisten Kanäle enden zwischen Folge drei und sieben.", "mitigation": "Der Vorrat aus der Vorproduktion überbrückt genau diese Phase." }
+    ],
+    "assumptions": []
+  },
+
+  {
+    "key": "digital.website",
+    "label": "Website oder Shop aufbauen",
+    "archetype": "vorhaben",
+    "keywords": ["website", "webseite", "homepage", "internetseite", "landingpage"],
+    "horizonDays": 120,
+    "inserts": {
+      "vorbereiten": [
+        { "title": "Domain sichern und rechtliche Pflichtangaben vorbereiten", "why": "Impressum und Datenschutzerklärung sind in Deutschland Pflicht und werden abgemahnt.", "how": null, "min": 180, "blocking": true }
+      ],
+      "umsetzen": [
+        { "title": "Mit der kleinsten sinnvollen Fassung online gehen", "why": "Eine kleine veröffentlichte Seite ist mehr wert als eine große, die nie fertig wird.", "how": null, "min": 480, "blocking": true }
+      ]
+    },
+    "risks": [],
+    "assumptions": []
+  },
+
+  {
+    "key": "sozial.kontakte",
+    "label": "Kontakte pflegen oder finden",
+    "archetype": "gewohnheit",
+    "keywords": ["freunde finden", "kontakte", "einsam", "leute kennenlernen", "netzwerk", "beziehung", "partner finden", "verein"],
+    "horizonDays": 150,
+    "inserts": {
+      "klein": [
+        { "title": "Eine wiederkehrende Gelegenheit wählen statt einmaliger Veranstaltungen", "why": "Nähe entsteht durch Wiedersehen, nicht durch gute erste Gespräche.", "how": "Verein, Kurs, Chor, Ehrenamt — etwas, das jede Woche stattfindet.", "min": 120, "blocking": true }
+      ],
+      "ausweiten": [
+        { "title": "Selbst einladen, statt auf Einladungen zu warten", "why": "Der Schritt vom Kennen zum Kennenlernen macht fast immer eine Seite zuerst.", "how": null, "min": 90, "blocking": true }
+      ]
+    },
+    "risks": [],
+    "assumptions": []
+  }
+];
+
+const STORAGE_KEY = "atlas.app.v3";
 const MAX_TASK_MINUTES = 480;
 const MS_DAY = 86400000;
 
@@ -843,27 +1846,239 @@ function taskKey(ref, title) { return `${ref}::${title}`; }
 function isoDate(d) { return d.toISOString().slice(0, 10); }
 function addDays(d, n) { const x = new Date(d); x.setUTCDate(x.getUTCDate() + n); return x; }
 
-/* --- Playbook-Auswahl (playbooks/index.ts) ------------------------------- */
+/* --- Regelbasierter Planer (demo/planner/planner.js) -------------------- */
 
-function tokenize(s) {
-  return new Set(String(s).toLowerCase().replace(/[^a-zäöüß0-9]+/g, " ").split(" ").filter((t) => t.length > 3));
+/* ============================================================================
+   Regelbasierter Planer — erzeugt ohne Sprachmodell für jedes Ziel einen Plan.
+
+   Drei Schichten, von konkret nach allgemein:
+
+     1. Playbook   — redaktionell geprüft, aus engine/src/playbooks/data/.
+                     Deckt heute drei Gründungsvorhaben ab.
+     2. Fachmodul  — rund dreißig Lebensbereiche mit konkreten Schritten,
+                     die sich in ein Grundmuster einklinken (domains.json).
+     3. Grundmuster— sieben Zielformen, die jedes denkbare Ziel abdecken
+                     (archetypes.json). Greift immer, auch wenn nichts passt.
+
+   Was diese Datei ausdrücklich nicht ist: eine Wissensdatenbank. Sie kennt
+   den typischen Weg für Ziele einer Art, nicht die Besonderheiten einer
+   einzelnen Person. Genau das steht auch in den Annahmen jedes Plans.
+
+   Diese Datei wird von demo/build.mjs in die Vorschau eingesetzt und von
+   demo/test/planner.test.mjs unverändert geprüft — eine Quelle, zwei Nutzer.
+   Erwartete Globale: ARCHETYPES, DOMAINS, PLAYBOOKS.
+   ========================================================================== */
+
+const PLANNER_MAX_TASK_MIN = 480;
+const PLANNER_MIN_TASK_MIN = 15;
+const HORIZON_MIN_DAYS = 21;
+const HORIZON_MAX_DAYS = 1460;
+
+/* --- Sicherheitsfilter ---------------------------------------------------
+   Für diese Lagen ist eine Aufgabenliste die falsche Antwort. Portiert aus
+   engine/src/pipeline.ts (SAFETY_RESPONSES). */
+
+const SAFETY_RULES = [
+  {
+    kind: "krise",
+    patterns: ["suizid", "selbstmord", "umbringen", "nicht mehr leben", "sterben will", "nicht mehr weiterleben", "selbstverletzung", "ritzen", "das leben nehmen"],
+    message:
+      "Dafür ist Atlas das falsche Werkzeug — und du sollst damit nicht allein bleiben. " +
+      "Die Telefonseelsorge ist rund um die Uhr kostenlos und anonym erreichbar: 0800 111 0 111 " +
+      "oder 0800 111 0 222. Im Notfall 112. Wenn du magst, plane hier etwas anderes — aber bitte " +
+      "sprich zuerst mit einem Menschen.",
+  },
+  {
+    kind: "essstoerung",
+    patterns: ["magersucht", "bulimie", "essstörung", "hungern", "erbrechen nach dem essen", "nichts mehr essen", "kalorien unter 1000"],
+    message:
+      "Zu diesem Ziel erstellt Atlas keinen Plan. Ein Stufenplan kann hier schaden statt zu helfen. " +
+      "Die Beratungsstelle der Bundeszentrale für gesundheitliche Aufklärung berät kostenlos und " +
+      "anonym: 0221 892031. Wenn du an deinem Essen etwas ändern willst, geht das — aber gemeinsam " +
+      "mit einer Ärztin oder einem Therapeuten.",
+  },
+  {
+    kind: "unzulaessig",
+    patterns: ["waffe bauen", "bombe", "sprengstoff", "drogen verkaufen", "einbrechen", "hacken von", "erpressen", "jemanden umbringen"],
+    message:
+      "Dabei helfe ich nicht. Wenn dahinter ein anderes Ziel steckt — Sicherheit, Geld, ein Konflikt —, " +
+      "formuliere es direkt, dann planen wir das.",
+  },
+];
+
+function safetyCheck(text) {
+  const t = String(text).toLowerCase();
+  for (const rule of SAFETY_RULES) {
+    if (rule.patterns.some((p) => t.includes(p))) return { kind: rule.kind, message: rule.message };
+  }
+  return null;
 }
 
-function overlap(a, b) {
-  let hits = 0;
-  for (const t of a) if (b.has(t)) hits++;
-  return b.size === 0 ? 0 : hits / b.size;
+/* --- Textauswertung ------------------------------------------------------ */
+
+const NUMBER_WORDS = {
+  "ein": 1, "einem": 1, "einer": 1, "eine": 1, "zwei": 2, "drei": 3, "vier": 4, "fünf": 5,
+  "sechs": 6, "sieben": 7, "acht": 8, "neun": 9, "zehn": 10, "elf": 11, "zwölf": 12,
+  "achtzehn": 18, "zwanzig": 20, "vierundzwanzig": 24,
+};
+
+const UNIT_DAYS = { tag: 1, woche: 7, monat: 30, jahr: 365 };
+
+/** Liest eine Zeitangabe aus dem Zieltext: „in 18 Monaten“, „in einem halben Jahr“. */
+function detectHorizonDays(text) {
+  const t = String(text).toLowerCase();
+
+  if (/in\s+(?:einem\s+)?halben\s+jahr/.test(t)) return 182;
+  if (/in\s+(?:einem\s+)?dreivierteljahr/.test(t)) return 273;
+
+  const m = t.match(/\b(?:in|binnen|innerhalb\s+von)\s+([\wäöüß]+)\s*(tag|woche|monat|jahr)/);
+  if (m) {
+    const n = /^\d+$/.test(m[1]) ? Number(m[1]) : NUMBER_WORDS[m[1]];
+    if (n && n > 0) return Math.round(n * UNIT_DAYS[m[2]]);
+  }
+
+  if (/\bnächstes\s+jahr\b|\bim\s+nächsten\s+jahr\b/.test(t)) return 365;
+  if (/\bbis\s+ende\s+des\s+jahres\b|\bbis\s+jahresende\b/.test(t)) {
+    const now = new Date();
+    const end = new Date(Date.UTC(now.getUTCFullYear(), 11, 31));
+    return Math.max(HORIZON_MIN_DAYS, Math.round((end - now) / 86400000));
+  }
+  return null;
 }
 
-function findPlaybook(query) {
-  const terms = tokenize(query);
-  const best = PLAYBOOKS
-    .map((p) => ({ p, score: overlap(terms, tokenize(`${p.title} ${p.intentKey} ${p.nodes.map((n) => n.title).join(" ")}`)) }))
-    .sort((a, b) => b.score - a.score)[0];
-  return best && best.score > 0 ? best.p : null;
+const LEAD_INS = [
+  /^ich\s+(?:möchte|will|würde\s+gerne|hätte\s+gerne?|muss|plane|träume\s+davon,?)\s+/i,
+  /^mein\s+ziel\s+ist(?:\s+es)?,?\s+/i,
+  /^ich\s+habe\s+vor,?\s+/i,
+  /^wie\s+(?:kann|schaffe)\s+ich\s+(?:es,?\s+)?/i,
+];
+
+/** Macht aus „Ich möchte in 18 Monaten ein Café eröffnen“ → „ein Café eröffnen“. */
+function extractGoalPhrase(text) {
+  let s = String(text).trim().replace(/[.!?]+$/, "");
+  for (const re of LEAD_INS) s = s.replace(re, "");
+  s = s.replace(/\b(?:in|binnen|innerhalb\s+von)\s+[\wäöüß]+\s*(?:tagen?|wochen?|monaten?|jahren?)\b\s*/i, "");
+  s = s.replace(/\bbis\s+ende\s+des\s+jahres\b\s*/i, "").replace(/\bnächstes\s+jahr\b\s*/i, "");
+  s = s.replace(/\s{2,}/g, " ").trim();
+  return s.length >= 3 ? s : String(text).trim();
 }
 
-/* --- Playbook-Direktplan (fallback.ts) ----------------------------------- */
+/* --- Zuordnung ----------------------------------------------------------- */
+
+/** Stichwörter der redaktionellen Playbooks. Bewusst hier und nicht in den
+    Playbook-Daten: die Daten beschreiben den Weg, nicht die Worterkennung. */
+const PLAYBOOK_KEYWORDS = {
+  "founding.gastronomy.cafe": ["café", "cafe", "kaffeehaus", "bistro", "restaurant", "gastronomie", "bäckerei", "imbiss", "bar eröffnen"],
+  "founding.services.freelance": ["freelancer", "freiberuflich", "freiberufler", "selbstständig", "selbständig", "selbstständigkeit", "nebenberuflich", "agentur gründen"],
+  "founding.retail.online": ["onlineshop", "online-shop", "e-commerce", "onlinehandel", "etsy", "dropshipping", "online verkaufen"],
+};
+
+function normalize(s) {
+  return String(s).toLowerCase().replace(/\s+/g, " ");
+}
+
+/** Ein Treffer zählt so viel, wie das Stichwort lang ist — längere Wörter sind
+    aussagekräftiger als kurze. Playbooks bekommen einen Bonus, weil sie
+    redaktionell geprüft sind und nicht nur einem Muster folgen. */
+function scoreKeywords(haystack, keywords) {
+  let score = 0;
+  const hits = [];
+  for (const k of keywords) {
+    if (haystack.includes(normalize(k))) { score += k.length; hits.push(k); }
+  }
+  return { score, hits };
+}
+
+function classifyGoal(text, playbooks) {
+  const hay = normalize(text);
+  const candidates = [];
+
+  for (const p of playbooks || []) {
+    const kw = PLAYBOOK_KEYWORDS[p.intentKey];
+    if (!kw) continue;
+    const { score, hits } = scoreKeywords(hay, kw);
+    if (score > 0) candidates.push({ kind: "playbook", playbook: p, score: score * 2, hits });
+  }
+
+  for (const d of DOMAINS) {
+    const { score, hits } = scoreKeywords(hay, d.keywords);
+    if (score > 0) candidates.push({ kind: "domain", domain: d, score, hits });
+  }
+
+  candidates.sort((a, b) => b.score - a.score);
+  if (candidates.length) {
+    const best = candidates[0];
+    if (best.kind === "domain") {
+      best.archetype = ARCHETYPES.find((a) => a.key === best.domain.archetype) || ARCHETYPES[1];
+    }
+    return best;
+  }
+
+  // Kein Fachmodul passt — dann bestimmt die Form des Ziels das Muster.
+  let bestArch = null;
+  for (const a of ARCHETYPES) {
+    const { score, hits } = scoreKeywords(hay, a.detect || []);
+    if (score > 0 && (!bestArch || score > bestArch.score)) bestArch = { archetype: a, score, hits };
+  }
+  const fallback = ARCHETYPES.find((a) => a.key === "vorhaben") || ARCHETYPES[0];
+  return {
+    kind: "archetype",
+    archetype: bestArch ? bestArch.archetype : fallback,
+    score: bestArch ? bestArch.score : 0,
+    hits: bestArch ? bestArch.hits : [],
+    generic: !bestArch,
+  };
+}
+
+/* --- Zusammenbau --------------------------------------------------------- */
+
+function clamp(n, lo, hi) { return Math.min(hi, Math.max(lo, n)); }
+
+function fill(str, phrase) {
+  return String(str).replace(/\{ziel\}/g, phrase);
+}
+
+/** Verteilt den Zeitraum so auf die Etappen, dass die Summe exakt aufgeht —
+    sonst reißt der kritische Pfad den Zieltermin um bloße Rundungstage.
+    Überschuss wird bei den längsten Etappen abgezogen, nie unter die
+    Mindestdauer; ein Rest wird auf die längste Etappe gelegt. */
+function stageDurations(stages, horizonDays) {
+  const n = stages.length;
+  const minDays = Math.max(1, Math.min(5, Math.floor(horizonDays / n)));
+  const raw = stages.map((s) => Math.max(minDays, Math.round(horizonDays * s.share)));
+  let sum = raw.reduce((a, b) => a + b, 0);
+
+  while (sum > horizonDays) {
+    let idx = -1;
+    for (let i = 0; i < n; i++) if (raw[i] > minDays && (idx === -1 || raw[i] > raw[idx])) idx = i;
+    if (idx === -1) break;                      // alle Etappen sind am Minimum
+    raw[idx] -= 1; sum -= 1;
+  }
+  while (sum < horizonDays) {
+    let idx = 0;
+    for (let i = 1; i < n; i++) if (raw[i] > raw[idx]) idx = i;
+    raw[idx] += 1; sum += 1;
+  }
+  return raw;
+}
+
+/** Skaliert die Aufwände so, dass die Wochenlast in die Kapazität passt.
+    Regel 5 des Validators prüft genau das — ein Plan, der sie reißt, ist
+    kein Plan, sondern eine Wunschliste. */
+function fitToCapacity(tasks, durationDays, weeklyCapacityMin) {
+  const weeks = Math.max(durationDays / 7, 1 / 7);
+  const budget = weeklyCapacityMin * weeks * 0.85;
+  const sum = tasks.reduce((s, t) => s + t.estimatedMin, 0);
+  if (sum <= budget) return tasks;
+
+  const factor = budget / sum;
+  return tasks.map((t) => ({
+    ...t,
+    estimatedMin: clamp(Math.round(t.estimatedMin * factor), PLANNER_MIN_TASK_MIN, PLANNER_MAX_TASK_MIN),
+  }));
+}
+
+/* --- Ebene 1: Direktplan aus einem Playbook (engine/src/fallback.ts) ----- */
 
 function orderNodes(template) {
   const ids = new Set(template.nodes.map((n) => n.id));
@@ -888,26 +2103,21 @@ function shorten(s, max = 90) {
   return s.length <= max ? s : s.slice(0, max - 1).trimEnd() + "…";
 }
 
-function buildTasks(node, input) {
-  const weeks = Math.max(node.typicalDurationDays / 7, 1);
-  const budget = Math.floor(input.weeklyCapacityMin * weeks * 0.7);
-
+function playbookTasks(node, input) {
   const drafts = [
     { title: `${node.title}: Überblick verschaffen und Vorgehen festlegen`,
-      why: "Ein klarer Startpunkt verhindert, dass dieser Meilenstein liegen bleibt.", blocking: true },
+      why: "Ein klarer Startpunkt verhindert, dass dieser Meilenstein liegen bleibt.", blocking: true, min: 60 },
     ...node.successCorrelates.slice(0, 2).map((c) => ({
-      title: c, why: "Das unterscheidet laut Playbook diejenigen, die abschließen, von denen, die aufgeben.", blocking: false })),
+      title: c, why: "Das unterscheidet laut Playbook diejenigen, die abschließen, von denen, die aufgeben.", blocking: false, min: 180 })),
     { title: `Prüfen: ${shorten(node.definitionOfDone)}`,
-      why: "Der Meilenstein gilt erst als erledigt, wenn dieses Ergebnis vorliegt.", blocking: true },
+      why: "Der Meilenstein gilt erst als erledigt, wenn dieses Ergebnis vorliegt.", blocking: true, min: 90 },
   ];
 
-  const perTask = Math.min(MAX_TASK_MINUTES, Math.max(30, Math.floor(budget / drafts.length)));
-
-  return drafts.map((d, i) => ({
-    title: d.title, why: d.why, how: null, blocking: d.blocking,
-    estimatedMin: i === 0 ? Math.min(perTask, 60) : perTask,
-    origin: "playbook",
-  }));
+  return fitToCapacity(
+    drafts.map((d) => ({ title: d.title, why: d.why, how: null, blocking: d.blocking, estimatedMin: d.min, origin: "playbook" })),
+    node.typicalDurationDays,
+    input.weeklyCapacityMin,
+  );
 }
 
 function planFromPlaybook(template, input) {
@@ -915,16 +2125,16 @@ function planFromPlaybook(template, input) {
   const milestones = nodes.map((node) => ({
     ref: node.id, title: node.title, definitionOfDone: node.definitionOfDone,
     durationDays: node.typicalDurationDays, dependsOn: node.requiredBefore,
-    origin: "playbook", playbookNodeId: node.id, tasks: buildTasks(node, input),
+    origin: "playbook", playbookNodeId: node.id, tasks: playbookTasks(node, input),
   }));
 
   const totalDays = milestones.reduce((s, m) => s + m.durationDays, 0);
 
   return {
-    summary: `${template.title} — strukturierter Plan aus dem Playbook „${template.intentKey}“. ` +
+    summary: `${template.title} — geprüfter Weg aus dem Playbook „${template.intentKey}“. ` +
              `${milestones.length} Etappen über rund ${totalDays} Tage.`,
     assumptions: [
-      "Dieser Plan stammt direkt aus dem Playbook und ist nicht auf deine Situation zugeschnitten.",
+      "Dieser Plan stammt aus einem redaktionell erstellten Playbook und ist nicht auf deine Situation zugeschnitten.",
       `Die Zeitangaben sind Mediandauern aus dem Playbook (Stichprobe: ${template.sampleSize}).`,
       ...(input.experience === "none" ? ["Angenommen, du hast in diesem Bereich keine Vorerfahrung."] : []),
     ],
@@ -934,7 +2144,131 @@ function planFromPlaybook(template, input) {
       mitigation: n.successCorrelates[0] || "Schneide diesen Meilenstein kleiner.",
     })),
     milestones,
+    meta: { archetypeKey: null, domainKey: null, playbookKey: template.intentKey, horizonDays: totalDays, horizonSource: "playbook", matchedOn: [] },
   };
+}
+
+/* --- Ebene 2 und 3: Fachmodul auf Grundmuster ---------------------------- */
+
+function composePlan(input, match) {
+  const phrase = extractGoalPhrase(input.rawInput);
+  const archetype = match.archetype;
+  const domain = match.kind === "domain" ? match.domain : null;
+
+  // Zeitraum: Frist schlägt Zielsatz schlägt Erfahrungswert.
+  const fromText = detectHorizonDays(input.rawInput);
+  let horizonSource;
+  let horizon;
+
+  if (input.targetDate) {
+    const days = Math.floor((new Date(input.targetDate) - new Date()) / 86400000);
+    horizon = days - 2;                       // zwei Tage Luft vor dem Zieltermin
+    horizonSource = "frist";
+  } else if (fromText) {
+    horizon = fromText;
+    horizonSource = "zielsatz";
+  } else {
+    horizon = (domain && domain.horizonDays) || archetype.horizonDays;
+    horizonSource = "erfahrungswert";
+  }
+  horizon = clamp(horizon, HORIZON_MIN_DAYS, HORIZON_MAX_DAYS);
+
+  const durations = stageDurations(archetype.stages, horizon);
+  const titles = (domain && domain.titles) || {};
+  const inserts = (domain && domain.inserts) || {};
+
+  const milestones = archetype.stages.map((stage, i) => {
+    const own = stage.tasks.map((t) => ({
+      title: fill(t.title, phrase),
+      why: fill(t.why, phrase),
+      how: t.how ? fill(t.how, phrase) : null,
+      estimatedMin: t.min,
+      blocking: !!t.blocking,
+      origin: "muster",
+    }));
+
+    const extra = (inserts[stage.ref] || []).map((t) => ({
+      title: fill(t.title, phrase),
+      why: fill(t.why, phrase),
+      how: t.how ? fill(t.how, phrase) : null,
+      estimatedMin: t.min,
+      blocking: !!t.blocking,
+      origin: "fachmodul",
+    }));
+
+    // Fachwissen zuerst: es ist konkreter als das Grundmuster.
+    const tasks = fitToCapacity([...extra, ...own], durations[i], input.weeklyCapacityMin);
+
+    return {
+      ref: stage.ref,
+      title: titles[stage.ref] || stage.title,
+      definitionOfDone: fill(stage.definitionOfDone, phrase),
+      durationDays: durations[i],
+      dependsOn: i === 0 ? [] : [archetype.stages[i - 1].ref],
+      origin: extra.length ? "fachmodul" : "muster",
+      tasks,
+    };
+  });
+
+  const risks = ((domain && domain.risks) || [])
+    .filter((r) => milestones.some((m) => m.ref === r.stage))
+    .map((r) => ({ milestoneRef: r.stage, risk: r.risk, mitigation: r.mitigation }));
+
+  const horizonNote = {
+    frist: "Der Zeitraum kommt aus deiner Frist.",
+    zielsatz: "Der Zeitraum ist aus deinem Zielsatz gelesen.",
+    erfahrungswert: `Der Zeitraum von rund ${horizon} Tagen ist ein Erfahrungswert für Ziele dieser Art — keine Aussage über deinen Fall.`,
+  }[horizonSource];
+
+  const assumptions = [
+    "Dieser Plan ist regelbasiert erstellt, nicht von einem Sprachmodell. Er nennt die Schritte, die für Ziele dieser Art typisch sind — nicht die Besonderheiten deiner Lage.",
+    horizonNote,
+    ...(domain
+      ? [`Fachmodul „${domain.label}“ ergänzt das Grundmuster „${archetype.label}“ um konkrete Schritte.`]
+      : [`Für dieses Ziel gibt es kein Fachmodul. Der Plan folgt dem allgemeinen Muster „${archetype.label}“ — die Etappen stimmen, die Einzelheiten musst du selbst füllen.`]),
+    ...((domain && domain.assumptions) || []),
+    ...(input.experience === "none" ? ["Angenommen, du hast in diesem Bereich keine Vorerfahrung."] : []),
+    ...(input.budgetEur ? ["Das genannte Budget ist im Plan nicht auf einzelne Posten verteilt."] : []),
+  ];
+
+  const label = domain ? domain.label : archetype.label;
+  const summary =
+    `${phrase.charAt(0).toUpperCase()}${phrase.slice(1)} — ` +
+    `${milestones.length} Etappen über rund ${horizon} Tage, ` +
+    (domain ? `nach dem Fachmodul „${label}“.` : `nach dem Grundmuster „${label}“.`);
+
+  return {
+    summary,
+    assumptions,
+    risks,
+    milestones,
+    meta: {
+      archetypeKey: archetype.key,
+      domainKey: domain ? domain.key : null,
+      horizonDays: horizon,
+      horizonSource,
+      matchedOn: match.hits || [],
+    },
+  };
+}
+
+/* --- Ein Einstiegspunkt für alle drei Ebenen ----------------------------- */
+
+/**
+ * Erzeugt für jedes Ziel einen Plan. Fällt niemals aus: gibt es kein Playbook
+ * und kein Fachmodul, greift das Grundmuster, das zur Form des Ziels passt.
+ * Nur bei den Lagen aus SAFETY_RULES gibt es bewusst keinen Plan.
+ */
+function buildPlan(input, playbooks) {
+  const blocked = safetyCheck(input.rawInput);
+  if (blocked) return { blocked };
+
+  const match = classifyGoal(input.rawInput, playbooks);
+  const plan = match.kind === "playbook"
+    ? planFromPlaybook(match.playbook, input)
+    : composePlan(input, match);
+
+  return { plan, match };
 }
 
 /* --- Terminierung (scheduler.ts) ----------------------------------------- */
@@ -1307,12 +2641,13 @@ function show(name) {
   window.scrollTo(0, 0);
 }
 
-function notice(msg, kind = "error") {
+function notice(msg, kind = "error", persist = false) {
   const el = $("notice");
   el.textContent = msg;
   el.className = `banner ${kind}`;
   clearTimeout(notice.timer);
-  notice.timer = setTimeout(() => el.classList.add("hidden"), 10000);
+  // Hinweise auf Hilfsangebote dürfen nicht wegblenden, während man sie liest.
+  if (!persist) notice.timer = setTimeout(() => el.classList.add("hidden"), 10000);
 }
 
 function refreshModeBanner() {
@@ -1320,18 +2655,16 @@ function refreshModeBanner() {
   $("mode-banner").className = withKey ? "banner ok" : "banner";
   $("mode-text").innerHTML = withKey
     ? `<strong>Mit Claude verbunden</strong>
-       Pläne werden für beliebige Ziele erzeugt (${esc(state.settings.model || "claude-opus-5")}).
+       Pläne werden auf deine Lage zugeschnitten erzeugt (${esc(state.settings.model || "claude-opus-5")}).
        Jeder Plan kostet etwa 0,15–0,20 € über deinen Anthropic-Account.`
     : `<strong>Ohne API-Key</strong>
-       Die Pläne kommen aus drei hinterlegten Playbooks und sind nicht auf deine
-       Situation zugeschnitten. Mit einem eigenen Anthropic-API-Key plant Claude
-       für beliebige Ziele.
+       Atlas plant jedes Ziel — nach Regeln, aus ${PLAYBOOKS.length} geprüften Playbooks,
+       ${DOMAINS.length} Fachmodulen und ${ARCHETYPES.length} Grundmustern. Was der Plan
+       nicht kann: auf deine Besonderheiten eingehen. Dafür braucht es Claude.
        <button class="link" id="btn-banner-key" style="display:block; margin-top:10px">Schlüssel hinterlegen</button>`;
   const jump = $("btn-banner-key");
   if (jump) jump.onclick = () => { if (state.user) openSettings(); };
-  $("goal-hint").textContent = withKey
-    ? "Ein Satz reicht. Je konkreter, desto besser der Plan."
-    : "Ohne API-Key gibt es Pläne zu drei Vorhaben: Café, Freelance, Onlineshop.";
+  $("goal-hint").textContent = "Ein Satz reicht. Je konkreter, desto besser der Plan.";
 }
 
 function loadGoals() {
@@ -1459,13 +2792,15 @@ async function generate() {
     includeWeekends: $("f-weekend").checked,
   };
 
-  const useClaude = !!state.settings.apiKey;
-  const template = useClaude ? null : findPlaybook(rawInput);
-
-  if (!useClaude && !template) {
-    notice("Ohne API-Key kennt Atlas nur Café, Freelance und Onlineshop. Hinterlege unter „Einstellungen“ einen Schlüssel für beliebige Ziele.");
+  // Krisen, Essstörungen und unzulässige Ziele: hier ist eine Aufgabenliste
+  // die falsche Antwort — auch dann, wenn ein Schlüssel hinterlegt ist.
+  const blocked = safetyCheck(rawInput);
+  if (blocked) {
+    notice(blocked.message, "attention", true);
     return;
   }
+
+  const useClaude = !!state.settings.apiKey;
 
   show("generating");
   let i = 0;
@@ -1476,15 +2811,18 @@ async function generate() {
   }, 900);
 
   try {
-    let plan, source;
+    let plan, source, herkunft;
 
     if (useClaude) {
       plan = await planWithClaude(input, state.settings, (msg) => { $("gen-step").textContent = msg; });
       source = "claude";
+      herkunft = "von Claude erzeugt";
     } else {
-      await new Promise((r) => setTimeout(r, 2400));
-      plan = planFromPlaybook(template, input);
-      source = "playbook";
+      await new Promise((r) => setTimeout(r, 1800));
+      const built = buildPlan(input, PLAYBOOKS);
+      plan = built.plan;
+      source = built.match.kind;                       // playbook | domain | archetype
+      herkunft = describeMatch(built.match);
     }
 
     const start = new Date();
@@ -1494,8 +2832,8 @@ async function generate() {
     const goal = {
       id: uid(), userId: state.user.id,
       createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
-      input, source,
-      intentKey: template ? template.intentKey : "claude",
+      input, source, herkunft,
+      intentKey: (plan.meta && (plan.meta.playbookKey || plan.meta.domainKey || plan.meta.archetypeKey)) || "claude",
       plan: scheduled, validation, taskStatus: {},
     };
 
@@ -1510,13 +2848,20 @@ async function generate() {
   }
 }
 
+/** Sagt in einem Halbsatz, woher der Plan kommt — das gehört unter jeden Plan. */
+function describeMatch(match) {
+  if (match.kind === "playbook") return `aus dem geprüften Playbook ${match.playbook.intentKey}`;
+  if (match.kind === "domain") return `aus dem Fachmodul „${match.domain.label}“`;
+  return `nach dem Grundmuster „${match.archetype.label}“`;
+}
+
 function openGoal(goal) {
   state.current = goal;
   $("plan-title").textContent = goal.input.rawInput;
   $("plan-summary").textContent = goal.plan.summary;
   $("plan-meta").textContent =
     `${goal.plan.startDate} bis ${goal.plan.endDate} · ` +
-    (goal.source === "claude" ? "von Claude erzeugt" : `aus dem Playbook ${goal.intentKey}`);
+    (goal.herkunft || (goal.source === "claude" ? "von Claude erzeugt" : `aus dem Playbook ${goal.intentKey}`));
   selectTab("today");
   show("plan");
 }

@@ -7,10 +7,15 @@ kein Node, kein Server, keine Installation, keine Internetverbindung.
 node demo/build.mjs      # baut atlas-vorschau.html neu
 ```
 
-Das Build-Skript setzt die Playbook-Daten aus
-`engine/src/playbooks/data/` in `template.html` ein, statt sie abzutippen. So
-kann die Vorschau nicht von den echten Daten abweichen. Danach prüft es drei
-Dinge und bricht ab, wenn eines fehlschlägt:
+```bash
+node --test demo/test/planner.test.mjs   # 16 Tests für den Planer
+```
+
+Das Build-Skript setzt vier Dinge in `template.html` ein, statt sie
+abzutippen: die Playbook-Daten aus `engine/src/playbooks/data/`, die
+Fachmodule, die Grundmuster und den Planer-Code aus `demo/planner/`. Die Tests
+prüfen genau dieselben Dateien — eine Quelle, zwei Nutzer. Danach prüft der
+Build drei Dinge und bricht ab, wenn eines fehlschlägt:
 
 1. Das eingebettete Skript ist syntaktisch gültig (`new Function`).
 2. `view-auth` ist **nicht** `hidden` — sonst bleibt die Seite ohne JavaScript leer.
@@ -35,11 +40,43 @@ wie man sie richtig öffnet — die App selbst läuft erst im Browser.
 
 ## Was funktioniert
 
-Konto anlegen, anmelden, abmelden · Ziel eingeben · Sechs-Fragen-Interview ·
-Plan mit Meilensteinen und Terminen · Heute-Ansicht · Pfad · Prüfung
-(sieben der neun Validator-Regeln, im Browser gerechnet) · Aufgaben abhaken
-und verschieben · Fortschritt bleibt nach dem Neuladen erhalten · Datenexport ·
-Konto löschen · Hell- und Dunkelmodus · mehrere Ziele nebeneinander.
+Konto anlegen, anmelden, abmelden · **jedes Ziel planen, auch ohne API-Key** ·
+Sechs-Fragen-Interview · Plan mit Meilensteinen und Terminen · Heute-Ansicht ·
+Pfad · Prüfung (sieben der neun Validator-Regeln, im Browser gerechnet) ·
+Aufgaben abhaken und verschieben · Fortschritt bleibt nach dem Neuladen
+erhalten · Datenexport · Konto löschen · Hell- und Dunkelmodus · mehrere Ziele
+nebeneinander.
+
+## Der Planer: drei Ebenen, von konkret nach allgemein
+
+`demo/planner/` enthält den regelbasierten Planer. Er kommt ohne Sprachmodell
+aus und fällt nie aus — für jedes Ziel greift mindestens die unterste Ebene.
+
+| Ebene | Woher | Deckt ab |
+|---|---|---|
+| **Playbook** | `engine/src/playbooks/data/` — redaktionell erstellt | 3 Gründungsvorhaben |
+| **Fachmodul** | `demo/planner/domains.json` | 27 Lebensbereiche: Sport, Gesundheit, Lernen, Karriere, Finanzen, Wohnen, Kreatives, Soziales |
+| **Grundmuster** | `demo/planner/archetypes.json` | 7 Zielformen: etwas lernen · etwas aufbauen · auf einen Termin hinarbeiten · körperliches Ziel · Gewohnheit ändern · finanzielles Ziel · Lebenssituation verändern |
+
+Die Zuordnung läuft über Stichwörter; ein Treffer zählt so viel, wie das
+Stichwort lang ist, Playbooks bekommen einen Bonus. Passt kein Fachmodul,
+entscheidet die **Form** des Ziels über das Grundmuster — und der Plan sagt
+das in seinen Annahmen ausdrücklich, statt Genauigkeit vorzutäuschen.
+
+Der Zeitraum kommt in dieser Reihenfolge: aus der eingegebenen Frist, sonst aus
+dem Zielsatz („in 18 Monaten“), sonst aus einem Erfahrungswert. Die Aufwände
+werden auf die angegebenen Wochenstunden herunterskaliert, damit Regel 5 des
+Validators hält — ein Plan, der die Kapazität reißt, ist eine Wunschliste.
+
+**Was der Planer nicht kann:** auf die Besonderheiten einer einzelnen Lage
+eingehen. Er kennt den typischen Weg für Ziele einer Art. Dafür gibt es den
+API-Key.
+
+### Wo es keinen Plan gibt
+
+Für Suizidgedanken, Selbstverletzung, Essstörungen und unzulässige Vorhaben
+erzeugt Atlas bewusst keinen Plan, sondern nennt eine Anlaufstelle — auch dann,
+wenn ein API-Key hinterlegt ist. Portiert aus `engine/src/pipeline.ts`.
 
 ## Mit eigenem API-Key: Pläne von Claude
 
@@ -62,13 +99,15 @@ Zwei Einschränkungen:
 
 | | Vorschau (diese Datei) | `engine/` |
 |---|---|---|
-| Pläne ohne Key | aus drei Playbooks, nicht personalisiert | dasselbe (dokumentierter Rückfallweg) |
+| Pläne ohne Key | regelbasiert, jedes Ziel | nur Playbook-Rückfall (3 Vorhaben) |
 | Pläne mit Key | Claude, direkt aus dem Browser | Claude, vom Server |
-| Zieldomänen | Café, Freelance, Onlineshop (ohne Key) | beliebig |
 | Konten | localStorage, SHA-256-Hash | scrypt, Sitzungstoken, HttpOnly-Cookie |
 | Daten | in diesem Browser | in einer Datei auf dem Server, pro Konto getrennt |
 | Validator | 7 von 9 Regeln | alle neun, plus Reparaturschleife |
-| Sicherheitsfilter | nein | ja (Krise, Überschuldung, Essstörung, Illegales) |
+| Sicherheitsfilter | ja (Krise, Essstörung, Illegales) | ja, zusätzlich Überschuldung und medizinische Risiken |
+
+Der regelbasierte Planer ist hier weiter als in `engine/` — dort ist der
+Playbook-Rückfall bewusst schmal, weil dort im Normalbetrieb Claude plant.
 
 **Die Anmeldung hier ist eine Vorschau, keine Sicherheit.** Alles liegt
 unverschlüsselt im localStorage des Browsers. Wer das Gerät hat, hat die Daten.

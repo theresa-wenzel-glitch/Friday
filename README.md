@@ -43,6 +43,7 @@ Ergänzend: [Finanzplan als CSV](finanzplan/finanzplan-3-jahre.csv) ·
 | Verzeichnis | Inhalt |
 |-------------|--------|
 | [`engine/`](engine/) | **Die Planungs-Engine.** Klassifikation, Playbook-Abruf, Planerzeugung, deterministischer Validator (9 Regeln), Reparaturschleife, Terminierung, Evaluations-Gate — plus lokale App mit Konten, Anmeldung und getrennten Daten pro Person. 129 Tests. Alles ohne API-Key testbar außer der Modellaufruf selbst |
+| [`demo/`](demo/) | **Die App als eine HTML-Datei.** Läuft ohne Server im Browser: Konto, Ziel, Plan, Fortschritt. Enthält einen regelbasierten Planer, der ohne Sprachmodell für jedes Ziel einen Plan erzeugt — 3 Playbooks, 27 Fachmodule, 7 Grundmuster, 16 Tests. Mit eigenem API-Key plant Claude |
 | [`pitch/`](pitch/atlas-pitch-deck.html) | Das Pitch Deck als eigenständige HTML-Präsentation, 16 Folien |
 
 ```bash

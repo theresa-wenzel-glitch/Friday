@@ -35,14 +35,24 @@ const playbooks = readdirSync(dataDir)
   }));
 
 const template = readFileSync(join(here, "template.html"), "utf8");
-const marker = "/*__PLAYBOOKS__*/[]";
 
-if (!template.includes(marker)) {
-  console.error(`Platzhalter ${marker} fehlt in template.html.`);
-  process.exit(1);
+// Daten und Planer-Code werden eingesetzt, nicht abgetippt: eine Quelle für
+// die Vorschau und für demo/test/planner.test.mjs.
+const parts = {
+  "/*__PLAYBOOKS__*/[]": JSON.stringify(playbooks, null, 2),
+  "/*__ARCHETYPES__*/[]": readFileSync(join(here, "planner", "archetypes.json"), "utf8").trim(),
+  "/*__DOMAINS__*/[]": readFileSync(join(here, "planner", "domains.json"), "utf8").trim(),
+  "/*__PLANNER__*/": readFileSync(join(here, "planner", "planner.js"), "utf8"),
+};
+
+let html = template;
+for (const [marker, value] of Object.entries(parts)) {
+  if (!html.includes(marker)) {
+    console.error(`Platzhalter ${marker} fehlt in template.html.`);
+    process.exit(1);
+  }
+  html = html.replace(marker, () => value);
 }
-
-const html = template.replace(marker, JSON.stringify(playbooks, null, 2));
 
 // Syntaxprüfung des eingebetteten Skripts. Ein Tippfehler im Inline-JavaScript
 // macht die Datei sonst vollständig funktionslos, ohne dass man es der Datei
@@ -83,8 +93,12 @@ const outHosted = join(here, "atlas-gehostet.html");
 writeFileSync(outHosted, hosted);
 
 const nodes = playbooks.reduce((n, p) => n + p.nodes.length, 0);
+const archetypes = JSON.parse(parts["/*__ARCHETYPES__*/[]"]);
+const domains = JSON.parse(parts["/*__DOMAINS__*/[]"]);
 console.log(
   `Geschrieben: ${out}\n` +
-    `  ${playbooks.length} Playbooks, ${nodes} Knoten, ${(html.length / 1024).toFixed(1)} KB\n` +
+    `  ${playbooks.length} Playbooks (${nodes} Knoten), ` +
+    `${domains.length} Fachmodule, ${archetypes.length} Grundmuster, ` +
+    `${(html.length / 1024).toFixed(1)} KB\n` +
     `Geschrieben: ${outHosted} (${(hosted.length / 1024).toFixed(1)} KB, ohne Dokumentgerüst)`,
 );

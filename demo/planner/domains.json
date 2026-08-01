@@ -1,0 +1,555 @@
+[
+  {
+    "key": "sport.marathon",
+    "label": "Marathon",
+    "archetype": "koerper",
+    "keywords": ["marathon", "42 km", "42km", "42,195", "ultralauf"],
+    "horizonDays": 210,
+    "titles": { "hoehepunkt": "Der lange Lauf", "halten": "Wettkampf und danach" },
+    "inserts": {
+      "ausgangswert": [
+        { "title": "Startplatz suchen und anmelden", "why": "Eine bezahlte Anmeldung ist der stärkste Grund, an einem verregneten Dienstag trotzdem zu laufen.", "how": "Beliebte Läufe sind ein halbes Jahr vorher ausgebucht.", "min": 60, "blocking": true }
+      ],
+      "steigern": [
+        { "title": "Wöchentlich einen langen Lauf einbauen", "why": "Der lange Lauf ist die eine Einheit, die über die Distanz entscheidet.", "how": "Langsam. Deutlich langsamer, als es sich richtig anfühlt.", "min": 150, "blocking": true },
+        { "title": "Verpflegung unterwegs im Training üben", "why": "Der Magen muss trainiert werden wie die Beine — im Wettkampf ist es dafür zu spät.", "how": null, "min": 60, "blocking": false }
+      ],
+      "hoehepunkt": [
+        { "title": "Einen Lauf über etwa 30 Kilometer absolvieren", "why": "Ab hier weiß der Kopf, dass die Distanz machbar ist.", "how": "Drei bis vier Wochen vor dem Wettkampf, danach nicht mehr.", "min": 240, "blocking": true },
+        { "title": "Die letzten zwei Wochen den Umfang halbieren", "why": "Die Form entsteht in der Erholung, nicht im letzten Training.", "how": null, "min": 120, "blocking": true }
+      ]
+    },
+    "risks": [
+      { "stage": "steigern", "risk": "Zu schnelle Steigerung ist die häufigste Ursache für Verletzungen im Marathontraining.", "mitigation": "Wochenumfang um höchstens ein Zehntel pro Woche steigern, jede vierte Woche reduzieren." }
+    ],
+    "assumptions": ["Angenommen, du kannst zu Beginn bereits etwa 30 Minuten am Stück laufen. Wenn nicht, kommt davor eine Aufbauphase von rund acht Wochen."]
+  },
+
+  {
+    "key": "sport.laufen",
+    "label": "Laufen",
+    "archetype": "koerper",
+    "keywords": ["laufen", "joggen", "5 km", "10 km", "halbmarathon", "läufer"],
+    "horizonDays": 120,
+    "inserts": {
+      "basis": [
+        { "title": "Nach dem Wechsel von Gehen und Laufen vorgehen", "why": "Der Kreislauf ist schneller bereit als Sehnen und Gelenke — der Wechsel schützt genau die.", "how": "Zum Beispiel eine Minute laufen, zwei Minuten gehen, insgesamt zwanzig Minuten.", "min": 120, "blocking": true },
+        { "title": "Laufschuhe im Fachgeschäft anpassen lassen", "why": "Die häufigsten Anfängerbeschwerden hängen am falschen Schuh.", "how": null, "min": 90, "blocking": false }
+      ],
+      "steigern": [
+        { "title": "Die Gehpausen Woche für Woche verkürzen", "why": "Der Übergang zum Durchlaufen gelingt so fast von selbst.", "how": null, "min": 180, "blocking": true }
+      ]
+    },
+    "risks": [
+      { "stage": "basis", "risk": "Die meisten Laufanfänger hören in den ersten sechs Wochen auf — fast immer, weil sie zu schnell gelaufen sind.", "mitigation": "So langsam laufen, dass ein Gespräch in ganzen Sätzen möglich bleibt." }
+    ],
+    "assumptions": []
+  },
+
+  {
+    "key": "sport.kraft",
+    "label": "Krafttraining",
+    "archetype": "koerper",
+    "keywords": ["krafttraining", "muskeln", "muskelaufbau", "hanteln", "fitnessstudio", "klimmzüge", "liegestütze", "stark werden"],
+    "horizonDays": 180,
+    "inserts": {
+      "basis": [
+        { "title": "Die Grundübungen sauber lernen — mit Anleitung", "why": "Falsche Technik unter Last ist der schnellste Weg zu einer langen Pause.", "how": "Eine oder zwei bezahlte Einheiten mit einem Trainer sind hier gut angelegtes Geld.", "min": 120, "blocking": true }
+      ],
+      "steigern": [
+        { "title": "Trainingsgewichte mitschreiben und stetig erhöhen", "why": "Ohne steigende Belastung passiert nichts — daran hängt der gesamte Fortschritt.", "how": null, "min": 240, "blocking": true },
+        { "title": "Auf ausreichend Eiweiß und Schlaf achten", "why": "Muskeln wachsen zwischen den Einheiten, nicht während.", "how": null, "min": 60, "blocking": false }
+      ]
+    },
+    "risks": [],
+    "assumptions": []
+  },
+
+  {
+    "key": "gesundheit.gewicht",
+    "label": "Gewicht verändern",
+    "archetype": "koerper",
+    "keywords": ["abnehmen", "zunehmen", "gewicht", "kilo", "schlanker", "diät", "figur"],
+    "horizonDays": 180,
+    "titles": { "steigern": "Stetig verändern", "halten": "Halten" },
+    "inserts": {
+      "ausgangswert": [
+        { "title": "Ein realistisches Tempo festlegen", "why": "Schnelle Erfolge kommen fast vollständig zurück — langsame bleiben.", "how": "Etwa ein halbes Kilo pro Woche gilt als gut haltbar.", "min": 30, "blocking": true }
+      ],
+      "basis": [
+        { "title": "Eine Woche lang alles mitschreiben, ohne etwas zu ändern", "why": "Fast jeder schätzt die eigene Menge deutlich falsch ein.", "how": null, "min": 90, "blocking": true },
+        { "title": "Zwei bis drei feste Änderungen wählen statt eines ganzen Programms", "why": "Wer alles gleichzeitig umstellt, hält es keine drei Wochen durch.", "how": null, "min": 45, "blocking": true }
+      ],
+      "halten": [
+        { "title": "Den Plan für danach schreiben", "why": "Ohne Plan für die Zeit danach ist das Ausgangsgewicht in einem Jahr wieder da.", "how": null, "min": 45, "blocking": true }
+      ]
+    },
+    "risks": [
+      { "stage": "basis", "risk": "Sehr strenge Vorgaben führen häufiger zum Abbruch als zum Ziel.", "mitigation": "Lieber kleiner ansetzen und dafür durchhalten." }
+    ],
+    "assumptions": ["Dieser Plan ist keine Ernährungsberatung. Bei Vorerkrankungen, Medikamenten oder einem gestörten Verhältnis zum Essen gehört das ärztlich begleitet."]
+  },
+
+  {
+    "key": "gesundheit.rauchen",
+    "label": "Rauchen aufgeben",
+    "archetype": "gewohnheit",
+    "keywords": ["rauchen", "zigaretten", "nikotin", "rauchfrei", "dampfen"],
+    "horizonDays": 120,
+    "inserts": {
+      "verstehen": [
+        { "title": "Einen Schlusstag festlegen", "why": "Ein festes Datum wirkt nachweislich besser als schrittweises Reduzieren.", "how": "Zwei bis vier Wochen in der Zukunft, nicht in einer besonders stressigen Woche.", "min": 30, "blocking": true }
+      ],
+      "kopplung": [
+        { "title": "Über Nikotinersatz oder ärztliche Unterstützung entscheiden", "why": "Unterstützung verdoppelt die Erfolgsaussicht gegenüber dem reinen Willensweg.", "how": "Hausarztpraxis oder Apotheke ansprechen. Die Krankenkasse zahlt oft einen Kurs.", "min": 60, "blocking": true },
+        { "title": "Alle Rauchutensilien aus Wohnung und Auto entfernen", "why": "Die ersten Tage entscheidet die Reichweite, nicht die Entschlossenheit.", "min": 45, "how": null, "blocking": true }
+      ],
+      "verankern": [
+        { "title": "Die drei riskantesten Situationen vorher durchspielen", "why": "Rückfälle passieren fast immer in denselben drei Situationen: Alkohol, Streit, Pause mit Rauchern.", "how": null, "min": 45, "blocking": true }
+      ]
+    },
+    "risks": [
+      { "stage": "klein", "risk": "Die ersten drei Tage sind körperlich am härtesten, die Wochen vier bis acht psychisch.", "mitigation": "Für beide Phasen vorher festlegen, wen du anrufst." }
+    ],
+    "assumptions": ["Kostenlose Beratung in Deutschland: Rauchfrei-Telefon der Bundeszentrale für gesundheitliche Aufklärung."]
+  },
+
+  {
+    "key": "gesundheit.alkohol",
+    "label": "Alkohol reduzieren",
+    "archetype": "gewohnheit",
+    "keywords": ["alkohol", "trinken", "nüchtern", "wein", "bier", "trocken werden"],
+    "horizonDays": 120,
+    "inserts": {
+      "verstehen": [
+        { "title": "Ehrlich mitschreiben, wie viel tatsächlich zusammenkommt", "why": "Die geschätzte Menge liegt fast immer deutlich unter der tatsächlichen.", "how": null, "min": 45, "blocking": true }
+      ],
+      "kopplung": [
+        { "title": "Feste alkoholfreie Tage in der Woche festlegen", "why": "Feste Tage sind leichter zu halten als eine Höchstmenge.", "how": null, "min": 30, "blocking": true }
+      ]
+    },
+    "risks": [
+      { "stage": "verstehen", "risk": "Bei körperlicher Abhängigkeit kann ein plötzlicher Entzug gefährlich sein.", "mitigation": "Wenn morgens Zittern, Schwitzen oder Unruhe auftreten: nicht allein aufhören, sondern ärztlich begleiten lassen." }
+    ],
+    "assumptions": ["Diese App ist keine Suchtberatung. Kostenlos und anonym: Sucht-und-Drogen-Hotline, 01806 313031."]
+  },
+
+  {
+    "key": "gesundheit.schlaf",
+    "label": "Besser schlafen",
+    "archetype": "gewohnheit",
+    "keywords": ["schlaf", "schlafen", "müde", "einschlafen", "durchschlafen", "früher ins bett"],
+    "horizonDays": 90,
+    "inserts": {
+      "kopplung": [
+        { "title": "Eine feste Aufstehzeit setzen — auch am Wochenende", "why": "Die Aufstehzeit steuert den Rhythmus stärker als die Zubettgehzeit.", "how": null, "min": 20, "blocking": true },
+        { "title": "Bildschirme aus dem Schlafzimmer verbannen", "why": "Das ist die Änderung mit dem größten Effekt bei geringstem Aufwand.", "how": null, "min": 45, "blocking": false }
+      ]
+    },
+    "risks": [],
+    "assumptions": ["Bei anhaltender Schlaflosigkeit über mehrere Wochen gehört das ärztlich abgeklärt."]
+  },
+
+  {
+    "key": "lernen.sprache",
+    "label": "Eine Sprache lernen",
+    "archetype": "faehigkeit",
+    "keywords": ["sprache", "englisch", "spanisch", "französisch", "italienisch", "japanisch", "chinesisch", "russisch", "vokabeln", "fließend sprechen"],
+    "horizonDays": 300,
+    "inserts": {
+      "standort": [
+        { "title": "Das Zielniveau festlegen", "why": "„Fließend“ ist kein Niveau. B1 oder B2 sind eins — und man merkt, wann man dort ist.", "how": "Ein kostenloser Einstufungstest zeigt in zwanzig Minuten, wo du stehst.", "min": 45, "blocking": true }
+      ],
+      "uebung": [
+        { "title": "Täglich zwanzig Minuten Vokabeln mit Wiederholungssystem", "why": "Verteiltes Wiederholen schlägt jede Lernmethode, die auf Menge setzt.", "how": null, "min": 140, "blocking": true },
+        { "title": "Wöchentlich mit einem Menschen sprechen", "why": "Sprechen lernt man nur durch Sprechen. Alles andere ist Vorbereitung darauf.", "how": "Sprachtandem, Tandem-App oder bezahlter Gesprächspartner.", "min": 60, "blocking": true }
+      ],
+      "anwendung": [
+        { "title": "Etwas konsumieren, das dich wirklich interessiert", "why": "Ab hier wird Lernen zum Nebenprodukt statt zur Aufgabe.", "how": "Serie, Podcast oder Nachrichten in der Zielsprache.", "min": 180, "blocking": false }
+      ]
+    },
+    "risks": [
+      { "stage": "uebung", "risk": "Die meisten bleiben im Anfängerbereich stecken, weil sie nie sprechen.", "mitigation": "Ab Woche vier wöchentlich sprechen, auch wenn es sich noch zu früh anfühlt." }
+    ],
+    "assumptions": ["Für ein solides B1 rechnet man üblicherweise mit 350 bis 400 Lernstunden."]
+  },
+
+  {
+    "key": "lernen.programmieren",
+    "label": "Programmieren lernen",
+    "archetype": "faehigkeit",
+    "keywords": ["programmieren", "coden", "entwickler", "python", "javascript", "software", "informatik", "app entwickeln"],
+    "horizonDays": 270,
+    "inserts": {
+      "standort": [
+        { "title": "Eine Sprache wählen und dabei bleiben", "why": "Der Wechsel zwischen Sprachen ist der häufigste Grund, warum Anfänger nach drei Monaten wieder am Anfang stehen.", "how": "Python für den Einstieg, JavaScript wenn es ums Web geht.", "min": 45, "blocking": true }
+      ],
+      "uebung": [
+        { "title": "Ein eigenes kleines Projekt bauen, statt weiter Kurse zu schauen", "why": "Kurse erzeugen das Gefühl von Fortschritt, Projekte erzeugen Fortschritt.", "how": "Etwas, das du selbst benutzen würdest. Klein.", "min": 480, "blocking": true },
+        { "title": "Den eigenen Code veröffentlichen", "why": "Was öffentlich steht, schreibt man sorgfältiger.", "how": null, "min": 90, "blocking": false }
+      ],
+      "nachweis": [
+        { "title": "Drei abgeschlossene Projekte vorzeigbar machen", "why": "Bei Bewerbungen zählen gezeigte Projekte mehr als Kurszertifikate.", "how": null, "min": 240, "blocking": true }
+      ]
+    },
+    "risks": [
+      { "stage": "grundlagen", "risk": "Die Phase, in der man Kurse sammelt, ohne selbst zu bauen, kann Monate verschlingen.", "mitigation": "Spätestens nach dem ersten Grundlagenkurs ein eigenes Projekt anfangen." }
+    ],
+    "assumptions": []
+  },
+
+  {
+    "key": "lernen.instrument",
+    "label": "Ein Instrument lernen",
+    "archetype": "faehigkeit",
+    "keywords": ["instrument", "gitarre", "klavier", "piano", "schlagzeug", "geige", "singen", "musik machen"],
+    "horizonDays": 240,
+    "inserts": {
+      "standort": [
+        { "title": "Instrument beschaffen und stimmen lassen", "why": "Ein schlecht klingendes Instrument bremst mehr als fehlende Zeit.", "how": "Mieten ist am Anfang oft die klügere Wahl.", "min": 120, "blocking": true }
+      ],
+      "uebung": [
+        { "title": "Lieber täglich fünfzehn Minuten als einmal die Woche zwei Stunden", "why": "Motorisches Lernen braucht Häufigkeit, nicht Dauer.", "how": null, "min": 105, "blocking": true },
+        { "title": "Ein Stück wählen, das du unbedingt spielen willst", "why": "Ein Stück, auf das man Lust hat, trägt durch die zähen Wochen.", "how": null, "min": 60, "blocking": false }
+      ],
+      "nachweis": [
+        { "title": "Einmal vor anderen Menschen spielen", "why": "Vorspielen ist eine eigene Fähigkeit — und der Moment, in dem es sich lohnt.", "how": null, "min": 120, "blocking": true }
+      ]
+    },
+    "risks": [],
+    "assumptions": []
+  },
+
+  {
+    "key": "lernen.pruefung",
+    "label": "Eine Prüfung bestehen",
+    "archetype": "ereignis",
+    "keywords": ["prüfung", "klausur", "examen", "abschluss", "test bestehen", "zertifizierung", "ihk"],
+    "horizonDays": 120,
+    "titles": { "buchen": "Anmelden und Stoff sichten", "probe": "Probeklausur" },
+    "inserts": {
+      "rahmen": [
+        { "title": "Prüfungsordnung und Stoffumfang beschaffen", "why": "Was geprüft wird, steht schriftlich fest — Vermutungen kosten Wochen.", "how": null, "min": 60, "blocking": true }
+      ],
+      "buchen": [
+        { "title": "Den Stoff in Wochenportionen aufteilen", "why": "Ohne Aufteilung wächst der Stoff in der Vorstellung ins Unendliche.", "how": null, "min": 90, "blocking": true },
+        { "title": "Altklausuren oder Musteraufgaben beschaffen", "why": "Nichts zeigt so genau, was verlangt wird.", "how": null, "min": 60, "blocking": true }
+      ],
+      "probe": [
+        { "title": "Eine vollständige Probeklausur unter echten Bedingungen", "why": "Zeitdruck ist ein eigener Prüfungsteil, den man üben muss.", "how": "Gleiche Uhrzeit, gleiche Dauer, keine Hilfsmittel, die es nicht gibt.", "min": 240, "blocking": true }
+      ]
+    },
+    "risks": [
+      { "stage": "vorbereiten", "risk": "Wiederholtes Lesen fühlt sich nach Lernen an, bringt aber am wenigsten.", "mitigation": "Stattdessen abfragen: zuklappen und aus dem Kopf aufschreiben." }
+    ],
+    "assumptions": []
+  },
+
+  {
+    "key": "lernen.fuehrerschein",
+    "label": "Führerschein",
+    "archetype": "faehigkeit",
+    "keywords": ["führerschein", "fahrschule", "fahrprüfung", "autofahren lernen", "motorrad"],
+    "horizonDays": 150,
+    "inserts": {
+      "standort": [
+        { "title": "Drei Fahrschulen vergleichen und anmelden", "why": "Preise und Wartezeiten unterscheiden sich erheblich.", "how": "Nach dem Preis pro Fahrstunde und der Wartezeit auf Prüfungstermine fragen.", "min": 120, "blocking": true },
+        { "title": "Sehtest, Erste-Hilfe-Kurs und Passbild erledigen", "why": "Ohne diese Unterlagen läuft der Antrag nicht an — und der braucht Wochen.", "how": null, "min": 240, "blocking": true }
+      ],
+      "nachweis": [
+        { "title": "Theorieprüfung ablegen, dann praktische Prüfung", "why": "Die Theorie muss bestanden sein, bevor die praktische Prüfung möglich ist.", "how": null, "min": 180, "blocking": true }
+      ]
+    },
+    "risks": [],
+    "assumptions": ["Die Bearbeitung des Antrags bei der Behörde dauert je nach Ort mehrere Wochen."]
+  },
+
+  {
+    "key": "karriere.bewerbung",
+    "label": "Neue Stelle finden",
+    "archetype": "wechsel",
+    "keywords": ["bewerbung", "neuer job", "neuen job", "job finden", "jobwechsel", "stelle finden", "arbeitsstelle", "arbeitgeber", "bewerben", "lebenslauf", "vorstellungsgespräch", "arbeitsplatz wechseln"],
+    "horizonDays": 150,
+    "titles": { "vollzug": "Zusage und Kündigung" },
+    "inserts": {
+      "optionen": [
+        { "title": "Lebenslauf und Profil überarbeiten", "why": "Beides wird in Sekunden überflogen — die Struktur entscheidet mehr als der Inhalt.", "how": "Ergebnisse statt Aufgaben: nicht „zuständig für“, sondern was dabei herauskam.", "min": 180, "blocking": true }
+      ],
+      "vorbereiten": [
+        { "title": "Wöchentlich eine feste Anzahl Bewerbungen abschicken", "why": "Bewerben ist ein Zahlenspiel mit langen Wartezeiten.", "how": "Lieber fünf sorgfältige pro Woche als dreißig gleichlautende.", "min": 240, "blocking": true },
+        { "title": "Gespräche üben, bevor das erste wichtige kommt", "why": "Das erste Gespräch ist immer das schlechteste — besser, es ist eins, das dir nicht so wichtig ist.", "how": null, "min": 120, "blocking": false }
+      ],
+      "vollzug": [
+        { "title": "Erst kündigen, wenn der neue Vertrag unterschrieben ist", "why": "Mündliche Zusagen platzen häufiger, als man denkt.", "how": null, "min": 60, "blocking": true }
+      ]
+    },
+    "risks": [
+      { "stage": "vorbereiten", "risk": "Bewerbungsverfahren dauern in vielen Branchen zwei bis vier Monate.", "mitigation": "Den Zeitplan darauf auslegen und parallel mehrere Verfahren laufen lassen." }
+    ],
+    "assumptions": []
+  },
+
+  {
+    "key": "karriere.gehalt",
+    "label": "Mehr verdienen",
+    "archetype": "vorhaben",
+    "keywords": ["gehalt", "gehaltserhöhung", "mehr verdienen", "beförderung", "verhandeln"],
+    "horizonDays": 120,
+    "inserts": {
+      "pruefen": [
+        { "title": "Marktübliches Gehalt für die eigene Rolle recherchieren", "why": "Ohne Vergleichszahl verhandelt man gegen das eigene Bauchgefühl.", "how": "Gehaltsvergleiche, Tarifverträge, Menschen in ähnlichen Rollen fragen.", "min": 120, "blocking": true }
+      ],
+      "vorbereiten": [
+        { "title": "Die eigenen Ergebnisse der letzten zwölf Monate aufschreiben", "why": "Verhandelt wird über Beiträge, nicht über Bedürfnisse.", "how": "Wo möglich mit Zahlen.", "min": 90, "blocking": true },
+        { "title": "Das Gespräch mit jemandem üben", "why": "Die entscheidenden zehn Minuten laufen besser, wenn man sie einmal gesprochen hat.", "how": null, "min": 60, "blocking": false }
+      ]
+    },
+    "risks": [],
+    "assumptions": []
+  },
+
+  {
+    "key": "finanzen.sparen",
+    "label": "Auf etwas sparen",
+    "archetype": "finanzen",
+    "keywords": ["sparen", "ansparen", "rücklage", "notgroschen", "geld zurücklegen"],
+    "horizonDays": 365,
+    "inserts": {},
+    "risks": [],
+    "assumptions": []
+  },
+
+  {
+    "key": "finanzen.schulden",
+    "label": "Schulden abbauen",
+    "archetype": "finanzen",
+    "keywords": ["schulden", "kredit abbezahlen", "dispo", "mahnung", "raten", "entschulden", "inkasso"],
+    "horizonDays": 540,
+    "titles": { "abschluss": "Schuldenfrei" },
+    "inserts": {
+      "ueberblick": [
+        { "title": "Alle Forderungen mit Betrag, Zins und Gläubiger auflisten", "why": "Der Überblick ist der schwerste und der wichtigste Schritt.", "how": "Auch die unangenehmen. Vollständigkeit ist entscheidend.", "min": 180, "blocking": true }
+      ],
+      "spielraum": [
+        { "title": "Die teuerste Schuld zuerst tilgen", "why": "Beim Zins liegt das meiste Geld — Dispokredite sind fast immer die teuersten.", "how": null, "min": 90, "blocking": true }
+      ],
+      "abschluss": [
+        { "title": "Kostenlose Schuldnerberatung aufsuchen", "why": "Anerkannte Stellen verhandeln mit Gläubigern und kennen Wege, die Privatpersonen nicht offenstehen.", "how": "Caritas, Diakonie, Verbraucherzentrale — kostenlos und vertraulich.", "min": 180, "blocking": true }
+      ]
+    },
+    "risks": [
+      { "stage": "ueberblick", "risk": "Unbeantwortete Post führt zu Titeln, Zwangsvollstreckung und wachsenden Kosten.", "mitigation": "Jede Forderung öffnen und beantworten, auch wenn nicht gezahlt werden kann." }
+    ],
+    "assumptions": ["Diese App ist keine Schuldnerberatung. Bei Überschuldung ist eine anerkannte Beratungsstelle der richtige erste Schritt — sie ist kostenlos."]
+  },
+
+  {
+    "key": "finanzen.immobilie",
+    "label": "Immobilie kaufen",
+    "archetype": "finanzen",
+    "keywords": ["haus kaufen", "wohnung kaufen", "immobilie", "eigenheim", "eigentumswohnung", "hauskauf", "baufinanzierung"],
+    "horizonDays": 400,
+    "inserts": {
+      "ziel": [
+        { "title": "Kaufnebenkosten mit einrechnen", "why": "Grunderwerbsteuer, Notar und Makler machen in Deutschland grob 10 bis 15 Prozent aus — sie werden meist nicht mitfinanziert.", "how": null, "min": 60, "blocking": true }
+      ],
+      "abschluss": [
+        { "title": "Mindestens drei Finanzierungsangebote vergleichen", "why": "Ein Zehntelprozent Unterschied macht über die Laufzeit einen fünfstelligen Betrag aus.", "how": "Hausbank, Vermittler und eine Direktbank gegeneinander stellen.", "min": 240, "blocking": true },
+        { "title": "Vor dem Kauf unabhängig begutachten lassen", "why": "Ein Gutachten kostet einige hundert Euro und verhindert regelmäßig sechsstellige Fehler.", "how": null, "min": 180, "blocking": true }
+      ]
+    },
+    "risks": [],
+    "assumptions": ["Die genannten Größenordnungen sind grobe Anhaltspunkte und je nach Bundesland verschieden. Diese App ist keine Finanzberatung."]
+  },
+
+  {
+    "key": "leben.umzug",
+    "label": "Umzug",
+    "archetype": "ereignis",
+    "keywords": ["umzug", "umziehen", "wohnung wechseln", "neue wohnung beziehen"],
+    "horizonDays": 90,
+    "titles": { "buchen": "Kündigen und Transport buchen", "durchfuehren": "Umzugstag und Ummeldungen" },
+    "inserts": {
+      "buchen": [
+        { "title": "Alte Wohnung fristgerecht kündigen", "why": "Die Kündigungsfrist bestimmt den ganzen Zeitplan.", "how": "Schriftlich, mit Nachweis des Zugangs.", "min": 60, "blocking": true },
+        { "title": "Umzugswagen oder Firma buchen", "why": "An Monatsenden und im Sommer ist alles Wochen vorher vergeben.", "how": null, "min": 90, "blocking": true }
+      ],
+      "durchfuehren": [
+        { "title": "Ummelden: Einwohnermeldeamt, Post, Verträge", "why": "Die Anmeldung beim Meldeamt ist Pflicht und hat eine kurze Frist.", "how": "In Deutschland üblicherweise innerhalb von zwei Wochen nach Einzug.", "min": 180, "blocking": true },
+        { "title": "Übergabeprotokolle mit Fotos anfertigen", "why": "Das entscheidet später über die Kaution.", "how": null, "min": 90, "blocking": true }
+      ]
+    },
+    "risks": [],
+    "assumptions": []
+  },
+
+  {
+    "key": "leben.wohnung",
+    "label": "Wohnung finden",
+    "archetype": "vorhaben",
+    "keywords": ["wohnung suchen", "wohnungssuche", "mietwohnung", "wg", "wohnung finden"],
+    "horizonDays": 120,
+    "inserts": {
+      "vorbereiten": [
+        { "title": "Bewerbungsmappe vorbereiten", "why": "Wer die Unterlagen erst nach der Besichtigung zusammensucht, ist zu spät.", "how": "Schufa-Auskunft, Gehaltsnachweise, Mietschuldenfreiheit, kurzes Anschreiben.", "min": 180, "blocking": true }
+      ],
+      "umsetzen": [
+        { "title": "Täglich zu einer festen Zeit die Portale durchgehen", "why": "In angespannten Märkten entscheidet die Geschwindigkeit der Antwort.", "how": null, "min": 300, "blocking": true }
+      ]
+    },
+    "risks": [],
+    "assumptions": []
+  },
+
+  {
+    "key": "leben.hochzeit",
+    "label": "Hochzeit",
+    "archetype": "ereignis",
+    "keywords": ["hochzeit", "heiraten", "trauung", "standesamt", "verlobung"],
+    "horizonDays": 330,
+    "inserts": {
+      "buchen": [
+        { "title": "Standesamt- oder Trautermin verbindlich buchen", "why": "Beliebte Termine sind ein Jahr im Voraus vergeben.", "how": null, "min": 120, "blocking": true },
+        { "title": "Location und die wichtigsten Dienstleister buchen", "why": "Ort, Fotografie und Essen sind die Posten mit der längsten Vorlaufzeit.", "how": null, "min": 300, "blocking": true }
+      ],
+      "vorbereiten": [
+        { "title": "Unterlagen beim Standesamt einreichen", "why": "Die Anmeldung zur Eheschließung hat eigene Fristen und braucht beglaubigte Dokumente.", "how": null, "min": 180, "blocking": true }
+      ]
+    },
+    "risks": [],
+    "assumptions": []
+  },
+
+  {
+    "key": "leben.reise",
+    "label": "Größere Reise",
+    "archetype": "ereignis",
+    "keywords": ["reise", "urlaub", "weltreise", "backpacking", "sabbatical", "roadtrip", "auszeit"],
+    "horizonDays": 180,
+    "inserts": {
+      "rahmen": [
+        { "title": "Route, Zeitraum und Budget grob festlegen", "why": "Diese drei bedingen einander — eines davon muss nachgeben.", "how": null, "min": 120, "blocking": true }
+      ],
+      "buchen": [
+        { "title": "Visa, Impfungen und Pass prüfen", "why": "Visa und Impfungen haben Vorlaufzeiten von Wochen bis Monaten.", "how": "Reisehinweise des Auswärtigen Amts prüfen.", "min": 120, "blocking": true },
+        { "title": "Die teuersten Verbindungen zuerst buchen", "why": "Flüge werden näher am Termin meist teurer, nicht billiger.", "how": null, "min": 180, "blocking": true }
+      ]
+    },
+    "risks": [],
+    "assumptions": []
+  },
+
+  {
+    "key": "leben.aufraeumen",
+    "label": "Ordnung schaffen",
+    "archetype": "vorhaben",
+    "keywords": ["aufräumen", "ausmisten", "entrümpeln", "ordnung", "keller", "dachboden", "minimalismus"],
+    "horizonDays": 60,
+    "inserts": {
+      "umsetzen": [
+        { "title": "Raum für Raum vorgehen, nie mehrere gleichzeitig", "why": "Wer überall anfängt, hat überall Baustellen und nirgends ein Ergebnis.", "how": null, "min": 480, "blocking": true },
+        { "title": "Für Aussortiertes gleich einen Abholtermin vereinbaren", "why": "Kisten im Flur wandern erfahrungsgemäß zurück.", "how": null, "min": 60, "blocking": true }
+      ]
+    },
+    "risks": [],
+    "assumptions": []
+  },
+
+  {
+    "key": "leben.garten",
+    "label": "Garten anlegen",
+    "archetype": "vorhaben",
+    "keywords": ["garten", "beet", "gemüse anbauen", "hochbeet", "balkon bepflanzen", "gärtnern"],
+    "horizonDays": 210,
+    "inserts": {
+      "vorbereiten": [
+        { "title": "Den Pflanzkalender auf die Fläche anwenden", "why": "Im Garten bestimmt die Jahreszeit den Zeitplan, nicht der eigene Kalender.", "how": null, "min": 90, "blocking": true }
+      ]
+    },
+    "risks": [],
+    "assumptions": ["Der Zeitplan hängt an der Jahreszeit — bei Aussaatterminen geht die Natur vor."]
+  },
+
+  {
+    "key": "kreativ.buch",
+    "label": "Ein Buch schreiben",
+    "archetype": "vorhaben",
+    "keywords": ["buch schreiben", "roman", "manuskript", "autor", "veröffentlichen", "sachbuch"],
+    "horizonDays": 365,
+    "titles": { "umsetzen": "Die Rohfassung schreiben", "abschliessen": "Überarbeiten und veröffentlichen" },
+    "inserts": {
+      "klaeren": [
+        { "title": "In drei Sätzen sagen, wovon das Buch handelt", "why": "Wer das nicht kann, schreibt sich in der Mitte fest.", "how": null, "min": 90, "blocking": true }
+      ],
+      "umsetzen": [
+        { "title": "Ein tägliches Wortziel setzen und protokollieren", "why": "Rohfassungen entstehen durch Menge, nicht durch Inspiration.", "how": "Fünfhundert Wörter am Tag ergeben in sechs Monaten ein Buch.", "min": 420, "blocking": true },
+        { "title": "Beim Schreiben nicht überarbeiten", "why": "Gleichzeitiges Schreiben und Korrigieren bringt beides zum Stehen.", "how": null, "min": 60, "blocking": false }
+      ],
+      "abschliessen": [
+        { "title": "Die Rohfassung vier Wochen liegen lassen", "why": "Abstand zeigt Schwächen, die frisch unsichtbar sind.", "how": null, "min": 30, "blocking": true },
+        { "title": "Drei Testleser suchen und ihre Rückmeldung einarbeiten", "why": "Was drei Menschen unabhängig anmerken, ist ein echtes Problem.", "how": null, "min": 240, "blocking": true }
+      ]
+    },
+    "risks": [
+      { "stage": "umsetzen", "risk": "Die meisten Manuskripte bleiben im mittleren Drittel liegen.", "mitigation": "Vorher aufschreiben, was im Mittelteil passiert — dann gibt es dort nichts mehr zu entscheiden." }
+    ],
+    "assumptions": []
+  },
+
+  {
+    "key": "kreativ.kanal",
+    "label": "Podcast oder Kanal aufbauen",
+    "archetype": "vorhaben",
+    "keywords": ["podcast", "youtube", "kanal", "videos", "streaming", "newsletter", "blog"],
+    "horizonDays": 240,
+    "inserts": {
+      "klaeren": [
+        { "title": "Thema und Zielgruppe in einem Satz festlegen", "why": "Kanäle ohne klares Thema wachsen nicht, egal wie gut die Einzelfolgen sind.", "how": null, "min": 60, "blocking": true }
+      ],
+      "umsetzen": [
+        { "title": "Zehn Folgen vorproduzieren, bevor die erste erscheint", "why": "Der Vorrat trägt über die Wochen, in denen noch niemand zuhört.", "how": null, "min": 480, "blocking": true },
+        { "title": "Einen festen Veröffentlichungsrhythmus einhalten", "why": "Regelmäßigkeit schlägt Perfektion — bei Publikum und bei den Algorithmen.", "how": null, "min": 240, "blocking": true }
+      ]
+    },
+    "risks": [
+      { "stage": "umsetzen", "risk": "Die meisten Kanäle enden zwischen Folge drei und sieben.", "mitigation": "Der Vorrat aus der Vorproduktion überbrückt genau diese Phase." }
+    ],
+    "assumptions": []
+  },
+
+  {
+    "key": "digital.website",
+    "label": "Website oder Shop aufbauen",
+    "archetype": "vorhaben",
+    "keywords": ["website", "webseite", "homepage", "internetseite", "landingpage"],
+    "horizonDays": 120,
+    "inserts": {
+      "vorbereiten": [
+        { "title": "Domain sichern und rechtliche Pflichtangaben vorbereiten", "why": "Impressum und Datenschutzerklärung sind in Deutschland Pflicht und werden abgemahnt.", "how": null, "min": 180, "blocking": true }
+      ],
+      "umsetzen": [
+        { "title": "Mit der kleinsten sinnvollen Fassung online gehen", "why": "Eine kleine veröffentlichte Seite ist mehr wert als eine große, die nie fertig wird.", "how": null, "min": 480, "blocking": true }
+      ]
+    },
+    "risks": [],
+    "assumptions": []
+  },
+
+  {
+    "key": "sozial.kontakte",
+    "label": "Kontakte pflegen oder finden",
+    "archetype": "gewohnheit",
+    "keywords": ["freunde finden", "kontakte", "einsam", "leute kennenlernen", "netzwerk", "beziehung", "partner finden", "verein"],
+    "horizonDays": 150,
+    "inserts": {
+      "klein": [
+        { "title": "Eine wiederkehrende Gelegenheit wählen statt einmaliger Veranstaltungen", "why": "Nähe entsteht durch Wiedersehen, nicht durch gute erste Gespräche.", "how": "Verein, Kurs, Chor, Ehrenamt — etwas, das jede Woche stattfindet.", "min": 120, "blocking": true }
+      ],
+      "ausweiten": [
+        { "title": "Selbst einladen, statt auf Einladungen zu warten", "why": "Der Schritt vom Kennen zum Kennenlernen macht fast immer eine Seite zuerst.", "how": null, "min": 90, "blocking": true }
+      ]
+    },
+    "risks": [],
+    "assumptions": []
+  }
+]
