@@ -94,6 +94,7 @@
     background: var(--elevated); border: 1px solid var(--line);
     border-radius: 16px; padding: 20px;
   }
+  a { color: var(--accent); text-underline-offset: 3px; }
   .chip {
     display: inline-block; font-size: 13px; color: var(--text-2);
     background: var(--sunken); border: 1px solid var(--line);
@@ -285,6 +286,17 @@
     <h1>Einstellungen</h1>
     <p>Mit einem Anthropic-API-Key plant Claude für <strong>beliebige</strong> Ziele
        statt nur für die drei hinterlegten Playbooks.</p>
+    <div class="card" style="margin-bottom:24px">
+      <span class="label">So kommst du an einen Schlüssel</span>
+      <ol style="margin:0; padding-left:20px; color:var(--text-2); font-size:15px; line-height:1.7">
+        <li><a href="https://console.anthropic.com" target="_blank" rel="noopener">console.anthropic.com</a>
+            öffnen und ein Konto anlegen.</li>
+        <li>Unter <em>Billing</em> Guthaben aufladen — 5 € reichen für etwa 25 Pläne.</li>
+        <li>Unter <em>API Keys</em> auf <em>Create Key</em>. Der Schlüssel wird
+            <strong>nur einmal</strong> angezeigt.</li>
+        <li>Hier einfügen und speichern.</li>
+      </ol>
+    </div>
     <div class="stack">
       <div class="field">
         <label class="label" for="s-key">Anthropic API-Key</label>
@@ -1312,8 +1324,11 @@ function refreshModeBanner() {
        Jeder Plan kostet etwa 0,15–0,20 € über deinen Anthropic-Account.`
     : `<strong>Ohne API-Key</strong>
        Die Pläne kommen aus drei hinterlegten Playbooks und sind nicht auf deine
-       Situation zugeschnitten. Unter „Einstellungen“ kannst du einen
-       Anthropic-API-Key hinterlegen — dann plant Claude für beliebige Ziele.`;
+       Situation zugeschnitten. Mit einem eigenen Anthropic-API-Key plant Claude
+       für beliebige Ziele.
+       <button class="link" id="btn-banner-key" style="display:block; margin-top:10px">Schlüssel hinterlegen</button>`;
+  const jump = $("btn-banner-key");
+  if (jump) jump.onclick = () => { if (state.user) openSettings(); };
   $("goal-hint").textContent = withKey
     ? "Ein Satz reicht. Je konkreter, desto besser der Plan."
     : "Ohne API-Key gibt es Pläne zu drei Vorhaben: Café, Freelance, Onlineshop.";
@@ -1677,14 +1692,15 @@ $("tab-today").onclick = () => selectTab("today");
 $("tab-path").onclick = () => selectTab("path");
 $("tab-check").onclick = () => selectTab("check");
 
-$("btn-settings").onclick = () => {
+function openSettings() {
   $("s-key").value = state.settings.apiKey || "";
   $("s-model").value = state.settings.model || "claude-opus-5";
   // Gehostete Seiten haben oft eine Content-Security-Policy, die fremde Ziele
   // sperrt. Lokal geöffnet (file:) gibt es die Einschränkung nicht.
   $("hosted-note").classList.toggle("hidden", location.protocol === "file:");
   show("settings");
-};
+}
+$("btn-settings").onclick = openSettings;
 $("btn-settings-back").onclick = () => renderHome();
 
 $("btn-save-key").onclick = () => {
