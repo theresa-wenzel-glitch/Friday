@@ -199,3 +199,18 @@
     color: var(--muted-fg);
   }
 }
+
+/* Druckansicht des Fohlen-Papier-Assistenten: nur die Zusammenfassung, ohne
+   Navigation/Fortschrittsanzeige/Knöpfe. */
+@media print {
+  header,
+  footer,
+  .no-print {
+    display: none !important;
+  }
+
+  .print-summary {
+    border: none !important;
+    box-shadow: none !important;
+  }
+}

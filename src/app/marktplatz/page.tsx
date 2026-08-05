@@ -41,6 +41,9 @@ export default async function MarketplacePage() {
         <Link href="/marktplatz/auktionen" className="btn btn-secondary no-underline">
           Decksprung-Auktionen
         </Link>
+        <Link href="/marktplatz/papiere" className="btn btn-secondary no-underline">
+          Papierservice
+        </Link>
         {account ? (
           <>
             <Link href="/marktplatz/inserieren" className="btn btn-secondary no-underline">

@@ -812,3 +812,14 @@ export function countOpenCorrections(): number {
       .get() as { c: number }
   ).c;
 }
+
+/** Nur Namen, für Auswahllisten (z. B. Vater/Mutter im Papierservice-Assistenten). */
+export function listHorseNames(): string[] {
+  return (
+    getDb()
+      .prepare(
+        "SELECT name FROM horses WHERE status = 'approved' ORDER BY name COLLATE NOCASE",
+      )
+      .all() as { name: string }[]
+  ).map((r) => r.name);
+}

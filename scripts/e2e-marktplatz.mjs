@@ -334,6 +334,57 @@ try {
       finalAuctionBody.includes("Bietende Zuechterin"),
   );
 
+  /* 24 - Papierservice: Info-Seite verweist auf die echten Verbandsseiten,
+     nicht auf eine erfundene eigene Schnittstelle. */
+  await page.goto(`${BASE}/marktplatz/papiere`);
+  check(
+    "Papierservice verlinkt AQHA und APHA direkt",
+    (await page.locator('a[href*="aqha.com"]').count()) > 0 &&
+      (await page.locator('a[href*="apha.com"]').count()) > 0,
+  );
+  check(
+    "Papierservice weist auf Ausfüllhilfe statt offiziellem Antrag hin",
+    (await page.textContent("main")).includes("keine offizielle"),
+  );
+
+  /* 25 - Fohlen-Papier-Assistent durchklicken -> Zusammenfassung ---------- */
+  await page.goto(`${BASE}/marktplatz/papiere/assistent`);
+  await page.click("text=Weiter");
+  await page.fill("#foalName", "E2E Testfohlen");
+  await page.selectOption("#sex", "Hengstfohlen");
+  await page.fill("#birthDate", "2026-05-01");
+  await page.fill("#color", "Palomino");
+  await page.click("text=Weiter");
+  await page.fill("#sireName", "Doc Bar");
+  await page.fill("#damName", "Poco Lena");
+  await page.click("text=Weiter");
+  await page.fill("#breederName", "E2E Testhof");
+  await page.click("text=Weiter");
+  const wizardSummary = await page.locator("main").textContent();
+  check(
+    "Assistent zeigt am Ende eine Zusammenfassung mit allen Angaben",
+    wizardSummary.includes("E2E Testfohlen") &&
+      wizardSummary.includes("Doc Bar") &&
+      wizardSummary.includes("Poco Lena") &&
+      wizardSummary.includes("E2E Testhof"),
+  );
+  check(
+    "Assistent bietet einen Druck-Knopf statt eines Absenden-Formulars",
+    (await page.locator('button:has-text("drucken")').count()) > 0,
+  );
+
+  /* 26 - Vater/Mutter lassen sich aus dem Bestand auswählen (datalist) ---- */
+  await page.goto(`${BASE}/marktplatz/papiere/assistent`);
+  await page.waitForTimeout(200);
+  await page.click("text=Weiter");
+  await page.click("text=Weiter");
+  const horseOptionCount = await page.locator("#horse-names option").count();
+  check(
+    "Abstammungsschritt bietet den Bestand als Auswahl an",
+    horseOptionCount > 100,
+    `${horseOptionCount} Optionen`,
+  );
+
   check("Keine Skriptfehler im gesamten Ablauf", true);
 } finally {
   await browser.close();
