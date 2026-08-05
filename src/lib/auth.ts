@@ -1,31 +1,13 @@
-import crypto from "node:crypto";
 import { cookies } from "next/headers";
+import { safeEqual, sign } from "./session-crypto";
 
 const COOKIE_NAME = "wh_admin";
 const MAX_AGE_SECONDS = 12 * 60 * 60;
-
-function secret(): string {
-  const value = process.env.SESSION_SECRET;
-  if (!value || value === "bitte-aendern") {
-    throw new Error(
-      "SESSION_SECRET ist nicht gesetzt. Bitte .env.local anlegen (siehe .env.example).",
-    );
-  }
-  return value;
-}
 
 function adminPassword(): string | null {
   const value = process.env.ADMIN_PASSWORD;
   if (!value || value === "bitte-aendern") return null;
   return value;
-}
-
-/** Vergleich in konstanter Zeit, damit die Laufzeit nichts über das Passwort verrät. */
-function safeEqual(a: string, b: string): boolean {
-  const bufA = Buffer.from(a);
-  const bufB = Buffer.from(b);
-  if (bufA.length !== bufB.length) return false;
-  return crypto.timingSafeEqual(bufA, bufB);
 }
 
 export function checkPassword(input: string): boolean {
@@ -37,10 +19,6 @@ export function checkPassword(input: string): boolean {
 /** Der Moderationsbereich ist erst nutzbar, wenn ein echtes Passwort gesetzt wurde. */
 export function isAdminConfigured(): boolean {
   return adminPassword() !== null && Boolean(process.env.SESSION_SECRET);
-}
-
-function sign(payload: string): string {
-  return crypto.createHmac("sha256", secret()).update(payload).digest("hex");
 }
 
 export async function createSession(): Promise<void> {

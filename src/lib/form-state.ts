@@ -39,6 +39,25 @@ export interface LoginState {
 
 export const EMPTY_LOGIN_STATE: LoginState = {};
 
+export interface RegisterState {
+  status: "idle" | "error";
+  errors: Record<string, string>;
+  values: Record<string, string>;
+}
+
+export const EMPTY_REGISTER_STATE: RegisterState = {
+  status: "idle",
+  errors: {},
+  values: {},
+};
+
+export interface AccountLoginState {
+  error?: string;
+  email?: string;
+}
+
+export const EMPTY_ACCOUNT_LOGIN_STATE: AccountLoginState = {};
+
 export interface ImportAction {
   name: string;
   kind: "create" | "update" | "unchanged";

@@ -187,6 +187,35 @@ function migrate(conn: Database.Database) {
     );
 
     CREATE INDEX IF NOT EXISTS idx_corrections_handled ON corrections(handled);
+
+    -- Marktplatz: Anbieter-Konten, getrennt vom globalen Admin-Passwort.
+    CREATE TABLE IF NOT EXISTS accounts (
+      id            INTEGER PRIMARY KEY AUTOINCREMENT,
+      email         TEXT    NOT NULL,
+      email_key     TEXT    NOT NULL UNIQUE,
+      password_hash TEXT    NOT NULL,
+      display_name  TEXT    NOT NULL,
+      phone         TEXT,
+      role          TEXT    NOT NULL DEFAULT 'provider',
+      is_verified   INTEGER NOT NULL DEFAULT 0,
+      status        TEXT    NOT NULL DEFAULT 'active',
+      created_at    TEXT    NOT NULL,
+      updated_at    TEXT    NOT NULL
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_accounts_status ON accounts(status);
+
+    -- Widerrufbare Sessions (anders als das zustandslose Admin-Cookie):
+    -- Logout auf anderen Geräten, Sperrung, Passwortwechsel muss sofort greifen.
+    CREATE TABLE IF NOT EXISTS account_sessions (
+      id          TEXT    PRIMARY KEY,
+      account_id  INTEGER NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+      created_at  TEXT    NOT NULL,
+      expires_at  TEXT    NOT NULL
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_sessions_account ON account_sessions(account_id);
+    CREATE INDEX IF NOT EXISTS idx_sessions_expires ON account_sessions(expires_at);
   `);
 }
 

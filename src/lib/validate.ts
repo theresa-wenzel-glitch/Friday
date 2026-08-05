@@ -27,7 +27,7 @@ const MAX = {
   genetics: 16,
 };
 
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i;
+export const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i;
 const CURRENT_YEAR = new Date().getFullYear();
 
 function str(form: FormData, key: string): string {
