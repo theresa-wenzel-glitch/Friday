@@ -52,6 +52,9 @@ export default async function AdminPage() {
           <Link href="/admin/abstammung" className="btn btn-secondary no-underline">
             Abstammungen eintragen
           </Link>
+          <Link href="/admin/marktplatz" className="btn btn-secondary no-underline">
+            Marktplatz-Moderation
+          </Link>
           <form action={logoutAction}>
             <button type="submit" className="btn btn-secondary">
               Abmelden

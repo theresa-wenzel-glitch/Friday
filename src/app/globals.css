@@ -175,4 +175,27 @@
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
   }
+
+  /* Statistik-Kopfzeile im Marktplatz - Zahlen kommen live aus der DB. */
+  .stat-tile {
+    background-color: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 0.75rem;
+    padding: 0.9rem 1rem;
+    text-align: center;
+  }
+
+  .stat-tile .stat-value {
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    font-weight: 600;
+    line-height: 1.1;
+  }
+
+  .stat-tile .stat-label {
+    font-size: 0.72rem;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--muted-fg);
+  }
 }

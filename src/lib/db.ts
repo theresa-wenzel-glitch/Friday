@@ -216,6 +216,42 @@ function migrate(conn: Database.Database) {
 
     CREATE INDEX IF NOT EXISTS idx_sessions_account ON account_sessions(account_id);
     CREATE INDEX IF NOT EXISTS idx_sessions_expires ON account_sessions(expires_at);
+
+    -- Marktplatz-Inserate: Deckhengst-Angebot ODER Verkaufspferd. Getrennt von
+    -- horses (Info-Verzeichnis) - horse_id ist nur eine optionale Verknuepfung.
+    CREATE TABLE IF NOT EXISTS listings (
+      id             INTEGER PRIMARY KEY AUTOINCREMENT,
+      account_id     INTEGER NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+      horse_id       INTEGER REFERENCES horses(id) ON DELETE SET NULL,
+      kind           TEXT    NOT NULL DEFAULT 'stud' CHECK (kind IN ('stud','sale')),
+      slug           TEXT    NOT NULL UNIQUE,
+      name           TEXT    NOT NULL,
+      name_key       TEXT    NOT NULL DEFAULT '',
+      sex            TEXT    NOT NULL DEFAULT 'stallion',
+      breed          TEXT,
+      year_of_birth  INTEGER,
+      color          TEXT,
+      country        TEXT,
+      location       TEXT,
+      disciplines    TEXT    NOT NULL DEFAULT '[]',
+      description    TEXT,
+      price_cents    INTEGER,
+      price_currency TEXT    NOT NULL DEFAULT 'EUR',
+      price_label    TEXT,
+      photo_url      TEXT,
+      contact_name   TEXT,
+      contact_email  TEXT,
+      contact_phone  TEXT,
+      status         TEXT    NOT NULL DEFAULT 'pending',
+      admin_note     TEXT,
+      created_at     TEXT    NOT NULL,
+      updated_at     TEXT    NOT NULL
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_listings_status  ON listings(status);
+    CREATE INDEX IF NOT EXISTS idx_listings_kind    ON listings(kind);
+    CREATE INDEX IF NOT EXISTS idx_listings_account ON listings(account_id);
+    CREATE INDEX IF NOT EXISTS idx_listings_country ON listings(country);
   `);
 }
 

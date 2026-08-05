@@ -115,6 +115,78 @@ try {
   );
   await page2.close();
 
+  /* 9 - Inserat einstellen (noch als Testhof Marktplatz angemeldet) ------ */
+  const HORSE_NAME = `Testhengst Markt ${Date.now()}`;
+  await page.goto(`${BASE}/marktplatz/inserieren`);
+  await page.fill("#name", HORSE_NAME);
+  await page.selectOption("#kind", "stud");
+  await page.fill("#yearOfBirth", "2018");
+  await page.fill("#color", "Palomino");
+  await page.fill("#country", "DE");
+  await page.fill("#price", "950");
+  await page.fill("#priceLabel", "zzgl. Versandsamen");
+  await page.fill("#contactEmail", "besitzer@example.com");
+  await page.click('button[type="submit"]');
+  await page.waitForTimeout(500);
+  check(
+    "Inserat-Einsendung wird bestätigt",
+    (await page.textContent("body")).includes("wird kurz geprüft"),
+  );
+
+  /* 10 - Vor Freigabe ist das Inserat im Marktplatz nicht sichtbar -------
+     Wichtig: page.textContent("body") liefert auch den Text von <script>-
+     Tags (u. a. die RSC-Nutzlast, die den Suchbegriff aus der URL enthält) -
+     das ergäbe hier einen falschen Treffer. Deshalb gezielt auf einen echten
+     Link mit diesem Namen prüfen (Accessibility-Baum, keine Script-Inhalte). */
+  await page.goto(`${BASE}/marktplatz/pferde?q=${encodeURIComponent(HORSE_NAME)}`);
+  check(
+    "Neues Inserat ist vor Freigabe unsichtbar",
+    (await page.getByRole("link", { name: HORSE_NAME }).count()) === 0,
+  );
+
+  /* 11 - Admin gibt das Inserat frei --------------------------------------
+     eigener Browser-Kontext, damit die Anbieter-Session nicht überschrieben wird. */
+  const adminContext = await browser.newContext();
+  const adminPage = await adminContext.newPage();
+  await adminPage.goto(`${BASE}/admin/marktplatz`);
+  await adminPage.fill("#password", process.env.ADMIN_PASSWORD ?? "test-passwort-lokal");
+  await adminPage.click('button[type="submit"]');
+  await adminPage.waitForTimeout(500);
+  check(
+    "Neues Inserat erscheint in der Marktplatz-Moderation",
+    (await adminPage.textContent("body")).includes(HORSE_NAME),
+  );
+
+  await adminPage.locator("li", { hasText: HORSE_NAME }).getByRole("button", { name: "Freigeben" }).click();
+  await adminPage.waitForTimeout(500);
+  await adminContext.close();
+
+  /* 12 - Nach Freigabe ist das Inserat mit Preis und Land sichtbar -------
+     Ab hier auf <main> statt <body> beschränken, aus demselben Grund wie
+     oben (RSC-Script-Nutzlast würde sonst falsche Treffer erzeugen). */
+  await page.goto(`${BASE}/marktplatz/pferde?q=${encodeURIComponent(HORSE_NAME)}`);
+  const listingMain = await page.locator("main").textContent();
+  check(
+    "Inserat ist nach Freigabe sichtbar mit Preis-Badge",
+    listingMain.includes(HORSE_NAME) && listingMain.includes("950"),
+  );
+  check(
+    "Inserat zeigt das Land",
+    listingMain.includes("Deutschland"),
+  );
+
+  await page.click(`a:has-text("${HORSE_NAME}")`);
+  await page.waitForTimeout(400);
+  const detailMain = await page.locator("main").textContent();
+  check(
+    "Detailseite zeigt Decktaxe und Zusatztext",
+    detailMain.includes("950") && detailMain.includes("Versandsamen"),
+  );
+  check(
+    "Detailseite verrät keine Kontakt-E-Mail im HTML",
+    !(await page.textContent("body")).includes("besitzer@example.com"),
+  );
+
   check("Keine Skriptfehler im gesamten Ablauf", true);
 } finally {
   await browser.close();

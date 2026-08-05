@@ -58,6 +58,18 @@ export interface AccountLoginState {
 
 export const EMPTY_ACCOUNT_LOGIN_STATE: AccountLoginState = {};
 
+export interface ListingState {
+  status: "idle" | "error" | "done";
+  errors: Record<string, string>;
+  values: Record<string, string>;
+}
+
+export const EMPTY_LISTING_STATE: ListingState = {
+  status: "idle",
+  errors: {},
+  values: {},
+};
+
 export interface ImportAction {
   name: string;
   kind: "create" | "update" | "unchanged";
