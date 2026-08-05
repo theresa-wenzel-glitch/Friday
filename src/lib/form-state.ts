@@ -70,6 +70,13 @@ export const EMPTY_LISTING_STATE: ListingState = {
   values: {},
 };
 
+export interface InquiryState {
+  status: "idle" | "sent" | "error";
+  message?: string;
+}
+
+export const EMPTY_INQUIRY_STATE: InquiryState = { status: "idle" };
+
 export interface ImportAction {
   name: string;
   kind: "create" | "update" | "unchanged";

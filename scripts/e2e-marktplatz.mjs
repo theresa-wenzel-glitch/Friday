@@ -187,6 +187,41 @@ try {
     !(await page.textContent("body")).includes("besitzer@example.com"),
   );
 
+  /* 13 - Ein Interessent (nicht angemeldet) schreibt über das Inserat an -
+     eigener Kontext, damit keine Anbieter-Session mitgeschickt wird. */
+  const listingUrl = page.url();
+  const visitorContext = await browser.newContext();
+  const visitorPage = await visitorContext.newPage();
+  await visitorPage.goto(listingUrl);
+  await visitorPage.fill("#senderName", "Interessentin Mueller");
+  await visitorPage.fill("#senderEmail", "interessentin@example.com");
+  await visitorPage.fill("#message", "Ist ein Decktermin im Mai noch frei?");
+  await visitorPage.click('button:has-text("Anfrage senden")');
+  await visitorPage.waitForTimeout(500);
+  check(
+    "Anfrage wird bestätigt",
+    (await visitorPage.textContent("main")).includes("beim Anbieter angekommen"),
+  );
+  await visitorContext.close();
+
+  /* 14 - Der Anbieter sieht die Anfrage im eigenen Konto ------------------ */
+  await page.goto(`${BASE}/marktplatz/konto`);
+  const dashboardBody = await page.locator("main").textContent();
+  check(
+    "Anfrage erscheint im Konto des Anbieters",
+    dashboardBody.includes("Interessentin Mueller") &&
+      dashboardBody.includes("interessentin@example.com") &&
+      dashboardBody.includes("Decktermin im Mai"),
+  );
+
+  /* 15 - Anfrage als erledigt markieren ----------------------------------- */
+  await page.click('button:has-text("Als erledigt markieren")');
+  await page.waitForTimeout(400);
+  check(
+    "Anfrage lässt sich als erledigt markieren",
+    (await page.locator("main").textContent()).includes("erledigt"),
+  );
+
   check("Keine Skriptfehler im gesamten Ablauf", true);
 } finally {
   await browser.close();

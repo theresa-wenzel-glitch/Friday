@@ -63,6 +63,17 @@ export interface Listing {
   updatedAt: string;
 }
 
+export interface Inquiry {
+  id: number;
+  listingId: number;
+  senderName: string;
+  senderEmail: string;
+  senderPhone: string | null;
+  message: string;
+  handled: boolean;
+  createdAt: string;
+}
+
 /** Formatiert einen Centbetrag als Preis-Badge, z. B. "1.200 €". `null` = "auf Anfrage". */
 export function formatPrice(cents: number | null, currency = "EUR"): string {
   if (cents === null) return "auf Anfrage";

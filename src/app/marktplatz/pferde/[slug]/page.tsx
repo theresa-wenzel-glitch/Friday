@@ -5,6 +5,7 @@ import { getListingBySlug, toPublicListing } from "@/lib/marketplace-db";
 import { formatPrice } from "@/lib/marketplace-types";
 import { countryLabel, SEX_LABEL } from "@/lib/labels";
 import { HorsePortrait } from "@/components/HorsePortrait";
+import { InquiryForm } from "@/components/marktplatz/InquiryForm";
 
 export const dynamic = "force-dynamic";
 
@@ -76,8 +77,10 @@ export default async function ListingDetailPage({
           </dl>
 
           {listing.description && (
-            <p className="whitespace-pre-line">{listing.description}</p>
+            <p className="whitespace-pre-line mb-8">{listing.description}</p>
           )}
+
+          <InquiryForm listingId={listing.id} />
         </div>
 
         <div className="sm:order-first sm:w-64">

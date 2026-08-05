@@ -234,3 +234,63 @@ export function validateListingSubmission(form: FormData): ListingValidation {
     },
   };
 }
+
+/* ------------------------------------------------------------------ */
+/* Kontaktanfragen                                                     */
+/* ------------------------------------------------------------------ */
+
+export interface InquiryValidation {
+  ok: boolean;
+  errors: Record<string, string>;
+  data?: {
+    senderName: string;
+    senderEmail: string;
+    senderPhone: string | null;
+    message: string;
+  };
+}
+
+export function validateInquiry(form: FormData): InquiryValidation {
+  const errors: Record<string, string> = {};
+
+  const senderName = str(form, "senderName");
+  const senderEmail = str(form, "senderEmail");
+  const senderPhone = str(form, "senderPhone");
+  const message = str(form, "message");
+
+  // Honeypot.
+  if (str(form, "website")) {
+    errors._spam = "Die Anfrage wurde als automatisiert erkannt.";
+  }
+
+  if (senderName.length < 2) {
+    errors.senderName = "Bitte deinen Namen angeben.";
+  }
+
+  if (!senderEmail) {
+    errors.senderEmail = "Bitte eine E-Mail-Adresse angeben, damit geantwortet werden kann.";
+  } else if (!EMAIL_RE.test(senderEmail)) {
+    errors.senderEmail = "Diese E-Mail-Adresse sieht nicht gültig aus.";
+  }
+
+  if (message.length < 10) {
+    errors.message = "Bitte kurz schreiben, worum es geht (mindestens 10 Zeichen).";
+  } else if (message.length > 2000) {
+    errors.message = "Bitte auf 2000 Zeichen kürzen.";
+  }
+
+  if (Object.keys(errors).length > 0) {
+    return { ok: false, errors };
+  }
+
+  return {
+    ok: true,
+    errors,
+    data: {
+      senderName,
+      senderEmail,
+      senderPhone: senderPhone || null,
+      message,
+    },
+  };
+}

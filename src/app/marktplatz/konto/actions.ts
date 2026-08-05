@@ -8,8 +8,10 @@ import {
   createAccount,
   createAccountSession,
   destroyAccountSession,
+  requireAccount,
   verifyLogin,
 } from "@/lib/accounts";
+import { markInquiryHandled } from "@/lib/marketplace-db";
 import { validateRegistration } from "@/lib/marketplace-validate";
 import { rateLimit } from "@/lib/rate-limit";
 import type {
@@ -94,4 +96,13 @@ export async function accountLogoutAction(): Promise<void> {
   await destroyAccountSession();
   revalidatePath("/marktplatz/konto");
   redirect("/marktplatz");
+}
+
+export async function markInquiryHandledAction(form: FormData): Promise<void> {
+  const account = await requireAccount();
+  const inquiryId = Number(form.get("inquiryId"));
+  if (!Number.isInteger(inquiryId)) return;
+
+  markInquiryHandled(inquiryId, account.id);
+  revalidatePath("/marktplatz/konto");
 }

@@ -252,6 +252,21 @@ function migrate(conn: Database.Database) {
     CREATE INDEX IF NOT EXISTS idx_listings_kind    ON listings(kind);
     CREATE INDEX IF NOT EXISTS idx_listings_account ON listings(account_id);
     CREATE INDEX IF NOT EXISTS idx_listings_country ON listings(country);
+
+    -- Kontaktanfragen zu einem Inserat.
+    CREATE TABLE IF NOT EXISTS inquiries (
+      id            INTEGER PRIMARY KEY AUTOINCREMENT,
+      listing_id    INTEGER NOT NULL REFERENCES listings(id) ON DELETE CASCADE,
+      sender_name   TEXT    NOT NULL,
+      sender_email  TEXT    NOT NULL,
+      sender_phone  TEXT,
+      message       TEXT    NOT NULL,
+      handled       INTEGER NOT NULL DEFAULT 0,
+      created_at    TEXT    NOT NULL
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_inquiries_listing ON inquiries(listing_id);
+    CREATE INDEX IF NOT EXISTS idx_inquiries_handled ON inquiries(handled);
   `);
 }
 

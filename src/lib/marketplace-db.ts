@@ -1,6 +1,7 @@
 import { getDb } from "./db";
 import { normalizeName, slugify } from "./slug";
 import type {
+  Inquiry,
   Listing,
   ListingKind,
   ListingStatus,
@@ -307,4 +308,88 @@ export function updateListingStatus(
        WHERE id = @id`,
     )
     .run({ id, status, note: adminNote ?? null, now: new Date().toISOString() });
+}
+
+/* ------------------------------------------------------------------ */
+/* Kontaktanfragen                                                     */
+/* ------------------------------------------------------------------ */
+
+function toInquiry(row: Row): Inquiry {
+  return {
+    id: row.id as number,
+    listingId: row.listing_id as number,
+    senderName: row.sender_name as string,
+    senderEmail: row.sender_email as string,
+    senderPhone: (row.sender_phone as string) ?? null,
+    message: row.message as string,
+    handled: Boolean(row.handled),
+    createdAt: row.created_at as string,
+  };
+}
+
+export function insertInquiry(input: {
+  listingId: number;
+  senderName: string;
+  senderEmail: string;
+  senderPhone: string | null;
+  message: string;
+}): void {
+  getDb()
+    .prepare(
+      `INSERT INTO inquiries (listing_id, sender_name, sender_email, sender_phone, message, created_at)
+       VALUES (@listing_id, @sender_name, @sender_email, @sender_phone, @message, @now)`,
+    )
+    .run({
+      listing_id: input.listingId,
+      sender_name: input.senderName,
+      sender_email: input.senderEmail,
+      sender_phone: input.senderPhone,
+      message: input.message,
+      now: new Date().toISOString(),
+    });
+}
+
+/** Anfragen für alle Inserate eines Kontos - neueste zuerst, samt Inseratsname. */
+export function listInquiriesForAccount(
+  accountId: number,
+): (Inquiry & { listingName: string; listingSlug: string })[] {
+  const rows = getDb()
+    .prepare(
+      `SELECT i.*, l.name AS listing_name, l.slug AS listing_slug
+       FROM inquiries i
+       JOIN listings l ON l.id = i.listing_id
+       WHERE l.account_id = @accountId
+       ORDER BY i.created_at DESC LIMIT 200`,
+    )
+    .all({ accountId }) as Row[];
+
+  return rows.map((row) => ({
+    ...toInquiry(row),
+    listingName: row.listing_name as string,
+    listingSlug: row.listing_slug as string,
+  }));
+}
+
+export function countOpenInquiriesForAccount(accountId: number): number {
+  return (
+    getDb()
+      .prepare(
+        `SELECT COUNT(*) AS c FROM inquiries i
+         JOIN listings l ON l.id = i.listing_id
+         WHERE l.account_id = @accountId AND i.handled = 0`,
+      )
+      .get({ accountId }) as { c: number }
+  ).c;
+}
+
+/** Prüft vor dem Als-erledigt-Markieren, dass die Anfrage zu einem Inserat
+ * dieses Kontos gehört - verhindert, dass ein Konto fremde Anfragen ändert. */
+export function markInquiryHandled(inquiryId: number, accountId: number): void {
+  getDb()
+    .prepare(
+      `UPDATE inquiries SET handled = 1
+       WHERE id = @inquiryId
+         AND listing_id IN (SELECT id FROM listings WHERE account_id = @accountId)`,
+    )
+    .run({ inquiryId, accountId });
 }
