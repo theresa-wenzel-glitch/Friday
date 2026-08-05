@@ -3,8 +3,16 @@
 Ein offenes Verzeichnis für Hengste der Westernpferdezucht: Abstammung,
 Papiere, Gentests, Erfolge und der direkte Draht zum Besitzer.
 
-Bewusst **ohne Decktaxen, ohne Preise, ohne Verkauf**. Wer Interesse an einem
-Hengst hat, schreibt den Besitzer direkt an; das Verzeichnis vermittelt nicht.
+Das **Verzeichnis** selbst ist bewusst **ohne Decktaxen, ohne Preise, ohne
+Verkauf** - reine Information. Wer Interesse an einem historischen oder
+bekannten Hengst hat, schreibt den Besitzer direkt an.
+
+Daneben gibt es seit Kurzem einen **separaten Marktplatz-Bereich**
+(`/marktplatz`), in dem Anbieter Deckhengste und Verkaufspferde mit Preis
+inserieren, Kontaktanfragen erhalten und Decksprung-Auktionen anlegen können -
+siehe [Abschnitt „Marktplatz"](#marktplatz) weiter unten. Das Info-Verzeichnis
+bleibt davon unberührt: keine Preise, keine Konten nötig, keine Migration der
+recherchierten Bestandshengste in den Marktplatz.
 
 ## Was die App kann
 
@@ -33,6 +41,51 @@ Hengst hat, schreibt den Besitzer direkt an; das Verzeichnis vermittelt nicht.
   Korrekturmeldungen bearbeiten, Einträge als „geprüft“ markieren.
 - **Nachkommenliste**: Jede Pferdeseite listet die im Verzeichnis erfassten
   Nachkommen.
+
+## Marktplatz
+
+Ein zweiter, bewusst getrennter Bereich unter `/marktplatz` - inspiriert von
+frozen-partners.com und DreamQuarters, aber mit eigenem Datenmodell und ohne
+deren Optik zu kopieren. Das Info-Verzeichnis oben bleibt davon unberührt.
+
+- **Anbieter-Konten** (`/marktplatz/konto/registrieren`,
+  `/marktplatz/konto/anmelden`): eigenes Login, getrennt vom
+  `ADMIN_PASSWORD` der Moderation. Passwörter sind über Node's eingebautes
+  `crypto.scrypt` gehasht, Sessions liegen in der Datenbank und sind damit
+  widerrufbar (Logout auf anderen Geräten, Kontosperrung).
+- **Inserate** (`/marktplatz/inserieren`): Deckhengst oder Verkaufspferd, mit
+  Decktaxe/Preis - anders als im Info-Verzeichnis sind Preise hier bewusst
+  sichtbar. Inserate durchlaufen dieselbe Freigabe-Logik wie neue
+  Verzeichniseinträge (`/admin/marktplatz`).
+- **Kontaktanfragen**: Interessenten schreiben direkt über ein Inserat an,
+  ohne eigenes Konto. Der Anbieter sieht die Anfrage im eigenen Dashboard
+  (`/marktplatz/konto`).
+- **Decksprung-Auktionen** (`/marktplatz/auktionen`): versteigert wird ein
+  einzelner Decktermin eines Hengstes, nicht der Hengst selbst - das
+  höchste Gebot nach Ablauf gewinnt den Platz. Bieten setzt ein Konto
+  voraus; der Anbieter darf nicht auf die eigene Auktion bieten. Das
+  Höchstgebot wird immer live aus den Geboten berechnet.
+- **Papierservice** (`/marktplatz/papiere`): Links zu den echten
+  Registrierungsseiten von AQHA und APHA, plus ein Fohlen-Papier-Assistent,
+  der die üblichen Angaben sammelt und eine druckbare Zusammenfassung
+  erzeugt. **Das ist eine Ausfüllhilfe, kein offizieller Antrag** - AQHA und
+  APHA haben keine öffentliche Schnittstelle, über die sich eine echte
+  Direkteinreichung automatisieren liesse.
+
+**Zur Monetarisierung:** Geplant ist eine Gebühr pro eingestellter Auktion.
+Das Datenmodell (`fee_status`, `fee_amount_cents`) ist dafür vorbereitet,
+aber es gibt **keine automatisierte Zahlungsabwicklung** - ein Admin setzt
+den Zahlstatus unter `/admin/marktplatz` manuell, z. B. nach Überweisung.
+Rest des Marktplatzes (Inserate, Kontaktanfragen) ist kostenlos.
+
+**Rechtlich noch offen, bevor das live geht:** Impressumspflicht greift
+unter Umständen schon vor einer Gewerbeanmeldung, sobald entgeltlich
+Leistungen (die Auktionsgebühr!) angeboten werden. Dazu kommen AGB für
+Konten und Gebotsverbindlichkeit, Widerrufsrecht bei der Auktionsgebühr,
+eine erweiterte Datenschutzerklärung für die neuen personenbezogenen Daten
+(Passwort-Hashes, Anfragen, Gebote) und ein Blick auf tierzuchtrechtliche
+Vorgaben bei beworbenen Decktaxen. Das sind bewusst benannte, nicht
+technisch lösbare Punkte - siehe auch „Vor dem Livegang" unten.
 
 ## Loslegen
 
@@ -251,6 +304,11 @@ eingetragene Pferde bleiben unberührt.
 | `src/lib/coat-color.ts` | Farbzuordnung fürs Platzhalter-Portrait |
 | `src/components/HorsePortrait.tsx` | Foto oder Platzhalter-Monogramm |
 | `src/app/api/upload/` , `src/app/api/uploads/[filename]/` | Foto-Upload: annehmen und ausliefern |
+| `src/app/marktplatz/` | Marktplatz: Konten, Inserate, Anfragen, Auktionen, Papierservice |
+| `src/lib/accounts.ts` | Anbieter-Konten: Passwort-Hashing, Sessions |
+| `src/lib/marketplace-db.ts` | SQLite-Zugriff für Inserate, Anfragen, Auktionen, Gebote |
+| `src/lib/marketplace-validate.ts` | Prüfung der Marktplatz-Formulareingaben |
+| `src/app/admin/marktplatz/` | Moderation für Inserate und Auktionen |
 
 Technisch: Next.js (App Router) mit React Server Components, SQLite über
 `better-sqlite3`, Tailwind CSS. Kein externer Dienst nötig, die Datenbank ist
@@ -280,6 +338,7 @@ Die weiteren Testläufe (Server muss laufen, ausser bei `test-vorschau.mjs`):
 node scripts/e2e-import.mjs     # Abstammungen stapelweise eintragen
 node scripts/e2e-upload.mjs     # Foto-Upload: echte Datei, gefälschter Typ, SVG, Pfad-Traversal
 node scripts/test-vorschau.mjs  # Ansichts-Version, direkt auf der Datei
+node scripts/e2e-marktplatz.mjs # Marktplatz: Konten, Inserate, Anfragen, Auktionen, Papierservice
 ```
 
 `scripts/e2e-import.mjs` **schreibt in die Datenbank** – nur gegen eine
@@ -322,6 +381,11 @@ gesicherte Volume.
 - [ ] Startdaten gegen Papiere prüfen und als „geprüft“ markieren
 - [ ] Sicherung der Datenbank einrichten
 - [ ] `NEXT_PUBLIC_SITE_URL` setzen, damit Sitemap und robots.txt stimmen
+- [ ] Falls der Marktplatz mit echten Nutzern live geht: die rechtlichen
+      Punkte aus dem Abschnitt „Marktplatz" klären (Impressum/Gewerbe, AGB,
+      Widerrufsrecht bei der Auktionsgebühr, Datenschutz für Konten/Anfragen/
+      Gebote) - bevor irgendjemand eine echte Gebühr zahlt oder ein echtes
+      Gebot abgibt.
 
 ## Bekannte Grenzen
 
@@ -340,3 +404,10 @@ gesicherte Volume.
   Unter-Abhängigkeiten von Next.js. Sie lassen sich erst mit einem Next-Update
   beheben; ein `npm audit fix --force` würde Next auf eine uralte Version
   zurücksetzen und ist keine Lösung.
+- **Marktplatz:** keine automatisierte Zahlungsabwicklung (siehe oben), kein
+  Passwort-Reset per E-Mail und keine E-Mail-Verifizierung bei der
+  Registrierung - das Projekt verschickt aktuell keine E-Mails. Kein
+  verbindlicher digitaler Vertragsabschluss, nur ein Kontaktanfrage-Formular.
+  Die Ansichts-Version (`vorschau/`) bildet nur das Info-Verzeichnis ab, nicht
+  den Marktplatz - der braucht Konten/Sessions und liesse sich nicht sinnvoll
+  als einzelne statische HTML-Datei nachbauen.
