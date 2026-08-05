@@ -77,6 +77,25 @@ export interface InquiryState {
 
 export const EMPTY_INQUIRY_STATE: InquiryState = { status: "idle" };
 
+export interface AuctionState {
+  status: "idle" | "error" | "done";
+  errors: Record<string, string>;
+  values: Record<string, string>;
+}
+
+export const EMPTY_AUCTION_STATE: AuctionState = {
+  status: "idle",
+  errors: {},
+  values: {},
+};
+
+export interface BidState {
+  status: "idle" | "placed" | "error";
+  message?: string;
+}
+
+export const EMPTY_BID_STATE: BidState = { status: "idle" };
+
 export interface ImportAction {
   name: string;
   kind: "create" | "update" | "unchanged";

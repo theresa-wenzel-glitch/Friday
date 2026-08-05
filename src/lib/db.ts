@@ -267,6 +267,48 @@ function migrate(conn: Database.Database) {
 
     CREATE INDEX IF NOT EXISTS idx_inquiries_listing ON inquiries(listing_id);
     CREATE INDEX IF NOT EXISTS idx_inquiries_handled ON inquiries(handled);
+
+    -- Deckakt-Auktionen: ein einzelner Decktermin eines Hengstes wird
+    -- versteigert, nicht der Hengst selbst. Hoechstgebot wird immer live aus
+    -- bids berechnet (kein winning_bid_id-Feld, siehe Architekturplan).
+    CREATE TABLE IF NOT EXISTS auctions (
+      id                   INTEGER PRIMARY KEY AUTOINCREMENT,
+      account_id           INTEGER NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+      listing_id           INTEGER REFERENCES listings(id) ON DELETE SET NULL,
+      slug                 TEXT    NOT NULL UNIQUE,
+      title                TEXT    NOT NULL,
+      description          TEXT,
+      season_note          TEXT,
+      start_at             TEXT    NOT NULL,
+      end_at               TEXT    NOT NULL,
+      starting_price_cents INTEGER NOT NULL DEFAULT 0,
+      min_increment_cents  INTEGER NOT NULL DEFAULT 1000,
+      currency             TEXT    NOT NULL DEFAULT 'EUR',
+      moderation_status    TEXT    NOT NULL DEFAULT 'pending',
+      cancelled_at         TEXT,
+      fee_type             TEXT    NOT NULL DEFAULT 'flat' CHECK (fee_type IN ('flat','percent')),
+      fee_amount_cents     INTEGER,
+      fee_percent          REAL,
+      fee_status           TEXT    NOT NULL DEFAULT 'unpaid' CHECK (fee_status IN ('unpaid','invoiced','paid','waived')),
+      fee_paid_at          TEXT,
+      fee_note             TEXT,
+      created_at           TEXT    NOT NULL,
+      updated_at           TEXT    NOT NULL
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_auctions_status ON auctions(moderation_status);
+    CREATE INDEX IF NOT EXISTS idx_auctions_end    ON auctions(end_at);
+    CREATE INDEX IF NOT EXISTS idx_auctions_fee    ON auctions(fee_status);
+
+    CREATE TABLE IF NOT EXISTS bids (
+      id           INTEGER PRIMARY KEY AUTOINCREMENT,
+      auction_id   INTEGER NOT NULL REFERENCES auctions(id) ON DELETE CASCADE,
+      account_id   INTEGER NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+      amount_cents INTEGER NOT NULL,
+      created_at   TEXT    NOT NULL
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_bids_auction ON bids(auction_id, amount_cents DESC);
   `);
 }
 

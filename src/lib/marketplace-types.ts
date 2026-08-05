@@ -63,6 +63,54 @@ export interface Listing {
   updatedAt: string;
 }
 
+export type AuctionModerationStatus = "pending" | "approved" | "rejected";
+export type FeeType = "flat" | "percent";
+export type FeeStatus = "unpaid" | "invoiced" | "paid" | "waived";
+
+export interface Auction {
+  id: number;
+  accountId: number;
+  listingId: number | null;
+  slug: string;
+  title: string;
+  description: string | null;
+  seasonNote: string | null;
+  startAt: string;
+  endAt: string;
+  startingPriceCents: number;
+  minIncrementCents: number;
+  currency: string;
+  moderationStatus: AuctionModerationStatus;
+  cancelledAt: string | null;
+  feeType: FeeType;
+  feeAmountCents: number | null;
+  feePercent: number | null;
+  feeStatus: FeeStatus;
+  feePaidAt: string | null;
+  feeNote: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Bid {
+  id: number;
+  auctionId: number;
+  accountId: number;
+  amountCents: number;
+  createdAt: string;
+}
+
+/** Zeitliche Phase - rein aus start_at/end_at abgeleitet, kein Cron nötig. */
+export type AuctionPhase = "upcoming" | "live" | "ended";
+
+export function auctionPhase(auction: Auction, now = new Date()): AuctionPhase {
+  const start = new Date(auction.startAt);
+  const end = new Date(auction.endAt);
+  if (now < start) return "upcoming";
+  if (now > end) return "ended";
+  return "live";
+}
+
 export interface Inquiry {
   id: number;
   listingId: number;

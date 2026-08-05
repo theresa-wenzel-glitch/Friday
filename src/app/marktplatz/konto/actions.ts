@@ -11,7 +11,7 @@ import {
   requireAccount,
   verifyLogin,
 } from "@/lib/accounts";
-import { markInquiryHandled } from "@/lib/marketplace-db";
+import { cancelOwnAuction, markInquiryHandled } from "@/lib/marketplace-db";
 import { validateRegistration } from "@/lib/marketplace-validate";
 import { rateLimit } from "@/lib/rate-limit";
 import type {
@@ -105,4 +105,14 @@ export async function markInquiryHandledAction(form: FormData): Promise<void> {
 
   markInquiryHandled(inquiryId, account.id);
   revalidatePath("/marktplatz/konto");
+}
+
+export async function cancelAuctionAction(form: FormData): Promise<void> {
+  const account = await requireAccount();
+  const auctionId = Number(form.get("auctionId"));
+  if (!Number.isInteger(auctionId)) return;
+
+  cancelOwnAuction(auctionId, account.id);
+  revalidatePath("/marktplatz/konto");
+  revalidatePath("/marktplatz/auktionen");
 }

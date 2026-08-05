@@ -38,6 +38,9 @@ export default async function MarketplacePage() {
         <Link href="/marktplatz/pferde" className="btn btn-primary no-underline">
           Alle Inserate ansehen
         </Link>
+        <Link href="/marktplatz/auktionen" className="btn btn-secondary no-underline">
+          Decksprung-Auktionen
+        </Link>
         {account ? (
           <>
             <Link href="/marktplatz/inserieren" className="btn btn-secondary no-underline">

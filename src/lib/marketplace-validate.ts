@@ -294,3 +294,143 @@ export function validateInquiry(form: FormData): InquiryValidation {
     },
   };
 }
+
+/* ------------------------------------------------------------------ */
+/* Auktionen                                                           */
+/* ------------------------------------------------------------------ */
+
+export interface AuctionInputData {
+  listingId: number | null;
+  title: string;
+  description: string | null;
+  seasonNote: string | null;
+  startAt: string;
+  endAt: string;
+  startingPriceCents: number;
+  minIncrementCents: number;
+  currency: string;
+  feeType: "flat" | "percent";
+  feeAmountCents: number | null;
+  feePercent: number | null;
+}
+
+export interface AuctionValidation {
+  ok: boolean;
+  errors: Record<string, string>;
+  values: Record<string, string>;
+  data?: AuctionInputData;
+}
+
+const MAX_AUCTION_TITLE = 120;
+const MAX_AUCTION_TEXT = 4000;
+
+/** Feste Auktionsgebühr, solange kein anderes Preiskonzept beschlossen ist. */
+const FLAT_FEE_CENTS = 2500;
+
+export function validateAuctionSubmission(form: FormData): AuctionValidation {
+  const errors: Record<string, string> = {};
+  const values: Record<string, string> = {};
+
+  const keep = (key: string): string => {
+    const value = str(form, key);
+    values[key] = value;
+    return value;
+  };
+
+  const title = keep("title");
+  const description = keep("description");
+  const seasonNote = keep("seasonNote");
+  const startAtRaw = keep("startAt");
+  const endAtRaw = keep("endAt");
+  const startingPriceRaw = keep("startingPrice");
+  const minIncrementRaw = keep("minIncrement") || "10";
+
+  if (str(form, "website")) {
+    errors._spam = "Die Einsendung wurde als automatisiert erkannt.";
+  }
+
+  if (title.length < 3) {
+    errors.title = "Bitte einen Titel angeben (mindestens 3 Zeichen).";
+  } else if (title.length > MAX_AUCTION_TITLE) {
+    errors.title = `Der Titel darf höchstens ${MAX_AUCTION_TITLE} Zeichen lang sein.`;
+  }
+
+  if (description.length > MAX_AUCTION_TEXT) {
+    errors.description = `Die Beschreibung: bitte auf ${MAX_AUCTION_TEXT} Zeichen kürzen.`;
+  }
+
+  const startAt = new Date(startAtRaw);
+  const endAt = new Date(endAtRaw);
+  const now = new Date();
+
+  // Kleine Gnadenfrist statt strikt "muss in der Zukunft liegen": das Formular
+  // braucht Zeit zum Ausfüllen, und datetime-local rundet auf die Minute.
+  const START_GRACE_MS = 15 * 60 * 1000;
+  if (!startAtRaw || Number.isNaN(startAt.getTime())) {
+    errors.startAt = "Bitte einen gültigen Beginn angeben.";
+  } else if (startAt.getTime() < now.getTime() - START_GRACE_MS) {
+    errors.startAt = "Der Beginn darf nicht so weit in der Vergangenheit liegen.";
+  }
+
+  if (!endAtRaw || Number.isNaN(endAt.getTime())) {
+    errors.endAt = "Bitte ein gültiges Ende angeben.";
+  } else if (!errors.startAt && endAt <= startAt) {
+    errors.endAt = "Das Ende muss nach dem Beginn liegen.";
+  }
+
+  let startingPriceCents = 0;
+  if (startingPriceRaw) {
+    const parsed = Number(startingPriceRaw.replace(",", "."));
+    if (!Number.isFinite(parsed) || parsed < 0 || parsed > 1_000_000) {
+      errors.startingPrice = "Bitte ein gültiges Startgebot angeben.";
+    } else {
+      startingPriceCents = Math.round(parsed * 100);
+    }
+  }
+
+  let minIncrementCents = 1000;
+  const parsedIncrement = Number(minIncrementRaw.replace(",", "."));
+  if (!Number.isFinite(parsedIncrement) || parsedIncrement <= 0 || parsedIncrement > 100_000) {
+    errors.minIncrement = "Bitte eine gültige Mindeststeigerung angeben.";
+  } else {
+    minIncrementCents = Math.round(parsedIncrement * 100);
+  }
+
+  if (Object.keys(errors).length > 0) {
+    return { ok: false, errors, values };
+  }
+
+  return {
+    ok: true,
+    errors,
+    values,
+    data: {
+      listingId: null,
+      title,
+      description: nullIfEmpty(description),
+      seasonNote: nullIfEmpty(seasonNote),
+      startAt: startAt.toISOString(),
+      endAt: endAt.toISOString(),
+      startingPriceCents,
+      minIncrementCents,
+      currency: "EUR",
+      feeType: "flat",
+      feeAmountCents: FLAT_FEE_CENTS,
+      feePercent: null,
+    },
+  };
+}
+
+export interface BidValidation {
+  ok: boolean;
+  error?: string;
+  amountCents?: number;
+}
+
+export function validateBidAmount(raw: string): BidValidation {
+  const parsed = Number(raw.replace(",", "."));
+  if (!Number.isFinite(parsed) || parsed <= 0 || parsed > 1_000_000) {
+    return { ok: false, error: "Bitte ein gültiges Gebot angeben." };
+  }
+  return { ok: true, amountCents: Math.round(parsed * 100) };
+}

@@ -2,9 +2,33 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getCurrentAccount } from "@/lib/accounts";
-import { listInquiriesForAccount, listListingsForAccount } from "@/lib/marketplace-db";
-import { formatPrice } from "@/lib/marketplace-types";
-import { accountLogoutAction, markInquiryHandledAction } from "./actions";
+import {
+  getHighestBid,
+  listAuctionsForAccount,
+  listInquiriesForAccount,
+  listListingsForAccount,
+} from "@/lib/marketplace-db";
+import { auctionPhase, formatPrice } from "@/lib/marketplace-types";
+import { accountLogoutAction, cancelAuctionAction, markInquiryHandledAction } from "./actions";
+
+const AUCTION_MODERATION_LABEL: Record<string, string> = {
+  pending: "wartet auf Prüfung",
+  approved: "online",
+  rejected: "abgelehnt",
+};
+
+const AUCTION_PHASE_LABEL: Record<string, string> = {
+  upcoming: "beginnt in Kürze",
+  live: "läuft",
+  ended: "beendet",
+};
+
+const FEE_STATUS_LABEL: Record<string, string> = {
+  unpaid: "Gebühr unbezahlt",
+  invoiced: "Rechnung gestellt",
+  paid: "Gebühr bezahlt",
+  waived: "Gebühr erlassen",
+};
 
 export const dynamic = "force-dynamic";
 
@@ -27,6 +51,7 @@ export default async function AccountDashboardPage() {
   const listings = listListingsForAccount(account.id);
   const inquiries = listInquiriesForAccount(account.id);
   const openInquiries = inquiries.filter((i) => !i.handled);
+  const auctions = listAuctionsForAccount(account.id);
 
   return (
     <div className="mx-auto w-full max-w-3xl px-4 py-10">
@@ -45,6 +70,9 @@ export default async function AccountDashboardPage() {
       <div className="flex flex-wrap gap-2 mb-10">
         <Link href="/marktplatz/inserieren" className="btn btn-primary no-underline">
           Neues Inserat
+        </Link>
+        <Link href="/marktplatz/auktionen/erstellen" className="btn btn-secondary no-underline">
+          Neue Auktion
         </Link>
         <Link href="/marktplatz" className="btn btn-secondary no-underline">
           Zum Marktplatz
@@ -79,6 +107,52 @@ export default async function AccountDashboardPage() {
                 <span className="chip">{STATUS_LABEL[listing.status] ?? listing.status}</span>
               </li>
             ))}
+          </ul>
+        )}
+      </section>
+
+      <section className="mb-12">
+        <h2 className="text-2xl mb-4">Meine Auktionen</h2>
+        {auctions.length === 0 ? (
+          <p className="muted text-sm">Noch keine Auktion angelegt.</p>
+        ) : (
+          <ul className="space-y-3">
+            {auctions.map((auction) => {
+              const phase = auctionPhase(auction);
+              const canCancel =
+                !auction.cancelledAt && phase === "upcoming" && auction.moderationStatus !== "rejected";
+
+              return (
+                <li key={auction.id} className="surface rounded-xl p-4">
+                  <div className="flex flex-wrap items-center gap-3 mb-1">
+                    {auction.moderationStatus === "approved" ? (
+                      <Link href={`/marktplatz/auktionen/${auction.slug}`} className="font-medium underline">
+                        {auction.title}
+                      </Link>
+                    ) : (
+                      <span className="font-medium">{auction.title}</span>
+                    )}
+                    <span className="chip">
+                      {auction.cancelledAt
+                        ? "abgesagt"
+                        : AUCTION_MODERATION_LABEL[auction.moderationStatus] ?? auction.moderationStatus}
+                    </span>
+                    {auction.moderationStatus === "approved" && !auction.cancelledAt && (
+                      <span className="chip">{AUCTION_PHASE_LABEL[phase]}</span>
+                    )}
+                    <span className="chip">{FEE_STATUS_LABEL[auction.feeStatus]}</span>
+                  </div>
+                  {canCancel && (
+                    <form action={cancelAuctionAction}>
+                      <input type="hidden" name="auctionId" value={auction.id} />
+                      <button type="submit" className="btn btn-secondary">
+                        Auktion absagen
+                      </button>
+                    </form>
+                  )}
+                </li>
+              );
+            })}
           </ul>
         )}
       </section>

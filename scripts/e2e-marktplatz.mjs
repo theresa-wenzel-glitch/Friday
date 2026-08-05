@@ -222,6 +222,118 @@ try {
     (await page.locator("main").textContent()).includes("erledigt"),
   );
 
+  /* 16 - Auktion für einen Decktermin anlegen (noch als Testhof Marktplatz).
+     Beginn absichtlich 2 Minuten in der Vergangenheit, damit die Auktion
+     sofort "läuft" - die Gnadenfrist in validateAuctionSubmission erlaubt das. */
+  const AUCTION_TITLE = `Decktermin Test ${Date.now()}`;
+  const isoMinute = (d) => d.toISOString().slice(0, 16);
+  const auctionStart = isoMinute(new Date(Date.now() - 2 * 60 * 1000));
+  const auctionEnd = isoMinute(new Date(Date.now() + 30 * 60 * 1000));
+
+  await page.goto(`${BASE}/marktplatz/auktionen/erstellen`);
+  await page.fill("#title", AUCTION_TITLE);
+  await page.fill("#startAt", auctionStart);
+  await page.fill("#endAt", auctionEnd);
+  await page.fill("#startingPrice", "500");
+  await page.click('button:has-text("Auktion zur Prüfung einsenden")');
+  await page.waitForURL("**/marktplatz/konto");
+  const dashboardAfterAuction = await page.locator("main").textContent();
+  check(
+    "Neue Auktion erscheint im Konto als 'wartet auf Prüfung'",
+    dashboardAfterAuction.includes(AUCTION_TITLE) &&
+      dashboardAfterAuction.includes("wartet auf Prüfung"),
+  );
+
+  /* 17 - Vor Freigabe ist die Auktion öffentlich nicht sichtbar ---------- */
+  await page.goto(`${BASE}/marktplatz/auktionen`);
+  check(
+    "Neue Auktion ist vor Freigabe unsichtbar",
+    (await page.getByRole("link", { name: AUCTION_TITLE }).count()) === 0,
+  );
+
+  /* 18 - Admin gibt die Auktion frei --------------------------------------- */
+  const auctionAdminContext = await browser.newContext();
+  const auctionAdminPage = await auctionAdminContext.newPage();
+  await auctionAdminPage.goto(`${BASE}/admin/marktplatz`);
+  await auctionAdminPage.fill("#password", process.env.ADMIN_PASSWORD ?? "test-passwort-lokal");
+  await auctionAdminPage.click('button[type="submit"]');
+  await auctionAdminPage.waitForTimeout(500);
+  check(
+    "Neue Auktion erscheint in der Marktplatz-Moderation",
+    (await auctionAdminPage.textContent("body")).includes(AUCTION_TITLE),
+  );
+  await auctionAdminPage
+    .locator("li", { hasText: AUCTION_TITLE })
+    .getByRole("button", { name: "Freigeben" })
+    .click();
+  await auctionAdminPage.waitForTimeout(500);
+  await auctionAdminContext.close();
+
+  /* 19 - Nach Freigabe ist die Auktion öffentlich sichtbar und läuft ------ */
+  await page.goto(`${BASE}/marktplatz/auktionen`);
+  const auctionsMain = await page.locator("main").textContent();
+  check(
+    "Auktion ist nach Freigabe sichtbar mit Startgebot",
+    auctionsMain.includes(AUCTION_TITLE) && auctionsMain.includes("500"),
+  );
+  check("Auktion zeigt den Status 'läuft'", auctionsMain.includes("läuft"));
+
+  /* 20 - Der Anbieter selbst sieht kein Gebotsformular auf der eigenen Auktion */
+  await page.click(`a:has-text("${AUCTION_TITLE}")`);
+  await page.waitForTimeout(400);
+  const auctionUrl = page.url();
+  check(
+    "Anbieter sieht kein Gebotsformular auf der eigenen Auktion",
+    (await page.locator("#amount").count()) === 0 &&
+      (await page.locator("main").textContent()).includes("eigene Auktion"),
+  );
+
+  /* 21 - Ein zweites, unabhängiges Konto bietet auf die Auktion ----------- */
+  const bidderContext = await browser.newContext();
+  const bidderPage = await bidderContext.newPage();
+  const BIDDER_EMAIL = `bieter-${Date.now()}@example.com`;
+  await bidderPage.goto(`${BASE}/marktplatz/konto/registrieren`);
+  await bidderPage.fill("#reg-displayName", "Bietende Zuechterin");
+  await bidderPage.fill("#reg-email", BIDDER_EMAIL);
+  await bidderPage.fill("#reg-password", PASSWORD);
+  await bidderPage.fill("#reg-passwordConfirm", PASSWORD);
+  await bidderPage.click('button[type="submit"]');
+  await bidderPage.waitForURL("**/marktplatz/konto");
+
+  await bidderPage.goto(auctionUrl);
+  await bidderPage.fill("#amount", "550");
+  await bidderPage.click('button:has-text("Bieten")');
+  await bidderPage.waitForTimeout(500);
+  check(
+    "Gebot wird bestätigt",
+    (await bidderPage.locator("main").textContent()).includes("Gebot angenommen"),
+  );
+
+  /* 22 - Zu niedriges Gebot wird abgelehnt ---------------------------------
+     Bewusst mit einem frischen page.goto() statt direkt nach dem ersten
+     Gebot weiterzuklicken - wie in den übrigen Testsuiten auch zwischen
+     Formularschritten üblich. */
+  await bidderPage.goto(auctionUrl);
+  await bidderPage.waitForTimeout(300);
+  await bidderPage.fill("#amount", "500");
+  await bidderPage.click('button:has-text("Bieten")');
+  await bidderPage.waitForTimeout(500);
+  check(
+    "Zu niedriges Gebot wird abgelehnt",
+    (await bidderPage.locator("main").textContent()).includes("mindestens"),
+  );
+  await bidderContext.close();
+
+  /* 23 - Das Höchstgebot ist danach für alle sichtbar --------------------- */
+  await page.goto(auctionUrl);
+  const finalAuctionBody = await page.locator("main").textContent();
+  check(
+    "Höchstgebot wird auf der Auktionsseite angezeigt",
+    finalAuctionBody.includes("Höchstgebot") &&
+      finalAuctionBody.includes("550") &&
+      finalAuctionBody.includes("Bietende Zuechterin"),
+  );
+
   check("Keine Skriptfehler im gesamten Ablauf", true);
 } finally {
   await browser.close();

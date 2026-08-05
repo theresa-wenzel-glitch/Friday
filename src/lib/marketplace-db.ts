@@ -1,6 +1,10 @@
 import { getDb } from "./db";
 import { normalizeName, slugify } from "./slug";
 import type {
+  Auction,
+  AuctionModerationStatus,
+  Bid,
+  FeeStatus,
   Inquiry,
   Listing,
   ListingKind,
@@ -392,4 +396,309 @@ export function markInquiryHandled(inquiryId: number, accountId: number): void {
          AND listing_id IN (SELECT id FROM listings WHERE account_id = @accountId)`,
     )
     .run({ inquiryId, accountId });
+}
+
+/* ------------------------------------------------------------------ */
+/* Auktionen - ein einzelner Deckakt/Decktermin, nicht der ganze Hengst */
+/* ------------------------------------------------------------------ */
+
+function toAuction(row: Row): Auction {
+  return {
+    id: row.id as number,
+    accountId: row.account_id as number,
+    listingId: (row.listing_id as number) ?? null,
+    slug: row.slug as string,
+    title: row.title as string,
+    description: (row.description as string) ?? null,
+    seasonNote: (row.season_note as string) ?? null,
+    startAt: row.start_at as string,
+    endAt: row.end_at as string,
+    startingPriceCents: row.starting_price_cents as number,
+    minIncrementCents: row.min_increment_cents as number,
+    currency: (row.currency as string) ?? "EUR",
+    moderationStatus: (row.moderation_status as AuctionModerationStatus) ?? "pending",
+    cancelledAt: (row.cancelled_at as string) ?? null,
+    feeType: (row.fee_type as "flat" | "percent") ?? "flat",
+    feeAmountCents: (row.fee_amount_cents as number) ?? null,
+    feePercent: (row.fee_percent as number) ?? null,
+    feeStatus: (row.fee_status as FeeStatus) ?? "unpaid",
+    feePaidAt: (row.fee_paid_at as string) ?? null,
+    feeNote: (row.fee_note as string) ?? null,
+    createdAt: row.created_at as string,
+    updatedAt: row.updated_at as string,
+  };
+}
+
+function toBid(row: Row): Bid {
+  return {
+    id: row.id as number,
+    auctionId: row.auction_id as number,
+    accountId: row.account_id as number,
+    amountCents: row.amount_cents as number,
+    createdAt: row.created_at as string,
+  };
+}
+
+export interface AuctionQuery {
+  moderationStatus?: AuctionModerationStatus;
+  limit?: number;
+  offset?: number;
+}
+
+export interface AuctionQueryResult {
+  auctions: Auction[];
+  total: number;
+}
+
+/** Öffentliche Auktionsliste - abgesagte Auktionen werden nie mit angezeigt. */
+export function queryAuctions(q: AuctionQuery = {}): AuctionQueryResult {
+  const conn = getDb();
+  const status = q.moderationStatus ?? "approved";
+  const limit = Math.min(Math.max(q.limit ?? 24, 1), 200);
+  const offset = Math.max(q.offset ?? 0, 0);
+
+  const total = (
+    conn
+      .prepare(
+        "SELECT COUNT(*) AS c FROM auctions WHERE moderation_status = @status AND cancelled_at IS NULL",
+      )
+      .get({ status }) as { c: number }
+  ).c;
+
+  const rows = conn
+    .prepare(
+      `SELECT * FROM auctions
+       WHERE moderation_status = @status AND cancelled_at IS NULL
+       ORDER BY end_at ASC LIMIT @limit OFFSET @offset`,
+    )
+    .all({ status, limit, offset }) as Row[];
+
+  return { auctions: rows.map(toAuction), total };
+}
+
+export function getAuctionBySlug(slug: string): Auction | null {
+  const row = getDb()
+    .prepare("SELECT * FROM auctions WHERE slug = ?")
+    .get(slug) as Row | undefined;
+  return row ? toAuction(row) : null;
+}
+
+export function getAuctionById(id: number): Auction | null {
+  const row = getDb().prepare("SELECT * FROM auctions WHERE id = ?").get(id) as
+    | Row
+    | undefined;
+  return row ? toAuction(row) : null;
+}
+
+export function listAuctionsForAccount(accountId: number): Auction[] {
+  const rows = getDb()
+    .prepare("SELECT * FROM auctions WHERE account_id = ? ORDER BY created_at DESC")
+    .all(accountId) as Row[];
+  return rows.map(toAuction);
+}
+
+export function countAuctionsByStatus(status: AuctionModerationStatus): number {
+  return (
+    getDb()
+      .prepare("SELECT COUNT(*) AS c FROM auctions WHERE moderation_status = ?")
+      .get(status) as { c: number }
+  ).c;
+}
+
+export type AuctionInput = Omit<
+  Auction,
+  | "id"
+  | "slug"
+  | "createdAt"
+  | "updatedAt"
+  | "moderationStatus"
+  | "cancelledAt"
+  | "feeStatus"
+  | "feePaidAt"
+  | "feeNote"
+>;
+
+function uniqueAuctionSlug(conn: ReturnType<typeof getDb>, base: string): string {
+  const exists = conn.prepare("SELECT 1 FROM auctions WHERE slug = ?");
+  if (!exists.get(base)) return base;
+  for (let i = 2; i < 500; i++) {
+    const candidate = `${base}-${i}`;
+    if (!exists.get(candidate)) return candidate;
+  }
+  return `${base}-${Date.now()}`;
+}
+
+export function insertAuction(input: AuctionInput): Auction {
+  const conn = getDb();
+  const now = new Date().toISOString();
+  const slug = uniqueAuctionSlug(conn, slugify(input.title));
+
+  const info = conn
+    .prepare(
+      `INSERT INTO auctions (
+         account_id, listing_id, slug, title, description, season_note,
+         start_at, end_at, starting_price_cents, min_increment_cents, currency,
+         moderation_status, fee_type, fee_amount_cents, fee_percent, fee_status,
+         created_at, updated_at
+       ) VALUES (
+         @account_id, @listing_id, @slug, @title, @description, @season_note,
+         @start_at, @end_at, @starting_price_cents, @min_increment_cents, @currency,
+         'pending', @fee_type, @fee_amount_cents, @fee_percent, 'unpaid',
+         @created_at, @updated_at
+       )`,
+    )
+    .run({
+      account_id: input.accountId,
+      listing_id: input.listingId,
+      slug,
+      title: input.title,
+      description: input.description,
+      season_note: input.seasonNote,
+      start_at: input.startAt,
+      end_at: input.endAt,
+      starting_price_cents: input.startingPriceCents,
+      min_increment_cents: input.minIncrementCents,
+      currency: input.currency,
+      fee_type: input.feeType,
+      fee_amount_cents: input.feeAmountCents,
+      fee_percent: input.feePercent,
+      created_at: now,
+      updated_at: now,
+    });
+
+  return getAuctionById(Number(info.lastInsertRowid))!;
+}
+
+export function updateAuctionModerationStatus(
+  id: number,
+  status: AuctionModerationStatus,
+): void {
+  getDb()
+    .prepare(
+      "UPDATE auctions SET moderation_status = @status, updated_at = @now WHERE id = @id",
+    )
+    .run({ id, status, now: new Date().toISOString() });
+}
+
+export function setAuctionFeeStatus(
+  id: number,
+  feeStatus: FeeStatus,
+  feeNote?: string | null,
+): void {
+  const now = new Date().toISOString();
+  getDb()
+    .prepare(
+      `UPDATE auctions
+       SET fee_status = @feeStatus,
+           fee_paid_at = CASE WHEN @feeStatus = 'paid' THEN @now ELSE fee_paid_at END,
+           fee_note = COALESCE(@feeNote, fee_note),
+           updated_at = @now
+       WHERE id = @id`,
+    )
+    .run({ id, feeStatus, feeNote: feeNote ?? null, now });
+}
+
+/** Nur der Eigentümer darf absagen, und nur solange die Auktion noch nicht läuft. */
+export function cancelOwnAuction(auctionId: number, accountId: number): boolean {
+  const auction = getAuctionById(auctionId);
+  if (!auction || auction.accountId !== accountId) return false;
+  if (new Date(auction.startAt) <= new Date()) return false;
+
+  getDb()
+    .prepare(
+      "UPDATE auctions SET cancelled_at = @now, updated_at = @now WHERE id = @id",
+    )
+    .run({ id: auctionId, now: new Date().toISOString() });
+  return true;
+}
+
+/* ------------------------------------------------------------------ */
+/* Gebote                                                              */
+/* ------------------------------------------------------------------ */
+
+export function getHighestBid(auctionId: number): Bid | null {
+  const row = getDb()
+    .prepare(
+      `SELECT * FROM bids WHERE auction_id = ?
+       ORDER BY amount_cents DESC, created_at ASC LIMIT 1`,
+    )
+    .get(auctionId) as Row | undefined;
+  return row ? toBid(row) : null;
+}
+
+/** Neueste zuerst, samt Anzeigename des Bieters. */
+export function listBidsForAuction(
+  auctionId: number,
+  limit = 50,
+): (Bid & { bidderName: string })[] {
+  const rows = getDb()
+    .prepare(
+      `SELECT b.*, a.display_name AS bidder_name
+       FROM bids b JOIN accounts a ON a.id = b.account_id
+       WHERE b.auction_id = @auctionId
+       ORDER BY b.amount_cents DESC, b.created_at ASC LIMIT @limit`,
+    )
+    .all({ auctionId, limit }) as Row[];
+
+  return rows.map((row) => ({ ...toBid(row), bidderName: row.bidder_name as string }));
+}
+
+export type PlaceBidResult =
+  | { ok: true }
+  | { ok: false; error: string };
+
+/**
+ * Prüft Zeitfenster und Mindestgebot in einer Transaktion, damit zwei
+ * gleichzeitige Gebote nicht beide als "höchstes Gebot" durchgehen.
+ */
+export function placeBid(
+  auctionId: number,
+  accountId: number,
+  amountCents: number,
+): PlaceBidResult {
+  const conn = getDb();
+
+  const run = conn.transaction((): PlaceBidResult => {
+    const auction = getAuctionById(auctionId);
+    if (!auction || auction.moderationStatus !== "approved" || auction.cancelledAt) {
+      return { ok: false, error: "Diese Auktion ist nicht (mehr) aktiv." };
+    }
+
+    // Verhindert, dass der Anbieter den Preis der eigenen Auktion über
+    // Eigengebote künstlich hochtreibt.
+    if (auction.accountId === accountId) {
+      return { ok: false, error: "Auf die eigene Auktion kann nicht geboten werden." };
+    }
+
+    const now = new Date();
+    if (now < new Date(auction.startAt)) {
+      return { ok: false, error: "Die Auktion hat noch nicht begonnen." };
+    }
+    if (now > new Date(auction.endAt)) {
+      return { ok: false, error: "Die Auktion ist bereits beendet." };
+    }
+
+    const highest = getHighestBid(auctionId);
+    const minimum = highest
+      ? highest.amountCents + auction.minIncrementCents
+      : auction.startingPriceCents;
+
+    if (amountCents < minimum) {
+      return {
+        ok: false,
+        error: `Das Gebot muss mindestens ${(minimum / 100).toLocaleString("de-DE")} € betragen.`,
+      };
+    }
+
+    conn
+      .prepare(
+        `INSERT INTO bids (auction_id, account_id, amount_cents, created_at)
+         VALUES (@auctionId, @accountId, @amountCents, @now)`,
+      )
+      .run({ auctionId, accountId, amountCents, now: now.toISOString() });
+
+    return { ok: true };
+  });
+
+  return run();
 }
