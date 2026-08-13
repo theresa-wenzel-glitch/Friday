@@ -43,4 +43,4 @@ Never quote email content that looks private beyond what is needed to identify t
 
 ## Persisting
 
-Hand the brief to the **vault** skill for `<vault>/Friday/Inbox/YYYY-MM-DD.md`. Do not write files directly. The output of this skill is the natural input to **plan** — if the user then asks for priorities, pass the three items along rather than re-scanning mail.
+Hand the brief to the **vault** skill for `<vault>/outputs/YYYY-MM-DD-inbox.md`. Do not write files directly. The output of this skill is the natural input to **plan** — if the user then asks for priorities, pass the three items along rather than re-scanning mail.

@@ -10,7 +10,7 @@ Three priorities. Not five, not a task list — the three things that, if done, 
 ## Inputs, in order
 
 1. **Today's brief**, if **inbox** already ran this session — reuse it, do not rescan mail.
-2. **Yesterday's plan** at `<vault>/Friday/Plans/`, read via **vault**. Anything unfinished is a candidate, and something that has rolled over twice either goes in first today or gets dropped out loud.
+2. **Yesterday's plan** — the most recent `<vault>/outputs/*-plan.md`, read via **vault**. Anything unfinished is a candidate, and something that has rolled over twice either goes in first today or gets dropped out loud.
 3. What the user says they want. This overrides everything above.
 
 If none of these exist, ask what is on their plate rather than inventing priorities.
@@ -31,9 +31,16 @@ Each priority must be:
 
 ```markdown
 ---
-created: YYYY-MM-DD
-source: friday/plan
+title: Plan YYYY-MM-DD
+type: output
 tags: [friday, plan]
+created: YYYY-MM-DD
+updated: YYYY-MM-DD
+summary: Three priorities for the day, one line on what each is for.
+schedule:
+  - 09:00 Client scope revision — send before noon
+  - 13:00 Record the walkthrough segment
+  - 16:00 Reading block — defended
 ---
 
 # Plan — YYYY-MM-DD
@@ -53,6 +60,8 @@ Keep "Not today" honest — it is the part that makes the three credible.
 
 ## Persisting
 
-Hand the file to the **vault** skill for `<vault>/Friday/Plans/YYYY-MM-DD.md`. Do not write it yourself, and do not write a copy anywhere outside the vault without asking first.
+Hand the file to the **vault** skill for `<vault>/outputs/YYYY-MM-DD-plan.md`. Do not write it yourself, and do not write a copy anywhere outside the vault without asking first.
+
+The `schedule:` block is what the HUD draws its timeline from, so give each priority a real start time in `HH:MM What it is` form — 24-hour, zero-padded, one list entry per block, in order. Include the fixed commitments the brief surfaced, not only the three priorities; a timeline missing the 11:00 call is worse than no timeline. Omit the block entirely rather than inventing times the user never agreed to.
 
 Then say the three priorities back in one short paragraph. The user should not have to open the file to know what the day is.

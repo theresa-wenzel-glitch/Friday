@@ -9,7 +9,7 @@ Report the delta, not the landscape. Most days this is short. Some days it is em
 
 ## Sources
 
-The source list is user-maintained at `<vault>/Friday/trends-sources.md`, read through the **vault** skill. It has three sections:
+The source list is user-maintained at `<vault>/wiki/trend-sources.md`, read through the **vault** skill. It lives in `wiki/` because it is knowledge that gets revised, not a shipped output. It has three sections:
 
 ```markdown
 ## AI & tech
@@ -29,7 +29,7 @@ If the file does not exist, do not invent sources. Draft a starter list from wha
 
 ## The delta
 
-Read the most recent file in `<vault>/Friday/Trends/` and compare. Anything already reported there is not news, even if it is still on the front page today. If there is no prior run, say this is a baseline and keep it to the five most significant items.
+Read the most recent `<vault>/outputs/*-trends.md` and compare. Anything already reported there is not news, even if it is still on the front page today. If there is no prior run, say this is a baseline and keep it to the five most significant items.
 
 ## Output
 
@@ -41,4 +41,4 @@ If nothing moved, say "Nothing moved since yesterday" and stop. Do not fill the 
 
 ## Persisting
 
-Hand the report to the **vault** skill for `<vault>/Friday/Trends/YYYY-MM-DD.md`, including the URLs checked so the next run can diff against them. Do not write files directly.
+Hand the report to the **vault** skill for `<vault>/outputs/YYYY-MM-DD-trends.md`, including the URLs checked so the next run can diff against them. Do not write files directly.

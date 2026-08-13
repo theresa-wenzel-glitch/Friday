@@ -45,7 +45,7 @@ Default window: since the previous metrics run. If there is no previous run, use
 
 ## Deltas
 
-Read the most recent file in `<vault>/Friday/Metrics/` (via the **vault** skill) and diff against it. A number with no comparison is close to useless — always report the direction and size of the move, or state that this is the first run.
+Read the most recent `<vault>/outputs/*-metrics.md` (via the **vault** skill) and diff against it. A number with no comparison is close to useless — always report the direction and size of the move, or state that this is the first run.
 
 ## The summary
 
@@ -55,4 +55,19 @@ Flag anything that looks broken — a count at zero that is usually not, an API 
 
 ## Persisting
 
-Hand the finished summary to the **vault** skill for `<vault>/Friday/Metrics/YYYY-MM-DD.md`. Raw numbers go in the note, secrets never do. Do not write any file yourself.
+Hand the finished summary to the **vault** skill for `<vault>/outputs/YYYY-MM-DD-metrics.md`. Do not write any file yourself.
+
+The frontmatter **must** carry a flat `vitals:` block — this is the series the HUD plots, and it is the only machine-readable part of the vault:
+
+```yaml
+vitals:
+  mrr: 4280
+  stripe_net_30d: 5120
+  db_signups: 728
+  instagram_followers: 3410
+  youtube_subscribers: 1180
+```
+
+Numbers only, same keys every day. A renamed key silently breaks its own history, so reuse the keys from the previous metrics output rather than inventing new ones. A platform that was skipped gets its key **omitted**, never zeroed — a fabricated zero is indistinguishable from a real collapse when the trend line is read next week.
+
+Prose goes in the body. Secrets go nowhere.

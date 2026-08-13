@@ -22,11 +22,15 @@ cp -r .claude/skills/{vault,metrics,inbox,trends,plan} ~/.claude/skills/
 
 ## Setup on a new machine
 
-**Vault** — resolved at runtime from
-`~/Library/Mobile Documents/iCloud~md~obsidian/Documents/`. If more than one
-vault is there, `vault` asks rather than guessing. Friday's output is confined
-to a `Friday/` subfolder; the rest of the vault is read-only unless you ask for
-a specific edit.
+**Vault** — resolved at runtime from `$FRIDAY_VAULT`, else the repo's `vault/`,
+else the iCloud Obsidian folder. The schema lives in `vault/CLAUDE.md` and every
+session reads it before writing: three folders (`raw/`, `wiki/`, `outputs/`),
+six required frontmatter fields, wikilinks between pages, an append-only
+`log.md`, and a generated `index.md`. Skill output always lands in
+`outputs/YYYY-MM-DD-<skill>.md`.
+
+Run `bin/vault-index.py` after any write — it rebuilds the index and fails loudly
+on missing frontmatter, dead links, orphans, and misfiled pages.
 
 **Credentials** — macOS Keychain only. Nothing is stored in this repo, in a
 `.env`, or in the vault.
@@ -44,9 +48,10 @@ security add-generic-password -s friday-youtube   -a channel-id        -w
 of failing the run.
 
 **Trend sources** — `metrics` and `inbox` need no config, but `trends` reads its
-source list from `<vault>/Friday/trends-sources.md`, with sections
-`## AI & tech`, `## Competitors & sites`, `## Chatter`. It will draft one for
-approval if the file doesn't exist.
+source list from `vault/wiki/trend-sources.md`, with sections `## AI & tech`,
+`## Competitors & sites`, `## Chatter`. It will draft one for approval if the
+file doesn't exist. This page does not exist yet, so `trends` shows `partial` on
+the HUD until it does.
 
 **macOS permissions** — the first `inbox` run triggers automation prompts for
 Mail and Calendar. Approve both, or the brief comes back empty.
