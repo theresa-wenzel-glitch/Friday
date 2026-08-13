@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # The one command. Starts the voice layer in the background and the HUD in front.
 #
-#   friday          voice + HUD
-#   friday hud      HUD only
+#   friday          voice + terminal HUD
+#   friday hud      terminal HUD only
+#   friday web      browser HUD, opens a window (127.0.0.1 only)
 #   friday voice    voice only, in the foreground with its transcript visible
 #   friday check    is everything wired up?
 #   friday index    rebuild the vault index and audit the schema
@@ -23,6 +24,7 @@ stop_voice() {
 
 case "${1:-all}" in
   hud)   exec python3 "$BIN/hud.py" ;;
+  web)   exec python3 "$BIN/hud-server.py" --open "${@:2}" ;;
   voice) exec python3 "$BIN/friday-voice.py" "${@:2}" ;;
   check)
     rc=0

@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>Friday</title>
+<style>
+  /* Committed dark instrument panel — the palette is hud.py's xterm-256 values
+     (108 sage, 179 amber, 167 red, 80 teal, 240/249/255 greys). Every colour is
+     painted explicitly so the page never borrows a host background. */
+  :root {
+    --ground:  #0c0e14;
+    --panel:   #12151d;
+    --raised:  #171b24;
+    --line:    #232833;
+    --line-hi: #2f3542;
+    --dim:     #626a7a;
+    --text:    #aab1bf;
+    --bright:  #e9ebf1;
+    --teal:    #5fb0b5;
+    --sage:    #8bae87;
+    --amber:   #d0a860;
+    --red:     #cf6f66;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { background: var(--ground); }
+  body {
+    margin: 0; padding: 1.5rem 1.5rem 2rem;
+    color: var(--text); font-family: var(--mono);
+    font-size: 13px; line-height: 1.5;
+    font-variant-numeric: tabular-nums;
+    -webkit-font-smoothing: antialiased;
+  }
+  .hud { max-width: 1180px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.5rem; }
+
+  /* ── header ───────────────────────────────────────────────── */
+  header {
+    display: flex; align-items: baseline; gap: 1.25rem; flex-wrap: wrap;
+    padding-bottom: 1.1rem; border-bottom: 1px solid var(--line);
+  }
+  .wordmark { color: var(--bright); letter-spacing: .32em; font-weight: 500; font-size: .875rem; }
+  .clock { color: var(--bright); font-size: clamp(1.5rem, 4vw, 2rem); line-height: 1; letter-spacing: -.01em; }
+  .date { color: var(--text); }
+  header .spacer { flex: 1; }
+  .conn { display: flex; align-items: center; gap: .5rem; color: var(--dim); font-size: .75rem; letter-spacing: .12em; }
+  .conn .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--sage); }
+  .conn[data-state="stale"]  .dot { background: var(--amber); }
+  .conn[data-state="down"]   .dot { background: var(--red); }
+  .conn[data-state="frozen"] .dot { background: var(--dim); }
+
+  /* ── section rules, matching the terminal's ─── LABEL ─── ─── */
+  .rule {
+    display: flex; align-items: center; gap: .8rem; margin: 0 0 1rem;
+    font-size: .7rem; letter-spacing: .2em; text-transform: uppercase;
+    color: var(--dim); font-weight: 500;
+  }
+  .rule::before { content: ""; width: 1.75rem; border-top: 1px solid var(--line); flex: none; }
+  .rule::after  { content: ""; flex: 1; border-top: 1px solid var(--line); }
+
+  .empty { color: var(--dim); padding: .35rem 0; }
+
+  /* ── vitals ───────────────────────────────────────────────── */
+  .vitals { display: flex; flex-direction: column; }
+  /* Sparkline column is fixed, not fluid: stretched across a wide viewport the
+     series flattens visually and stops carrying the shape it exists to show. */
+  .vital {
+    display: grid; grid-template-columns: minmax(0, 1fr) 6.5rem 280px 5rem 3rem;
+    gap: 1rem; align-items: center; padding: .7rem 0;
+    border-top: 1px solid var(--line);
+  }
+  .vital:last-child { border-bottom: 1px solid var(--line); }
+  .vital .label { color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .vital .value { color: var(--bright); font-size: 1.1rem; text-align: right; }
+  .vital .spark { min-width: 0; }
+  .vital .spark svg { display: block; width: 100%; height: 30px; }
+  @media (max-width: 700px) {
+    .vital { grid-template-columns: minmax(0, 1fr) 5rem 4.5rem; }
+    .vital .spark, .vital .days { display: none; }
+  }
+  .vital .delta { text-align: right; }
+  .vital .days  { text-align: right; color: var(--dim); font-size: .75rem; }
+  .up { color: var(--sage); } .down { color: var(--red); } .flat { color: var(--dim); }
+
+  /* ── two-up: deck and schedule ────────────────────────────── */
+  .split { display: grid; grid-template-columns: minmax(0, 21rem) minmax(0, 1fr); gap: 1.5rem; }
+  @media (max-width: 780px) { .split { grid-template-columns: 1fr; } }
+
+  .skill { display: grid; grid-template-columns: 1.1rem 5.5rem 1fr; gap: .6rem; align-items: baseline; padding: .42rem 0; }
+  .skill .glyph { font-size: .8rem; }
+  .skill .name  { color: var(--text); }
+  .skill .note  { color: var(--dim); font-size: .8rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .s-ready   { color: var(--sage); }
+  .s-partial { color: var(--amber); }
+  .s-blocked { color: var(--red); }
+  .s-idle, .s-unknown { color: var(--dim); }
+
+  .block { display: grid; grid-template-columns: 3px 3.5rem 1fr auto; gap: .75rem; align-items: baseline; padding: .42rem 0; }
+  .block .bar { align-self: stretch; background: var(--line); border-radius: 1px; }
+  .block .t { color: var(--dim); }
+  .block .w { color: var(--text); }
+  .block.past .w, .block.past .t { color: var(--dim); }
+  .block.now .bar { background: var(--teal); }
+  .block.now .t, .block.now .w { color: var(--bright); }
+  .block .now-tag { color: var(--teal); font-size: .75rem; letter-spacing: .08em; }
+  .src { color: var(--dim); font-size: .75rem; margin-top: .6rem; }
+
+  /* ── audio ────────────────────────────────────────────────── */
+  .audio { display: flex; flex-wrap: wrap; gap: 1.75rem 2.5rem; align-items: center; }
+  .io { display: flex; align-items: center; gap: .6rem; min-width: 12rem; }
+  .io .lbl { color: var(--text); }
+  .meter { display: flex; gap: 2px; }
+  .meter i { width: 5px; height: 15px; background: var(--line-hi); border-radius: 1px; }
+  .meter i.on { background: var(--teal); }
+  .heard { color: var(--dim); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  footer {
+    border-top: 1px solid var(--line); padding-top: .9rem;
+    color: var(--dim); font-size: .75rem;
+    display: flex; gap: 1rem; justify-content: space-between; flex-wrap: wrap;
+  }
+  /* Red is reserved for "something is wrong". A frozen snapshot is merely a
+     fact about the page, so it gets the amber informational treatment. */
+  .banner {
+    border: 1px solid var(--red); border-left-width: 2px; border-radius: 3px;
+    padding: .7rem .9rem; color: var(--red); background: var(--panel);
+  }
+  .banner.info { border-color: var(--amber); color: var(--amber); }
+  [hidden] { display: none !important; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+  .vital .spark svg polyline, .meter i { transition: none; }
+</style>
+</head>
+<body>
+<!--STATE-->
+<div class="hud">
+
+  <header>
+    <span class="wordmark">FRIDAY</span>
+    <span class="clock" id="clock">--:--:--</span>
+    <span class="date" id="date"></span>
+    <span class="spacer"></span>
+    <span class="conn" id="conn" data-state="live"><span class="dot"></span><span id="conn-label">LIVE</span></span>
+    <span class="date" id="vault"></span>
+  </header>
+
+  <div class="banner" id="banner" hidden></div>
+
+  <section>
+    <div class="rule">System vitals</div>
+    <div class="vitals" id="vitals"></div>
+  </section>
+
+  <div class="split">
+    <section>
+      <div class="rule">Command deck</div>
+      <div id="deck"></div>
+    </section>
+    <section>
+      <div class="rule">Schedule</div>
+      <div id="schedule"></div>
+      <div class="src" id="sched-src"></div>
+    </section>
+  </div>
+
+  <section>
+    <div class="rule">Audio I/O</div>
+    <div class="audio" id="audio"></div>
+  </section>
+
+  <footer>
+    <span id="log"></span>
+    <span id="vault-path"></span>
+  </footer>
+</div>
+
+<script>
+(() => {
+  "use strict";
+  const $ = id => document.getElementById(id);
+  const FROZEN = window.__FRIDAY_STATE__ || null;
+  const GLYPH = { ready: "●", partial: "◐", blocked: "✕", idle: "○", unknown: "·" };
+
+  const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+  /* Sparkline: area fill, 1px line, emphasised endpoint. No axes — the value
+     sits beside it, so gridlines would carry nothing. */
+  function spark(series) {
+    if (!series || series.length < 2) return '<span class="flat">—</span>';
+    const W = 280, H = 30, P = 3;
+    const lo = Math.min(...series), hi = Math.max(...series), span = (hi - lo) || 1;
+    const pts = series.map((v, i) => [
+      P + i * (W - 2 * P) / (series.length - 1),
+      H - P - ((v - lo) / span) * (H - 2 * P)
+    ]);
+    const line = pts.map(p => `${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(" ");
+    const [ex, ey] = pts[pts.length - 1];
+    return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true">
+      <polygon points="${line} ${W - P},${H} ${P},${H}" fill="var(--teal)" opacity=".1"></polygon>
+      <polyline points="${line}" fill="none" stroke="var(--teal)" stroke-width="1"
+        stroke-linejoin="round" vector-effect="non-scaling-stroke"></polyline>
+      <circle cx="${ex.toFixed(1)}" cy="${ey.toFixed(1)}" r="1.9" fill="var(--teal)"></circle>
+    </svg>`;
+  }
+
+  function renderVitals(v) {
+    if (!v.length) {
+      $("vitals").innerHTML = '<div class="empty">no metrics output in the vault yet — run the metrics skill</div>';
+      return;
+    }
+    $("vitals").innerHTML = v.map(m => {
+      const cls = m.delta == null ? "flat" : m.delta > 0 ? "up" : m.delta < 0 ? "down" : "flat";
+      const d = m.delta == null ? "··" : `${m.delta > 0 ? "+" : ""}${m.delta.toFixed(1)}%`;
+      return `<div class="vital">
+        <span class="label">${esc(m.label)}</span>
+        <span class="value">${esc(m.display)}</span>
+        <span class="spark">${spark(m.series)}</span>
+        <span class="delta ${cls}">${d}</span>
+        <span class="days">${m.days}d</span>
+      </div>`;
+    }).join("");
+  }
+
+  function renderDeck(skills) {
+    $("deck").innerHTML = skills.map(s => `<div class="skill">
+      <span class="glyph s-${esc(s.status)}">${GLYPH[s.status] || "·"}</span>
+      <span class="name">${esc(s.name)}</span>
+      <span class="note">${esc(s.note)}</span>
+    </div>`).join("");
+  }
+
+  function renderSchedule(blocks, source) {
+    if (!blocks.length) {
+      $("schedule").innerHTML = '<div class="empty">nothing scheduled — no calendar, no plan for today</div>';
+      $("sched-src").textContent = "";
+      return;
+    }
+    $("schedule").innerHTML = blocks.map(b => `<div class="block ${esc(b.state)}">
+      <span class="bar"></span>
+      <span class="t">${esc(b.time)}</span>
+      <span class="w">${esc(b.what)}</span>
+      <span class="now-tag">${b.state === "now" ? "◀ now" : ""}</span>
+    </div>`).join("");
+    $("sched-src").textContent = `source: ${source}`;
+  }
+
+  function renderAudio(a) {
+    if (!a || a.stale) {
+      $("audio").innerHTML = '<div class="empty">mic offline · out offline — voice layer not running</div>';
+      return;
+    }
+    const SEG = 24, on = Math.round(Math.max(0, Math.min(1, a.level || 0)) * SEG);
+    const meter = Array.from({ length: SEG }, (_, i) => `<i class="${i < on ? "on" : ""}"></i>`).join("");
+    const cls = s => s === "listening" || s === "speaking" ? "s-ready" : "s-idle";
+    $("audio").innerHTML = `
+      <div class="io"><span class="glyph ${cls(a.mic)}">●</span><span class="lbl">mic&nbsp;&nbsp;${esc(a.mic)}</span></div>
+      <div class="meter">${meter}</div>
+      <div class="io"><span class="glyph ${cls(a.tts)}">●</span><span class="lbl">out&nbsp;&nbsp;${esc(a.tts)}</span></div>
+      <div class="heard">${a.last ? esc(a.last) : ""}</div>`;
+  }
+
+  function paint(s) {
+    $("clock").textContent = s.time;
+    $("date").textContent = s.date;
+    $("vault").textContent = s.vault + "/";
+    renderVitals(s.vitals || []);
+    renderDeck(s.skills || []);
+    renderSchedule(s.schedule || [], s.scheduleSource || "none");
+    renderAudio(s.audio);
+    $("log").textContent = "last write  " + (s.log || "");
+  }
+
+  function conn(state, label) {
+    $("conn").dataset.state = state;
+    $("conn-label").textContent = label;
+  }
+
+  if (FROZEN) {
+    paint(FROZEN);
+    conn("frozen", "SNAPSHOT");
+    $("banner").hidden = false;
+    $("banner").className = "banner info";
+    $("banner").textContent =
+      "Frozen snapshot — not live. Run bin/friday web for a panel that follows the vault.";
+    return;
+  }
+
+  let fails = 0;
+  async function tick() {
+    try {
+      const r = await fetch("/api/state", { cache: "no-store" });
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      paint(await r.json());
+      fails = 0;
+      conn("live", "LIVE");
+      $("banner").hidden = true;
+    } catch (e) {
+      if (++fails >= 2) {
+        conn("down", "NO SIGNAL");
+        $("banner").hidden = false;
+        $("banner").textContent = "Lost the server — the panel is showing the last good read. (" + e.message + ")";
+      }
+    }
+  }
+
+  // Clock ticks every second so the panel never looks frozen; the vault is
+  // re-read every two, which is plenty for files that change a few times a day.
+  setInterval(() => {
+    const el = $("clock");
+    if ($("conn").dataset.state === "live") el.textContent = new Date().toTimeString().slice(0, 8);
+  }, 1000);
+  tick();
+  setInterval(tick, 2000);
+})();
+</script>
+</body>
+</html>
