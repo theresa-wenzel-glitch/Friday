@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+# The one command. Starts the voice layer in the background and the HUD in front.
+#
+#   friday          voice + terminal HUD
+#   friday hud      terminal HUD only
+#   friday web      browser HUD, opens a window (127.0.0.1 only)
+#   friday voice    voice only, in the foreground with its transcript visible
+#   friday check    is everything wired up?
+#   friday index    rebuild the vault index and audit the schema
+#
+# Quitting the HUD (q) stops the voice layer too.
+
+set -euo pipefail
+BIN="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export FRIDAY_VAULT="${FRIDAY_VAULT:-$(dirname "$BIN")/vault}"
+FRIDAY_HOME="${FRIDAY_HOME:-$HOME/.friday}"
+PIDFILE="$FRIDAY_HOME/voice.pid"
+
+stop_voice() {
+  [ -f "$PIDFILE" ] || return 0
+  kill "$(cat "$PIDFILE")" 2>/dev/null || true
+  rm -f "$PIDFILE"
+}
+
+case "${1:-all}" in
+  hud)   exec python3 "$BIN/hud.py" ;;
+  web)   exec python3 "$BIN/hud-server.py" --open "${@:2}" ;;
+  voice) exec python3 "$BIN/friday-voice.py" "${@:2}" ;;
+  check)
+    rc=0
+    python3 "$BIN/friday-voice.py" --check || rc=1      # keep going: report both
+    echo
+    python3 "$BIN/vault-index.py" --check || rc=1
+    exit $rc ;;
+  index) exec python3 "$BIN/vault-index.py" ;;
+  all)
+    mkdir -p "$FRIDAY_HOME"
+    stop_voice
+    python3 "$BIN/friday-voice.py" >"$FRIDAY_HOME/voice.log" 2>&1 &
+    echo $! > "$PIDFILE"
+    trap stop_voice EXIT INT TERM
+    python3 "$BIN/hud.py"
+    ;;
+  *) echo "usage: friday [hud|voice|check|index]" >&2; exit 2 ;;
+esac
