@@ -110,6 +110,7 @@ eine einzelne Datei.
 ## Testen
 
 ```bash
+npm run typecheck               # TypeScript prüfen
 npm run build
 npx next start -p 3111          # in einem zweiten Terminal
 node scripts/e2e.mjs            # kompletter Ablauf im echten Browser
