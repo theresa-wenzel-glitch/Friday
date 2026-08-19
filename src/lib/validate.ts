@@ -8,6 +8,7 @@ import {
   type Sex,
 } from "./types";
 import { isValidAllbreedUrl } from "./allbreed";
+import { MAX_PHOTO_BYTES, MAX_PHOTO_MB } from "./photo";
 import type { HorseInput } from "./db";
 
 export interface ValidationResult {
@@ -185,6 +186,22 @@ export function validateSubmission(form: FormData): ValidationResult {
   const photo = safeUrl(photoUrl);
   if (photoUrl && !photo) errors.photoUrl = "Bitte eine gültige Bildadresse angeben.";
 
+  // Hochgeladenes Bild: hier wird nur geprüft, ob es überhaupt eines gibt und
+  // ob die Rechte bestätigt wurden. Was wirklich in der Datei steht, prüft
+  // `savePhoto()` anhand der Bytes - der Dateiname sagt darüber nichts aus.
+  const upload = form.get("photo");
+  const hasUpload = upload instanceof File && upload.size > 0;
+  values.photoRights = str(form, "photoRights") ? "1" : "";
+
+  if (hasUpload) {
+    if (upload.size > MAX_PHOTO_BYTES) {
+      errors.photo = `Das Bild ist zu groß - höchstens ${MAX_PHOTO_MB} MB.`;
+    } else if (!values.photoRights) {
+      errors.photo =
+        "Bitte bestätige, dass du das Bild veröffentlichen darfst.";
+    }
+  }
+
   const video = safeUrl(videoUrl);
   if (videoUrl && !video) errors.videoUrl = "Bitte eine gültige Videoadresse angeben.";
 
@@ -238,6 +255,9 @@ export function validateSubmission(form: FormData): ValidationResult {
       genetics,
       availability,
       photoUrl: photo,
+      // Wird in `submitHorseAction` gesetzt, sobald die Datei auf der Platte
+      // liegt. Die Validierung schreibt bewusst nichts auf die Festplatte.
+      photoFile: null,
       photoCredit: nullIfEmpty(photoCredit.slice(0, MAX.short)),
       videoUrl: video,
       websiteUrl: website,

@@ -6,7 +6,8 @@
 #     -v westernhengste-data:/data \
 #     westernhengste
 #
-# Wichtig: /data muss ein dauerhaftes Volume sein - dort liegt die Datenbank.
+# Wichtig: /data muss ein dauerhaftes Volume sein - dort liegen die Datenbank
+# und die hochgeladenen Bilder (/data/uploads).
 
 FROM node:22-slim AS deps
 WORKDIR /app

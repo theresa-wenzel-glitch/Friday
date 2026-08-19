@@ -21,6 +21,10 @@ Hengst hat, schreibt den Besitzer direkt an; das Verzeichnis vermittelt nicht.
 - **Selbsteintragung**: Jeder kann seinen Hengst kostenlos eintragen. Auch
   Stuten sind erlaubt – sie erscheinen nicht als Deckhengste, machen aber die
   Stammbäume vollständiger.
+- **Bilder**: Ein Foto kann direkt hochgeladen werden (JPEG, PNG oder WebP,
+  bis 5 MB) oder weiterhin nur verlinkt werden. Hochgeladene Bilder liegen auf
+  dem eigenen Server und werden erst mit der Freigabe des Eintrags öffentlich
+  sichtbar. Geprüft wird am tatsächlichen Dateiinhalt, nicht an der Endung.
 - **Besitzerkontakt**: Die E-Mail-Adresse wird erst auf Klick nachgeladen und
   steht nicht im Seitenquelltext, damit Adress-Sammler sie nicht abgreifen.
   Die Zahl der Abrufe pro Anschluss ist begrenzt.
@@ -102,6 +106,9 @@ eingetragene Pferde bleiben unberührt.
 | `src/lib/pedigree.ts` | Aufbau des Stammbaums |
 | `src/lib/seed-data.ts` | Grundbestand bekannter Hengste |
 | `src/lib/validate.ts` | Prüfung der Formulareingaben |
+| `src/lib/uploads.ts` | Ablage der hochgeladenen Bilder, Prüfung des Dateiinhalts |
+| `src/lib/photo.ts` | Bildpfade und erlaubte Formate |
+| `src/app/bilder/` | Auslieferung der hochgeladenen Bilder |
 
 Technisch: Next.js (App Router) mit React Server Components, SQLite über
 `better-sqlite3`, Tailwind CSS. Kein externer Dienst nötig, die Datenbank ist
@@ -138,15 +145,17 @@ docker run -p 3000:3000 \
   westernhengste
 ```
 
-Das Volume auf `/data` ist Pflicht – dort liegt die Datenbank. Ohne Volume sind
-alle Einträge nach einem Neustart weg.
+Das Volume auf `/data` ist Pflicht – dort liegen die Datenbank und die
+hochgeladenen Bilder (`/data/uploads`). Ohne Volume sind alle Einträge und
+Bilder nach einem Neustart weg.
 
 Wichtig für die Wahl des Hosters: Die App braucht einen **dauerhaften
 Dateispeicher**. Plattformen ohne persistente Festplatte (etwa Vercel im
 Standardbetrieb) funktionieren so nicht; dort müsste die Datenspeicherung auf
 eine externe Datenbank umgestellt werden.
 
-Sichert `data/westernhengste.db` regelmässig – das ist der gesamte Bestand.
+Sichert `data/` regelmässig – dort liegt der gesamte Bestand: die Datenbank
+`westernhengste.db` und die hochgeladenen Bilder in `data/uploads/`.
 
 ## Vor dem Livegang
 
@@ -161,8 +170,10 @@ Sichert `data/westernhengste.db` regelmässig – das ist der gesamte Bestand.
 
 - Die Ratenbegrenzung liegt im Arbeitsspeicher eines Prozesses. Bei mehreren
   Instanzen müsste sie auf einen gemeinsamen Speicher umgestellt werden.
-- Bilder werden nur verlinkt, nicht hochgeladen. Ein echter Upload bräuchte
-  Speicher und eine Prüfung der Dateien.
+- Hochgeladene Bilder werden gespeichert wie sie kommen: keine Verkleinerung,
+  keine Umwandlung, kein Entfernen der EXIF-Daten. Ein 5-MB-Foto wird also auch
+  in dieser Grösse ausgeliefert, und Aufnahmeort und Kameramodell bleiben in der
+  Datei stehen.
 - Es gibt noch keine Benachrichtigung per E-Mail, wenn eine neue Einsendung
   eintrifft – die Moderation muss aktiv unter `/admin` nachsehen.
 - Die Oberfläche ist auf Deutsch. Für US-Besitzer, die ihren Hengst eintragen

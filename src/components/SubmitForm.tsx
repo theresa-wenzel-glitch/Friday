@@ -11,6 +11,7 @@ import {
   SEXES,
 } from "@/lib/types";
 import { AVAILABILITY_LABEL, SEX_LABEL } from "@/lib/labels";
+import { MAX_PHOTO_MB } from "@/lib/photo";
 
 export function SubmitForm() {
   const [state, formAction, pending] = useActionState<SubmitState, FormData>(
@@ -345,9 +346,47 @@ export function SubmitForm() {
 
       <Section
         title="Medien"
-        hint="Bitte nur Bilder verlinken, für die ihr die Rechte habt oder eine Erlaubnis vorliegt. Das Bild bleibt auf dem Ursprungsserver liegen."
+        hint="Bitte nur Bilder, für die ihr die Rechte habt oder eine Erlaubnis vorliegt. Fotos aus fremden Hengstkatalogen sind urheberrechtlich geschützt."
       >
-        <Field label="Bild-Adresse (URL)" name="photoUrl" error={error("photoUrl")} wide>
+        <Field
+          label="Bild hochladen"
+          name="photo"
+          error={error("photo")}
+          hint={`JPEG, PNG oder WebP, höchstens ${MAX_PHOTO_MB} MB. Das Bild wird erst mit der Freigabe des Eintrags öffentlich sichtbar.`}
+          wide
+        >
+          <input
+            id="photo"
+            name="photo"
+            type="file"
+            className="field"
+            accept="image/jpeg,image/png,image/webp"
+          />
+        </Field>
+
+        <div className="sm:col-span-2">
+          <label className="flex gap-3 items-start text-sm">
+            <input
+              type="checkbox"
+              name="photoRights"
+              value="1"
+              className="mt-1"
+              defaultChecked={value("photoRights") === "1"}
+            />
+            <span>
+              Ich habe die Rechte an diesem Bild oder eine Erlaubnis des
+              Fotografen und darf es hier veröffentlichen.
+            </span>
+          </label>
+        </div>
+
+        <Field
+          label="Oder: Bild-Adresse (URL)"
+          name="photoUrl"
+          error={error("photoUrl")}
+          hint="Alternative zum Hochladen - das Bild bleibt dann auf dem fremden Server liegen. Ist beides angegeben, wird das hochgeladene Bild gezeigt."
+          wide
+        >
           <input
             id="photoUrl"
             name="photoUrl"

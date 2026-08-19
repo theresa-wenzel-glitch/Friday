@@ -84,6 +84,7 @@ export function seedFamousHorses(): number {
       genetics: {},
       availability: seed.availability ?? "unknown",
       photoUrl: null,
+      photoFile: null,
       photoCredit: null,
       videoUrl: null,
       websiteUrl: null,
@@ -151,6 +152,7 @@ function migrate(conn: Database.Database) {
       genetics       TEXT    NOT NULL DEFAULT '{}',
       availability   TEXT    NOT NULL DEFAULT 'unknown',
       photo_url      TEXT,
+      photo_file     TEXT,
       photo_credit   TEXT,
       video_url      TEXT,
       website_url    TEXT,
@@ -188,6 +190,28 @@ function migrate(conn: Database.Database) {
 
     CREATE INDEX IF NOT EXISTS idx_corrections_handled ON corrections(handled);
   `);
+
+  // Bestehende Datenbanken nachziehen. Rein additiv: vorhandener Bestand wird
+  // nie gelöscht oder neu angelegt, nur um eine fehlende Spalte ergänzt.
+  addColumnIfMissing(conn, "horses", "photo_file", "TEXT");
+
+  conn.exec(
+    `CREATE INDEX IF NOT EXISTS idx_horses_photo_file ON horses(photo_file);`,
+  );
+}
+
+/** Ergänzt eine Spalte, falls sie in einer älteren Datenbank noch fehlt. */
+function addColumnIfMissing(
+  conn: Database.Database,
+  table: string,
+  column: string,
+  definition: string,
+): void {
+  const columns = conn.prepare(`PRAGMA table_info(${table})`).all() as {
+    name: string;
+  }[];
+  if (columns.some((c) => c.name === column)) return;
+  conn.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`);
 }
 
 /* ------------------------------------------------------------------ */
@@ -233,6 +257,7 @@ function toHorse(row: Row): Horse {
     genetics: parseJson<Partial<Record<GeneticTest, string>>>(row.genetics, {}),
     availability: (row.availability as Availability) ?? "unknown",
     photoUrl: (row.photo_url as string) ?? null,
+    photoFile: (row.photo_file as string) ?? null,
     photoCredit: (row.photo_credit as string) ?? null,
     videoUrl: (row.video_url as string) ?? null,
     websiteUrl: (row.website_url as string) ?? null,
@@ -485,7 +510,7 @@ export function insertHorse(input: HorseInput): Horse {
          year_of_death, color, height_cm, country, location, stud_name,
          disciplines, description, show_record, offspring, bloodline_note,
          sire_name, dam_name, sire_name_key, dam_name_key,
-         genetics, availability, photo_url, photo_credit,
+         genetics, availability, photo_url, photo_file, photo_credit,
          video_url, website_url, allbreed_url, owner_name, contact_email,
          contact_phone, is_historic, is_verified, status, source,
          submitter_email, admin_note, created_at, updated_at
@@ -494,7 +519,7 @@ export function insertHorse(input: HorseInput): Horse {
          @year_of_death, @color, @height_cm, @country, @location, @stud_name,
          @disciplines, @description, @show_record, @offspring, @bloodline_note,
          @sire_name, @dam_name, @sire_name_key, @dam_name_key,
-         @genetics, @availability, @photo_url, @photo_credit,
+         @genetics, @availability, @photo_url, @photo_file, @photo_credit,
          @video_url, @website_url, @allbreed_url, @owner_name, @contact_email,
          @contact_phone, @is_historic, @is_verified, @status, @source,
          @submitter_email, @admin_note, @created_at, @updated_at
@@ -527,6 +552,7 @@ export function insertHorse(input: HorseInput): Horse {
       genetics: JSON.stringify(input.genetics ?? {}),
       availability: input.availability,
       photo_url: input.photoUrl,
+      photo_file: input.photoFile,
       photo_credit: input.photoCredit,
       video_url: input.videoUrl,
       website_url: input.websiteUrl,
@@ -630,6 +656,37 @@ export function setVerified(id: number, verified: boolean): void {
 
 export function deleteHorse(id: number): void {
   getDb().prepare("DELETE FROM horses WHERE id = ?").run(id);
+}
+
+/* ------------------------------------------------------------------ */
+/* Hochgeladene Bilder                                                 */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Ob ein hochgeladenes Bild öffentlich ausgeliefert werden darf: nur, wenn
+ * mindestens ein freigegebenes Pferd es verwendet. Solange eine Einsendung
+ * noch in der Moderation liegt, ist auch ihr Bild nicht abrufbar - sonst wäre
+ * die Freigabe über die Bild-Adresse zu umgehen.
+ */
+export function isPhotoPublic(file: string): boolean {
+  const row = getDb()
+    .prepare(
+      "SELECT 1 FROM horses WHERE photo_file = ? AND status = 'approved' LIMIT 1",
+    )
+    .get(file);
+  return row !== undefined;
+}
+
+/**
+ * Wie viele Einträge dieses Bild verwenden. Gleiche Datei ergibt denselben
+ * Hash und damit denselben Namen, deshalb kann ein Bild zu mehreren Pferden
+ * gehören - es darf erst gelöscht werden, wenn niemand mehr darauf zeigt.
+ */
+export function countPhotoUsage(file: string): number {
+  const row = getDb()
+    .prepare("SELECT COUNT(*) AS c FROM horses WHERE photo_file = ?")
+    .get(file) as { c: number };
+  return row.c;
 }
 
 /* ------------------------------------------------------------------ */

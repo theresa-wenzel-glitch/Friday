@@ -16,6 +16,7 @@ import {
   verifyAction,
 } from "./actions";
 import { pedigreeLine, summaryLine } from "@/lib/labels";
+import { isUploadedPhoto, photoSrc } from "@/lib/photo";
 import type { Horse } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -198,8 +199,13 @@ function SubmissionDetails({ horse }: { horse: Horse }) {
     ["Telefon", horse.contactPhone],
     ["Einsender", horse.submitterEmail],
     ["Website", horse.websiteUrl],
-    ["Bild", horse.photoUrl],
+    ["Bild-Adresse", horse.photoUrl],
+    ["Bildnachweis", horse.photoCredit],
   ];
+
+  // Das Vorschaubild kommt über /bilder und ist vor der Freigabe nur für
+  // angemeldete Moderatoren abrufbar - genau dieser Fall ist hier.
+  const photo = photoSrc(horse);
 
   return (
     <>
@@ -215,6 +221,24 @@ function SubmissionDetails({ horse }: { horse: Horse }) {
         >
           ⚠ {horse.adminNote}
         </p>
+      )}
+
+      {photo && (
+        <figure className="mt-3">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={photo}
+            alt={`Eingesandtes Bild zu ${horse.name}`}
+            referrerPolicy={isUploadedPhoto(horse) ? undefined : "no-referrer"}
+            className="rounded-lg max-h-56 w-auto"
+            style={{ border: "1px solid var(--line)" }}
+          />
+          <figcaption className="text-xs muted mt-1">
+            {isUploadedPhoto(horse)
+              ? "Hochgeladen - liegt auf diesem Server und wird mit der Freigabe öffentlich."
+              : "Verlinkt - liegt auf einem fremden Server."}
+          </figcaption>
+        </figure>
       )}
 
       <dl className="text-sm grid gap-1 sm:grid-cols-2 mt-3">

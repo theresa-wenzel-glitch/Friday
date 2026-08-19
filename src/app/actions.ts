@@ -11,6 +11,7 @@ import {
 } from "@/lib/db";
 import { validateSubmission } from "@/lib/validate";
 import { rateLimit } from "@/lib/rate-limit";
+import { savePhoto } from "@/lib/uploads";
 import { normalizeName } from "@/lib/slug";
 import type {
   ContactState,
@@ -50,6 +51,23 @@ export async function submitHorseAction(
     return { status: "error", errors: result.errors, values: result.values };
   }
 
+  // Erst jetzt, nachdem alles andere gültig ist, landet eine Datei auf der
+  // Platte. So entstehen bei einem fehlerhaften Formular keine Bildleichen.
+  let photoFile: string | null = null;
+  const upload = form.get("photo");
+
+  if (upload instanceof File && upload.size > 0) {
+    const saved = await savePhoto(upload);
+    if (!saved.ok) {
+      return {
+        status: "error",
+        errors: { photo: saved.error },
+        values: result.values,
+      };
+    }
+    photoFile = saved.file;
+  }
+
   // Dublettenwarnung: gleicher Name plus gleiches Geburtsjahr gibt es meistens
   // nur einmal. Der Eintrag wird nicht blockiert, aber der Moderation gemeldet.
   const existing = queryHorses({ search: result.horse.name, limit: 5 });
@@ -62,6 +80,7 @@ export async function submitHorseAction(
 
   insertHorse({
     ...result.horse,
+    photoFile,
     adminNote: duplicate
       ? `Möglicher Doppeleintrag zu „${duplicate.name}" (/hengste/${duplicate.slug}).`
       : null,

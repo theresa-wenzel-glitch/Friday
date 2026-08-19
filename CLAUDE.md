@@ -95,6 +95,8 @@ Im Container ist Chromium unter `/opt/pw-browsers` vorinstalliert
 | `src/lib/pedigree.ts` | Aufbau des Stammbaums über vier Generationen |
 | `src/lib/seed-data.ts` | Grundbestand bekannter Hengste |
 | `src/lib/validate.ts` | Prüfung der Formulareingaben |
+| `src/lib/uploads.ts` | Bildablage auf dem Datenvolume, Prüfung der Magic Bytes |
+| `src/app/bilder/` | Auslieferung hochgeladener Bilder (erst nach Freigabe) |
 | `scripts/e2e.mjs` | End-to-End-Test des kompletten Ablaufs |
 
 ### Konventionen
@@ -108,6 +110,9 @@ Im Container ist Chromium unter `/opt/pw-browsers` vorinstalliert
   Prüfungen im Browser sind Komfort, nie die Absicherung.
 - **Kontaktdaten:** E-Mail-Adressen werden erst auf Klick nachgeladen und dürfen
   nicht in den Seitenquelltext gelangen (Schutz vor Adress-Sammlern).
+- **Hochgeladene Dateien:** liegen auf dem Datenvolume neben der Datenbank, nie
+  unter `public/`. Das Format wird am Dateiinhalt bestimmt, nie an der Endung
+  oder am gemeldeten MIME-Typ. SVG bleibt ausgeschlossen.
 - **Inhalte:** Keine Texte oder Fotos aus fremden Hengstkatalogen übernehmen.
   Stammdaten sind freie Fakten, Beschreibungen und Bilder sind es nicht. Bei
   unklarer Quellenlage bleibt ein Feld leer statt geraten.
@@ -115,8 +120,8 @@ Im Container ist Chromium unter `/opt/pw-browsers` vorinstalliert
 
 ### Bekannte Grenzen
 
-Ratenbegrenzung liegt im Prozessspeicher (nicht mehrinstanzfähig) · Bilder werden
-nur verlinkt, nicht hochgeladen · keine E-Mail-Benachrichtigung bei neuen
+Ratenbegrenzung liegt im Prozessspeicher (nicht mehrinstanzfähig) · hochgeladene
+Bilder werden nicht verkleinert und behalten ihre EXIF-Daten · keine E-Mail-Benachrichtigung bei neuen
 Einsendungen · Oberfläche nur auf Deutsch · kein ESLint eingerichtet (`next lint`
 ist in Next 16 entfernt), statische Prüfung läuft über `npm run typecheck` · die
 App braucht **persistenten Dateispeicher** (Vercel im Standardbetrieb

@@ -7,6 +7,7 @@ import { PedigreeChart } from "@/components/PedigreeChart";
 import { ContactReveal } from "@/components/ContactReveal";
 import { CorrectionForm } from "@/components/CorrectionForm";
 import { allbreedUrlFor } from "@/lib/allbreed";
+import { isUploadedPhoto, photoSrc } from "@/lib/photo";
 import {
   AVAILABILITY_LABEL,
   SEX_LABEL,
@@ -44,6 +45,9 @@ export default async function HorsePage({
   const horse = getHorseBySlug(slug);
 
   if (!horse || horse.status !== "approved") notFound();
+
+  const photo = photoSrc(horse);
+  const uploaded = isUploadedPhoto(horse);
 
   const pedigree = buildPedigree(horse, GENERATIONS);
   const { filled, total } = pedigreeCompleteness(pedigree, GENERATIONS);
@@ -131,16 +135,17 @@ export default async function HorsePage({
       <div className="grid gap-8 lg:grid-cols-[1fr_20rem] items-start">
         <div className="min-w-0 space-y-10">
           {/* Foto */}
-          {horse.photoUrl && (
+          {photo && (
             <figure>
-              {/* Bewusst ein einfaches img-Element: die Bilder liegen auf fremden
-                  Servern und sollen nicht über diesen Server geleitet werden. */}
+              {/* Bewusst ein einfaches img-Element. Hochgeladene Bilder kommen
+                  über /bilder vom eigenen Server, verlinkte bleiben beim
+                  Ursprung und werden nicht durchgeleitet. */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={horse.photoUrl}
+                src={photo}
                 alt={horse.name}
                 loading="lazy"
-                referrerPolicy="no-referrer"
+                referrerPolicy={uploaded ? undefined : "no-referrer"}
                 className="w-full rounded-xl"
                 style={{ border: "1px solid var(--line)" }}
               />

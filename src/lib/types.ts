@@ -87,7 +87,10 @@ export interface Horse {
   damId: number | null;
   genetics: Partial<Record<GeneticTest, string>>;
   availability: Availability;
+  /** Verlinktes Bild auf einem fremden Server. */
   photoUrl: string | null;
+  /** Hochgeladenes Bild, gespeichert im Upload-Verzeichnis. Hat Vorrang. */
+  photoFile: string | null;
   photoCredit: string | null;
   videoUrl: string | null;
   websiteUrl: string | null;

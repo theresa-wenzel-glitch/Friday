@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import {
+  countPhotoUsage,
   deleteHorse,
   getHorseById,
   linkAsParentOfOthers,
@@ -19,6 +20,7 @@ import {
   requireAdmin,
 } from "@/lib/auth";
 import { rateLimit } from "@/lib/rate-limit";
+import { removePhoto } from "@/lib/uploads";
 import type { LoginState } from "@/lib/form-state";
 
 export async function loginAction(
@@ -105,7 +107,15 @@ export async function deleteAction(form: FormData): Promise<void> {
   const id = Number(form.get("id"));
   if (!Number.isInteger(id)) return;
 
+  const horse = getHorseById(id);
   deleteHorse(id);
+
+  // Ein hochgeladenes Bild wird erst entfernt, wenn kein Eintrag mehr darauf
+  // zeigt: gleiche Datei ergibt denselben Hash und kann zu mehreren Pferden
+  // gehören.
+  if (horse?.photoFile && countPhotoUsage(horse.photoFile) === 0) {
+    await removePhoto(horse.photoFile);
+  }
   revalidatePath("/admin");
   revalidatePath("/hengste");
 }
