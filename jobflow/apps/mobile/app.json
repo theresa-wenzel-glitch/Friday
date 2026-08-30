@@ -1,0 +1,32 @@
+{
+  "expo": {
+    "name": "JobFlow",
+    "slug": "jobflow",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "scheme": "jobflow",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#5B4CF0"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "app.jobflow.client"
+    },
+    "android": {
+      "package": "app.jobflow.client",
+      "adaptiveIcon": {
+        "backgroundColor": "#5B4CF0"
+      }
+    },
+    "plugins": ["expo-router", "expo-secure-store"],
+    "experiments": {
+      "typedRoutes": false
+    },
+    "extra": {
+      "apiUrl": "http://localhost:4000"
+    }
+  }
+}
