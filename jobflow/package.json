@@ -1,0 +1,22 @@
+{
+  "name": "jobflow",
+  "version": "0.1.0",
+  "private": true,
+  "description": "JobFlow - von der Anfrage zum Auftrag. Marktplatz und KI-Assistent fuer Dienstleistungen.",
+  "engines": {
+    "node": ">=22.6.0"
+  },
+  "packageManager": "pnpm@9.12.0",
+  "scripts": {
+    "typecheck": "pnpm -r --if-present typecheck",
+    "test": "pnpm -r --if-present test",
+    "db:migrate": "pnpm --filter @jobflow/database migrate",
+    "db:seed": "pnpm --filter @jobflow/database seed",
+    "db:reset": "pnpm --filter @jobflow/database reset",
+    "api:dev": "pnpm --filter @jobflow/api dev",
+    "mobile:start": "pnpm --filter @jobflow/mobile start"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}

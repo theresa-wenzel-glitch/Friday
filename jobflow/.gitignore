@@ -1,0 +1,14 @@
+node_modules/
+dist/
+build/
+.expo/
+.tsbuildinfo
+*.tsbuildinfo
+
+# Laufzeitdaten
+var/
+uploads/
+
+.env
+.env.local
+.env*.local
