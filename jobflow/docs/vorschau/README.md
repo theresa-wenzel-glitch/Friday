@@ -1,3 +1,19 @@
+# Vorschau und Quellcode
+
+Zwei Dateien, die beide ohne Server und ohne Installation funktionieren —
+einfach im Browser öffnen.
+
+| Datei | Was sie zeigt |
+|---|---|
+| `jobflow-vorschau.html` | Die App klickbar, Kunden- und Unternehmensseite |
+| `jobflow-quellcode.html` | Den gesamten Quellcode zum Durchblättern |
+
+`jobflow-quellcode.html` ist eine **Momentaufnahme** des Codes zum Zeitpunkt
+des jeweiligen Commits: 150 Dateien, nach Architektur-Bereichen gruppiert, mit
+Suche und eigener Einfärbung. Sie lädt nichts nach und funktioniert deshalb
+auch offline. Wer den aktuellen Stand braucht, liest ihn im Repository —
+die Seite ersetzt kein `git pull`.
+
 # Vorschau
 
 `jobflow-vorschau.html` ist ein klickbarer Prototyp der gesamten App — eine
