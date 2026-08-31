@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Gemeinsame Validierung fuer Mobile, Web und Backend - ohne Laufzeitabhaengigkeiten.",
+  "description": "Gemeinsame Validierung für Mobile, Web und Backend - ohne Laufzeitabhaengigkeiten.",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {

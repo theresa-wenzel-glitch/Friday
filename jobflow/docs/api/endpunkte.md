@@ -4,8 +4,8 @@ Basisadresse in der Entwicklung: `http://localhost:4000`
 
 ## Antwortstruktur
 
-Jede Antwort hat dieselbe Huelle — im Erfolgs- wie im Fehlerfall. Die
-Frontends muessen so nie pro Endpunkt raten, wie eine Antwort aussieht.
+Jede Antwort hat dieselbe Hülle — im Erfolgs- wie im Fehlerfall. Die
+Frontends müssen so nie pro Endpunkt raten, wie eine Antwort aussieht.
 
 ```json
 { "success": true, "data": { }, "error": null }
@@ -17,7 +17,7 @@ Frontends muessen so nie pro Endpunkt raten, wie eine Antwort aussieht.
   "data": null,
   "error": {
     "code": "VALIDATION_FAILED",
-    "message": "Bitte pruefe deine Eingaben.",
+    "message": "Bitte prüfe deine Eingaben.",
     "fields": { "password": "Bitte mindestens 10 Zeichen angeben." }
   }
 }
@@ -30,18 +30,18 @@ direkt unter dem betroffenen Feld anzeigen.
 
 | Code | Status | Bedeutung |
 |---|---|---|
-| `VALIDATION_FAILED` | 422 | Eingaben unvollstaendig oder ungueltig |
+| `VALIDATION_FAILED` | 422 | Eingaben unvollständig oder ungueltig |
 | `UNAUTHENTICATED` | 401 | Kein oder ungueltiges Token |
 | `FORBIDDEN` | 403 | Angemeldet, aber nicht berechtigt |
-| `NOT_FOUND` | 404 | Gibt es nicht — **oder gehoert jemand anderem** |
+| `NOT_FOUND` | 404 | Gibt es nicht — **oder gehört jemand anderem** |
 | `CONFLICT` | 409 | Zustand passt nicht (Angebot bereits angenommen o. ae.) |
 | `RATE_LIMITED` | 429 | Zu viele Anfragen, `Retry-After` beachten |
-| `AI_UNAVAILABLE` | 503 | Die Analyse ist gerade nicht moeglich |
+| `AI_UNAVAILABLE` | 503 | Die Analyse ist gerade nicht möglich |
 | `INTERNAL_ERROR` | 500 | Fehler auf Serverseite |
 
 ## Anmeldung
 
-Nach `register` oder `login` gibt es ein Token. Es gehoert in jeden weiteren
+Nach `register` oder `login` gibt es ein Token. Es gehört in jeden weiteren
 Aufruf:
 
 ```
@@ -53,19 +53,19 @@ Authorization: Bearer <token>
 | POST | `/auth/register` | — | Konto anlegen (`CUSTOMER` oder `BUSINESS`) |
 | POST | `/auth/login` | — | Anmelden |
 | POST | `/auth/logout` | angemeldet | Diese Session beenden |
-| POST | `/auth/logout-all` | angemeldet | Auf allen Geraeten abmelden |
+| POST | `/auth/logout-all` | angemeldet | Auf allen Geräten abmelden |
 | GET | `/me` | angemeldet | Eigenes Konto |
 
-Ein `BUSINESS`-Konto bekommt bei der Registrierung sofort ein — zunaechst
-leeres — Unternehmensprofil. Sonst muesste jede spaetere Abfrage den Sonderfall
+Ein `BUSINESS`-Konto bekommt bei der Registrierung sofort ein — zunächst
+leeres — Unternehmensprofil. Sonst müsste jede spätere Abfrage den Sonderfall
 "Konto ohne Unternehmen" behandeln.
 
 ## Kategorien
 
 | Methode | Pfad | Rolle | Zweck |
 |---|---|---|---|
-| GET | `/categories` | oeffentlich | Alle aktiven Kategorien |
-| GET | `/categories/tree` | oeffentlich | Als Baum, fuer die Startseite |
+| GET | `/categories` | öffentlich | Alle aktiven Kategorien |
+| GET | `/categories/tree` | öffentlich | Als Baum, für die Startseite |
 
 ## Anfragen
 
@@ -74,8 +74,8 @@ leeres — Unternehmensprofil. Sonst muesste jede spaetere Abfrage den Sonderfal
 | POST | `/requests` | CUSTOMER | Anfrage anlegen |
 | GET | `/requests` | CUSTOMER | Eigene Anfragen (`?limit=&offset=`) |
 | GET | `/requests/:id` | Beteiligte | Anfrage lesen |
-| PATCH | `/requests/:id` | CUSTOMER | Aendern, solange keine Angebote vorliegen |
-| DELETE | `/requests/:id` | CUSTOMER | Zurueckziehen |
+| PATCH | `/requests/:id` | CUSTOMER | Ändern, solange keine Angebote vorliegen |
+| DELETE | `/requests/:id` | CUSTOMER | Zurückziehen |
 
 `GET /requests/:id` liefert die Anfrage an den Kunden **und** an jedes
 Unternehmen, dem sie vorgeschlagen wurde — vorher nicht.
@@ -85,13 +85,13 @@ Unternehmen, dem sie vorgeschlagen wurde — vorher nicht.
 | Methode | Pfad | Rolle | Zweck |
 |---|---|---|---|
 | POST | `/requests/:id/analyze` | CUSTOMER | Analysieren lassen |
-| GET | `/requests/:id/analysis` | Beteiligte | Juengste Analyse mit Rueckfragen |
-| POST | `/requests/:id/questions/:questionId` | CUSTOMER | Rueckfrage beantworten |
-| POST | `/offers/suggest-text` | BUSINESS | Textvorschlag fuer ein Angebot |
+| GET | `/requests/:id/analysis` | Beteiligte | Jüngste Analyse mit Rückfragen |
+| POST | `/requests/:id/questions/:questionId` | CUSTOMER | Rückfrage beantworten |
+| POST | `/offers/suggest-text` | BUSINESS | Textvorschlag für ein Angebot |
 | POST | `/conversations/:id/suggest-reply` | Beteiligte | Antwortvorschlag |
 
-Die Vorschlaege werden **zurueckgegeben, nicht abgeschickt**. Sie tragen
-`isAiGenerated: true`, damit die Oberflaeche sie kennzeichnen kann.
+Die Vorschläge werden **zurückgegeben, nicht abgeschickt**. Sie tragen
+`isAiGenerated: true`, damit die Oberfläche sie kennzeichnen kann.
 
 ## Unternehmen
 
@@ -105,52 +105,52 @@ Die Vorschlaege werden **zurueckgegeben, nicht abgeschickt**. Sie tragen
 | GET/POST | `/businesses/me/availability` | BUSINESS | Wochenplan |
 | GET | `/businesses/me/matches` | BUSINESS | Vorgeschlagene Anfragen |
 | GET | `/businesses/me/offers` | BUSINESS | Eigene Angebote |
-| GET | `/businesses/:id` | oeffentlich | Oeffentliches Profil |
-| GET | `/businesses/:id/reviews` | oeffentlich | Bewertungen |
+| GET | `/businesses/:id` | öffentlich | Öffentliches Profil |
+| GET | `/businesses/:id/reviews` | öffentlich | Bewertungen |
 | GET | `/businesses/:id/availability` | angemeldet | Freie Zeitfenster |
 
 Es gibt bewusst **keinen** Endpunkt, mit dem ein Unternehmen eine fremde
-Unternehmens-ID uebergeben koennte. `/businesses/me` bezieht sich immer auf das
+Unternehmens-ID übergeben könnte. `/businesses/me` bezieht sich immer auf das
 eigene — die ID kommt aus der Session, nicht aus der Anfrage.
 
-## Matching, Angebote, Termine, Auftraege
+## Matching, Angebote, Termine, Aufträge
 
 | Methode | Pfad | Rolle | Zweck |
 |---|---|---|---|
 | POST | `/requests/:id/matches` | CUSTOMER | Anbieter suchen |
-| GET | `/requests/:id/matches` | CUSTOMER | Vorschlaege mit Begruendung |
+| GET | `/requests/:id/matches` | CUSTOMER | Vorschläge mit Begründung |
 | POST | `/matches/:id/respond` | BUSINESS | Annehmen oder ablehnen |
 | POST | `/offers` | BUSINESS | Angebot abgeben |
 | GET | `/requests/:id/offers` | CUSTOMER | Angebote vergleichen |
 | GET | `/offers/:id` | Beteiligte | Angebot lesen |
 | POST | `/offers/:id/accept` | CUSTOMER | Annehmen → Auftrag entsteht |
 | POST | `/offers/:id/decline` | CUSTOMER | Ablehnen |
-| POST | `/offers/:id/withdraw` | BUSINESS | Zurueckziehen |
+| POST | `/offers/:id/withdraw` | BUSINESS | Zurückziehen |
 | POST | `/appointments` | Beteiligte | Termin buchen |
 | DELETE | `/appointments/:id` | Beteiligte | Absagen |
-| GET | `/jobs`, `/jobs/:id` | Beteiligte | Auftraege |
+| GET | `/jobs`, `/jobs/:id` | Beteiligte | Aufträge |
 | PATCH | `/jobs/:id/status` | siehe unten | Fortschritt melden |
 | POST | `/reviews` | CUSTOMER | Abgeschlossenen Auftrag bewerten |
 
 `POST /offers/:id/accept` ist der wichtigste Zustandswechsel der Plattform und
-laeuft in **einer** Transaktion: Angebot annehmen, uebrige Angebote ablehnen,
-Anfrage umstellen, Auftrag anlegen, Gespraech eroeffnen. Entweder alles oder
+laeuft in **einer** Transaktion: Angebot annehmen, übrige Angebote ablehnen,
+Anfrage umstellen, Auftrag anlegen, Gespräch eröffnen. Entweder alles oder
 nichts.
 
 `PATCH /jobs/:id/status`: Den Fortschritt (`IN_PROGRESS`, `COMPLETED`) meldet
-das ausfuehrende Unternehmen — das ist seine Aussage, nicht die des Kunden.
-Abbrechen (`CANCELLED`) duerfen beide Seiten.
+das ausführende Unternehmen — das ist seine Aussage, nicht die des Kunden.
+Abbrechen (`CANCELLED`) dürfen beide Seiten.
 
 ## Chat
 
 | Methode | Pfad | Rolle | Zweck |
 |---|---|---|---|
-| GET | `/conversations` | angemeldet | Eigene Gespraeche |
+| GET | `/conversations` | angemeldet | Eigene Gespräche |
 | GET | `/conversations/:id/messages` | Beteiligte | Verlauf |
 | POST | `/conversations/:id/messages` | Beteiligte | Nachricht senden |
 
-Nachrichten tragen `isAiGenerated`. Die Oberflaeche muss das sichtbar machen —
-ein KI-Text darf nicht aussehen, als haette ihn ein Mensch geschrieben.
+Nachrichten tragen `isAiGenerated`. Die Oberfläche muss das sichtbar machen —
+ein KI-Text darf nicht aussehen, als hätte ihn ein Mensch geschrieben.
 
 ## Rate Limiting
 

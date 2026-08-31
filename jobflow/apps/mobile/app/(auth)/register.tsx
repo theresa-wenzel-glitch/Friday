@@ -25,7 +25,7 @@ export default function RegisterScreen() {
   async function submit(): Promise<void> {
     setMessage(null);
 
-    // Dieselbe Pruefung wie im Backend - hier nur fuer die schnelle Rueckmeldung.
+    // Dieselbe Prüfung wie im Backend - hier nur für die schnelle Rückmeldung.
     // Verbindlich entscheidet immer der Server.
     const parsed = validate(registerSchema, { name, email, password, role });
     if (!parsed.ok) {
@@ -52,7 +52,7 @@ export default function RegisterScreen() {
 
   return (
     <Screen>
-      <Text style={styles.intro}>Wofuer moechtest du JobFlow nutzen?</Text>
+      <Text style={styles.intro}>Wofür moechtest du JobFlow nutzen?</Text>
 
       <View style={styles.roles}>
         <RoleOption
@@ -92,7 +92,7 @@ export default function RegisterScreen() {
         onChangeText={setPassword}
         secureTextEntry
         autoCapitalize="none"
-        hint={`Mindestens ${PASSWORD_MIN_LENGTH} Zeichen. Laenge schuetzt mehr als Sonderzeichen.`}
+        hint={`Mindestens ${PASSWORD_MIN_LENGTH} Zeichen. Länge schützt mehr als Sonderzeichen.`}
         error={fields["password"]}
       />
 

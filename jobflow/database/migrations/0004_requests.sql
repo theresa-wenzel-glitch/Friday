@@ -3,14 +3,14 @@
 CREATE TABLE requests (
   id             uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   customer_id    uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  -- Anfangs null: die KI schlaegt die Kategorie erst nach der Analyse vor.
+  -- Anfangs null: die KI schlägt die Kategorie erst nach der Analyse vor.
   category_id    uuid REFERENCES categories(id) ON DELETE SET NULL,
   title          text,
   description    text NOT NULL CHECK (length(description) >= 10),
   urgency        text NOT NULL DEFAULT 'NORMAL' CHECK (urgency IN ('LOW', 'NORMAL', 'HIGH')),
   latitude       double precision CHECK (latitude BETWEEN -90 AND 90),
   longitude      double precision CHECK (longitude BETWEEN -180 AND 180),
-  -- Grobe Ortsangabe fuer die Anzeige ("45127 Essen"). Die genaue Adresse
+  -- Grobe Ortsangabe für die Anzeige ("45127 Essen"). Die genaue Adresse
   -- braucht erst das Unternehmen, das den Auftrag bekommt.
   location_label text,
   desired_from   timestamptz,
@@ -27,7 +27,7 @@ CREATE TRIGGER requests_touch_updated_at
   BEFORE UPDATE ON requests
   FOR EACH ROW EXECUTE FUNCTION jobflow_touch_updated_at();
 
--- "Meine Anfragen" ist der haeufigste Zugriff der Kunden-App.
+-- "Meine Anfragen" ist der häufigste Zugriff der Kunden-App.
 CREATE INDEX requests_customer_idx ON requests (customer_id, created_at DESC);
 CREATE INDEX requests_status_idx ON requests (status, created_at DESC);
 CREATE INDEX requests_category_idx ON requests (category_id) WHERE category_id IS NOT NULL;
@@ -35,8 +35,8 @@ CREATE INDEX requests_category_idx ON requests (category_id) WHERE category_id I
 CREATE TABLE request_photos (
   id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   request_id   uuid NOT NULL REFERENCES requests(id) ON DELETE CASCADE,
-  -- Schluessel im Object Storage, nie eine oeffentliche URL. Der Zugriff laeuft
-  -- immer ueber die API, die vorher die Berechtigung prueft.
+  -- Schluessel im Object Storage, nie eine öffentliche URL. Der Zugriff laeuft
+  -- immer über die API, die vorher die Berechtigung prüft.
   storage_key  text NOT NULL UNIQUE,
   content_type text NOT NULL CHECK (content_type IN ('image/jpeg', 'image/png', 'image/webp', 'image/heic')),
   byte_size    integer NOT NULL CHECK (byte_size > 0),

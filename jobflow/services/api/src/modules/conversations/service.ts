@@ -59,10 +59,10 @@ export class ConversationService {
   }
 
   /**
-   * Prueft, ob der Nutzer an dieser Konversation beteiligt ist.
+   * Prüft, ob der Nutzer an dieser Konversation beteiligt ist.
    *
-   * Jede Nachrichtenoperation geht durch diese Pruefung. Ein Chat ist der Ort,
-   * an dem Kunden Adressen und Telefonnummern austauschen - hier waere ein
+   * Jede Nachrichtenoperation geht durch diese Prüfung. Ein Chat ist der Ort,
+   * an dem Kunden Adressen und Telefonnummern austauschen - hier wäre ein
    * Fehler in der Berechtigung besonders unangenehm.
    */
   private async requireParticipant(conversationId: string, userId: string): Promise<ConversationRow> {
@@ -77,7 +77,7 @@ export class ConversationService {
       [conversationId, userId],
     );
     const row = result.rows[0];
-    if (row === undefined) throw ApiError.notFound("Dieses Gespraech gibt es nicht.");
+    if (row === undefined) throw ApiError.notFound("Dieses Gespräch gibt es nicht.");
     return row;
   }
 
@@ -91,7 +91,7 @@ export class ConversationService {
       "SELECT * FROM messages WHERE conversation_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3",
       [conversationId, limit, offset],
     );
-    // Aelteste zuerst - so erwartet es die Anzeige.
+    // Älteste zuerst - so erwartet es die Anzeige.
     return result.rows.reverse().map(mapMessage);
   }
 

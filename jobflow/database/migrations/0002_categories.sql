@@ -1,8 +1,8 @@
 -- 0002 Kategorien.
 --
 -- Kategorien sind Daten, keine fest einprogrammierte Handwerkerliste. Neue
--- Branchen (Auto, Haushalt, Garten, Freelancer ...) kommen ueber Zeilen in
--- dieser Tabelle dazu, nicht ueber ein Deployment.
+-- Branchen (Auto, Haushalt, Garten, Freelancer ...) kommen über Zeilen in
+-- dieser Tabelle dazu, nicht über ein Deployment.
 
 CREATE TABLE categories (
   id         uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -13,8 +13,8 @@ CREATE TABLE categories (
   position   integer NOT NULL DEFAULT 0,
   active     boolean NOT NULL DEFAULT true,
   created_at timestamptz NOT NULL DEFAULT now(),
-  -- Zwei Ebenen reichen fuer den Start (Handwerk > Sanitaer). Tiefer wird die
-  -- Auswahl in der App unuebersichtlich.
+  -- Zwei Ebenen reichen für den Start (Handwerk > Sanitär). Tiefer wird die
+  -- Auswahl in der App unübersichtlich.
   CONSTRAINT categories_no_self_parent CHECK (parent_id IS NULL OR parent_id <> id)
 );
 

@@ -1,22 +1,22 @@
 /**
- * Ein sehr kleines Validierungs-Werkzeug ohne Abhaengigkeiten.
+ * Ein sehr kleines Validierungs-Werkzeug ohne Abhängigkeiten.
  *
- * Bewusst klein gehalten: es laeuft unveraendert im Backend (Node) und in der
- * React-Native-App. Beide Seiten pruefen dieselben Regeln - die App fuer schnelle
- * Rueckmeldung, das Backend als verbindliche Instanz. Die App darf nie allein
- * darueber entscheiden, ob Daten gueltig sind.
+ * Bewusst klein gehalten: es laeuft unverändert im Backend (Node) und in der
+ * React-Native-App. Beide Seiten prüfen dieselben Regeln - die App für schnelle
+ * Rückmeldung, das Backend als verbindliche Instanz. Die App darf nie allein
+ * darüber entscheiden, ob Daten gültig sind.
  */
 
 export type ValidationResult<T> =
   | { ok: true; value: T }
   | { ok: false; fields: Record<string, string> };
 
-/** Ein Validator prueft einen Wert an einer bestimmten Stelle (path). */
+/** Ein Validator prüft einen Wert an einer bestimmten Stelle (path). */
 export interface Validator<T> {
   parse(input: unknown, path: string, errors: Record<string, string>): T | undefined;
 }
 
-/** Fuehrt einen Validator aus und liefert entweder Wert oder Feldfehler. */
+/** Führt einen Validator aus und liefert entweder Wert oder Feldfehler. */
 export function validate<T>(validator: Validator<T>, input: unknown): ValidationResult<T> {
   const errors: Record<string, string> = {};
   const value = validator.parse(input, "", errors);
@@ -25,7 +25,7 @@ export function validate<T>(validator: Validator<T>, input: unknown): Validation
 }
 
 function fail(errors: Record<string, string>, path: string, message: string): undefined {
-  // Der erste Fehler pro Feld ist der aussagekraeftigste; spaetere ueberschreiben ihn nicht.
+  // Der erste Fehler pro Feld ist der aussagekräftigste; spätere überschreiben ihn nicht.
   if (!(path in errors)) errors[path] = message;
   return undefined;
 }
@@ -39,7 +39,7 @@ function join(path: string, key: string): string {
 export interface StringOptions {
   min?: number;
   max?: number;
-  /** Fuehrende und abschliessende Leerzeichen entfernen (Standard: true). */
+  /** Führende und abschließende Leerzeichen entfernen (Standard: true). */
   trim?: boolean;
   pattern?: RegExp;
   patternMessage?: string;
@@ -58,7 +58,7 @@ export function string(options: StringOptions = {}): Validator<string> {
           min === 1 ? "Dieses Feld darf nicht leer sein." : `Bitte mindestens ${min} Zeichen angeben.`,
         );
       }
-      if (value.length > max) return fail(errors, path, `Bitte hoechstens ${max} Zeichen angeben.`);
+      if (value.length > max) return fail(errors, path, `Bitte höchstens ${max} Zeichen angeben.`);
       if (pattern && !pattern.test(value)) {
         return fail(errors, path, patternMessage ?? "Das Format ist ungueltig.");
       }
@@ -67,8 +67,8 @@ export function string(options: StringOptions = {}): Validator<string> {
   };
 }
 
-// Absichtlich pragmatisch: eine vollstaendige RFC-Pruefung ist weder moeglich
-// noch sinnvoll. Ob eine Adresse existiert, zeigt erst die Bestaetigungsmail.
+// Absichtlich pragmatisch: eine vollständige RFC-Prüfung ist weder möglich
+// noch sinnvoll. Ob eine Adresse existiert, zeigt erst die Bestätigungsmail.
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@.]+(\.[^\s@.]+)+$/;
 
 export function email(): Validator<string> {
@@ -78,7 +78,7 @@ export function email(): Validator<string> {
       const value = input.trim().toLowerCase();
       if (value.length === 0) return fail(errors, path, "Bitte eine E-Mail-Adresse angeben.");
       if (value.length > 254 || !EMAIL_PATTERN.test(value)) {
-        return fail(errors, path, "Diese E-Mail-Adresse sieht nicht gueltig aus.");
+        return fail(errors, path, "Diese E-Mail-Adresse sieht nicht gültig aus.");
       }
       return value;
     },
@@ -101,7 +101,7 @@ export function number(options: NumberOptions = {}): Validator<number> {
       }
       if (int && !Number.isInteger(value)) return fail(errors, path, "Bitte eine ganze Zahl angeben.");
       if (min !== undefined && value < min) return fail(errors, path, `Der Wert muss mindestens ${min} sein.`);
-      if (max !== undefined && value > max) return fail(errors, path, `Der Wert darf hoechstens ${max} sein.`);
+      if (max !== undefined && value > max) return fail(errors, path, `Der Wert darf höchstens ${max} sein.`);
       return value;
     },
   };
@@ -133,14 +133,14 @@ export function uuid(): Validator<string> {
   return {
     parse(input, path, errors) {
       if (typeof input !== "string" || !UUID_PATTERN.test(input)) {
-        return fail(errors, path, "Ungueltige Kennung.");
+        return fail(errors, path, "Ungültige Kennung.");
       }
       return input.toLowerCase();
     },
   };
 }
 
-/** ISO-8601-Zeitstempel. Liefert den normalisierten UTC-String zurueck. */
+/** ISO-8601-Zeitstempel. Liefert den normalisierten UTC-String zurück. */
 export function isoDateTime(): Validator<string> {
   return {
     parse(input, path, errors) {
@@ -160,7 +160,7 @@ export function longitude(): Validator<number> {
   return number({ min: -180, max: 180 });
 }
 
-/** Erlaubt zusaetzlich undefined und einen fehlenden Schluessel. */
+/** Erlaubt zusätzlich undefined und einen fehlenden Schluessel. */
 export function optional<T>(inner: Validator<T>): Validator<T | undefined> {
   return {
     parse(input, path, errors) {
@@ -170,7 +170,7 @@ export function optional<T>(inner: Validator<T>): Validator<T | undefined> {
   };
 }
 
-/** Erlaubt zusaetzlich null (und undefined, das zu null wird). */
+/** Erlaubt zusätzlich null (und undefined, das zu null wird). */
 export function nullable<T>(inner: Validator<T>): Validator<T | null> {
   return {
     parse(input, path, errors) {
@@ -181,7 +181,7 @@ export function nullable<T>(inner: Validator<T>): Validator<T | null> {
   };
 }
 
-/** Setzt einen Standardwert ein, wenn nichts uebergeben wurde. */
+/** Setzt einen Standardwert ein, wenn nichts übergeben wurde. */
 export function withDefault<T>(inner: Validator<T>, fallback: T): Validator<T> {
   return {
     parse(input, path, errors) {
@@ -196,8 +196,8 @@ export function array<T>(inner: Validator<T>, options: { min?: number; max?: num
   return {
     parse(input, path, errors) {
       if (!Array.isArray(input)) return fail(errors, path, "Bitte eine Liste angeben.");
-      if (input.length < min) return fail(errors, path, `Bitte mindestens ${min} Eintraege angeben.`);
-      if (input.length > max) return fail(errors, path, `Bitte hoechstens ${max} Eintraege angeben.`);
+      if (input.length < min) return fail(errors, path, `Bitte mindestens ${min} Einträge angeben.`);
+      if (input.length > max) return fail(errors, path, `Bitte höchstens ${max} Einträge angeben.`);
       const out: T[] = [];
       let failed = false;
       input.forEach((item, index) => {
@@ -223,7 +223,7 @@ export function object<S extends Record<string, Validator<any>>>(shape: S): Vali
   return {
     parse(input, path, errors) {
       if (typeof input !== "object" || input === null || Array.isArray(input)) {
-        return fail(errors, path, "Es wurden keine gueltigen Daten uebermittelt.");
+        return fail(errors, path, "Es wurden keine gültigen Daten übermittelt.");
       }
       const source = input as Record<string, unknown>;
       const out: Record<string, unknown> = {};
@@ -231,8 +231,8 @@ export function object<S extends Record<string, Validator<any>>>(shape: S): Vali
       for (const key of Object.keys(shape)) {
         const validator = shape[key] as Validator<unknown>;
         // Ob ein Feld in Ordnung ist, entscheidet allein, ob der Validator einen
-        // Fehler gemeldet hat. Ein undefined als Rueckgabe ist bei optional()
-        // ein voellig legitimes Ergebnis.
+        // Fehler gemeldet hat. Ein undefined als Rückgabe ist bei optional()
+        // ein völlig legitimes Ergebnis.
         const before = Object.keys(errors).length;
         const value = validator.parse(source[key], join(path, key), errors);
         if (Object.keys(errors).length > before) {
@@ -246,7 +246,7 @@ export function object<S extends Record<string, Validator<any>>>(shape: S): Vali
   };
 }
 
-/** Prueft einen bereits geparsten Wert und wirft nicht - nur zur Verfeinerung. */
+/** Prüft einen bereits geparsten Wert und wirft nicht - nur zur Verfeinerung. */
 export function refine<T>(inner: Validator<T>, check: (value: T) => string | null): Validator<T> {
   return {
     parse(input, path, errors) {

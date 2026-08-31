@@ -7,13 +7,13 @@ export type DbClient = pg.PoolClient;
 /** Pool und Client teilen sich query() - Services nehmen beides entgegen. */
 export type Queryable = Pick<pg.Pool, "query">;
 
-// numeric kommt sonst als String zurueck. JobFlow verwendet numeric nur fuer
+// numeric kommt sonst als String zurück. JobFlow verwendet numeric nur für
 // Bewertungen und Konfidenzwerte - beides sind echte Zahlen.
 const NUMERIC_OID = 1700;
 types.setTypeParser(NUMERIC_OID, (value) => Number(value));
 
-// int8 (bigint) bleibt bewusst ein String: die Werte koennten Number.MAX_SAFE_INTEGER
-// ueberschreiten. Betroffen sind nur die fortlaufenden IDs der Ereignistabellen.
+// int8 (bigint) bleibt bewusst ein String: die Werte könnten Number.MAX_SAFE_INTEGER
+// überschreiten. Betroffen sind nur die fortlaufenden IDs der Ereignistabellen.
 
 export function createPool(connectionString: string): Db {
   return new Pool({
@@ -25,11 +25,11 @@ export function createPool(connectionString: string): Db {
 }
 
 /**
- * Fuehrt eine Funktion in einer Transaktion aus.
+ * Führt eine Funktion in einer Transaktion aus.
  *
- * Alles, was mehrere Tabellen zugleich veraendert - ein Angebot annehmen legt
- * einen Auftrag an, aktualisiert die Anfrage und lehnt die uebrigen Angebote ab -
- * gehoert hier hinein. Halb ausgefuehrte Zustandswechsel waeren in einem
+ * Alles, was mehrere Tabellen zugleich verändert - ein Angebot annehmen legt
+ * einen Auftrag an, aktualisiert die Anfrage und lehnt die übrigen Angebote ab -
+ * gehört hier hinein. Halb ausgeführte Zustandswechsel wären in einem
  * Marktplatz besonders unangenehm.
  */
 export async function withTransaction<T>(db: Db, fn: (client: DbClient) => Promise<T>): Promise<T> {
@@ -43,7 +43,7 @@ export async function withTransaction<T>(db: Db, fn: (client: DbClient) => Promi
     try {
       await client.query("ROLLBACK");
     } catch {
-      // Die Verbindung ist bereits kaputt - der urspruengliche Fehler zaehlt.
+      // Die Verbindung ist bereits kaputt - der ursprüngliche Fehler zählt.
     }
     throw error;
   } finally {

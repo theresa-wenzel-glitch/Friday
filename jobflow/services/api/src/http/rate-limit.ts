@@ -1,9 +1,9 @@
 /**
- * Rate Limiting mit einem gleitenden Zaehlfenster im Arbeitsspeicher.
+ * Rate Limiting mit einem gleitenden Zählfenster im Arbeitsspeicher.
  *
- * Fuer eine Instanz reicht das. Sobald mehrere Instanzen hinter einem Load
- * Balancer laufen, gehoert der Zaehler in einen gemeinsamen Speicher (Redis) -
- * bis dahin waere das unnoetige Infrastruktur.
+ * Für eine Instanz reicht das. Sobald mehrere Instanzen hinter einem Load
+ * Balancer laufen, gehört der Zähler in einen gemeinsamen Speicher (Redis) -
+ * bis dahin wäre das unnötige Infrastruktur.
  */
 export interface RateLimitRule {
   /** Erlaubte Anfragen je Fenster. */
@@ -20,7 +20,7 @@ export class RateLimiter {
   private readonly buckets = new Map<string, Bucket>();
   private lastSweep = 0;
 
-  /** Liefert false, wenn das Kontingent erschoepft ist. */
+  /** Liefert false, wenn das Kontingent erschöpft ist. */
   check(key: string, rule: RateLimitRule, now: number = Date.now()): boolean {
     this.sweep(now);
     const bucket = this.buckets.get(key);
@@ -40,7 +40,7 @@ export class RateLimiter {
     return Math.max(1, Math.ceil((bucket.resetAt - now) / 1000));
   }
 
-  /** Alte Eintraege entfernen, damit die Map nicht unbegrenzt waechst. */
+  /** Alte Einträge entfernen, damit die Map nicht unbegrenzt wächst. */
   private sweep(now: number): void {
     if (now - this.lastSweep < 60_000) return;
     this.lastSweep = now;
@@ -56,7 +56,7 @@ export class RateLimiter {
 
 /**
  * Anmeldung und Registrierung sind streng begrenzt: dort wird geraten und
- * ausprobiert. Der Rest ist grosszuegiger.
+ * ausprobiert. Der Rest ist großzügiger.
  */
 export const RATE_LIMITS = {
   auth: { limit: 10, windowMs: 15 * 60_000 },

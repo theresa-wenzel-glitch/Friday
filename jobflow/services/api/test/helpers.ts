@@ -12,22 +12,22 @@ const { Pool } = pg;
 /**
  * Die Integrationstests laufen gegen eine echte PostgreSQL-Datenbank.
  *
- * Ein Nachbau der Datenbank waere fuer JobFlow wertlos: die interessanten
+ * Ein Nachbau der Datenbank wäre für JobFlow wertlos: die interessanten
  * Zusicherungen - "nur ein angenommenes Angebot je Anfrage", die generierte
- * Gesamtsumme, die Berechtigungspruefungen in den Abfragen - stecken im Schema
+ * Gesamtsumme, die Berechtigungsprüfungen in den Abfragen - stecken im Schema
  * selbst. Ohne Datenbank ist keine davon getestet.
  *
- * Ist keine Testdatenbank konfiguriert, ueberspringen sich die Tests, statt
+ * Ist keine Testdatenbank konfiguriert, überspringen sich die Tests, statt
  * fehlzuschlagen.
  *
  * Jeder Lauf baut das Schema neu auf. Deshalb laufen die Testdateien
- * nacheinander (--test-concurrency=1 im test-Skript) - parallel wuerden sie
- * einander die Tabellen unter den Fuessen wegziehen.
+ * nacheinander (--test-concurrency=1 im test-Skript) - parallel würden sie
+ * einander die Tabellen unter den Füßen wegziehen.
  */
 export const TEST_DATABASE_URL = process.env["TEST_DATABASE_URL"] ?? process.env["DATABASE_URL"] ?? null;
 
 export const skipUnlessDatabase = TEST_DATABASE_URL === null
-  ? { skip: "TEST_DATABASE_URL ist nicht gesetzt - Integrationstests werden uebersprungen." }
+  ? { skip: "TEST_DATABASE_URL ist nicht gesetzt - Integrationstests werden übersprungen." }
   : {};
 
 export interface TestHarness {
@@ -84,7 +84,7 @@ export interface ApiCallResult<T = unknown> {
   body: { success: boolean; data: T; error: { code: string; message: string; fields?: Record<string, string> } | null };
 }
 
-/** Kleiner Client fuer die Tests - spricht die API genau wie die App. */
+/** Kleiner Client für die Tests - spricht die API genau wie die App. */
 export class TestClient {
   private token: string | null = null;
 

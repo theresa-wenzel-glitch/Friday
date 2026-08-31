@@ -12,7 +12,7 @@ import { Screen } from "../../../components/Screen.js";
 /**
  * Die Anfragenliste.
  *
- * Fuer den Kunden: "Meine Anfragen". Fuer das Unternehmen: die Anfragen, die
+ * Für den Kunden: "Meine Anfragen". Für das Unternehmen: die Anfragen, die
  * ihm vorgeschlagen wurden. Zwei Sichten, ein Screen - die Daten kommen aus
  * unterschiedlichen Endpunkten, die Darstellung ist dieselbe.
  */
@@ -67,7 +67,7 @@ export default function RequestListScreen() {
         {matches.length === 0 ? (
           <Empty
             title="Noch keine Anfragen"
-            hint="Sobald eine passende Anfrage in deiner Naehe entsteht, erscheint sie hier. Pruefe im Profil, ob deine Leistungen und dein Einsatzgebiet hinterlegt sind."
+            hint="Sobald eine passende Anfrage in deiner Nähe entsteht, erscheint sie hier. Prüfe im Profil, ob deine Leistungen und dein Einsatzgebiet hinterlegt sind."
           />
         ) : (
           <View style={styles.list}>
@@ -75,7 +75,7 @@ export default function RequestListScreen() {
               <Card
                 key={match.id}
                 onPress={() => router.push(`/(app)/requests/${match.requestId}`)}
-                accessibilityLabel="Anfrage oeffnen"
+                accessibilityLabel="Anfrage öffnen"
               >
                 <Text style={styles.matchScore}>Passung {match.score} von 100</Text>
                 <View style={styles.reasons}>

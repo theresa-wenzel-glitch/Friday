@@ -16,8 +16,8 @@ const URGENCY_OPTIONS: Urgency[] = ["LOW", "NORMAL", "HIGH"];
  * Screen 03 - Anfrage erstellen.
  *
  * Ein Textfeld, ein Ort, ein Zeitrahmen. Kein 30-Felder-Formular: was noch
- * fehlt, fragt die KI im naechsten Schritt gezielt nach - und nur das, was
- * wirklich noetig ist.
+ * fehlt, fragt die KI im nächsten Schritt gezielt nach - und nur das, was
+ * wirklich nötig ist.
  */
 export default function CreateRequestScreen() {
   const params = useLocalSearchParams<{ categoryId?: string }>();
@@ -70,7 +70,7 @@ export default function CreateRequestScreen() {
         onChangeText={setDescription}
         placeholder="Meine Heizung wird nicht mehr richtig warm."
         multiline
-        hint={`Ein bis zwei Saetze reichen. Mindestens ${REQUEST_DESCRIPTION_MIN} Zeichen.`}
+        hint={`Ein bis zwei Sätze reichen. Mindestens ${REQUEST_DESCRIPTION_MIN} Zeichen.`}
         error={fields["description"]}
       />
 
@@ -79,7 +79,7 @@ export default function CreateRequestScreen() {
         value={locationLabel}
         onChangeText={setLocationLabel}
         placeholder="45127 Essen"
-        hint="Postleitzahl und Ort genuegen. Die genaue Adresse bekommt nur das beauftragte Unternehmen."
+        hint="Postleitzahl und Ort genügen. Die genaue Adresse bekommt nur das beauftragte Unternehmen."
         error={fields["locationLabel"]}
       />
 
@@ -103,7 +103,7 @@ export default function CreateRequestScreen() {
       </View>
 
       {/* Fotos folgen in Phase 2 - der Upload braucht Object Storage und
-          Zugriffsschutz, und ohne beides waere er ein Sicherheitsproblem. */}
+          Zugriffsschutz, und ohne beides wäre er ein Sicherheitsproblem. */}
 
       <ErrorNotice message={message} />
       <Button title="Anfrage starten" onPress={submit} loading={busy} />

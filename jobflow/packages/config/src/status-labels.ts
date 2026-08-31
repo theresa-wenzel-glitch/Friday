@@ -1,9 +1,9 @@
 /**
- * Deutsche Bezeichnungen fuer die Status-Werte aus @jobflow/types.
+ * Deutsche Bezeichnungen für die Status-Werte aus @jobflow/types.
  *
- * Die Typen selbst bleiben englisch (sie sind Datenbankwerte), die Oberflaeche
+ * Die Typen selbst bleiben englisch (sie sind Datenbankwerte), die Oberfläche
  * ist deutsch. Diese Zuordnung liegt zentral, damit Mobile, Web und Admin
- * dieselben Woerter verwenden.
+ * dieselben Wörter verwenden.
  */
 
 export const requestStatusLabels: Record<string, string> = {
@@ -14,20 +14,20 @@ export const requestStatusLabels: Record<string, string> = {
   OFFERED: "Angebote erhalten",
   ACCEPTED: "Angebot angenommen",
   COMPLETED: "Abgeschlossen",
-  CANCELLED: "Zurueckgezogen",
+  CANCELLED: "Zurückgezogen",
 };
 
 export const offerStatusLabels: Record<string, string> = {
   PENDING: "Offen",
   ACCEPTED: "Angenommen",
   DECLINED: "Abgelehnt",
-  WITHDRAWN: "Zurueckgezogen",
+  WITHDRAWN: "Zurückgezogen",
   EXPIRED: "Abgelaufen",
 };
 
 export const appointmentStatusLabels: Record<string, string> = {
   PROPOSED: "Vorgeschlagen",
-  CONFIRMED: "Bestaetigt",
+  CONFIRMED: "Bestätigt",
   CANCELLED: "Abgesagt",
   COMPLETED: "Stattgefunden",
 };

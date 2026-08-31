@@ -21,9 +21,9 @@ import {
 /**
  * Passwortregeln.
  *
- * Bewusst nur eine Mindestlaenge statt Zeichenklassen-Zwang: Laenge ist der
- * Faktor, der tatsaechlich schuetzt, und erzwungene Sonderzeichen fuehren in der
- * Praxis zu schlechteren Passwoertern.
+ * Bewusst nur eine Mindestlänge statt Zeichenklassen-Zwang: Länge ist der
+ * Faktor, der tatsächlich schützt, und erzwungene Sonderzeichen führen in der
+ * Praxis zu schlechteren Passwörtern.
  */
 export const PASSWORD_MIN_LENGTH = 10;
 export const PASSWORD_MAX_LENGTH = 200;
@@ -70,7 +70,7 @@ export const createRequestSchema = refine(
     // Eine halbe Koordinate ist wertlos - entweder beides oder nichts.
     const hasLat = value.latitude !== null && value.latitude !== undefined;
     const hasLon = value.longitude !== null && value.longitude !== undefined;
-    if (hasLat !== hasLon) return "Bitte Breiten- und Laengengrad gemeinsam angeben.";
+    if (hasLat !== hasLon) return "Bitte Breiten- und Längengrad gemeinsam angeben.";
     if (value.desiredFrom && value.desiredTo && value.desiredFrom > value.desiredTo) {
       return "Das Ende des Zeitraums liegt vor seinem Beginn.";
     }
@@ -95,7 +95,7 @@ export const answerQuestionSchema = object({
 // --- KI --------------------------------------------------------------------
 
 /**
- * Schema fuer das, was ein KI-Provider zurueckliefert.
+ * Schema für das, was ein KI-Provider zurückliefert.
  *
  * Wichtig: Auch die KI ist eine untrusted source. Ihr Ergebnis wird genauso
  * validiert wie eine Eingabe aus der App, bevor es in die Datenbank darf.
@@ -134,7 +134,7 @@ export const businessServiceSchema = refine(
       value.priceMaxCents !== undefined &&
       value.priceMinCents > value.priceMaxCents
     ) {
-      return "Der Mindestpreis darf nicht ueber dem Hoechstpreis liegen.";
+      return "Der Mindestpreis darf nicht über dem Höchstpreis liegen.";
     }
     return null;
   },
@@ -171,7 +171,7 @@ export const createOfferSchema = refine(
   }),
   (value) => {
     const total = value.laborCents + value.materialCents + value.travelCents;
-    if (total <= 0) return "Das Angebot muss einen Betrag groesser als 0 enthalten.";
+    if (total <= 0) return "Das Angebot muss einen Betrag größer als 0 enthalten.";
     if (total > 100_000_000) return "Der Gesamtbetrag ist zu hoch.";
     return null;
   },
@@ -210,5 +210,5 @@ export const paginationSchema = object({
   offset: withDefault(number({ min: 0, max: 100_000, int: true }), 0),
 });
 
-/** Hilfstyp: der Wert, den ein Schema nach erfolgreicher Pruefung liefert. */
+/** Hilfstyp: der Wert, den ein Schema nach erfolgreicher Prüfung liefert. */
 export type Parsed<V> = V extends Validator<infer T> ? T : never;

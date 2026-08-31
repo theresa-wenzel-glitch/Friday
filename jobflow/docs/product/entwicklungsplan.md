@@ -5,7 +5,7 @@
 ### Phase 0 — Fundament ✅
 
 - Monorepo mit pnpm-Workspaces
-- PostgreSQL-Schema, zehn Migrationen mit Pruefsummenschutz
+- PostgreSQL-Schema, zehn Migrationen mit Prüfsummenschutz
 - Seed-Daten: 6 Ober- und 22 Unterkategorien
 - Geteilte Typen, Validierung und Design-Tokens
 - Authentifizierung, Rollen, Sessions
@@ -15,50 +15,50 @@
 
 - Registrierung und Anmeldung
 - Startseite, Kategorien
-- Anfrage erstellen, ansehen, aendern, zurueckziehen
-- KI-Analyse mit gezielten Rueckfragen
+- Anfrage erstellen, ansehen, ändern, zurückziehen
+- KI-Analyse mit gezielten Rückfragen
 - „Meine Anfragen"
 
 ### Phase 2 — Unternehmen ✅
 
-- Unternehmensprofil, Leistungen, Verfuegbarkeit
+- Unternehmensprofil, Leistungen, Verfügbarkeit
 - Dashboard mit Kennzahlen
-- Vorgeschlagene Anfragen oeffnen
+- Vorgeschlagene Anfragen öffnen
 
 ### Phase 3 — Matching ✅
 
 - Matching-Engine mit den Gewichten aus dem Konzept
-- Nachvollziehbare Begruendungen je Vorschlag
+- Nachvollziehbare Begründungen je Vorschlag
 - Verteilung der Anfragen an passende Betriebe
 
-### Phase 4 — Auftraege ✅ (Backend vollstaendig)
+### Phase 4 — Aufträge ✅ (Backend vollständig)
 
-- Angebote erstellen, annehmen, ablehnen, zurueckziehen
+- Angebote erstellen, annehmen, ablehnen, zurückziehen
 - Termine aus dem Wochenplan
 - Chat je Anfrage und Unternehmen
-- Auftragsstatus mit geprueften Uebergaengen
+- Auftragsstatus mit geprueften Übergängen
 - Bewertungen
 
-## Was als Naechstes kommt
+## Was als Nächstes kommt
 
 ### Phase 4b — Fotos
 
 Der einzige Teil von Phase 1 bis 4, der noch fehlt. Er braucht Object Storage
-**und** Zugriffsschutz: Fotos zeigen Wohnungen und Haeuser, und eine oeffentlich
-erratbare URL waere ein ernstes Datenschutzproblem. Das Schema ist vorbereitet
+**und** Zugriffsschutz: Fotos zeigen Wohnungen und Häuser, und eine öffentlich
+erratbare URL wäre ein ernstes Datenschutzproblem. Das Schema ist vorbereitet
 (`request_photos.storage_key` — ein Schluessel, keine URL).
 
 Konkret:
-1. Object Storage anbinden, Upload ueber die API (nie direkt vom Client).
-2. Zugriff nur ueber die API mit derselben Berechtigungspruefung wie bei der
+1. Object Storage anbinden, Upload über die API (nie direkt vom Client).
+2. Zugriff nur über die API mit derselben Berechtigungsprüfung wie bei der
    Anfrage.
-3. Bildtyp und -groesse serverseitig pruefen, nicht dem Client glauben.
+3. Bildtyp und -größe serverseitig prüfen, nicht dem Client glauben.
 
 ### Phase 5 — Business
 
 - Abonnements (**erst nachdem echte Nutzer die Zahlungsbereitschaft gezeigt
   haben** — siehe `konzept.md`)
-- Web-Dashboard fuer Unternehmen (`apps/web`)
+- Web-Dashboard für Unternehmen (`apps/web`)
 - Administration (`apps/admin`)
 - Unternehmensverifizierung als Ablauf
 - Push-Nachrichten und E-Mail
@@ -67,7 +67,7 @@ Konkret:
 
 Erst, wenn echte Nutzerzahlen es rechtfertigen:
 
-- Rate Limiting in einen gemeinsamen Speicher (fuer mehrere Instanzen)
+- Rate Limiting in einen gemeinsamen Speicher (für mehrere Instanzen)
 - Caching der Kategorien
 - Suche
 - Lasttests
@@ -75,10 +75,10 @@ Erst, wenn echte Nutzerzahlen es rechtfertigen:
 
 ### Phase 7 — weitere Branchen
 
-Technisch bereits moeglich: Kategorien sind Daten. Eine neue Branche ist eine
+Technisch bereits möglich: Kategorien sind Daten. Eine neue Branche ist eine
 Zeile in `categories`, kein Umbau.
 
-## Der naechste sinnvolle Schritt
+## Der nächste sinnvolle Schritt
 
 **Echte Nutzer, eine Stadt, eine Branche.**
 
@@ -86,11 +86,11 @@ Die Plattform kann den kompletten Weg von der Anfrage bis zur Bewertung. Was
 sie noch nicht kann, ist beantworten, ob Menschen sie benutzen wollen — und
 diese Frage beantwortet kein weiteres Feature, sondern nur der Betrieb.
 
-Konkret waere zu messen:
-- Wie viele Anfragen erreichen ueberhaupt ein Angebot?
+Konkret wäre zu messen:
+- Wie viele Anfragen erreichen überhaupt ein Angebot?
 - Wie lange brauchen Betriebe wirklich zum Antworten?
-- Stimmen die Gewichte des Matchings, oder fuehren ganz andere Faktoren zu
-  Auftraegen?
+- Stimmen die Gewichte des Matchings, oder führen ganz andere Faktoren zu
+  Aufträgen?
 
-Auf diese Antworten sind die Gewichte, die Preise und die Rueckfragen der KI
-bewusst so gebaut, dass sie sich aendern lassen.
+Auf diese Antworten sind die Gewichte, die Preise und die Rückfragen der KI
+bewusst so gebaut, dass sie sich ändern lassen.

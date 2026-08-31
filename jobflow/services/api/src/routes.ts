@@ -28,7 +28,7 @@ import type { RequestContext } from "./http/context.js";
  * Alle Routen der API.
  *
  * Jeder Handler sagt in seiner ersten Zeile, wer ihn aufrufen darf. Wo
- * `requireUser` oder `requireRole` fehlt, ist der Endpunkt oeffentlich - und
+ * `requireUser` oder `requireRole` fehlt, ist der Endpunkt öffentlich - und
  * das soll man ihm auf einen Blick ansehen.
  */
 export function buildRouter(): Router {
@@ -109,7 +109,7 @@ function meRoutes(): Router {
 function categoryRoutes(): Router {
   const router = new Router();
 
-  // Oeffentlich: die Kategorien sind der Einstieg in die App und enthalten
+  // Öffentlich: die Kategorien sind der Einstieg in die App und enthalten
   // keine personenbezogenen Daten.
   router.get("/", async (ctx) => ctx.app.categories.list());
   router.get("/tree", async (ctx) => ctx.app.categories.tree());
@@ -265,7 +265,7 @@ function businessRoutes(): Router {
     return ctx.app.offers.listForBusiness(membership.businessId, page.limit, page.offset);
   });
 
-  // Oeffentliches Profil.
+  // Öffentliches Profil.
   router.get("/:id", async (ctx) => ctx.app.businesses.get(ctx.param("id")));
 
   router.get("/:id/reviews", async (ctx) => {
@@ -274,7 +274,7 @@ function businessRoutes(): Router {
   });
 
   router.get("/:id/availability", async (ctx) => {
-    // Freie Zeitfenster darf nur sehen, wer angemeldet ist - sonst waere der
+    // Freie Zeitfenster darf nur sehen, wer angemeldet ist - sonst wäre der
     // Kalender eines Betriebs frei auslesbar.
     await ctx.requireUser();
     return ctx.app.appointments.availableSlots(ctx.param("id"));
@@ -316,9 +316,9 @@ function offerRoutes(): Router {
   });
 
   /**
-   * Textvorschlag fuer ein Angebot.
+   * Textvorschlag für ein Angebot.
    *
-   * Der Vorschlag wird zurueckgegeben, nicht abgeschickt: ueber Preis und
+   * Der Vorschlag wird zurückgegeben, nicht abgeschickt: über Preis und
    * Inhalt entscheidet das Unternehmen.
    */
   router.post("/suggest-text", async (ctx) => {
@@ -378,7 +378,7 @@ function appointmentRoutes(): Router {
   return router;
 }
 
-// --- Auftraege -------------------------------------------------------------
+// --- Aufträge -------------------------------------------------------------
 
 const jobStatusSchema = object({ status: oneOf(JOB_STATUSES) });
 
@@ -446,7 +446,7 @@ function conversationRoutes(): Router {
   router.post("/:id/suggest-reply", async (ctx) => {
     const principal = await ctx.requireUser();
     limit(ctx, "ai", principal.user.id);
-    // Die Beteiligung wird geprueft, bevor irgendein Kontext an die KI geht.
+    // Die Beteiligung wird geprüft, bevor irgendein Kontext an die KI geht.
     await ctx.app.conversations.get(ctx.param("id"), principal.user.id);
     const input = await ctx.input(chatSuggestionSchema);
     const text = await ctx.app.ai.suggestChatReply(input.context, input.hint || undefined);

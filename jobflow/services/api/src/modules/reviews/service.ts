@@ -49,7 +49,7 @@ export class ReviewService {
       const jobRow = job.rows[0];
       if (jobRow === undefined) throw ApiError.notFound("Diesen Auftrag gibt es nicht.");
       if (jobRow.status !== "COMPLETED") {
-        throw ApiError.conflict("Bewerten laesst sich erst ein abgeschlossener Auftrag.");
+        throw ApiError.conflict("Bewerten lässt sich erst ein abgeschlossener Auftrag.");
       }
 
       const inserted = await client.query<ReviewRow>(
@@ -62,7 +62,7 @@ export class ReviewService {
       const row = inserted.rows[0];
       if (row === undefined) throw ApiError.conflict("Dieser Auftrag wurde bereits bewertet.");
 
-      // Durchschnitt und Anzahl am Unternehmen fortschreiben. Sonst muesste
+      // Durchschnitt und Anzahl am Unternehmen fortschreiben. Sonst müsste
       // das Matching bei jeder Anfrage alle Bewertungen zusammenrechnen.
       await client.query(
         `UPDATE businesses b
@@ -86,7 +86,7 @@ export class ReviewService {
     });
   }
 
-  /** Oeffentliche Bewertungen eines Unternehmens. */
+  /** Öffentliche Bewertungen eines Unternehmens. */
   async listForBusiness(businessId: string, limit: number, offset: number): Promise<Review[]> {
     const result = await this.db.query<ReviewRow>(
       "SELECT * FROM reviews WHERE business_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3",

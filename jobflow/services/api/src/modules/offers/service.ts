@@ -50,13 +50,13 @@ export class OfferService {
    * Ein Unternehmen gibt ein Angebot ab.
    *
    * Erlaubt ist das nur, wenn die Anfrage dem Unternehmen auch vorgeschlagen
-   * wurde. Sonst koennte ein Betrieb fremde Anfragen abgreifen, indem er IDs
+   * wurde. Sonst könnte ein Betrieb fremde Anfragen abgreifen, indem er IDs
    * durchprobiert.
    */
   async create(businessId: string, userId: string, data: CreateOfferData): Promise<Offer> {
     const validUntil = new Date(data.validUntil);
     if (validUntil.getTime() <= Date.now()) {
-      throw ApiError.validation({ validUntil: "Das Angebot muss in der Zukunft gueltig sein." });
+      throw ApiError.validation({ validUntil: "Das Angebot muss in der Zukunft gültig sein." });
     }
 
     return withTransaction(this.db, async (client) => {
@@ -106,7 +106,7 @@ export class OfferService {
       const row = inserted.rows[0];
       if (row === undefined) {
         // Die WHERE-Klausel des Upserts hat gegriffen: es gibt bereits ein
-        // angenommenes oder abgelehntes Angebot, das nicht ueberschrieben wird.
+        // angenommenes oder abgelehntes Angebot, das nicht überschrieben wird.
         throw ApiError.conflict("Zu dieser Anfrage liegt bereits ein abgeschlossenes Angebot vor.");
       }
 
@@ -119,7 +119,7 @@ export class OfferService {
         businessId,
       ]);
 
-      // Antwortzeit fortschreiben - sie fliesst ins Matching ein und steht im
+      // Antwortzeit fortschreiben - sie fließt ins Matching ein und steht im
       // Dashboard des Unternehmens.
       await this.updateResponseTime(client, businessId);
 
@@ -131,8 +131,8 @@ export class OfferService {
         properties: { totalCents: row.total_cents, aiAssisted: row.description_ai_assisted },
       });
 
-      // Zu jedem Angebot gehoert ein Gespraechsfaden. Er entsteht hier, damit
-      // Kunde und Unternehmen sofort Rueckfragen stellen koennen.
+      // Zu jedem Angebot gehört ein Gesprächsfaden. Er entsteht hier, damit
+      // Kunde und Unternehmen sofort Rückfragen stellen können.
       await client.query(
         `INSERT INTO conversations (request_id, business_id, customer_id)
          VALUES ($1, $2, $3)
@@ -187,9 +187,9 @@ export class OfferService {
    * Der Kunde nimmt ein Angebot an.
    *
    * Das ist der wichtigste Zustandswechsel der Plattform, und er betrifft
-   * mehrere Tabellen: Angebot annehmen, uebrige Angebote ablehnen, Anfrage
+   * mehrere Tabellen: Angebot annehmen, übrige Angebote ablehnen, Anfrage
    * umstellen, Auftrag anlegen. Entweder alles oder nichts - ein halb
-   * angenommenes Angebot waere fuer beide Seiten ein echtes Problem.
+   * angenommenes Angebot wäre für beide Seiten ein echtes Problem.
    */
   async accept(offerId: string, customerId: string, ipPrefix: string): Promise<{ offer: Offer; job: Job }> {
     return withTransaction(this.db, async (client) => {
@@ -220,7 +220,7 @@ export class OfferService {
         [offerId],
       );
 
-      // Die uebrigen Angebote werden abgelehnt - sonst blieben sie fuer die
+      // Die übrigen Angebote werden abgelehnt - sonst blieben sie für die
       // anderen Unternehmen unbeantwortet stehen.
       await client.query(
         "UPDATE offers SET status = 'DECLINED' WHERE request_id = $1 AND id <> $2 AND status = 'PENDING'",
@@ -279,7 +279,7 @@ export class OfferService {
     return mapOffer(row);
   }
 
-  /** Das Unternehmen zieht sein Angebot zurueck. */
+  /** Das Unternehmen zieht sein Angebot zurück. */
   async withdraw(offerId: string, businessId: string): Promise<Offer> {
     const result = await this.db.query<OfferRow>(
       "UPDATE offers SET status = 'WITHDRAWN' WHERE id = $1 AND business_id = $2 AND status = 'PENDING' RETURNING *",
@@ -287,7 +287,7 @@ export class OfferService {
     );
     const row = result.rows[0];
     if (row === undefined) {
-      throw ApiError.conflict("Dieses Angebot laesst sich nicht mehr zurueckziehen.");
+      throw ApiError.conflict("Dieses Angebot lässt sich nicht mehr zurückziehen.");
     }
     return mapOffer(row);
   }
@@ -296,7 +296,7 @@ export class OfferService {
    * Schreibt die durchschnittliche Antwortzeit fort.
    *
    * Gemessen wird die Spanne zwischen dem Vorschlag der Anfrage und dem
-   * Angebot. Der Median waere robuster gegen Ausreisser - dafuer braucht es
+   * Angebot. Der Median wäre robuster gegen Ausreißer - dafür braucht es
    * aber erst genug Daten, um ihn sinnvoll zu berechnen.
    */
   private async updateResponseTime(client: DbClient, businessId: string): Promise<void> {

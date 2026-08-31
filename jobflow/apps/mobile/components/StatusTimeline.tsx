@@ -40,7 +40,7 @@ export function StatusTimeline({ status }: Props) {
           </View>
         );
       })}
-      {status === "CANCELLED" ? <Text style={styles.cancelled}>Diese Anfrage wurde zurueckgezogen.</Text> : null}
+      {status === "CANCELLED" ? <Text style={styles.cancelled}>Diese Anfrage wurde zurückgezogen.</Text> : null}
     </View>
   );
 }

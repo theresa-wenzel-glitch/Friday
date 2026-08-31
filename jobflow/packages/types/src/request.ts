@@ -5,12 +5,12 @@ import type { IsoDateTime, Uuid } from "./common.js";
  *
  * DRAFT      - angelegt, noch nicht abgeschickt
  * ANALYZING  - die KI wertet Beschreibung und Fotos aus
- * OPEN       - abgeschickt, Rueckfragen beantwortet
+ * OPEN       - abgeschickt, Rückfragen beantwortet
  * MATCHING   - passende Unternehmen wurden ermittelt und benachrichtigt
  * OFFERED    - mindestens ein Angebot liegt vor
  * ACCEPTED   - der Kunde hat ein Angebot angenommen, daraus entsteht ein Job
  * COMPLETED  - der Auftrag ist abgeschlossen
- * CANCELLED  - vom Kunden zurueckgezogen
+ * CANCELLED  - vom Kunden zurückgezogen
  */
 export const REQUEST_STATUSES = [
   "DRAFT",
@@ -27,20 +27,20 @@ export type RequestStatus = (typeof REQUEST_STATUSES)[number];
 export const URGENCIES = ["LOW", "NORMAL", "HIGH"] as const;
 export type Urgency = (typeof URGENCIES)[number];
 
-/** Die zentrale Entitaet der Plattform: das Problem eines Kunden. */
+/** Die zentrale Entität der Plattform: das Problem eines Kunden. */
 export interface ServiceRequest {
   id: Uuid;
   customerId: Uuid;
-  /** Kann anfangs null sein - die KI schlaegt die Kategorie vor. */
+  /** Kann anfangs null sein - die KI schlägt die Kategorie vor. */
   categoryId: Uuid | null;
   title: string | null;
   description: string;
   urgency: Urgency;
   latitude: number | null;
   longitude: number | null;
-  /** Grobe Ortsangabe fuer die Anzeige, z. B. "45127 Essen". */
+  /** Grobe Ortsangabe für die Anzeige, z. B. "45127 Essen". */
   locationLabel: string | null;
-  /** Gewuenschter Zeitraum. */
+  /** Gewünschter Zeitraum. */
   desiredFrom: IsoDateTime | null;
   desiredTo: IsoDateTime | null;
   status: RequestStatus;
@@ -48,11 +48,11 @@ export interface ServiceRequest {
   updatedAt: IsoDateTime;
 }
 
-/** Foto zu einer Anfrage. Der Zugriff ist auf die Beteiligten beschraenkt. */
+/** Foto zu einer Anfrage. Der Zugriff ist auf die Beteiligten beschränkt. */
 export interface RequestPhoto {
   id: Uuid;
   requestId: Uuid;
-  /** Schluessel im Object Storage - niemals eine oeffentliche URL. */
+  /** Schluessel im Object Storage - niemals eine öffentliche URL. */
   storageKey: string;
   contentType: string;
   byteSize: number;

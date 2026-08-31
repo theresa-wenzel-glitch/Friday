@@ -1,0 +1,2500 @@
+<title>JobFlow Prototyp</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+
+<style>
+/* ==========================================================================
+   JobFlow - klickbare Vorschau
+
+   Zwei Farbwelten in einer Datei:
+
+   1. Die App selbst (Präfix --jf-). Sie folgt der Designrichtung aus dem
+      Konzept - Violett/Blau, sehr heller Grund, dunkles Navy - und bleibt
+      bewusst in einer Welt: sie stellt eine helle App dar, unabhängig davon,
+      in welchem Erscheinungsbild der Betrachter diese Seite öffnet. Alle
+      Farben sind trotzdem ausdrücklich gesetzt, nie geerbt.
+
+   2. Die Werkbank drumherum. Sie folgt dem Erscheinungsbild des Betrachters
+      und ist über Tokens in drei Zuständen definiert: hell, System-dunkel
+      und ausdrücklich gewählt.
+
+   Die Werte unter --jf- stimmen mit packages/config/src/theme.ts überein.
+   ========================================================================== */
+
+:root {
+  /* --- Werkbank, hell ---------------------------------------------------- */
+  --ground: #E9EBF4;
+  --ground-deep: #DFE2EF;
+  --panel: #FFFFFF;
+  --panel-soft: #F4F5FB;
+  --ink: #171C36;
+  --ink-muted: #5B6386;
+  --ink-faint: #868DAC;
+  --rule: #D6DAEA;
+  --accent: #4438C7;
+  --accent-soft: #EDEBFE;
+  --shadow-device: 0 40px 80px -24px rgba(23, 28, 54, .38), 0 8px 24px -8px rgba(23, 28, 54, .2);
+  --shadow-panel: 0 1px 3px rgba(23, 28, 54, .06), 0 8px 24px -16px rgba(23, 28, 54, .18);
+
+  /* --- Die App (in beiden Erscheinungsbildern gleich) --------------------- */
+  --jf-primary: #5B4CF0;
+  --jf-primary-dark: #4438C7;
+  --jf-primary-light: #EDEBFE;
+  --jf-bg: #F6F7FB;
+  --jf-surface: #FFFFFF;
+  --jf-surface-muted: #F0F1F7;
+  --jf-text: #131A34;
+  --jf-muted: #5A6284;
+  --jf-inverted: #FFFFFF;
+  --jf-border: #E3E5EF;
+  --jf-success: #1FA971;
+  --jf-success-light: #E4F7EF;
+  --jf-warning: #E08A1E;
+  --jf-warning-light: #FDF2E1;
+  --jf-error: #D8464F;
+  --jf-error-light: #FCEAEB;
+  --jf-ai: #7A5AF8;
+  --jf-ai-light: #F1EDFE;
+
+  --font-display: "Poppins", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #0F1226;
+    --ground-deep: #090B1A;
+    --panel: #191E38;
+    --panel-soft: #222842;
+    --ink: #E9EBF7;
+    --ink-muted: #9AA2C4;
+    --ink-faint: #757D9F;
+    --rule: #2C3357;
+    --accent: #A99BFF;
+    --accent-soft: #262C4C;
+    --shadow-device: 0 40px 80px -24px rgba(0, 0, 0, .7), 0 8px 24px -8px rgba(0, 0, 0, .5);
+    --shadow-panel: 0 1px 3px rgba(0, 0, 0, .3), 0 8px 24px -16px rgba(0, 0, 0, .5);
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --ground: #0F1226;
+  --ground-deep: #090B1A;
+  --panel: #191E38;
+  --panel-soft: #222842;
+  --ink: #E9EBF7;
+  --ink-muted: #9AA2C4;
+  --ink-faint: #757D9F;
+  --rule: #2C3357;
+  --accent: #A99BFF;
+  --accent-soft: #262C4C;
+  --shadow-device: 0 40px 80px -24px rgba(0, 0, 0, .7), 0 8px 24px -8px rgba(0, 0, 0, .5);
+  --shadow-panel: 0 1px 3px rgba(0, 0, 0, .3), 0 8px 24px -16px rgba(0, 0, 0, .5);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(1200px 700px at 18% -10%, var(--ground) 0%, var(--ground-deep) 100%);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
+}
+
+/* ==========================================================================
+   Werkbank
+   ========================================================================== */
+
+.shell {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 32px 24px 64px;
+}
+
+.masthead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--rule);
+  margin-bottom: 32px;
+}
+
+.masthead__id { display: flex; flex-direction: column; gap: 6px; }
+
+.wordmark {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 30px;
+  letter-spacing: -.02em;
+  color: var(--ink);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.wordmark__dot {
+  width: 12px; height: 12px; border-radius: 50%;
+  background: var(--jf-primary);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--jf-primary) 22%, transparent);
+}
+
+.masthead__slogan {
+  margin: 0;
+  color: var(--ink-muted);
+  font-size: 14px;
+}
+
+.masthead__note {
+  margin: 0;
+  max-width: 46ch;
+  font-size: 13px;
+  color: var(--ink-faint);
+  text-wrap: pretty;
+}
+
+.theme-toggle {
+  appearance: none;
+  border: 1px solid var(--rule);
+  background: var(--panel);
+  color: var(--ink-muted);
+  border-radius: 999px;
+  padding: 7px 14px;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  transition: color .15s, border-color .15s;
+}
+.theme-toggle:hover { color: var(--ink); border-color: var(--ink-faint); }
+
+.workbench {
+  display: grid;
+  grid-template-columns: minmax(0, 420px) minmax(0, 1fr);
+  gap: 40px;
+  align-items: start;
+}
+
+@media (max-width: 940px) {
+  .workbench { grid-template-columns: minmax(0, 1fr); gap: 32px; justify-items: center; }
+  .console { width: 100%; max-width: 560px; }
+}
+
+/* --- Gerät --------------------------------------------------------------- */
+
+.stage { position: sticky; top: 24px; display: flex; flex-direction: column; align-items: center; gap: 16px; }
+@media (max-width: 940px) { .stage { position: static; } }
+
+.device {
+  width: 390px;
+  max-width: 100%;
+  /* Auf einem flachen Fenster soll das Gerät mitschrumpfen, statt unten
+     herauszulaufen - es klebt oben fest und muss vollständig sichtbar sein. */
+  height: min(800px, 82vh);
+  min-height: 520px;
+  border-radius: 46px;
+  padding: 12px;
+  background: linear-gradient(160deg, #3A4066 0%, #191D33 40%, #23283F 100%);
+  box-shadow: var(--shadow-device);
+  flex: none;
+}
+
+.device__screen {
+  position: relative;
+  height: 100%;
+  border-radius: 35px;
+  overflow: hidden;
+  background: var(--jf-bg);
+  display: flex;
+  flex-direction: column;
+  isolation: isolate;
+}
+
+.statusbar {
+  flex: none;
+  height: 44px;
+  padding: 0 26px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--jf-text);
+  background: var(--jf-bg);
+  letter-spacing: .01em;
+}
+.statusbar__icons { display: flex; gap: 5px; align-items: center; opacity: .8; font-size: 11px; }
+
+.viewport {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--jf-bg);
+  scrollbar-width: thin;
+  scrollbar-color: var(--jf-border) transparent;
+}
+.viewport::-webkit-scrollbar { width: 4px; }
+.viewport::-webkit-scrollbar-thumb { background: var(--jf-border); border-radius: 4px; }
+
+.screen {
+  padding: 20px 20px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-height: 100%;
+  animation: screen-in .26s cubic-bezier(.22, .9, .3, 1);
+}
+
+@keyframes screen-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+.device__caption {
+  font-size: 12.5px;
+  color: var(--ink-faint);
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.device__caption b { color: var(--ink-muted); font-weight: 600; }
+
+/* ==========================================================================
+   Die App - Bausteine
+   Große runde Karten, klare Buttons, großzügige Abstände.
+   ========================================================================== */
+
+.jf-h1 {
+  font-family: var(--font-display);
+  font-size: 25px; font-weight: 700; line-height: 1.2;
+  color: var(--jf-text); margin: 0; letter-spacing: -.02em;
+  text-wrap: balance;
+}
+.jf-h2 {
+  font-family: var(--font-display);
+  font-size: 18px; font-weight: 600; color: var(--jf-text); margin: 0;
+  letter-spacing: -.01em;
+}
+.jf-greeting { font-size: 15px; color: var(--jf-muted); margin: 0 0 2px; }
+.jf-body { font-size: 14.5px; color: var(--jf-text); margin: 0; line-height: 1.6; }
+.jf-muted { font-size: 13.5px; color: var(--jf-muted); margin: 0; line-height: 1.55; }
+.jf-caption { font-size: 12px; color: var(--jf-muted); margin: 0; }
+.jf-label {
+  font-size: 12.5px; font-weight: 500; color: var(--jf-muted);
+  margin: 0 0 6px; display: block;
+}
+
+.jf-card {
+  background: var(--jf-surface);
+  border-radius: 20px;
+  padding: 18px;
+  box-shadow: 0 4px 12px rgba(19, 26, 52, .06);
+  display: flex; flex-direction: column; gap: 10px;
+  text-align: left; width: 100%; border: none;
+  font-family: inherit; color: inherit;
+}
+button.jf-card { cursor: pointer; transition: transform .12s, box-shadow .12s; }
+button.jf-card:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(19, 26, 52, .1); }
+button.jf-card:active { transform: translateY(0); }
+
+.jf-btn {
+  appearance: none; border: none; cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 15px; font-weight: 600;
+  padding: 15px 20px; border-radius: 16px;
+  min-height: 52px;
+  display: flex; align-items: center; justify-content: center; gap: 9px;
+  width: 100%;
+  transition: filter .12s, transform .12s;
+}
+.jf-btn:hover { filter: brightness(1.06); }
+.jf-btn:active { transform: scale(.985); }
+.jf-btn--primary { background: var(--jf-primary); color: var(--jf-inverted); }
+.jf-btn--secondary { background: var(--jf-primary-light); color: var(--jf-primary-dark); }
+.jf-btn--ghost { background: transparent; color: var(--jf-primary); min-height: 44px; padding: 10px; }
+.jf-btn--danger { background: var(--jf-error-light); color: var(--jf-error); }
+.jf-btn--sm { min-height: 42px; padding: 10px 16px; font-size: 14px; border-radius: 13px; }
+.jf-btn[disabled] { opacity: .45; cursor: not-allowed; }
+.jf-btn__icon { font-size: 17px; line-height: 1; }
+
+.jf-row { display: flex; gap: 10px; }
+.jf-row--between { justify-content: space-between; align-items: center; }
+.jf-stack { display: flex; flex-direction: column; gap: 12px; }
+.jf-stack--tight { gap: 8px; }
+.jf-spacer { flex: 1; }
+
+/* Eingabefelder */
+.jf-input, .jf-textarea {
+  width: 100%;
+  background: var(--jf-surface);
+  border: 1px solid var(--jf-border);
+  border-radius: 13px;
+  padding: 13px 15px;
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: var(--jf-text);
+  min-height: 50px;
+}
+.jf-textarea { min-height: 110px; resize: none; line-height: 1.55; }
+.jf-input:focus, .jf-textarea:focus { outline: 2px solid var(--jf-primary); outline-offset: -1px; border-color: transparent; }
+.jf-input::placeholder, .jf-textarea::placeholder { color: #98A0BC; }
+.jf-hint { font-size: 11.5px; color: var(--jf-muted); margin: 5px 0 0; }
+.jf-error-text { font-size: 11.5px; color: var(--jf-error); margin: 5px 0 0; }
+
+/* Abzeichen */
+.jf-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 4px 11px; border-radius: 999px;
+  font-size: 11.5px; font-weight: 600;
+  background: var(--jf-surface-muted); color: var(--jf-muted);
+  white-space: nowrap;
+}
+.jf-badge--success { background: var(--jf-success-light); color: var(--jf-success); }
+.jf-badge--warning { background: var(--jf-warning-light); color: var(--jf-warning); }
+.jf-badge--error { background: var(--jf-error-light); color: var(--jf-error); }
+.jf-badge--ai { background: var(--jf-ai-light); color: var(--jf-ai); }
+.jf-badge--primary { background: var(--jf-primary-light); color: var(--jf-primary-dark); }
+
+/* Ein Abzeichen als direktes Kind einer Flex-Spalte würde sonst auf die volle
+   Breite gestreckt. In einer Reihe soll es dagegen mittig ausgerichtet bleiben. */
+.jf-card > .jf-badge, .screen > .jf-badge { align-self: flex-start; }
+
+/* Kategorien */
+.jf-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.jf-cat {
+  background: var(--jf-surface); border: none; border-radius: 17px;
+  padding: 15px 6px; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 7px;
+  box-shadow: 0 3px 10px rgba(19, 26, 52, .055);
+  font-family: inherit;
+  transition: transform .12s, box-shadow .12s;
+}
+.jf-cat:hover { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(19, 26, 52, .1); }
+.jf-cat__icon { font-size: 25px; line-height: 1; }
+.jf-cat__name { font-size: 12px; font-weight: 500; color: var(--jf-text); text-align: center; }
+
+/* Auswahl in Reihe (Dringlichkeit, Rolle) */
+.jf-choice {
+  flex: 1; background: var(--jf-surface);
+  border: 2px solid var(--jf-border); border-radius: 13px;
+  padding: 11px 8px; cursor: pointer; font-family: inherit;
+  font-size: 13px; color: var(--jf-muted); text-align: center;
+  transition: border-color .12s, background .12s, color .12s;
+}
+.jf-choice[aria-pressed="true"] {
+  border-color: var(--jf-primary); background: var(--jf-primary-light);
+  color: var(--jf-primary-dark); font-weight: 600;
+}
+
+.jf-option {
+  background: var(--jf-surface); border: 2px solid var(--jf-border);
+  border-radius: 17px; padding: 15px; cursor: pointer;
+  font-family: inherit; text-align: left; width: 100%;
+  display: flex; flex-direction: column; gap: 3px;
+  transition: border-color .12s, background .12s;
+}
+.jf-option[aria-pressed="true"] { border-color: var(--jf-primary); background: var(--jf-primary-light); }
+.jf-option__title { font-size: 14.5px; font-weight: 600; color: var(--jf-text); }
+.jf-option[aria-pressed="true"] .jf-option__title { color: var(--jf-primary-dark); }
+.jf-option__desc { font-size: 12.5px; color: var(--jf-muted); }
+
+/* KI-Bereich: eigene Farbe, damit KI-Inhalte erkennbar bleiben */
+.jf-ai {
+  background: var(--jf-ai-light);
+  border-radius: 18px; padding: 16px;
+  display: flex; flex-direction: column; gap: 9px;
+}
+.jf-ai__head { display: flex; align-items: center; gap: 8px; }
+.jf-ai__title { font-size: 12.5px; font-weight: 600; color: var(--jf-ai); }
+.jf-ai__disclaimer { font-size: 11.5px; color: var(--jf-muted); line-height: 1.5; }
+.jf-ai__field { display: flex; flex-direction: column; gap: 2px; }
+.jf-ai__field dt { font-size: 11.5px; color: var(--jf-muted); }
+.jf-ai__field dd { margin: 0; font-size: 14.5px; font-weight: 600; color: var(--jf-text); }
+
+.jf-thinking { display: flex; flex-direction: column; align-items: center; gap: 18px; padding: 46px 0; }
+.jf-thinking__orb {
+  width: 76px; height: 76px; border-radius: 50%;
+  background: var(--jf-ai-light);
+  display: grid; place-items: center; font-size: 34px;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--jf-ai) 32%, transparent); }
+  50% { box-shadow: 0 0 0 18px color-mix(in srgb, var(--jf-ai) 0%, transparent); }
+}
+.jf-thinking__steps { display: flex; flex-direction: column; gap: 9px; width: 100%; }
+.jf-thinking__step {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 13.5px; color: var(--jf-muted);
+  opacity: .35; transition: opacity .3s, color .3s;
+}
+.jf-thinking__step.is-on { opacity: 1; color: var(--jf-text); }
+.jf-thinking__step.is-on .jf-thinking__tick { color: var(--jf-success); }
+.jf-thinking__tick { color: var(--jf-border); font-weight: 700; }
+
+/* Zeitstrahl des Auftragsstatus */
+.jf-timeline { display: flex; flex-direction: column; }
+.jf-tl { display: flex; gap: 12px; }
+.jf-tl__col { display: flex; flex-direction: column; align-items: center; width: 26px; flex: none; }
+.jf-tl__dot {
+  width: 24px; height: 24px; border-radius: 50%;
+  display: grid; place-items: center;
+  font-size: 11px; font-weight: 700;
+  background: var(--jf-surface-muted); color: var(--jf-muted);
+}
+.jf-tl__dot--done { background: var(--jf-success); color: #fff; }
+.jf-tl__dot--now { background: var(--jf-primary); color: #fff; }
+.jf-tl__line { width: 2px; flex: 1; min-height: 22px; background: var(--jf-border); }
+.jf-tl__line--done { background: var(--jf-success); }
+.jf-tl__label { flex: 1; font-size: 13.5px; color: var(--jf-muted); padding-bottom: 18px; }
+.jf-tl__label--reached { color: var(--jf-text); font-weight: 500; }
+.jf-tl:last-child .jf-tl__label { padding-bottom: 0; }
+
+/* Preisaufstellung */
+.jf-price { display: flex; flex-direction: column; gap: 7px; }
+.jf-price__row { display: flex; justify-content: space-between; font-size: 13.5px; }
+.jf-price__row dt { color: var(--jf-muted); }
+.jf-price__row dd { margin: 0; color: var(--jf-text); font-variant-numeric: tabular-nums; }
+.jf-price__total {
+  display: flex; justify-content: space-between; align-items: baseline;
+  padding-top: 11px; border-top: 1px solid var(--jf-border);
+}
+.jf-price__total dt { font-size: 13.5px; color: var(--jf-muted); }
+.jf-price__total dd {
+  margin: 0; font-family: var(--font-display); font-size: 25px; font-weight: 700;
+  color: var(--jf-text); font-variant-numeric: tabular-nums;
+}
+
+/* Kennzahlen */
+.jf-tiles { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.jf-tile {
+  background: var(--jf-surface); border-radius: 17px; padding: 14px;
+  box-shadow: 0 3px 10px rgba(19, 26, 52, .055);
+  display: flex; flex-direction: column; gap: 2px;
+}
+.jf-tile__value {
+  font-family: var(--font-display); font-size: 25px; font-weight: 700;
+  color: var(--jf-primary); font-variant-numeric: tabular-nums; line-height: 1.1;
+}
+.jf-tile__label { font-size: 11.5px; color: var(--jf-muted); }
+
+.jf-bar { display: flex; flex-direction: column; gap: 5px; }
+.jf-bar__head { display: flex; justify-content: space-between; font-size: 13px; }
+.jf-bar__head span:first-child { color: var(--jf-muted); }
+.jf-bar__head span:last-child { color: var(--jf-text); font-weight: 600; font-variant-numeric: tabular-nums; }
+.jf-bar__track { height: 8px; border-radius: 99px; background: var(--jf-surface-muted); overflow: hidden; }
+.jf-bar__fill { height: 100%; border-radius: 99px; background: var(--jf-primary); }
+
+/* Kalender */
+.jf-cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.jf-cal__wd {
+  text-align: center; font-size: 10.5px; font-weight: 600;
+  color: var(--jf-muted); padding-bottom: 5px;
+}
+.jf-cal__day {
+  aspect-ratio: 1; border: none; background: transparent; border-radius: 11px;
+  font-family: inherit; font-size: 13px; color: var(--jf-text); cursor: pointer;
+  display: grid; place-items: center; font-variant-numeric: tabular-nums;
+}
+.jf-cal__day:hover:not([disabled]) { background: var(--jf-surface-muted); }
+.jf-cal__day[disabled] { color: #C3C8DA; cursor: not-allowed; }
+.jf-cal__day[aria-pressed="true"] { background: var(--jf-primary); color: #fff; font-weight: 600; }
+.jf-cal__day--free { font-weight: 600; }
+.jf-cal__day--free::after {
+  content: ""; width: 4px; height: 4px; border-radius: 50%;
+  background: var(--jf-success); position: absolute; transform: translateY(13px);
+}
+.jf-cal__day { position: relative; }
+.jf-cal__day[aria-pressed="true"]::after { background: #fff; }
+
+.jf-slots { display: grid; grid-template-columns: repeat(2, 1fr); gap: 9px; }
+.jf-slot {
+  border: 2px solid var(--jf-border); background: var(--jf-surface);
+  border-radius: 13px; padding: 12px; cursor: pointer;
+  font-family: inherit; font-size: 14px; color: var(--jf-text);
+  font-variant-numeric: tabular-nums;
+  transition: border-color .12s, background .12s;
+}
+.jf-slot[aria-pressed="true"] {
+  border-color: var(--jf-primary); background: var(--jf-primary-light);
+  color: var(--jf-primary-dark); font-weight: 600;
+}
+
+/* Chat */
+.jf-chat { display: flex; flex-direction: column; gap: 11px; }
+.jf-bubble { max-width: 78%; padding: 11px 14px; border-radius: 17px; font-size: 14px; line-height: 1.5; }
+.jf-bubble--them { align-self: flex-start; background: var(--jf-surface); color: var(--jf-text); border-bottom-left-radius: 6px; }
+.jf-bubble--me { align-self: flex-end; background: var(--jf-primary); color: #fff; border-bottom-right-radius: 6px; }
+.jf-bubble__time { display: block; font-size: 10.5px; opacity: .65; margin-top: 4px; }
+.jf-bubble--ai-mark { border: 1px dashed var(--jf-ai); }
+.jf-composer { display: flex; gap: 8px; align-items: flex-end; }
+.jf-composer .jf-input { min-height: 46px; }
+
+/* Sterne */
+.jf-stars { display: flex; gap: 7px; justify-content: center; }
+.jf-star {
+  background: none; border: none; cursor: pointer; font-size: 37px;
+  line-height: 1; padding: 0; filter: grayscale(1) opacity(.3);
+  transition: filter .12s, transform .12s;
+}
+.jf-star.is-on { filter: none; }
+.jf-star:hover { transform: scale(1.12); }
+
+/* Untere Navigation */
+.jf-nav {
+  flex: none; display: flex; align-items: stretch;
+  background: var(--jf-surface);
+  border-top: 1px solid var(--jf-border);
+  padding: 7px 4px 22px;
+}
+.jf-nav__item {
+  flex: 1; background: none; border: none; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  padding: 5px 2px; font-family: inherit;
+  font-size: 10.5px; color: var(--jf-muted);
+}
+.jf-nav__item.is-active { color: var(--jf-primary); font-weight: 600; }
+.jf-nav__icon { font-size: 19px; line-height: 1; }
+.jf-nav__item--fab .jf-nav__icon {
+  background: var(--jf-primary); color: #fff;
+  width: 42px; height: 42px; border-radius: 50%;
+  display: grid; place-items: center; font-size: 22px;
+  margin-top: -12px; box-shadow: 0 6px 14px color-mix(in srgb, var(--jf-primary) 42%, transparent);
+}
+
+/* Kopfzeile innerhalb eines Screens */
+.jf-topbar { display: flex; align-items: center; gap: 10px; margin: -2px 0 -4px; }
+.jf-back {
+  background: none; border: none; cursor: pointer; padding: 4px 6px 4px 0;
+  font-size: 19px; color: var(--jf-primary); line-height: 1; font-family: inherit;
+}
+.jf-topbar__title { font-family: var(--font-display); font-size: 16px; font-weight: 600; color: var(--jf-text); }
+
+.jf-empty { text-align: center; padding: 30px 12px; display: flex; flex-direction: column; gap: 7px; align-items: center; }
+.jf-empty__icon { font-size: 34px; }
+
+.jf-toast {
+  position: absolute; left: 16px; right: 16px; bottom: 96px; z-index: 5;
+  background: var(--jf-text); color: #fff;
+  padding: 13px 16px; border-radius: 14px; font-size: 13.5px;
+  box-shadow: 0 10px 26px rgba(19, 26, 52, .3);
+  animation: toast-in .25s cubic-bezier(.2, .9, .3, 1);
+}
+@keyframes toast-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+
+/* ==========================================================================
+   Steuerleiste
+   ========================================================================== */
+
+.console { display: flex; flex-direction: column; gap: 20px; }
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 16px;
+  box-shadow: var(--shadow-panel);
+  overflow: hidden;
+}
+
+.panel__head {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
+  padding: 15px 18px;
+  border-bottom: 1px solid var(--rule);
+  background: var(--panel-soft);
+}
+.panel__title {
+  font-family: var(--font-display); font-size: 14px; font-weight: 600;
+  color: var(--ink); margin: 0; letter-spacing: -.005em;
+}
+.panel__meta { font-size: 12px; color: var(--ink-faint); }
+.panel__body { padding: 18px; display: flex; flex-direction: column; gap: 14px; }
+
+.roles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.role {
+  border: 1px solid var(--rule); background: var(--panel-soft);
+  border-radius: 12px; padding: 13px; cursor: pointer;
+  font-family: inherit; text-align: left; color: var(--ink);
+  display: flex; flex-direction: column; gap: 3px;
+  transition: border-color .15s, background .15s;
+}
+.role:hover { border-color: var(--ink-faint); }
+.role[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
+.role__name { font-size: 13.5px; font-weight: 600; }
+.role__desc { font-size: 11.5px; color: var(--ink-muted); line-height: 1.45; }
+
+.flowmap { display: flex; flex-direction: column; gap: 3px; }
+.flowmap__group {
+  font-size: 10.5px; text-transform: uppercase; letter-spacing: .09em;
+  color: var(--ink-faint); font-weight: 600;
+  margin: 12px 0 5px;
+}
+.flowmap__group:first-child { margin-top: 0; }
+
+.step {
+  display: flex; align-items: center; gap: 10px;
+  padding: 7px 10px; border-radius: 9px;
+  border: none; background: none; cursor: pointer;
+  font-family: inherit; font-size: 13px; color: var(--ink-muted);
+  text-align: left; width: 100%;
+  transition: background .12s, color .12s;
+}
+.step:hover { background: var(--panel-soft); color: var(--ink); }
+.step.is-current { background: var(--accent-soft); color: var(--ink); font-weight: 600; }
+.step__no {
+  font-family: var(--font-mono); font-size: 10.5px;
+  color: var(--ink-faint); width: 20px; flex: none;
+  font-variant-numeric: tabular-nums;
+}
+.step.is-current .step__no { color: var(--accent); }
+.step__done { color: var(--jf-success); font-size: 11px; margin-left: auto; flex: none; }
+
+.log {
+  font-family: var(--font-mono); font-size: 11.5px; line-height: 1.7;
+  max-height: 260px; overflow-y: auto;
+  display: flex; flex-direction: column-reverse; gap: 2px;
+  padding: 14px 18px;
+  scrollbar-width: thin;
+}
+.log__row { display: flex; gap: 9px; align-items: baseline; }
+.log__verb { font-weight: 500; flex: none; width: 46px; }
+.log__verb--POST { color: #2E9E6B; }
+.log__verb--GET { color: var(--accent); }
+.log__verb--PATCH { color: #C98520; }
+.log__path { color: var(--ink); word-break: break-all; }
+.log__status { margin-left: auto; color: var(--ink-faint); flex: none; }
+.log__empty { color: var(--ink-faint); font-style: italic; }
+
+.notes { font-size: 12.5px; color: var(--ink-muted); line-height: 1.6; display: flex; flex-direction: column; gap: 10px; }
+.notes p { margin: 0; text-wrap: pretty; }
+.notes strong { color: var(--ink); font-weight: 600; }
+.notes code {
+  font-family: var(--font-mono); font-size: 11.5px;
+  background: var(--panel-soft); padding: 1px 5px; border-radius: 4px;
+  border: 1px solid var(--rule);
+}
+
+.reset {
+  appearance: none; border: 1px solid var(--rule); background: var(--panel-soft);
+  color: var(--ink-muted); border-radius: 9px; padding: 8px 13px;
+  font: inherit; font-size: 12.5px; cursor: pointer; align-self: flex-start;
+}
+.reset:hover { color: var(--ink); border-color: var(--ink-faint); }
+</style>
+
+<div class="shell">
+  <header class="masthead">
+    <div class="masthead__id">
+      <h1 class="wordmark"><span class="wordmark__dot"></span>JobFlow</h1>
+      <p class="masthead__slogan">Von der Anfrage zum Auftrag.</p>
+    </div>
+    <p class="masthead__note">
+      Klickbarer Prototyp mit Beispieldaten. Die Regel-KI und die
+      Matching-Berechnung sind aus dem echten Backend übernommen &mdash;
+      beschreib ein anderes Problem, und beides rechnet neu.
+    </p>
+    <button class="theme-toggle" id="themeToggle" type="button">Dunkel</button>
+  </header>
+
+  <div class="workbench">
+    <div class="stage">
+      <div class="device">
+        <div class="device__screen">
+          <div class="statusbar">
+            <span id="clock">9:41</span>
+            <span class="statusbar__icons"><span>&#9679;&#9679;&#9679;</span><span>&#9650;</span><span>&#9632;</span></span>
+          </div>
+          <div class="viewport" id="viewport"></div>
+          <nav class="jf-nav" id="nav"></nav>
+        </div>
+      </div>
+      <p class="device__caption" id="caption"></p>
+    </div>
+
+    <div class="console">
+      <section class="panel">
+        <div class="panel__head">
+          <h2 class="panel__title">Rolle</h2>
+          <span class="panel__meta">eine Codebasis, zwei Oberflächen</span>
+        </div>
+        <div class="panel__body">
+          <div class="roles" id="roles"></div>
+          <button class="reset" id="reset" type="button">Prototyp zurücksetzen</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel__head">
+          <h2 class="panel__title">Ablauf</h2>
+          <span class="panel__meta" id="progress"></span>
+        </div>
+        <div class="panel__body">
+          <div class="flowmap" id="flowmap"></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel__head">
+          <h2 class="panel__title">Was das Backend tut</h2>
+          <span class="panel__meta">echte Endpunkte</span>
+        </div>
+        <div class="log" id="log"></div>
+      </section>
+
+      <section class="panel">
+        <div class="panel__head">
+          <h2 class="panel__title">Zum Weiterlesen</h2>
+        </div>
+        <div class="panel__body notes">
+          <p>
+            <strong>Die KI entscheidet nichts Verbindliches.</strong> Sie erkennt die
+            Kategorie und schlägt einen Angebotstext vor &mdash; über Preis und
+            Inhalt entscheidet das Unternehmen. Alles, was von ihr kommt, ist
+            violett hinterlegt und beschriftet.
+          </p>
+          <p>
+            <strong>Der Matching-Score wird gerechnet, nicht gesetzt.</strong>
+            Passende Leistung 35, Entfernung 20, Verfügbarkeit 15, Bewertung 10,
+            Preis 10, Erfahrung 5, Antwortzeit 5 &mdash; dieselbe Funktion wie in
+            <code>modules/matching/engine.ts</code>.
+          </p>
+          <p>
+            Diese Vorschau läuft ohne Server. Der echte Ablauf mit PostgreSQL
+            steht im Repository unter <code>jobflow/</code> und ist mit einem
+            End-to-End-Test abgesichert.
+          </p>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+/* ==========================================================================
+   1. Daten
+   Beispieldaten, die im echten System aus PostgreSQL kämen.
+   ========================================================================== */
+
+const CATEGORIES = [
+  { slug: "handwerk", name: "Handwerk", icon: "\u{1F528}" },
+  { slug: "auto", name: "Auto", icon: "\u{1F697}" },
+  { slug: "haushalt", name: "Haushalt", icon: "\u{1F3E0}" },
+  { slug: "garten", name: "Garten", icon: "\u{1F333}" },
+  { slug: "dienstleistungen", name: "Service", icon: "\u{1F4F8}" },
+  { slug: "lernen", name: "Lernen", icon: "\u{1F4DA}" }
+];
+
+const SUBCATEGORIES = {
+  heizung: { name: "Heizung", parent: "handwerk", icon: "\u{1F525}" },
+  sanitaer: { name: "Sanitär", parent: "handwerk", icon: "\u{1F6BF}" },
+  elektrik: { name: "Elektrik", parent: "handwerk", icon: "\u{1F4A1}" },
+  maler: { name: "Maler", parent: "handwerk", icon: "\u{1F3A8}" },
+  dach: { name: "Dach", parent: "handwerk", icon: "\u{1F3D8}" },
+  schluessel: { name: "Schlüsseldienst", parent: "handwerk", icon: "\u{1F511}" },
+  "kfz-reparatur": { name: "Reparatur", parent: "auto", icon: "\u{1F527}" },
+  "kfz-reifen": { name: "Reifen", parent: "auto", icon: "\u{1F6DE}" },
+  reinigung: { name: "Reinigung", parent: "haushalt", icon: "\u{1F9FD}" },
+  umzug: { name: "Umzug", parent: "haushalt", icon: "\u{1F4E6}" },
+  montage: { name: "Möbelmontage", parent: "haushalt", icon: "\u{1FA9B}" },
+  gartenpflege: { name: "Gartenpflege", parent: "garten", icon: "✂️" },
+  baumpflege: { name: "Baumpflege", parent: "garten", icon: "\u{1F332}" },
+  fotografie: { name: "Fotografie", parent: "dienstleistungen", icon: "\u{1F4F7}" },
+  nachhilfe: { name: "Nachhilfe", parent: "lernen", icon: "✏️" }
+};
+
+/* Betriebe mit den Kennzahlen, die ins Matching einfließen. */
+const BUSINESSES = [
+  { id: "b1", name: "HeizPro Essen", categories: ["heizung", "sanitaer"], distanceKm: 3.2, radius: 40,
+    availability: true, rating: 4.9, reviews: 238, jobs: 412, responseMin: 18,
+    priceMin: 9000, priceMax: 15000, verified: true, blurb: "Heizungsbau und Sanitär seit 1998." },
+  { id: "b2", name: "WärmeFix", categories: ["heizung"], distanceKm: 4.1, radius: 30,
+    availability: true, rating: 4.7, reviews: 96, jobs: 148, responseMin: 42,
+    priceMin: 11000, priceMax: 17000, verified: true, blurb: "Schnelldienst für Heizungsstörungen." },
+  { id: "b3", name: "Ruhr Haustechnik", categories: ["handwerk"], distanceKm: 8.7, radius: 50,
+    availability: false, rating: 4.4, reviews: 41, jobs: 63, responseMin: 210,
+    priceMin: 8000, priceMax: 22000, verified: false, blurb: "Haustechnik aus einer Hand - alle Gewerke." },
+  { id: "b4", name: "Sanitär Kaya", categories: ["sanitaer"], distanceKm: 2.4, radius: 25,
+    availability: true, rating: 4.8, reviews: 154, jobs: 289, responseMin: 25,
+    priceMin: 7000, priceMax: 13000, verified: true, blurb: "Bad, Rohr und Abfluss." },
+  { id: "b5", name: "Elektro Nowak", categories: ["elektrik"], distanceKm: 5.5, radius: 35,
+    availability: true, rating: 4.6, reviews: 88, jobs: 176, responseMin: 55,
+    priceMin: 8500, priceMax: 16000, verified: true, blurb: "Elektroinstallation und Störungssuche." },
+  { id: "b6", name: "GartenWerk", categories: ["gartenpflege", "baumpflege"], distanceKm: 6.1, radius: 30,
+    availability: true, rating: 4.8, reviews: 112, jobs: 203, responseMin: 33,
+    priceMin: 4000, priceMax: 9000, verified: true, blurb: "Pflege, Schnitt und Gestaltung." },
+  { id: "b7", name: "Umzugshelden", categories: ["umzug", "montage"], distanceKm: 9.4, radius: 60,
+    availability: true, rating: 4.5, reviews: 67, jobs: 121, responseMin: 70,
+    priceMin: 25000, priceMax: 60000, verified: true, blurb: "Umzüge im ganzen Ruhrgebiet." },
+  { id: "b8", name: "Auto Service Bergmann", categories: ["kfz-reparatur", "kfz-reifen"], distanceKm: 4.8, radius: 25,
+    availability: true, rating: 4.6, reviews: 201, jobs: 508, responseMin: 40,
+    priceMin: 6000, priceMax: 45000, verified: true, blurb: "Freie Werkstatt, alle Marken." },
+  { id: "b9", name: "Glanz Reinigung", categories: ["reinigung"], categoriesAlt: [], distanceKm: 3.9, radius: 30,
+    availability: true, rating: 4.3, reviews: 29, jobs: 88, responseMin: 90,
+    priceMin: 3000, priceMax: 8000, verified: false, blurb: "Unterhalts- und Grundreinigung." },
+  { id: "b10", name: "Maler Schäfer", categories: ["maler"], distanceKm: 7.2, radius: 40,
+    availability: true, rating: 4.9, reviews: 74, jobs: 139, responseMin: 28,
+    priceMin: 15000, priceMax: 40000, verified: true, blurb: "Anstrich, Tapete, Fassade." }
+];
+
+/* ==========================================================================
+   2. Die Regel-KI
+   Übernommen aus services/api/src/modules/ai/rules-provider.ts.
+   Sie ist kein Sprachmodell, erfüllt aber denselben Vertrag - genau darum
+   lässt sich die Plattform ohne externen Dienst vorführen.
+   ========================================================================== */
+
+const RULES = [
+  { slug: "heizung",
+    keywords: ["heizung", "heizkörper", "heizkoerper", "thermostat", "warmwasser", "therme", "kessel"],
+    summary: "Die Heizung arbeitet nicht wie erwartet.",
+    questions: ["Sind mehrere Heizkörper betroffen oder nur einer?", "Seit wann besteht das Problem?", "Welche Heizungsanlage ist verbaut?"] },
+  { slug: "sanitaer",
+    keywords: ["waschbecken", "wasserhahn", "abfluss", "toilette", "wc", "dusche", "rohr", "tropft", "undicht", "verstopft", "spülkasten"],
+    summary: "An der Sanitärinstallation tritt ein Defekt auf.",
+    questions: ["Wo genau tritt das Wasser aus?", "Seit wann besteht das Problem?", "Lässt sich das Wasser abstellen?"] },
+  { slug: "elektrik",
+    keywords: ["strom", "steckdose", "sicherung", "lichtschalter", "kabel", "kurzschluss", "lampe"],
+    summary: "Es liegt eine Störung an der Elektroinstallation vor.",
+    questions: ["Ist nur ein Raum betroffen oder die ganze Wohnung?", "Hat die Sicherung ausgelöst?"] },
+  { slug: "maler",
+    keywords: ["streichen", "malern", "tapete", "wand", "anstrich", "lackieren", "farbe"],
+    summary: "Es werden Malerarbeiten benötigt.",
+    questions: ["Wie viele Quadratmeter sind es ungefähr?", "Sind die Wände vorbereitet?"] },
+  { slug: "dach",
+    keywords: ["dach", "ziegel", "dachrinne", "regenrinne", "dachfenster"],
+    summary: "Am Dach besteht ein Schaden.",
+    questions: ["Tritt bereits Wasser ins Gebäude ein?", "Wie viele Geschosse hat das Gebäude?"] },
+  { slug: "schluessel",
+    keywords: ["ausgesperrt", "schlüssel", "schluessel", "schloss"],
+    summary: "Es besteht ein Problem mit Schloss oder Zugang.",
+    questions: ["Befindet sich jemand in der Wohnung?", "Um welche Art von Tür handelt es sich?"] },
+  { slug: "kfz-reparatur",
+    keywords: ["auto", "motor", "bremse", "kupplung", "auspuff", "werkstatt", "fahrzeug", "pkw"],
+    summary: "Am Fahrzeug ist eine Reparatur nötig.",
+    questions: ["Welches Fahrzeugmodell und Baujahr?", "Ist das Fahrzeug noch fahrbereit?"] },
+  { slug: "kfz-reifen",
+    keywords: ["reifen", "felge", "reifenwechsel", "platten", "winterreifen", "sommerreifen"],
+    summary: "Es geht um Reifen oder einen Reifenwechsel.",
+    questions: ["Welche Reifengröße wird benötigt?", "Sind die Reifen bereits vorhanden?"] },
+  { slug: "reinigung",
+    keywords: ["putzen", "reinigung", "sauber", "fenster putzen", "grundreinigung"],
+    summary: "Es werden Reinigungsarbeiten benötigt.",
+    questions: ["Wie groß ist die zu reinigende Fläche?", "Einmalig oder regelmäßig?"] },
+  { slug: "umzug",
+    keywords: ["umzug", "umziehen", "transport", "kisten", "möbel transportieren"],
+    summary: "Es steht ein Umzug oder Transport an.",
+    questions: ["Von welchem in welches Stockwerk?", "Wie viele Zimmer sind es?"] },
+  { slug: "montage",
+    keywords: ["aufbauen", "montage", "schrank", "regal", "möbel aufbauen", "küche montieren"],
+    summary: "Es sollen Möbel montiert werden.",
+    questions: ["Um welche Möbelstücke geht es?", "Liegt eine Aufbauanleitung vor?"] },
+  { slug: "gartenpflege",
+    keywords: ["rasen", "hecke", "unkraut", "garten", "mähen", "maehen", "beet"],
+    summary: "Der Garten soll gepflegt werden.",
+    questions: ["Wie groß ist die Fläche ungefähr?", "Einmalig oder regelmäßig?"] },
+  { slug: "baumpflege",
+    keywords: ["baum", "baumfällung", "äste", "aeste", "stubben"],
+    summary: "An Bäumen sind Arbeiten nötig.",
+    questions: ["Wie hoch ist der Baum ungefähr?", "Steht er frei zugänglich?"] },
+  { slug: "nachhilfe",
+    keywords: ["nachhilfe", "mathe", "lernen", "schule", "hausaufgaben", "abitur"],
+    summary: "Es wird Unterstützung beim Lernen gesucht.",
+    questions: ["Um welches Fach und welche Klassenstufe geht es?", "Präsenz oder online?"] },
+  { slug: "fotografie",
+    keywords: ["foto", "fotograf", "shooting", "hochzeit", "portrait", "bilder"],
+    summary: "Es wird ein Fotograf gesucht.",
+    questions: ["Um welchen Anlass geht es?", "Wann soll der Termin stattfinden?"] }
+];
+
+const URGENT_WORDS = ["notfall", "dringend", "sofort", "läuft aus", "laeuft aus", "überschwemmt",
+  "wasserschaden", "kein strom", "ausgesperrt", "gasgeruch", "brennt", "friert"];
+const RELAXED_WORDS = ["irgendwann", "keine eile", "gelegentlich", "in den nächsten wochen"];
+
+function analyze(description, photoCount, answered) {
+  const hay = String(description).toLowerCase().replace(/\s+/g, " ");
+  let best = null;
+  for (const rule of RULES) {
+    const hits = rule.keywords.filter((k) => hay.includes(k)).length;
+    if (hits > 0 && (best === null || hits > best.hits)) best = { rule, hits };
+  }
+
+  const urgency = URGENT_WORDS.some((w) => hay.includes(w)) ? "HIGH"
+    : RELAXED_WORDS.some((w) => hay.includes(w)) ? "LOW" : "NORMAL";
+
+  if (best === null) {
+    // Keine Regel greift. Dann sagt die KI das ehrlich, statt zu raten.
+    const clean = String(description).trim().replace(/\s+/g, " ");
+    return {
+      categorySlug: null,
+      summary: clean.length < 10
+        ? "Die Beschreibung reicht noch nicht aus, um das Anliegen einzuordnen."
+        : (clean.length > 150 ? clean.slice(0, 149) + "…" : clean),
+      urgency,
+      questions: ["Um welche Art von Leistung geht es genau?", "Wo soll die Arbeit ausgeführt werden?"],
+      confidence: 0.2
+    };
+  }
+
+  const askedSet = new Set((answered || []).map((a) => a.question));
+  const open = best.rule.questions.filter((q) => !askedSet.has(q));
+  return {
+    categorySlug: best.rule.slug,
+    summary: best.rule.summary,
+    urgency,
+    // Ein Foto ersetzt oft eine Rückfrage.
+    questions: photoCount > 0 ? open.slice(0, 2) : open.slice(0, 3),
+    confidence: Math.min(0.9, 0.55 + best.hits * 0.1)
+  };
+}
+
+/* ==========================================================================
+   3. Die Matching-Engine
+   Übernommen aus services/api/src/modules/matching/engine.ts.
+   Die Gewichte sind ein Startmodell - was wirklich zu Aufträgen führt,
+   zeigt sich erst im Betrieb.
+   ========================================================================== */
+
+const WEIGHTS = { service: 35, distance: 20, availability: 15, rating: 10, price: 10, experience: 5, responseTime: 5 };
+
+const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+const saturate = (v, half) => (v <= 0 ? 0 : v / (v + half));
+
+function scoreBusiness(biz, categorySlug, referencePrice) {
+  const parent = SUBCATEGORIES[categorySlug] ? SUBCATEGORIES[categorySlug].parent : null;
+  const exact = biz.categories.includes(categorySlug);
+  // Nur die Oberkategorie selbst zählt als teilweise Übereinstimmung, nicht
+  // eine Schwesterkategorie: ein Maler ist kein Treffer für eine Heizung.
+  const viaParent = !exact && parent !== null && biz.categories.includes(parent);
+
+  const f = {
+    service: exact ? 1 : viaParent ? 0.45 : 0,
+    // Außerhalb des Einsatzradius: 0. Ein Betrieb, der nicht hinfährt,
+    // ist kein Treffer, egal wie gut er sonst passt.
+    distance: biz.distanceKm > biz.radius ? 0 : clamp(1 - biz.distanceKm / biz.radius, 0, 1),
+    availability: biz.availability ? 1 : 0,
+    // Wenige Bestbewertungen werden gedämpft: 5,0 aus einer Bewertung soll
+    // 4,7 aus 200 nicht überholen.
+    rating: biz.reviews === 0 ? 0.5 : 0.5 + (clamp((biz.rating - 1) / 4, 0, 1) - 0.5) * saturate(biz.reviews, 20),
+    price: 0.5,
+    experience: saturate(biz.jobs, 25),
+    responseTime: biz.responseMin <= 15 ? 1 : biz.responseMin >= 1440 ? 0 : clamp(1 - (biz.responseMin - 15) / 1425, 0, 1)
+  };
+
+  if (referencePrice > 0) {
+    const own = (biz.priceMin + biz.priceMax) / 2;
+    f.price = clamp(1 - (own / referencePrice - 0.5) / 1.5, 0, 1);
+  }
+
+  const reasons = [];
+  let total = 0;
+  for (const key of Object.keys(WEIGHTS)) {
+    const points = f[key] * WEIGHTS[key];
+    total += points;
+    const label = reasonLabel(key, biz, f[key]);
+    if (label) reasons.push({ factor: key, label, points: Math.round(points * 10) / 10 });
+  }
+
+  return {
+    business: biz,
+    score: Math.round(clamp(total, 0, 100)),
+    reasons: reasons.sort((a, b) => b.points - a.points)
+  };
+}
+
+function reasonLabel(factor, biz, value) {
+  switch (factor) {
+    case "service": return value === 1 ? "Bietet genau diese Leistung an" : value > 0 ? "Arbeitet in diesem Bereich" : null;
+    case "distance": return value > 0 ? fmtKm(biz.distanceKm) + " entfernt" : null;
+    case "availability": return biz.availability ? "Hat freie Zeiten hinterlegt" : null;
+    case "rating": return biz.reviews === 0 ? null : biz.rating.toFixed(1).replace(".", ",") + " aus " + biz.reviews + " Bewertungen";
+    case "price": return value > 0.5 ? "Preislich günstig" : null;
+    case "experience": return biz.jobs === 0 ? null : biz.jobs + " abgeschlossene Aufträge";
+    case "responseTime": return "Antwortet im Schnitt in " + fmtMin(biz.responseMin);
+    default: return null;
+  }
+}
+
+function runMatching(categorySlug) {
+  if (!categorySlug) return [];
+  const parent = SUBCATEGORIES[categorySlug] ? SUBCATEGORIES[categorySlug].parent : null;
+  const pool = BUSINESSES.filter((b) =>
+    b.categories.includes(categorySlug) || (parent !== null && b.categories.includes(parent))
+  );
+  if (pool.length === 0) return [];
+
+  // Bezugspreis ist der Median, nicht der Mittelwert: einzelne Ausreißer
+  // sollen ihn nicht verziehen.
+  const mids = pool.map((b) => (b.priceMin + b.priceMax) / 2).sort((a, b) => a - b);
+  const mid = Math.floor(mids.length / 2);
+  const reference = mids.length % 2 ? mids[mid] : (mids[mid - 1] + mids[mid]) / 2;
+
+  return pool
+    .map((b) => scoreBusiness(b, categorySlug, reference))
+    .filter((m) => m.score >= 25)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 6);
+}
+
+/* --- Formatierung --------------------------------------------------------- */
+
+const fmtEuro = (cents) => (cents / 100).toFixed(2).replace(".", ",") + " €";
+const fmtEuroShort = (cents) => Math.round(cents / 100) + " €";
+const fmtKm = (km) => (km < 10 ? km.toFixed(1).replace(".", ",") : Math.round(km)) + " km";
+const fmtMin = (m) => (m < 60 ? m + " Min." : Math.round(m / 60) + " Std.");
+
+const URGENCY_LABELS = { LOW: "Kann warten", NORMAL: "Normal", HIGH: "Dringend" };
+const STATUS_LABELS = {
+  DRAFT: "Entwurf", ANALYZING: "Wird analysiert", OPEN: "Offen",
+  MATCHING: "Anbieter gefunden", OFFERED: "Angebote erhalten",
+  ACCEPTED: "Angebot angenommen", COMPLETED: "Abgeschlossen", CANCELLED: "Zurückgezogen"
+};
+
+function esc(value) {
+  return String(value).replace(/[&<>"']/g, (c) =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
+/* ==========================================================================
+   4. Zustand
+   ========================================================================== */
+
+const initialState = () => ({
+  role: "customer",
+  screen: "welcome",
+  toast: null,
+  draft: { description: "", locationLabel: "45127 Essen", urgency: "NORMAL", photos: 0 },
+  request: null,
+  analysis: null,
+  answers: {},
+  matches: [],
+  offers: [],
+  openedOfferId: null,
+  acceptedOfferId: null,
+  appointment: null,
+  jobStatus: null,
+  review: null,
+  messages: [],
+  signupRole: "CUSTOMER",
+  bizOffer: { labor: 8000, material: 2500, travel: 1500, description: "", aiAssisted: false },
+  bizDeclined: false,
+  log: []
+});
+
+let state = initialState();
+
+function logCall(verb, path, status) {
+  state.log.push({ verb, path, status });
+  if (state.log.length > 40) state.log.shift();
+}
+
+function toast(text) {
+  state.toast = text;
+  window.clearTimeout(toast._t);
+  toast._t = window.setTimeout(() => { state.toast = null; render(); }, 2600);
+}
+
+/* Das Angebot eines Betriebs - deterministisch aus seiner Preisspanne. */
+function offerFor(biz) {
+  const round500 = (n) => Math.round(n / 500) * 500;
+  return {
+    id: "o-" + biz.id,
+    businessId: biz.id,
+    labor: round500(biz.priceMin * 0.9),
+    material: round500(biz.priceMin * 0.28),
+    travel: Math.min(3000, round500(biz.distanceKm * 450)),
+    description:
+      "Anfahrt, Störungssuche und Reparatur an der Anlage. Sollte sich vor Ort ein " +
+      "größerer Aufwand zeigen, stimmen wir uns vorher mit Ihnen ab.",
+    aiAssisted: false,
+    status: "PENDING"
+  };
+}
+const offerTotal = (o) => o.labor + o.material + o.travel;
+const bizById = (id) => BUSINESSES.find((b) => b.id === id);
+const offerById = (id) => state.offers.find((o) => o.id === id);
+
+/* ==========================================================================
+   5. Screens - Kundenseite
+   ========================================================================== */
+
+const screens = {};
+
+/* Screen 01 */
+screens.welcome = () => `
+  <div class="screen" style="justify-content:space-between;padding-top:40px;padding-bottom:40px">
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:14px">
+      <div style="font-family:var(--font-display);font-size:40px;font-weight:700;color:var(--jf-primary);letter-spacing:-.03em">JobFlow</div>
+      <p class="jf-h2" style="font-size:19px">Von der Anfrage zum Auftrag.</p>
+      <p class="jf-muted" style="font-size:14.5px">
+        Sag uns einfach, was los ist. Wir kümmern uns um den Rest &mdash;
+        passende Betriebe, Angebote und Termin.
+      </p>
+    </div>
+    <div class="jf-stack">
+      <button class="jf-btn jf-btn--primary" data-go="signup">Konto erstellen</button>
+      <button class="jf-btn jf-btn--secondary" data-go="login">Anmelden</button>
+      <button class="jf-btn jf-btn--ghost" data-action="as-business">Als Unternehmen starten</button>
+    </div>
+  </div>`;
+
+screens.signup = () => `
+  <div class="screen">
+    <div class="jf-topbar"><button class="jf-back" data-go="welcome">&larr;</button><span class="jf-topbar__title">Konto erstellen</span></div>
+    <p class="jf-muted">Wofür möchtest du JobFlow nutzen?</p>
+    <div class="jf-stack--tight jf-stack">
+      <button class="jf-option" data-action="signup-role" data-value="CUSTOMER" aria-pressed="${state.signupRole === "CUSTOMER"}">
+        <span class="jf-option__title">Ich suche jemanden</span>
+        <span class="jf-option__desc">Problem beschreiben und passende Anbieter finden.</span>
+      </button>
+      <button class="jf-option" data-action="signup-role" data-value="BUSINESS" aria-pressed="${state.signupRole === "BUSINESS"}">
+        <span class="jf-option__title">Ich biete Leistungen an</span>
+        <span class="jf-option__desc">Passende Anfragen erhalten und Angebote schreiben.</span>
+      </button>
+    </div>
+    <div>
+      <label class="jf-label" for="su-name">${state.signupRole === "BUSINESS" ? "Name des Unternehmens" : "Dein Name"}</label>
+      <input class="jf-input" id="su-name" value="${state.signupRole === "BUSINESS" ? "HeizPro Essen" : "Max Mustermann"}">
+    </div>
+    <div>
+      <label class="jf-label" for="su-mail">E-Mail</label>
+      <input class="jf-input" id="su-mail" value="max@example.de">
+    </div>
+    <div>
+      <label class="jf-label" for="su-pw">Passwort</label>
+      <input class="jf-input" id="su-pw" type="password" value="ein-langes-passwort">
+      <p class="jf-hint">Mindestens 10 Zeichen. Länge schützt mehr als Sonderzeichen.</p>
+    </div>
+    <div class="jf-spacer"></div>
+    <button class="jf-btn jf-btn--primary" data-action="do-signup">Konto erstellen</button>
+  </div>`;
+
+screens.login = () => `
+  <div class="screen">
+    <div class="jf-topbar"><button class="jf-back" data-go="welcome">&larr;</button><span class="jf-topbar__title">Anmelden</span></div>
+    <div>
+      <label class="jf-label" for="li-mail">E-Mail</label>
+      <input class="jf-input" id="li-mail" value="max@example.de">
+    </div>
+    <div>
+      <label class="jf-label" for="li-pw">Passwort</label>
+      <input class="jf-input" id="li-pw" type="password" value="ein-langes-passwort">
+    </div>
+    <div class="jf-spacer"></div>
+    <button class="jf-btn jf-btn--primary" data-action="do-login">Anmelden</button>
+    <button class="jf-btn jf-btn--ghost" data-go="signup">Noch kein Konto? Jetzt erstellen</button>
+  </div>`;
+
+/* Screen 02 */
+screens.home = () => {
+  const recent = state.request ? `
+    <div class="jf-stack">
+      <h2 class="jf-h2">Deine letzte Anfrage</h2>
+      ${requestCard(state.request)}
+    </div>` : "";
+
+  return `
+  <div class="screen">
+    <div>
+      <p class="jf-greeting">Hallo Max \u{1F44B}</p>
+      <h1 class="jf-h1">Was brauchst du?</h1>
+    </div>
+    <button class="jf-btn jf-btn--primary" data-go="create">
+      <span class="jf-btn__icon">✍️</span> Problem beschreiben
+    </button>
+    <button class="jf-btn jf-btn--secondary" data-action="add-photo">
+      <span class="jf-btn__icon">\u{1F4F7}</span> Foto hinzufügen
+    </button>
+    ${recent}
+    <div class="jf-stack">
+      <h2 class="jf-h2">Beliebte Kategorien</h2>
+      <div class="jf-grid-3">
+        ${CATEGORIES.map((c) => `
+          <button class="jf-cat" data-action="pick-category" data-value="${c.slug}">
+            <span class="jf-cat__icon">${c.icon}</span>
+            <span class="jf-cat__name">${esc(c.name)}</span>
+          </button>`).join("")}
+      </div>
+    </div>
+  </div>`;
+};
+
+function requestCard(req) {
+  const sub = req.categorySlug ? SUBCATEGORIES[req.categorySlug] : null;
+  const tone = req.status === "COMPLETED" ? "success"
+    : req.status === "ANALYZING" ? "ai"
+    : req.status === "OFFERED" || req.status === "ACCEPTED" ? "success" : "";
+  return `
+    <button class="jf-card" data-go="${state.jobStatus ? "job" : "detail"}">
+      <div class="jf-row" style="flex-wrap:wrap">
+        <span class="jf-badge ${tone ? "jf-badge--" + tone : ""}">${STATUS_LABELS[req.status]}</span>
+        ${req.urgency === "HIGH" ? '<span class="jf-badge jf-badge--warning">Dringend</span>' : ""}
+        ${sub ? `<span class="jf-badge jf-badge--primary">${sub.icon} ${esc(sub.name)}</span>` : ""}
+      </div>
+      <p class="jf-body" style="font-weight:600">${esc(req.description)}</p>
+      <p class="jf-caption">\u{1F4CD} ${esc(req.locationLabel)} &nbsp;·&nbsp; \u{1F550} heute</p>
+    </button>`;
+}
+
+/* Screen 03 */
+screens.create = () => `
+  <div class="screen">
+    <div class="jf-topbar"><button class="jf-back" data-go="home">&larr;</button><span class="jf-topbar__title">Anfrage erstellen</span></div>
+    <h1 class="jf-h1">Was ist passiert?</h1>
+    <div>
+      <label class="jf-label" for="desc">Beschreibung</label>
+      <textarea class="jf-textarea" id="desc" placeholder="Meine Heizung wird nicht mehr richtig warm.">${esc(state.draft.description)}</textarea>
+      <p class="jf-hint">Ein bis zwei Sätze reichen. Den Rest fragt die KI gezielt nach.</p>
+    </div>
+    <div>
+      <label class="jf-label">Fotos</label>
+      <div class="jf-row">
+        ${Array.from({ length: state.draft.photos }, () => `
+          <div style="width:66px;height:66px;border-radius:14px;background:var(--jf-surface-muted);display:grid;place-items:center;font-size:24px">\u{1F5BC}</div>`).join("")}
+        <button data-action="add-photo" style="width:66px;height:66px;border-radius:14px;border:2px dashed var(--jf-border);background:var(--jf-surface);font-size:24px;color:var(--jf-muted);cursor:pointer">+</button>
+      </div>
+      <p class="jf-hint">Ein Foto ersetzt oft eine Rückfrage.</p>
+    </div>
+    <div>
+      <label class="jf-label" for="loc">Wo?</label>
+      <input class="jf-input" id="loc" value="${esc(state.draft.locationLabel)}">
+      <p class="jf-hint">Postleitzahl und Ort genügen. Die genaue Adresse bekommt nur der beauftragte Betrieb.</p>
+    </div>
+    <div>
+      <label class="jf-label">Wie dringend ist es?</label>
+      <div class="jf-row">
+        ${["LOW", "NORMAL", "HIGH"].map((u) => `
+          <button class="jf-choice" data-action="set-urgency" data-value="${u}" aria-pressed="${state.draft.urgency === u}">${URGENCY_LABELS[u]}</button>`).join("")}
+      </div>
+    </div>
+    <div class="jf-spacer"></div>
+    <button class="jf-btn jf-btn--primary" data-action="submit-request">Anfrage starten</button>
+  </div>`;
+
+/* Screen 04 - der charakteristische Moment des Produkts */
+screens.analyzing = () => `
+  <div class="screen" style="justify-content:center">
+    <div class="jf-thinking">
+      <div class="jf-thinking__orb">\u{1F916}</div>
+      <p class="jf-h2" style="text-align:center">Ich schaue mir dein Problem an</p>
+      <div class="jf-thinking__steps">
+        <div class="jf-thinking__step" data-step="0"><span class="jf-thinking__tick">✓</span> Beschreibung gelesen</div>
+        <div class="jf-thinking__step" data-step="1"><span class="jf-thinking__tick">✓</span> Kategorie bestimmt</div>
+        <div class="jf-thinking__step" data-step="2"><span class="jf-thinking__tick">✓</span> Offene Punkte gesammelt</div>
+      </div>
+    </div>
+  </div>`;
+
+/* Screen 04b */
+screens.questions = () => {
+  const a = state.analysis;
+  const sub = a.categorySlug ? SUBCATEGORIES[a.categorySlug] : null;
+  const open = a.questions.filter((q) => !state.answers[q]);
+
+  return `
+  <div class="screen">
+    <div class="jf-topbar"><span class="jf-topbar__title">KI-Analyse</span></div>
+    <div class="jf-ai">
+      <div class="jf-ai__head"><span style="font-size:19px">\u{1F916}</span><span class="jf-ai__title">Von der KI erkannt</span></div>
+      <dl style="margin:0;display:flex;flex-direction:column;gap:11px">
+        <div class="jf-ai__field">
+          <dt>Kategorie</dt>
+          <dd>${sub ? sub.icon + " " + esc(sub.name) : "Noch nicht eindeutig"}</dd>
+        </div>
+        <div class="jf-ai__field">
+          <dt>Problem</dt>
+          <dd style="font-weight:500;font-size:14px">${esc(a.summary)}</dd>
+        </div>
+        <div class="jf-ai__field">
+          <dt>Dringlichkeit</dt>
+          <dd style="font-size:14px">${URGENCY_LABELS[a.urgency]}</dd>
+        </div>
+      </dl>
+      <p class="jf-ai__disclaimer">
+        ${a.confidence < 0.6
+          ? "Die KI ist sich hier unsicher (" + Math.round(a.confidence * 100) + " %). Bitte prüfe die Angaben."
+          : "Sicherheit " + Math.round(a.confidence * 100) + " % &mdash; automatisch erstellt, bitte kurz prüfen."}
+      </p>
+    </div>
+
+    ${open.length > 0 ? `
+      <div class="jf-stack">
+        <h2 class="jf-h2">Noch ${open.length} ${open.length === 1 ? "Frage" : "Fragen"}</h2>
+        <p class="jf-muted" style="margin-top:-4px">Nur das, was für ein gutes Angebot wirklich fehlt.</p>
+        ${open.map((q, i) => `
+          <div class="jf-card">
+            <label class="jf-label" for="q${i}" style="margin:0">${esc(q)}</label>
+            <input class="jf-input" id="q${i}" data-question="${esc(q)}" placeholder="Deine Antwort">
+          </div>`).join("")}
+        <button class="jf-btn jf-btn--primary" data-action="answer-questions">Antworten senden</button>
+        <button class="jf-btn jf-btn--ghost" data-go="summary">Überspringen</button>
+      </div>`
+      : `
+      <div class="jf-card">
+        <p class="jf-body">Alle Rückfragen beantwortet. \u{2705}</p>
+        <p class="jf-muted">${Object.keys(state.answers).length} Antworten gehen mit an die Betriebe.</p>
+      </div>
+      <button class="jf-btn jf-btn--primary" data-go="summary">Weiter</button>`}
+  </div>`;
+};
+
+/* Screen 05 */
+screens.summary = () => {
+  const a = state.analysis;
+  const sub = a && a.categorySlug ? SUBCATEGORIES[a.categorySlug] : null;
+  const answered = Object.entries(state.answers);
+
+  return `
+  <div class="screen">
+    <div class="jf-topbar"><button class="jf-back" data-go="questions">&larr;</button><span class="jf-topbar__title">Deine Anfrage</span></div>
+    <div class="jf-card">
+      <div class="jf-row jf-row--between">
+        <h2 class="jf-h2">${sub ? sub.icon + " " + esc(sub.name) : "Anfrage"}</h2>
+        <span class="jf-badge jf-badge--ai">KI erkannt</span>
+      </div>
+      <div>
+        <p class="jf-label" style="margin-bottom:2px">Problem</p>
+        <p class="jf-body">${esc(state.request.description)}</p>
+      </div>
+      ${state.draft.photos > 0 ? `<div><p class="jf-label" style="margin-bottom:2px">Fotos</p><p class="jf-body">\u{1F5BC} ${state.draft.photos} Bilder</p></div>` : ""}
+      <div>
+        <p class="jf-label" style="margin-bottom:2px">Standort</p>
+        <p class="jf-body">\u{1F4CD} ${esc(state.request.locationLabel)}</p>
+      </div>
+      <div>
+        <p class="jf-label" style="margin-bottom:2px">Dringlichkeit</p>
+        <p class="jf-body">${URGENCY_LABELS[state.request.urgency]}</p>
+      </div>
+    </div>
+    ${answered.length > 0 ? `
+      <div class="jf-card">
+        <p class="jf-label" style="margin:0">Deine Antworten</p>
+        ${answered.map(([q, ans]) => `
+          <div><p class="jf-caption">${esc(q)}</p><p class="jf-body" style="font-weight:500">${esc(ans)}</p></div>`).join("")}
+      </div>` : ""}
+    <div class="jf-spacer"></div>
+    <button class="jf-btn jf-btn--primary" data-action="find-providers">Passende Anbieter suchen</button>
+  </div>`;
+};
+
+/* Screen 06 */
+screens.matches = () => `
+  <div class="screen">
+    <div class="jf-topbar"><span class="jf-topbar__title">Passende Anbieter</span></div>
+    ${state.matches.length === 0 ? `
+      <div class="jf-empty">
+        <span class="jf-empty__icon">\u{1F50D}</span>
+        <p class="jf-h2">Noch kein passender Betrieb</p>
+        <p class="jf-muted">In dieser Kategorie ist noch niemand in deiner Nähe registriert.</p>
+      </div>`
+    : `
+      <p class="jf-muted">Wir haben <b style="color:var(--jf-text)">${state.matches.length} passende Unternehmen</b> gefunden.</p>
+      ${state.matches.map((m) => `
+        <div class="jf-card">
+          <div class="jf-row jf-row--between">
+            <div>
+              <p class="jf-body" style="font-weight:600;font-size:15.5px">${esc(m.business.name)}</p>
+              <p class="jf-caption">${m.business.reviews === 0 ? "Noch keine Bewertungen"
+                : "⭐ " + m.business.rating.toFixed(1).replace(".", ",") + " · " + m.business.reviews + " Bewertungen"}</p>
+            </div>
+            <span class="jf-badge jf-badge--primary">${m.score}/100</span>
+          </div>
+          ${m.business.verified ? '<span class="jf-badge jf-badge--success">✓ Geprüft</span>' : ""}
+          <div class="jf-stack--tight jf-stack" style="margin-top:2px">
+            ${m.reasons.slice(0, 3).map((r) => `<p class="jf-caption">• ${esc(r.label)}</p>`).join("")}
+          </div>
+        </div>`).join("")}
+      <div class="jf-spacer"></div>
+      <button class="jf-btn jf-btn--primary" data-action="request-offers">Angebote erhalten</button>`}
+  </div>`;
+
+/* Screen 07 */
+screens.offers = () => `
+  <div class="screen">
+    <div class="jf-topbar"><span class="jf-topbar__title">Angebote</span></div>
+    <h1 class="jf-h1">${state.offers.length} Angebote erhalten</h1>
+    <p class="jf-muted" style="margin-top:-8px">Du entscheidest. Preise sind vollständig, inklusive Anfahrt.</p>
+    ${state.offers.map((o) => {
+      const biz = bizById(o.businessId);
+      const accepted = o.status === "ACCEPTED";
+      const declined = o.status === "DECLINED";
+      return `
+        <button class="jf-card" data-action="open-offer" data-value="${o.id}" ${declined ? 'style="opacity:.5"' : ""}>
+          <div class="jf-row jf-row--between">
+            <p class="jf-body" style="font-weight:600;font-size:15.5px">${esc(biz.name)}</p>
+            ${accepted ? '<span class="jf-badge jf-badge--success">Angenommen</span>'
+              : declined ? '<span class="jf-badge">Abgelehnt</span>' : ""}
+          </div>
+          <div class="jf-row jf-row--between" style="align-items:baseline">
+            <span style="font-family:var(--font-display);font-size:26px;font-weight:700;color:var(--jf-text);font-variant-numeric:tabular-nums">${fmtEuroShort(offerTotal(o))}</span>
+            <span class="jf-caption">⭐ ${biz.rating.toFixed(1).replace(".", ",")} · ${fmtKm(biz.distanceKm)}</span>
+          </div>
+          <p class="jf-caption">inkl. Material &amp; Anfahrt</p>
+        </button>`;
+    }).join("")}
+  </div>`;
+
+/* Screen 08 */
+screens.offer = () => {
+  const o = offerById(state.openedOfferId) || state.offers[0];
+  const biz = bizById(o.businessId);
+  const valid = new Date(Date.now() + 6 * 864e5).toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric" });
+
+  return `
+  <div class="screen">
+    <div class="jf-topbar"><button class="jf-back" data-go="offers">&larr;</button><span class="jf-topbar__title">Angebot</span></div>
+    <div>
+      <h1 class="jf-h1">${esc(biz.name)}</h1>
+      <p class="jf-muted">⭐ ${biz.rating.toFixed(1).replace(".", ",")} · ${biz.reviews} Bewertungen · ${fmtKm(biz.distanceKm)}</p>
+    </div>
+    ${biz.verified ? '<span class="jf-badge jf-badge--success">✓ Unternehmen geprüft</span>' : '<span class="jf-badge jf-badge--warning">Noch nicht geprüft</span>'}
+    <div class="jf-card">
+      <dl class="jf-price">
+        <div class="jf-price__row"><dt>Arbeitskosten</dt><dd>${fmtEuro(o.labor)}</dd></div>
+        <div class="jf-price__row"><dt>Material</dt><dd>${fmtEuro(o.material)}</dd></div>
+        <div class="jf-price__row"><dt>Anfahrt</dt><dd>${fmtEuro(o.travel)}</dd></div>
+        <div class="jf-price__total"><dt>Gesamt</dt><dd>${fmtEuroShort(offerTotal(o))}</dd></div>
+      </dl>
+    </div>
+    <div class="jf-card">
+      <p class="jf-label" style="margin:0">Beschreibung</p>
+      <p class="jf-body">${esc(o.description)}</p>
+      ${o.aiAssisted ? '<p class="jf-caption" style="color:var(--jf-ai)">Text mit KI-Unterstützung verfasst, vom Betrieb freigegeben.</p>' : ""}
+    </div>
+    <p class="jf-caption">Gültig bis ${valid}</p>
+    <div class="jf-spacer"></div>
+    ${o.status === "ACCEPTED"
+      ? '<button class="jf-btn jf-btn--secondary" data-go="appointment">Zum Termin</button>'
+      : `<button class="jf-btn jf-btn--primary" data-action="accept-offer" data-value="${o.id}">Angebot annehmen</button>
+         <button class="jf-btn jf-btn--ghost" data-action="decline-offer" data-value="${o.id}">Ablehnen</button>`}
+  </div>`;
+};
+
+/* Screen 09 - Termin. Der Kunde sieht nur freigegebene Zeitfenster. */
+screens.appointment = () => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  // Drei Wochen ab dem Montag der laufenden Woche - derselbe Horizont wie
+  // AppointmentService.availableSlots im Backend. Ein fester Kalendermonat
+  // wäre am Monatsende fast leer.
+  const monday = new Date(today);
+  monday.setDate(today.getDate() - ((today.getDay() + 6) % 7));
+  const days = Array.from({ length: 21 }, (_, i) => {
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    return d;
+  });
+
+  const first = days[0];
+  const last = days[days.length - 1];
+  const rangeLabel = first.getMonth() === last.getMonth()
+    ? first.toLocaleDateString("de-DE", { month: "long", year: "numeric" })
+    : first.toLocaleDateString("de-DE", { month: "long" }) + " – " +
+      last.toLocaleDateString("de-DE", { month: "long", year: "numeric" });
+
+  const chosen = state.appointment ? state.appointment.key : null;
+
+  const cells = days.map((d) => {
+    const key = d.toISOString().slice(0, 10);
+    const past = d.getTime() < today.getTime();
+    // Verfügbarkeit des Betriebs laut Wochenplan: Montag, Dienstag, Donnerstag.
+    const free = !past && [1, 2, 4].includes(d.getDay());
+    return `<button class="jf-cal__day ${free ? "jf-cal__day--free" : ""}" data-action="pick-day" data-value="${key}"
+      ${free ? "" : "disabled"} aria-pressed="${chosen === key}"
+      aria-label="${d.toLocaleDateString("de-DE", { weekday: "long", day: "numeric", month: "long" })}">${d.getDate()}</button>`;
+  }).join("");
+
+  const slots = ["09:00", "11:00", "14:00", "16:00"];
+  const acceptedBiz = bizById(offerById(state.acceptedOfferId).businessId);
+
+  return `
+  <div class="screen">
+    <div class="jf-topbar"><span class="jf-topbar__title">Termin auswählen</span></div>
+    <p class="jf-muted">Diese Zeiten hat ${esc(acceptedBiz.name)} freigegeben.</p>
+    <div class="jf-card">
+      <p class="jf-h2" style="text-transform:capitalize">${rangeLabel}</p>
+      <div class="jf-cal">
+        ${["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"].map((w) => `<span class="jf-cal__wd">${w}</span>`).join("")}
+        ${cells}
+      </div>
+    </div>
+    ${chosen ? `
+      <div class="jf-stack">
+        <h2 class="jf-h2">Verfügbare Zeiten</h2>
+        <div class="jf-slots">
+          ${slots.map((t) => `
+            <button class="jf-slot" data-action="pick-time" data-value="${t}" aria-pressed="${state.appointment.time === t}">${t}</button>`).join("")}
+        </div>
+      </div>` : '<p class="jf-caption">Wähle zuerst einen Tag mit grünem Punkt.</p>'}
+    <div class="jf-spacer"></div>
+    <button class="jf-btn jf-btn--primary" data-action="confirm-appointment"
+      ${state.appointment && state.appointment.time ? "" : "disabled"}>Termin bestätigen</button>
+  </div>`;
+};
+
+/* Screen 10 */
+screens.job = () => {
+  const o = offerById(state.acceptedOfferId);
+  const biz = bizById(o.businessId);
+  const sub = state.analysis && state.analysis.categorySlug ? SUBCATEGORIES[state.analysis.categorySlug] : null;
+
+  const steps = [
+    { label: "Anfrage erstellt", done: true },
+    { label: "Angebot erhalten", done: true },
+    { label: "Angebot angenommen", done: true },
+    { label: "Termin bestätigt", done: Boolean(state.appointment && state.appointment.confirmed) },
+    { label: "Auftrag abgeschlossen", done: state.jobStatus === "COMPLETED" }
+  ];
+  const currentIndex = steps.findIndex((s) => !s.done);
+
+  const apptText = state.appointment && state.appointment.confirmed
+    ? new Date(state.appointment.key).toLocaleDateString("de-DE",
+        { weekday: "long", day: "numeric", month: "long" }) + " um " + state.appointment.time + " Uhr"
+    : "Noch kein Termin";
+
+  return `
+  <div class="screen">
+    <div class="jf-topbar"><span class="jf-topbar__title">Dein Auftrag</span></div>
+    <div>
+      <h1 class="jf-h1">${sub ? esc(sub.name) : "Auftrag"}</h1>
+      <p class="jf-muted">${esc(biz.name)} · ${fmtEuroShort(offerTotal(o))}</p>
+    </div>
+    <div class="jf-card">
+      <div class="jf-timeline">
+        ${steps.map((s, i) => {
+          const isNow = i === currentIndex;
+          const last = i === steps.length - 1;
+          return `
+            <div class="jf-tl">
+              <div class="jf-tl__col">
+                <span class="jf-tl__dot ${s.done ? "jf-tl__dot--done" : isNow ? "jf-tl__dot--now" : ""}">${s.done ? "✓" : isNow ? "●" : "○"}</span>
+                ${last ? "" : `<span class="jf-tl__line ${s.done ? "jf-tl__line--done" : ""}"></span>`}
+              </div>
+              <span class="jf-tl__label ${s.done || isNow ? "jf-tl__label--reached" : ""}">${s.label}</span>
+            </div>`;
+        }).join("")}
+      </div>
+    </div>
+    <div class="jf-card">
+      <p class="jf-label" style="margin:0">Termin</p>
+      <p class="jf-body" style="font-weight:600">\u{1F4C5} ${apptText}</p>
+      ${state.jobStatus === "COMPLETED" ? '<span class="jf-badge jf-badge--success">Auftrag abgeschlossen</span>' : ""}
+    </div>
+    <button class="jf-btn jf-btn--secondary" data-go="chat">
+      <span class="jf-btn__icon">\u{1F4AC}</span> Nachricht schreiben
+    </button>
+    ${state.jobStatus === "COMPLETED" && !state.review
+      ? '<button class="jf-btn jf-btn--primary" data-go="review">Auftrag bewerten</button>'
+      : state.jobStatus === "COMPLETED"
+        ? `<div class="jf-card"><p class="jf-label" style="margin:0">Deine Bewertung</p><p class="jf-body">${"⭐".repeat(state.review.rating)}</p><p class="jf-muted">${esc(state.review.text)}</p></div>`
+        : `<button class="jf-btn jf-btn--ghost" data-action="simulate-completion">Betrieb meldet: Auftrag erledigt</button>`}
+  </div>`;
+};
+
+/* Screen 11 */
+screens.review = () => {
+  const o = offerById(state.acceptedOfferId);
+  const biz = bizById(o.businessId);
+  const rating = state.reviewDraft || 0;
+  return `
+  <div class="screen">
+    <div class="jf-topbar"><button class="jf-back" data-go="job">&larr;</button><span class="jf-topbar__title">Bewertung</span></div>
+    <h1 class="jf-h1" style="text-align:center;margin-top:14px">Wie war dein Auftrag?</h1>
+    <p class="jf-muted" style="text-align:center;margin-top:-8px">${esc(biz.name)}</p>
+    <div class="jf-stars">
+      ${[1, 2, 3, 4, 5].map((n) => `
+        <button class="jf-star ${n <= rating ? "is-on" : ""}" data-action="rate" data-value="${n}" aria-label="${n} von 5">⭐</button>`).join("")}
+    </div>
+    <div>
+      <label class="jf-label" for="rev">Was möchtest du sagen?</label>
+      <textarea class="jf-textarea" id="rev" placeholder="Sehr freundlicher und zuverlässiger Service.">Sehr freundlicher und zuverlässiger Service.</textarea>
+    </div>
+    <div class="jf-spacer"></div>
+    <button class="jf-btn jf-btn--primary" data-action="submit-review" ${rating > 0 ? "" : "disabled"}>Bewertung senden</button>
+    <p class="jf-caption" style="text-align:center">Bewerten kannst du nur einen abgeschlossenen Auftrag &mdash; das schützt vor erfundenen Bewertungen.</p>
+  </div>`;
+};
+
+/* Anfragenliste */
+screens.requests = () => `
+  <div class="screen">
+    <h1 class="jf-h1">Meine Anfragen</h1>
+    ${state.request ? requestCard(state.request) : `
+      <div class="jf-empty">
+        <span class="jf-empty__icon">\u{1F4CB}</span>
+        <p class="jf-h2">Noch keine Anfragen</p>
+        <p class="jf-muted">Beschreibe dein Anliegen &mdash; JobFlow findet die passenden Anbieter.</p>
+        <button class="jf-btn jf-btn--primary jf-btn--sm" data-go="create" style="width:auto;margin-top:8px">Anfrage starten</button>
+      </div>`}
+  </div>`;
+
+/* Detailansicht der Anfrage - führt durch den nächsten offenen Schritt */
+screens.detail = () => {
+  const req = state.request;
+  const sub = req.categorySlug ? SUBCATEGORIES[req.categorySlug] : null;
+  let next = "";
+  if (!state.analysis) next = `<button class="jf-btn jf-btn--primary" data-action="run-analysis"><span class="jf-btn__icon">\u{1F916}</span> Von der KI analysieren lassen</button>`;
+  else if (state.matches.length === 0) next = `<button class="jf-btn jf-btn--primary" data-action="find-providers"><span class="jf-btn__icon">\u{1F50E}</span> Passende Anbieter suchen</button>`;
+  else if (state.offers.length === 0) next = `<button class="jf-btn jf-btn--primary" data-action="request-offers">Angebote erhalten</button>`;
+  else next = `<button class="jf-btn jf-btn--primary" data-go="offers">${state.offers.length} Angebote ansehen</button>`;
+
+  return `
+  <div class="screen">
+    <div class="jf-topbar"><button class="jf-back" data-go="requests">&larr;</button><span class="jf-topbar__title">Anfrage</span></div>
+    <div>
+      <div class="jf-row" style="flex-wrap:wrap;margin-bottom:8px">
+        <span class="jf-badge ${req.status === "OFFERED" ? "jf-badge--success" : ""}">${STATUS_LABELS[req.status]}</span>
+        ${sub ? `<span class="jf-badge jf-badge--primary">${sub.icon} ${esc(sub.name)}</span>` : ""}
+      </div>
+      <p class="jf-body">${esc(req.description)}</p>
+      <p class="jf-caption" style="margin-top:6px">\u{1F4CD} ${esc(req.locationLabel)}</p>
+    </div>
+    ${state.analysis ? `
+      <div class="jf-ai">
+        <div class="jf-ai__head"><span style="font-size:19px">\u{1F916}</span><span class="jf-ai__title">KI-Zusammenfassung</span></div>
+        <p class="jf-body">${esc(state.analysis.summary)}</p>
+        <p class="jf-ai__disclaimer">Automatisch erstellt &mdash; bitte kurz prüfen.</p>
+      </div>` : ""}
+    ${next}
+  </div>`;
+};
+
+/* Chat */
+screens.chat = () => {
+  const o = state.acceptedOfferId ? offerById(state.acceptedOfferId) : state.offers[0];
+  const partner = state.role === "customer"
+    ? (o ? bizById(o.businessId).name : "JobFlow")
+    : "Max M.";
+
+  return `
+  <div class="screen" style="min-height:100%">
+    <div class="jf-topbar">
+      <button class="jf-back" data-go="${state.role === "customer" ? (state.jobStatus ? "job" : "offers") : "bizdashboard"}">&larr;</button>
+      <span class="jf-topbar__title">${esc(partner)}</span>
+    </div>
+    <div class="jf-chat">
+      ${state.messages.length === 0 ? '<p class="jf-caption" style="text-align:center">Noch keine Nachrichten.</p>' : ""}
+      ${state.messages.map((m) => `
+        <div class="jf-bubble jf-bubble--${m.mine ? "me" : "them"} ${m.ai ? "jf-bubble--ai-mark" : ""}">
+          ${esc(m.text)}
+          <span class="jf-bubble__time">${m.time}${m.ai ? " · KI-Vorschlag" : ""}</span>
+        </div>`).join("")}
+    </div>
+    <div class="jf-spacer"></div>
+    ${state.role === "business" ? `
+      <div class="jf-ai">
+        <div class="jf-ai__head"><span style="font-size:17px">\u{1F916}</span><span class="jf-ai__title">Antwort formulieren</span></div>
+        <p class="jf-caption">Die KI schreibt einen Vorschlag &mdash; du entscheidest, ob du ihn abschickst.</p>
+        <button class="jf-btn jf-btn--secondary jf-btn--sm" data-action="suggest-reply">Vorschlag erzeugen</button>
+      </div>` : ""}
+    <div class="jf-composer">
+      <input class="jf-input" id="msg" placeholder="Nachricht schreiben" value="${esc(state.msgDraft || "")}">
+      <button class="jf-btn jf-btn--primary jf-btn--sm" data-action="send-message" style="width:auto;padding:0 18px">Senden</button>
+    </div>
+  </div>`;
+};
+
+screens.profile = () => `
+  <div class="screen">
+    <h1 class="jf-h1">Profil</h1>
+    <div class="jf-card">
+      <p class="jf-h2">Max Mustermann</p>
+      <p class="jf-caption">max@example.de</p>
+      <p class="jf-caption">Kundenkonto</p>
+    </div>
+    <div class="jf-card">
+      <p class="jf-label" style="margin:0">Deine Daten</p>
+      <p class="jf-muted">
+        JobFlow speichert deine Anfragen, Angebote und Termine. Der Standort wird nur so
+        genau gespeichert, wie es für die Vermittlung nötig ist &mdash; die vollständige
+        Adresse erfährt erst der Betrieb, den du beauftragst.
+      </p>
+    </div>
+    <div class="jf-card">
+      <p class="jf-label" style="margin:0">KI-Hinweise</p>
+      <p class="jf-muted">
+        Alles, was die KI erzeugt, ist in der App violett markiert. Sie trifft keine
+        verbindlichen Entscheidungen über Preise oder Termine.
+      </p>
+    </div>
+    <div class="jf-spacer"></div>
+    <button class="jf-btn jf-btn--secondary" data-action="logout">Abmelden</button>
+  </div>`;
+
+/* ==========================================================================
+   6. Screens - Unternehmensseite
+   Dieselbe Codebasis, völlig andere Oberfläche.
+   ========================================================================== */
+
+/* Die Anfrage, die der Betrieb sieht - entweder die selbst erstellte oder ein Beispiel. */
+function inboxRequest() {
+  if (state.request && state.analysis) {
+    return {
+      description: state.request.description,
+      summary: state.analysis.summary,
+      categorySlug: state.analysis.categorySlug,
+      urgency: state.request.urgency,
+      location: state.request.locationLabel,
+      photos: state.draft.photos,
+      answers: Object.entries(state.answers),
+      distanceKm: 4.2,
+      score: state.matches.length > 0 ? state.matches[0].score : 88,
+      customer: "Max M."
+    };
+  }
+  return {
+    description: "Meine Heizung wird nicht mehr richtig warm.",
+    summary: "Die Heizung arbeitet nicht wie erwartet.",
+    categorySlug: "heizung",
+    urgency: "NORMAL",
+    location: "45127 Essen",
+    photos: 2,
+    answers: [["Sind mehrere Heizkörper betroffen oder nur einer?", "Alle Heizkörper, seit gestern Abend."]],
+    distanceKm: 4.2,
+    score: 88,
+    customer: "Max M."
+  };
+}
+
+/* Screen 12 */
+screens.bizdashboard = () => {
+  const req = inboxRequest();
+  const sub = SUBCATEGORIES[req.categorySlug] || SUBCATEGORIES.heizung;
+  const sent = state.offers.some((o) => o.businessId === "b1" && o.fromBusinessScreen);
+
+  return `
+  <div class="screen">
+    <div>
+      <p class="jf-greeting">Guten Morgen \u{1F44B}</p>
+      <h1 class="jf-h1">HeizPro Essen</h1>
+    </div>
+    <div class="jf-tiles">
+      <div class="jf-tile"><span class="jf-tile__value">${state.bizDeclined ? 0 : 1}</span><span class="jf-tile__label">Neue Anfragen</span></div>
+      <div class="jf-tile"><span class="jf-tile__value">${sent ? 13 : 12}</span><span class="jf-tile__label">Angebote offen</span></div>
+      <div class="jf-tile"><span class="jf-tile__value">5</span><span class="jf-tile__label">Aufträge diese Woche</span></div>
+      <div class="jf-tile"><span class="jf-tile__value">2.430&nbsp;€</span><span class="jf-tile__label">Umsatz</span></div>
+    </div>
+
+    <div class="jf-stack">
+      <h2 class="jf-h2">Neue Anfrage</h2>
+      ${state.bizDeclined ? `
+        <div class="jf-empty">
+          <span class="jf-empty__icon">\u{2705}</span>
+          <p class="jf-muted">Alles bearbeitet. Sobald eine passende Anfrage entsteht, erscheint sie hier.</p>
+        </div>`
+      : `
+        <button class="jf-card" data-go="bizrequest">
+          <div class="jf-row jf-row--between">
+            <span class="jf-badge jf-badge--primary">${sub.icon} ${esc(sub.name)}</span>
+            <span class="jf-badge">Passung ${req.score}</span>
+          </div>
+          <p class="jf-body" style="font-weight:600">${esc(req.description)}</p>
+          <p class="jf-caption">\u{1F4CD} ${fmtKm(req.distanceKm)} entfernt · \u{1F5BC} ${req.photos} Fotos · \u{1F550} diese Woche</p>
+        </button>`}
+    </div>
+
+    <div class="jf-card">
+      <p class="jf-label" style="margin:0">Diese Woche</p>
+      ${bar("Anfragen", 128, 128)}
+      ${bar("Angebote", 87, 128)}
+      ${bar("Aufträge", 42, 128)}
+    </div>
+    <button class="jf-btn jf-btn--secondary" data-go="bizstats">Alle Statistiken</button>
+  </div>`;
+};
+
+function bar(label, value, max) {
+  return `
+    <div class="jf-bar">
+      <div class="jf-bar__head"><span>${label}</span><span>${value}</span></div>
+      <div class="jf-bar__track"><div class="jf-bar__fill" style="width:${Math.round((value / max) * 100)}%"></div></div>
+    </div>`;
+}
+
+/* Screen 13 */
+screens.bizrequest = () => {
+  const req = inboxRequest();
+  const sub = SUBCATEGORIES[req.categorySlug] || SUBCATEGORIES.heizung;
+
+  return `
+  <div class="screen">
+    <div class="jf-topbar"><button class="jf-back" data-go="bizdashboard">&larr;</button><span class="jf-topbar__title">Anfrage</span></div>
+    <div>
+      <h1 class="jf-h1">${sub.icon} ${esc(sub.name)}</h1>
+      <p class="jf-muted">${esc(req.customer)} · ${fmtKm(req.distanceKm)} entfernt</p>
+    </div>
+
+    <div class="jf-ai">
+      <div class="jf-ai__head"><span style="font-size:19px">\u{1F916}</span><span class="jf-ai__title">KI-Zusammenfassung</span></div>
+      <p class="jf-body">${esc(req.summary)}</p>
+      <p class="jf-ai__disclaimer">Automatisch aus der Beschreibung erstellt. Der Wortlaut des Kunden steht darunter.</p>
+    </div>
+
+    <div class="jf-card">
+      <p class="jf-label" style="margin:0">Der Kunde schreibt</p>
+      <p class="jf-body">„${esc(req.description)}"</p>
+    </div>
+
+    ${req.answers.length > 0 ? `
+      <div class="jf-card">
+        <p class="jf-label" style="margin:0">Rückfragen bereits beantwortet</p>
+        ${req.answers.map(([q, a]) => `
+          <div><p class="jf-caption">${esc(q)}</p><p class="jf-body" style="font-weight:500">${esc(a)}</p></div>`).join("")}
+      </div>` : ""}
+
+    <div class="jf-card">
+      <div class="jf-row" style="flex-wrap:wrap">
+        <span class="jf-badge">\u{1F4CD} ${esc(req.location)}</span>
+        <span class="jf-badge">\u{1F5BC} ${req.photos} Fotos</span>
+        <span class="jf-badge ${req.urgency === "HIGH" ? "jf-badge--warning" : ""}">${URGENCY_LABELS[req.urgency]}</span>
+      </div>
+      ${req.photos > 0 ? `
+        <div class="jf-row" style="margin-top:4px">
+          ${Array.from({ length: Math.min(req.photos, 3) }, () => `
+            <div style="width:74px;height:74px;border-radius:14px;background:var(--jf-surface-muted);display:grid;place-items:center;font-size:26px">\u{1F5BC}</div>`).join("")}
+        </div>` : ""}
+    </div>
+
+    <div class="jf-spacer"></div>
+    <button class="jf-btn jf-btn--primary" data-go="bizoffer">Angebot erstellen</button>
+    <button class="jf-btn jf-btn--ghost" data-action="decline-request">Ablehnen</button>
+  </div>`;
+};
+
+/* Screen 14 */
+screens.bizoffer = () => {
+  const o = state.bizOffer;
+  const total = o.labor + o.material + o.travel;
+
+  return `
+  <div class="screen">
+    <div class="jf-topbar"><button class="jf-back" data-go="bizrequest">&larr;</button><span class="jf-topbar__title">Angebot erstellen</span></div>
+    <div>
+      <label class="jf-label" for="lab">Arbeitskosten</label>
+      <input class="jf-input" id="lab" inputmode="decimal" data-money="labor" value="${(o.labor / 100).toFixed(0)}">
+    </div>
+    <div>
+      <label class="jf-label" for="mat">Material</label>
+      <input class="jf-input" id="mat" inputmode="decimal" data-money="material" value="${(o.material / 100).toFixed(0)}">
+    </div>
+    <div>
+      <label class="jf-label" for="tra">Anfahrt</label>
+      <input class="jf-input" id="tra" inputmode="decimal" data-money="travel" value="${(o.travel / 100).toFixed(0)}">
+    </div>
+
+    <div class="jf-card" style="background:var(--jf-primary-light)">
+      <div class="jf-price__total" style="border:none;padding:0">
+        <dt style="font-size:13.5px;color:var(--jf-primary-dark)">Gesamt</dt>
+        <dd style="color:var(--jf-primary-dark)">${fmtEuroShort(total)}</dd>
+      </div>
+      <p class="jf-caption" style="color:var(--jf-primary-dark)">Wird serverseitig aus den drei Positionen berechnet.</p>
+    </div>
+
+    <div>
+      <label class="jf-label" for="odesc">Beschreibung</label>
+      <textarea class="jf-textarea" id="odesc" placeholder="Was ist im Angebot enthalten?">${esc(o.description)}</textarea>
+      ${o.aiAssisted ? '<p class="jf-hint" style="color:var(--jf-ai)">Vorschlag der KI &mdash; du kannst ihn frei ändern.</p>' : ""}
+    </div>
+
+    <div class="jf-ai">
+      <div class="jf-ai__head"><span style="font-size:17px">\u{1F916}</span><span class="jf-ai__title">Text vorschlagen</span></div>
+      <p class="jf-caption">Die KI formuliert einen Entwurf. Über Preis und Inhalt entscheidest du.</p>
+      <button class="jf-btn jf-btn--secondary jf-btn--sm" data-action="suggest-offer-text">KI-Text vorschlagen</button>
+    </div>
+
+    <div class="jf-spacer"></div>
+    <button class="jf-btn jf-btn--primary" data-action="send-offer" ${total > 0 && o.description.trim().length > 9 ? "" : "disabled"}>Angebot senden</button>
+  </div>`;
+};
+
+/* Screen 15 */
+screens.bizstats = () => `
+  <div class="screen">
+    <div class="jf-topbar"><button class="jf-back" data-go="bizdashboard">&larr;</button><span class="jf-topbar__title">Statistik</span></div>
+    <h1 class="jf-h1">Statistik</h1>
+    <div class="jf-card">
+      ${bar("Anfragen", 128, 128)}
+      ${bar("Angebote", 87, 128)}
+      ${bar("Aufträge", 42, 128)}
+    </div>
+    <div class="jf-tiles">
+      <div class="jf-tile"><span class="jf-tile__value">67&nbsp;%</span><span class="jf-tile__label">Angebotsquote</span></div>
+      <div class="jf-tile"><span class="jf-tile__value">48&nbsp;%</span><span class="jf-tile__label">Aus Angebot wird Auftrag</span></div>
+      <div class="jf-tile"><span class="jf-tile__value">18&nbsp;Min.</span><span class="jf-tile__label">Antwortzeit im Schnitt</span></div>
+      <div class="jf-tile"><span class="jf-tile__value">4,9</span><span class="jf-tile__label">aus 238 Bewertungen</span></div>
+    </div>
+    <div class="jf-card">
+      <p class="jf-label" style="margin:0">Was das bedeutet</p>
+      <p class="jf-muted">
+        Von 128 vorgeschlagenen Anfragen hast du 87 beantwortet und 42 gewonnen.
+        Die Antwortzeit fließt direkt ins Matching ein &mdash; wer schneller antwortet,
+        wird häufiger vorgeschlagen.
+      </p>
+    </div>
+  </div>`;
+
+screens.bizprofile = () => `
+  <div class="screen">
+    <h1 class="jf-h1">Unternehmen</h1>
+    <div class="jf-card">
+      <div class="jf-row jf-row--between">
+        <p class="jf-h2">HeizPro Essen</p>
+        <span class="jf-badge jf-badge--success">✓ Geprüft</span>
+      </div>
+      <p class="jf-muted">Heizungsbau und Sanitär seit 1998.</p>
+      <p class="jf-caption">\u{1F4CD} 45127 Essen · Einsatzradius 40 km</p>
+    </div>
+
+    <div class="jf-card">
+      <p class="jf-label" style="margin:0">Leistungen</p>
+      <div class="jf-row" style="flex-wrap:wrap">
+        <span class="jf-badge jf-badge--primary">\u{1F525} Heizung</span>
+        <span class="jf-badge jf-badge--primary">\u{1F6BF} Sanitär</span>
+        <button class="jf-badge" data-action="noop" style="border:1px dashed var(--jf-border);cursor:pointer">+ Leistung</button>
+      </div>
+      <p class="jf-caption">Ohne hinterlegte Leistung findet dich das Matching nicht.</p>
+    </div>
+
+    <div class="jf-card">
+      <p class="jf-label" style="margin:0">Verfügbarkeit</p>
+      ${[["Montag", "08:00–12:00, 14:00–18:00"], ["Dienstag", "09:00–17:00"], ["Donnerstag", "08:00–16:00"]]
+        .map(([d, t]) => `<div class="jf-row jf-row--between"><span class="jf-muted">${d}</span><span class="jf-body" style="font-size:13.5px">${t}</span></div>`).join("")}
+      <p class="jf-caption">Der Kunde sieht ausschließlich diese Zeiten.</p>
+    </div>
+
+    <div class="jf-card">
+      <p class="jf-label" style="margin:0">Paket</p>
+      <div class="jf-row jf-row--between">
+        <span class="jf-body" style="font-weight:600">Pro</span>
+        <span class="jf-badge jf-badge--primary">29 €/Monat</span>
+      </div>
+      <p class="jf-caption">Preis ist eine Hypothese &mdash; erst echte Nutzer zeigen die Zahlungsbereitschaft.</p>
+    </div>
+
+    <div class="jf-spacer"></div>
+    <button class="jf-btn jf-btn--secondary" data-action="logout">Abmelden</button>
+  </div>`;
+
+/* ==========================================================================
+   7. Navigation und Ablaufkarte
+   ========================================================================== */
+
+const FLOW = {
+  customer: [
+    { group: "Einstieg", items: [
+      { key: "welcome", no: "01", label: "Willkommen" },
+      { key: "signup", no: "02", label: "Konto erstellen" },
+      { key: "home", no: "03", label: "Startseite" }
+    ]},
+    { group: "Anfrage", items: [
+      { key: "create", no: "04", label: "Anfrage erstellen" },
+      { key: "questions", no: "05", label: "KI-Analyse und Rückfragen", needs: "analysis" },
+      { key: "summary", no: "06", label: "Anfrage prüfen", needs: "analysis" }
+    ]},
+    { group: "Vermittlung", items: [
+      { key: "matches", no: "07", label: "Passende Anbieter", needs: "matches" },
+      { key: "offers", no: "08", label: "Angebote", needs: "offers" },
+      { key: "offer", no: "09", label: "Angebot im Detail", needs: "offers" }
+    ]},
+    { group: "Auftrag", items: [
+      { key: "appointment", no: "10", label: "Termin wählen", needs: "accepted" },
+      { key: "job", no: "11", label: "Auftragsstatus", needs: "accepted" },
+      { key: "chat", no: "12", label: "Chat", needs: "offers" },
+      { key: "review", no: "13", label: "Bewertung", needs: "completed" }
+    ]},
+    { group: "Weiteres", items: [
+      { key: "requests", no: "14", label: "Meine Anfragen" },
+      { key: "profile", no: "15", label: "Profil" }
+    ]}
+  ],
+  business: [
+    { group: "Überblick", items: [
+      { key: "bizdashboard", no: "01", label: "Dashboard" },
+      { key: "bizstats", no: "02", label: "Statistik" }
+    ]},
+    { group: "Anfrage bearbeiten", items: [
+      { key: "bizrequest", no: "03", label: "Anfrage mit KI-Zusammenfassung" },
+      { key: "bizoffer", no: "04", label: "Angebot erstellen" },
+      { key: "chat", no: "05", label: "Chat mit KI-Vorschlag" }
+    ]},
+    { group: "Betrieb", items: [
+      { key: "bizprofile", no: "06", label: "Unternehmensprofil" }
+    ]}
+  ]
+};
+
+const NAV = {
+  customer: [
+    { key: "home", icon: "\u{1F3E0}", label: "Start" },
+    { key: "requests", icon: "\u{1F4CB}", label: "Anfragen" },
+    { key: "create", icon: "+", label: "Neu", fab: true },
+    { key: "chat", icon: "\u{1F4AC}", label: "Chat" },
+    { key: "profile", icon: "\u{1F464}", label: "Profil" }
+  ],
+  business: [
+    { key: "bizdashboard", icon: "\u{1F4CA}", label: "Dashboard" },
+    { key: "bizrequest", icon: "\u{1F4CB}", label: "Anfragen" },
+    { key: "chat", icon: "\u{1F4AC}", label: "Chat" },
+    { key: "bizprofile", icon: "\u{1F3E2}", label: "Profil" }
+  ]
+};
+
+/* Screens ohne untere Leiste - dort ist die Navigation Teil des Ablaufs. */
+const NAV_HIDDEN = new Set(["welcome", "signup", "login", "analyzing"]);
+
+function reachable(key) {
+  const requirement = {
+    questions: () => Boolean(state.analysis),
+    summary: () => Boolean(state.analysis),
+    matches: () => state.matches.length > 0,
+    offers: () => state.offers.length > 0,
+    offer: () => state.offers.length > 0,
+    appointment: () => Boolean(state.acceptedOfferId),
+    job: () => Boolean(state.acceptedOfferId),
+    review: () => state.jobStatus === "COMPLETED",
+    detail: () => Boolean(state.request)
+  }[key];
+  return requirement ? requirement() : true;
+}
+
+/* ==========================================================================
+   8. Rendern
+   ========================================================================== */
+
+const viewport = document.getElementById("viewport");
+const navEl = document.getElementById("nav");
+const flowmapEl = document.getElementById("flowmap");
+const rolesEl = document.getElementById("roles");
+const logEl = document.getElementById("log");
+const captionEl = document.getElementById("caption");
+const progressEl = document.getElementById("progress");
+
+function render() {
+  const screen = screens[state.screen] || screens.welcome;
+  viewport.innerHTML = screen() + (state.toast ? `<div class="jf-toast">${esc(state.toast)}</div>` : "");
+
+  const items = NAV[state.role];
+  if (NAV_HIDDEN.has(state.screen)) {
+    navEl.style.display = "none";
+  } else {
+    navEl.style.display = "flex";
+    navEl.innerHTML = items.map((item) => `
+      <button class="jf-nav__item ${item.fab ? "jf-nav__item--fab" : ""} ${state.screen === item.key ? "is-active" : ""}"
+        data-go="${item.key}">
+        <span class="jf-nav__icon">${item.icon}</span>
+        <span>${item.label}</span>
+      </button>`).join("");
+  }
+
+  renderConsole();
+}
+
+function renderConsole() {
+  rolesEl.innerHTML = `
+    <button class="role" data-action="role" data-value="customer" aria-pressed="${state.role === "customer"}">
+      <span class="role__name">Kunde</span>
+      <span class="role__desc">Problem beschreiben, Angebote vergleichen, Termin buchen.</span>
+    </button>
+    <button class="role" data-action="role" data-value="business" aria-pressed="${state.role === "business"}">
+      <span class="role__name">Unternehmen</span>
+      <span class="role__desc">Anfragen erhalten, Angebot schreiben, Auftrag gewinnen.</span>
+    </button>`;
+
+  const groups = FLOW[state.role];
+  flowmapEl.innerHTML = groups.map((g) => `
+    <div class="flowmap__group">${g.group}</div>
+    ${g.items.map((item) => {
+      const open = reachable(item.key);
+      return `
+        <button class="step ${state.screen === item.key ? "is-current" : ""}" data-go="${item.key}">
+          <span class="step__no">${item.no}</span>
+          <span>${item.label}</span>
+          ${open && item.needs ? '<span class="step__done">✓</span>' : ""}
+        </button>`;
+    }).join("")}`).join("");
+
+  const total = groups.reduce((sum, g) => sum + g.items.length, 0);
+  const seen = groups.reduce((sum, g) => sum + g.items.filter((i) => reachable(i.key)).length, 0);
+  progressEl.textContent = seen + " von " + total + " erreichbar";
+
+  logEl.innerHTML = state.log.length === 0
+    ? '<div class="log__empty" style="padding:0">Noch nichts passiert. Tipp auf einen Button im Telefon.</div>'
+    : state.log.slice().reverse().map((e) => `
+        <div class="log__row">
+          <span class="log__verb log__verb--${e.verb}">${e.verb}</span>
+          <span class="log__path">${esc(e.path)}</span>
+          <span class="log__status">${e.status}</span>
+        </div>`).join("");
+
+  const current = groups.flatMap((g) => g.items).find((i) => i.key === state.screen);
+  captionEl.innerHTML = current
+    ? `<b>${current.no}</b> &nbsp;${esc(current.label)}`
+    : "&nbsp;";
+}
+
+/* ==========================================================================
+   9. Aktionen
+   ========================================================================== */
+
+const val = (id) => { const el = document.getElementById(id); return el ? el.value : ""; };
+
+const actions = {
+  role(value) {
+    state.role = value;
+    state.screen = value === "business" ? "bizdashboard" : (state.request ? "home" : "welcome");
+  },
+
+  "as-business"() {
+    state.role = "business";
+    state.screen = "bizdashboard";
+    logCall("POST", "/auth/login", 200);
+  },
+
+  "signup-role"(value) { state.signupRole = value; },
+
+  "do-signup"() {
+    logCall("POST", "/auth/register", 201);
+    if (state.signupRole === "BUSINESS") {
+      state.role = "business";
+      state.screen = "bizdashboard";
+    } else {
+      state.role = "customer";
+      state.screen = "home";
+    }
+  },
+
+  "do-login"() {
+    logCall("POST", "/auth/login", 200);
+    state.screen = state.role === "business" ? "bizdashboard" : "home";
+  },
+
+  logout() {
+    logCall("POST", "/auth/logout", 200);
+    const log = state.log;
+    state = initialState();
+    state.log = log;
+  },
+
+  "add-photo"() {
+    if (state.draft.photos >= 3) { toast("Mehr als drei Fotos braucht es selten."); return; }
+    state.draft.photos += 1;
+    if (state.screen === "home") state.screen = "create";
+    toast("Foto hinzugefügt. Ein Bild ersetzt oft eine Rückfrage.");
+  },
+
+  "pick-category"(value) {
+    state.draft.categoryHint = value;
+    state.screen = "create";
+    logCall("GET", "/categories", 200);
+  },
+
+  "set-urgency"(value) { state.draft.urgency = value; },
+
+  "submit-request"() {
+    const description = val("desc").trim();
+    if (description.length < 10) {
+      toast("Bitte beschreibe dein Anliegen in mindestens 10 Zeichen.");
+      return;
+    }
+    state.draft.description = description;
+    state.draft.locationLabel = val("loc").trim() || "45127 Essen";
+    state.request = {
+      description,
+      locationLabel: state.draft.locationLabel,
+      urgency: state.draft.urgency,
+      categorySlug: null,
+      status: "DRAFT"
+    };
+    state.analysis = null;
+    state.answers = {};
+    state.matches = [];
+    state.offers = [];
+    state.acceptedOfferId = null;
+    logCall("POST", "/requests", 201);
+    actions["run-analysis"]();
+  },
+
+  "run-analysis"() {
+    state.screen = "analyzing";
+    render();
+    logCall("POST", "/requests/:id/analyze", 201);
+
+    // Die Schritte laufen sichtbar durch - das ist der charakteristische
+    // Moment des Produkts und soll nicht in einem Sprung verschwinden.
+    const steps = viewport.querySelectorAll(".jf-thinking__step");
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const delay = reduce ? 60 : 420;
+    steps.forEach((step, i) => window.setTimeout(() => step.classList.add("is-on"), delay * (i + 1)));
+
+    window.setTimeout(() => {
+      const answered = Object.entries(state.answers).map(([question, answer]) => ({ question, answer }));
+      state.analysis = analyze(state.request.description, state.draft.photos, answered);
+      state.request.categorySlug = state.analysis.categorySlug;
+      state.request.urgency = state.analysis.urgency;
+      state.request.status = "ANALYZING";
+      state.screen = "questions";
+      render();
+    }, delay * 3 + (reduce ? 40 : 400));
+  },
+
+  "answer-questions"() {
+    let count = 0;
+    viewport.querySelectorAll("[data-question]").forEach((input) => {
+      const answer = input.value.trim();
+      if (answer.length > 0) {
+        state.answers[input.getAttribute("data-question")] = answer;
+        count += 1;
+        logCall("POST", "/requests/:id/questions/:questionId", 201);
+      }
+    });
+    if (count === 0) { toast("Beantworte mindestens eine Frage oder überspring den Schritt."); return; }
+    state.request.status = "OPEN";
+    state.screen = "summary";
+  },
+
+  "find-providers"() {
+    state.matches = runMatching(state.analysis ? state.analysis.categorySlug : null);
+    logCall("POST", "/requests/:id/matches", 201);
+    state.request.status = state.matches.length > 0 ? "MATCHING" : "OPEN";
+    state.screen = "matches";
+    if (state.matches.length === 0) toast("In dieser Kategorie ist noch kein Betrieb registriert.");
+  },
+
+  "request-offers"() {
+    state.offers = state.matches.slice(0, 3).map((m) => offerFor(m.business));
+    state.offers.sort((a, b) => offerTotal(a) - offerTotal(b));
+    state.offers.forEach(() => logCall("POST", "/offers", 201));
+    logCall("GET", "/requests/:id/offers", 200);
+    state.request.status = "OFFERED";
+    state.screen = "offers";
+    state.messages = [];
+  },
+
+  "open-offer"(value) {
+    state.openedOfferId = value;
+    state.screen = "offer";
+    logCall("GET", "/offers/:id", 200);
+  },
+
+  "accept-offer"(value) {
+    state.offers.forEach((o) => { o.status = o.id === value ? "ACCEPTED" : "DECLINED"; });
+    state.acceptedOfferId = value;
+    state.request.status = "ACCEPTED";
+    state.jobStatus = "SCHEDULED";
+    logCall("POST", "/offers/:id/accept", 201);
+    state.screen = "appointment";
+    toast("Angebot angenommen. Jetzt fehlt nur noch der Termin.");
+  },
+
+  "decline-offer"(value) {
+    const offer = offerById(value);
+    if (offer) offer.status = "DECLINED";
+    logCall("POST", "/offers/:id/decline", 201);
+    state.screen = "offers";
+  },
+
+  "pick-day"(value) {
+    state.appointment = { key: value, time: null, confirmed: false };
+    logCall("GET", "/businesses/:id/availability", 200);
+  },
+
+  "pick-time"(value) {
+    if (!state.appointment) return;
+    state.appointment.time = value;
+  },
+
+  "confirm-appointment"() {
+    if (!state.appointment || !state.appointment.time) return;
+    state.appointment.confirmed = true;
+    logCall("POST", "/appointments", 201);
+    state.screen = "job";
+    toast("Termin bestätigt. Du bekommst eine Erinnerung.");
+  },
+
+  "simulate-completion"() {
+    state.jobStatus = "COMPLETED";
+    state.request.status = "COMPLETED";
+    logCall("PATCH", "/jobs/:id/status", 200);
+    toast("Der Betrieb hat den Auftrag als erledigt gemeldet.");
+  },
+
+  rate(value) { state.reviewDraft = Number(value); },
+
+  "submit-review"() {
+    if (!state.reviewDraft) return;
+    state.review = { rating: state.reviewDraft, text: val("rev").trim() };
+    logCall("POST", "/reviews", 201);
+    state.screen = "job";
+    toast("Danke für deine Bewertung.");
+  },
+
+  "send-message"() {
+    const text = val("msg").trim();
+    if (text.length === 0) return;
+    const time = new Date().toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" });
+    state.messages.push({ text, mine: true, time, ai: state.pendingAi === text });
+    state.pendingAi = null;
+    state.msgDraft = "";
+    logCall("POST", "/conversations/:id/messages", 201);
+
+    // Eine Antwort der Gegenseite, damit der Verlauf lebendig wirkt.
+    window.setTimeout(() => {
+      const reply = state.role === "customer"
+        ? "Wir könnten am Dienstag um 16 Uhr vorbeikommen. Passt das?"
+        : "Ja, Dienstag um 16 Uhr passt gut. Bis dann!";
+      state.messages.push({ text: reply, mine: false, time, ai: false });
+      render();
+    }, 900);
+  },
+
+  "suggest-reply"() {
+    const text = "Hallo Max, vielen Dank für Ihre Nachricht. Wir könnten am Dienstag um 16 Uhr vorbeikommen.";
+    state.msgDraft = text;
+    state.pendingAi = text;
+    logCall("POST", "/conversations/:id/suggest-reply", 201);
+    toast("Vorschlag eingefügt. Du kannst ihn ändern, bevor du sendest.");
+  },
+
+  "decline-request"() {
+    state.bizDeclined = true;
+    logCall("POST", "/matches/:id/respond", 201);
+    state.screen = "bizdashboard";
+    toast("Anfrage abgelehnt. Sie wird dir nicht erneut vorgeschlagen.");
+  },
+
+  "suggest-offer-text"() {
+    const summary = state.analysis ? state.analysis.summary : "Die Heizung arbeitet nicht wie erwartet.";
+    state.bizOffer.description =
+      "Vielen Dank für Ihre Anfrage. Wir kümmern uns um folgendes Anliegen: " + summary +
+      " Das Angebot umfasst Anfahrt, Arbeitszeit und das benötigte Material. Sollte sich vor Ort " +
+      "ein größerer Aufwand zeigen, stimmen wir uns vorher mit Ihnen ab.";
+    state.bizOffer.aiAssisted = true;
+    logCall("POST", "/offers/suggest-text", 201);
+    toast("Vorschlag eingefügt. Preis und Inhalt bleiben deine Entscheidung.");
+  },
+
+  "send-offer"() {
+    state.bizOffer.description = val("odesc").trim();
+    logCall("POST", "/offers", 201);
+    state.screen = "bizdashboard";
+    toast("Angebot gesendet. Der Kunde sieht es sofort in seiner App.");
+  },
+
+  noop() {}
+};
+
+/* --- Ereignisse ----------------------------------------------------------- */
+
+document.addEventListener("click", (event) => {
+  const target = event.target.closest("[data-go], [data-action]");
+  if (!target) return;
+
+  // Ein Hinweis gehört zu der Aktion, die ihn ausgelöst hat. Beim Wechsel
+  // des Screens ist er nicht mehr richtig und wird verworfen.
+  state.toast = null;
+  window.clearTimeout(toast._t);
+
+  const go = target.getAttribute("data-go");
+  if (go) {
+    if (!reachable(go)) {
+      toast("Diesen Schritt gibt es erst später im Ablauf.");
+      render();
+      return;
+    }
+    // Zustandsabhängige Umleitung: "Anfragen" führt zur Detailansicht,
+    // sobald eine Anfrage existiert.
+    state.screen = go === "create" && state.request && state.offers.length > 0 ? "requests" : go;
+    if (go === "offers" && state.offers.length === 0) state.screen = "requests";
+    render();
+    return;
+  }
+
+  const action = target.getAttribute("data-action");
+  const handler = actions[action];
+  if (handler) {
+    handler(target.getAttribute("data-value"));
+    render();
+  }
+});
+
+/* Eingaben zwischenspeichern, damit ein Neuzeichnen sie nicht verwirft. */
+document.addEventListener("input", (event) => {
+  const el = event.target;
+  if (el.id === "msg") { state.msgDraft = el.value; return; }
+  if (el.id === "odesc") { state.bizOffer.description = el.value; return; }
+  if (el.id === "desc") { state.draft.description = el.value; return; }
+
+  const money = el.getAttribute && el.getAttribute("data-money");
+  if (money) {
+    const euros = Number(String(el.value).replace(",", "."));
+    state.bizOffer[money] = Number.isFinite(euros) && euros >= 0 ? Math.round(euros * 100) : 0;
+    // Nur die Summe neu zeichnen, damit der Cursor im Feld bleibt.
+    const total = state.bizOffer.labor + state.bizOffer.material + state.bizOffer.travel;
+    const totalEl = viewport.querySelector(".jf-price__total dd");
+    if (totalEl) totalEl.textContent = fmtEuroShort(total);
+    const send = viewport.querySelector('[data-action="send-offer"]');
+    if (send) send.disabled = !(total > 0 && state.bizOffer.description.trim().length > 9);
+  }
+});
+
+/* --- Steuerung ------------------------------------------------------------ */
+
+document.getElementById("reset").addEventListener("click", () => {
+  state = initialState();
+  render();
+});
+
+const themeToggle = document.getElementById("themeToggle");
+function currentlyDark() {
+  const stamped = document.documentElement.getAttribute("data-theme");
+  if (stamped) return stamped === "dark";
+  return window.matchMedia("(prefers-color-scheme: dark)").matches;
+}
+function syncToggleLabel() {
+  themeToggle.textContent = currentlyDark() ? "Hell" : "Dunkel";
+}
+themeToggle.addEventListener("click", () => {
+  document.documentElement.setAttribute("data-theme", currentlyDark() ? "light" : "dark");
+  syncToggleLabel();
+});
+window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", syncToggleLabel);
+syncToggleLabel();
+
+/* Die Uhr im Statusbalken zeigt die echte Zeit - eine eingefrorene 9:41
+   fällt sofort als Attrappe auf. */
+function tick() {
+  document.getElementById("clock").textContent =
+    new Date().toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" });
+}
+tick();
+window.setInterval(tick, 30000);
+
+render();
+</script>

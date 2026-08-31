@@ -1,9 +1,9 @@
 /**
  * Konfiguration aus Umgebungsvariablen.
  *
- * Wird beim Start einmal gelesen und geprueft. Fehlt etwas Sicherheitsrelevantes,
+ * Wird beim Start einmal gelesen und geprüft. Fehlt etwas Sicherheitsrelevantes,
  * startet die API gar nicht erst - ein Backend, das mit einem Standardgeheimnis
- * hochfaehrt, ist gefaehrlicher als eines, das sich weigert.
+ * hochfährt, ist gefährlicher als eines, das sich weigert.
  */
 
 export type AiProviderName = "rules" | "remote";
@@ -63,7 +63,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
       `SESSION_SECRET muss mindestens ${SESSION_SECRET_MIN_LENGTH} Zeichen lang sein.`,
     );
   }
-  if (isProduction && sessionSecret.startsWith("bitte-aendern")) {
+  if (isProduction && sessionSecret.startsWith("bitte-ändern")) {
     throw new ConfigError("SESSION_SECRET steht noch auf dem Beispielwert.");
   }
 
@@ -75,12 +75,12 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
   const aiBaseUrl = optionalString(env, "AI_BASE_URL");
   const aiApiKey = optionalString(env, "AI_API_KEY");
   if (providerRaw === "remote" && (aiBaseUrl === null || aiApiKey === null)) {
-    throw new ConfigError('AI_PROVIDER="remote" benoetigt AI_BASE_URL und AI_API_KEY.');
+    throw new ConfigError('AI_PROVIDER="remote" benötigt AI_BASE_URL und AI_API_KEY.');
   }
 
   return {
-    // PORT=0 ist zulaessig: das Betriebssystem sucht dann einen freien Port.
-    // Genau das brauchen die Tests, damit mehrere Laeufe sich nicht behindern.
+    // PORT=0 ist zulässig: das Betriebssystem sucht dann einen freien Port.
+    // Genau das brauchen die Tests, damit mehrere Läufe sich nicht behindern.
     port: integer(env, "PORT", 4000, 0),
     databaseUrl: required(env, "DATABASE_URL"),
     sessionSecret,

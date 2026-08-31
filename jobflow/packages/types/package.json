@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Gemeinsame Domaenen- und API-Typen fuer Mobile, Web, Admin und Backend.",
+  "description": "Gemeinsame Domaenen- und API-Typen für Mobile, Web, Admin und Backend.",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {

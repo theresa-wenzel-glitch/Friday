@@ -17,8 +17,8 @@ export interface Message {
   body: string;
   /**
    * true, wenn der Text aus einem KI-Vorschlag stammt.
-   * Die Oberflaeche muss das kennzeichnen - KI-Inhalte duerfen nicht so
-   * aussehen, als kaemen sie garantiert von einem Menschen.
+   * Die Oberfläche muss das kennzeichnen - KI-Inhalte dürfen nicht so
+   * aussehen, als kämen sie garantiert von einem Menschen.
    */
   isAiGenerated: boolean;
   createdAt: IsoDateTime;

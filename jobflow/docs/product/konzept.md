@@ -6,11 +6,11 @@
 
 Nicht: „Hier ist eine Liste von Handwerkern." Das gibt es bereits.
 
-Sondern: „Sag uns einfach, was los ist. Wir kuemmern uns um den Rest."
+Sondern: „Sag uns einfach, was los ist. Wir kümmern uns um den Rest."
 
 Der Kunde beschreibt sein Problem in einem Satz. Die KI versteht es, fragt nur
-das Noetige nach und macht daraus eine strukturierte Anfrage. JobFlow findet
-passende Anbieter, der Kunde vergleicht Angebote, waehlt einen Termin — fertig.
+das Nötige nach und macht daraus eine strukturierte Anfrage. JobFlow findet
+passende Anbieter, der Kunde vergleicht Angebote, wählt einen Termin — fertig.
 
 ## Der Ablauf
 
@@ -26,7 +26,7 @@ KUNDE                                          UNTERNEHMEN
    Dringlichkeit: normal
       │
       ▼
-   2 Rueckfragen
+   2 Rückfragen
    (nicht 30 Felder)
       │
       ▼
@@ -35,15 +35,15 @@ KUNDE                                          UNTERNEHMEN
                                              + 4,2 km entfernt
                                                      │
    3 Angebote  ◄─────────────────────────────  Angebot 120 €
-      │                                       (KI schlaegt Text vor,
+      │                                       (KI schlägt Text vor,
       ▼                                        der Betrieb entscheidet)
    Angebot annehmen  ─────────────────────►  Auftrag
       │                                             │
       ▼                                             ▼
-   Termin waehlen                            Termin bestaetigt
+   Termin wählen                            Termin bestätigt
       │                                             │
       ▼                                             ▼
-   Auftrag laeuft  ◄──────── Chat ────────►  Auftrag abschliessen
+   Auftrag laeuft  ◄──────── Chat ────────►  Auftrag abschließen
       │
       ▼
    ⭐⭐⭐⭐⭐
@@ -53,14 +53,14 @@ KUNDE                                          UNTERNEHMEN
 
 | Die KI darf | Die KI darf nicht |
 |---|---|
-| Das Problem verstehen und einordnen | Die Kategorie des Kunden ueberschreiben |
+| Das Problem verstehen und einordnen | Die Kategorie des Kunden überschreiben |
 | Gezielt nachfragen, was fehlt | Ein 30-Felder-Formular erzeugen |
-| Einen Angebotstext vorschlagen | Ueber Preise entscheiden |
-| Eine Antwort im Chat vorschlagen | Sie eigenstaendig abschicken |
-| Aus „Wann koennen Sie kommen?" eine Terminaktion machen | Den Termin verbindlich zusagen |
+| Einen Angebotstext vorschlagen | Über Preise entscheiden |
+| Eine Antwort im Chat vorschlagen | Sie eigenständig abschicken |
+| Aus „Wann können Sie kommen?" eine Terminaktion machen | Den Termin verbindlich zusagen |
 
-Und: KI-generierte Inhalte werden als solche gekennzeichnet. Sie duerfen nicht
-so aussehen, als waeren sie garantiert richtig.
+Und: KI-generierte Inhalte werden als solche gekennzeichnet. Sie dürfen nicht
+so aussehen, als wären sie garantiert richtig.
 
 ## Die wichtigste Kennzahl
 
@@ -83,28 +83,28 @@ Diese Ereignisse werden bereits geschrieben (`analytics_events`) — bewusst
 ohne personenbezogene Freitexte. Wir messen, was passiert, nicht was Nutzer
 schreiben.
 
-**Wie viele Anfragen werden tatsaechlich zu Auftraegen?** Dort entsteht der
+**Wie viele Anfragen werden tatsächlich zu Aufträgen?** Dort entsteht der
 Wert, und dort entscheidet sich, ob das Produkt funktioniert.
 
-## Geschaeftsmodell
+## Geschäftsmodell
 
-Freemium fuer Unternehmen: kostenloses Profil mit begrenzten Anfragen, dazu
-kostenpflichtige Stufen mit mehr Anfragen, KI-Unterstuetzung, Kalender und
-Statistiken. Spaeter moeglicherweise eine Vermittlungsgebuehr bei
-erfolgreichen Auftraegen.
+Freemium für Unternehmen: kostenloses Profil mit begrenzten Anfragen, dazu
+kostenpflichtige Stufen mit mehr Anfragen, KI-Unterstützung, Kalender und
+Statistiken. Später möglicherweise eine Vermittlungsgebühr bei
+erfolgreichen Aufträgen.
 
 **Die genannten Preise sind Hypothesen.** Erst echte Nutzer zeigen, welche
 Zahlungsbereitschaft vorhanden ist. Deshalb ist im Datenmodell noch kein
 Abonnement verdrahtet: eine falsch geratene Preisstruktur im Schema kostet
-spaeter mehr als sie jetzt spart.
+später mehr als sie jetzt spart.
 
-## Drei Tests, die nicht vermischt werden duerfen
+## Drei Tests, die nicht vermischt werden dürfen
 
 | Test | Frage |
 |---|---|
 | **Produkt-Test** | Funktioniert der Ablauf? |
-| **Markt-Test** | Wollen Menschen das ueberhaupt? |
-| **Groessen-Test** | Funktioniert das noch bei vielen Nutzern gleichzeitig? |
+| **Markt-Test** | Wollen Menschen das überhaupt? |
+| **Größen-Test** | Funktioniert das noch bei vielen Nutzern gleichzeitig? |
 
 Der Produkt-Test ist beantwortbar — der End-to-End-Test in
 `services/api/test/flow.test.ts` geht den kompletten Weg durch. Die anderen
@@ -114,13 +114,13 @@ beiden beantwortet keine Testsuite, sondern nur echter Betrieb.
 
 Bei einem Marktplatz ist das keine Nebensache:
 
-- **Unternehmen** koennen verifiziert werden (`businesses.verified`).
-- **Kunden** sehen den Preis vollstaendig, bevor sie annehmen — aufgeschluesselt
+- **Unternehmen** können verifiziert werden (`businesses.verified`).
+- **Kunden** sehen den Preis vollständig, bevor sie annehmen — aufgeschlüsselt
   nach Arbeit, Material und Anfahrt.
 - **Bewertungen** setzen einen abgeschlossenen Auftrag voraus. Ohne echten
   Auftrag keine Bewertung — in der Datenbank erzwungen, nicht nur im Code.
 - **Der Auftragsstatus** ist jederzeit sichtbar. Vertrauen entsteht daraus,
-  dass der Kunde weiss, wo sein Anliegen steht.
-- **Standortdaten** werden nur so genau gespeichert, wie noetig: der Kunde gibt
-  „45127 Essen" an, die vollstaendige Adresse erfaehrt erst der beauftragte
+  dass der Kunde weiß, wo sein Anliegen steht.
+- **Standortdaten** werden nur so genau gespeichert, wie nötig: der Kunde gibt
+  „45127 Essen" an, die vollständige Adresse erfährt erst der beauftragte
   Betrieb.

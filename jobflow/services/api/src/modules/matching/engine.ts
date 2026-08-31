@@ -4,12 +4,12 @@ import { DEFAULT_MATCH_WEIGHTS } from "@jobflow/types";
 /**
  * Die Matching-Engine.
  *
- * Sie ist absichtlich eine reine Funktion ohne Datenbankzugriff: so laesst sie
- * sich einzeln testen, und die Gewichte lassen sich spaeter anhand echter
+ * Sie ist absichtlich eine reine Funktion ohne Datenbankzugriff: so lässt sie
+ * sich einzeln testen, und die Gewichte lassen sich später anhand echter
  * Daten nachjustieren, ohne die Abfragen anzufassen.
  *
  * Die Gewichte sind ein Startmodell, keine Wahrheit. Welche Faktoren
- * tatsaechlich zu Auftraegen fuehren, zeigt sich erst im Betrieb.
+ * tatsächlich zu Aufträgen führen, zeigt sich erst im Betrieb.
  */
 
 export interface CandidateInput {
@@ -20,9 +20,9 @@ export interface CandidateInput {
   matchesParentCategory: boolean;
   /** Entfernung zur Anfrage in Kilometern; null, wenn Koordinaten fehlen. */
   distanceKm: number | null;
-  /** Wie weit das Unternehmen faehrt. */
+  /** Wie weit das Unternehmen fährt. */
   serviceRadiusKm: number;
-  /** Hat es fuer den gewuenschten Zeitraum Verfuegbarkeit hinterlegt? */
+  /** Hat es für den gewünschten Zeitraum Verfügbarkeit hinterlegt? */
   hasAvailability: boolean;
   rating: number | null;
   reviewCount: number;
@@ -43,11 +43,11 @@ export interface ScoredCandidate {
 
 export interface ScoringOptions {
   weights?: MatchWeights;
-  /** Median der Preisspannen aller Kandidaten - Bezugspunkt fuer den Preisfaktor. */
+  /** Median der Preisspannen aller Kandidaten - Bezugspunkt für den Preisfaktor. */
   referencePriceCents?: number | null;
 }
 
-/** Ein Kandidat, dessen Anteil an einem Faktor 0 bis 1 betraegt. */
+/** Ein Kandidat, dessen Anteil an einem Faktor 0 bis 1 beträgt. */
 type FactorScores = Record<keyof MatchWeights, number>;
 
 export function scoreCandidate(candidate: CandidateInput, options: ScoringOptions = {}): ScoredCandidate {
@@ -66,7 +66,7 @@ export function scoreCandidate(candidate: CandidateInput, options: ScoringOption
   return {
     businessId: candidate.businessId,
     score: Math.round(clamp(total, 0, 100)),
-    // Die staerksten Gruende zuerst - die App zeigt nur die obersten an.
+    // Die stärksten Gründe zuerst - die App zeigt nur die obersten an.
     reasons: reasons.sort((a, b) => b.points - a.points),
     distanceKm: candidate.distanceKm,
   };
@@ -74,8 +74,8 @@ export function scoreCandidate(candidate: CandidateInput, options: ScoringOption
 
 function computeFactors(candidate: CandidateInput, referencePriceCents: number | null): FactorScores {
   return {
-    // Die passende Leistung ist der wichtigste Faktor. Eine Uebereinstimmung
-    // nur auf Ebene der Oberkategorie zaehlt deutlich weniger.
+    // Die passende Leistung ist der wichtigste Faktor. Eine Übereinstimmung
+    // nur auf Ebene der Oberkategorie zählt deutlich weniger.
     service: candidate.matchesCategory ? 1 : candidate.matchesParentCategory ? 0.45 : 0,
 
     distance: distanceFactor(candidate.distanceKm, candidate.serviceRadiusKm),
@@ -86,8 +86,8 @@ function computeFactors(candidate: CandidateInput, referencePriceCents: number |
 
     price: priceFactor(candidate.priceMinCents, candidate.priceMaxCents, referencePriceCents),
 
-    // Erfahrung waechst schnell und flacht dann ab: der Unterschied zwischen
-    // 0 und 10 Auftraegen sagt viel mehr aus als der zwischen 200 und 210.
+    // Erfahrung wächst schnell und flacht dann ab: der Unterschied zwischen
+    // 0 und 10 Aufträgen sagt viel mehr aus als der zwischen 200 und 210.
     experience: saturate(candidate.completedJobCount, 25),
 
     responseTime: responseFactor(candidate.avgResponseMinutes),
@@ -97,14 +97,14 @@ function computeFactors(candidate: CandidateInput, referencePriceCents: number |
 /**
  * Entfernung.
  *
- * Innerhalb des eigenen Einsatzradius faellt der Wert linear ab, ausserhalb
- * ist er 0 - ein Betrieb, der nicht hinfaehrt, ist kein Treffer, egal wie gut
+ * Innerhalb des eigenen Einsatzradius fällt der Wert linear ab, außerhalb
+ * ist er 0 - ein Betrieb, der nicht hinfährt, ist kein Treffer, egal wie gut
  * er sonst passt.
  */
 function distanceFactor(distanceKm: number | null, serviceRadiusKm: number): number {
-  // Ohne Koordinaten laesst sich nichts sagen. Ein mittlerer Wert ist ehrlicher
-  // als eine 0 (die den Betrieb aussortieren wuerde) oder eine 1 (die ihn
-  // gegenueber Betrieben mit Angabe bevorzugen wuerde).
+  // Ohne Koordinaten lässt sich nichts sagen. Ein mittlerer Wert ist ehrlicher
+  // als eine 0 (die den Betrieb aussortieren würde) oder eine 1 (die ihn
+  // gegenüber Betrieben mit Angabe bevorzugen würde).
   if (distanceKm === null) return 0.5;
   if (distanceKm > serviceRadiusKm) return 0;
   return clamp(1 - distanceKm / serviceRadiusKm, 0, 1);
@@ -113,9 +113,9 @@ function distanceFactor(distanceKm: number | null, serviceRadiusKm: number): num
 /**
  * Bewertung.
  *
- * Wenige Bewertungen sind wenig aussagekraeftig, deshalb wird der Ausschlag
- * gedaempft: ein Betrieb mit 5,0 aus einer Bewertung soll einen mit 4,7 aus
- * 200 Bewertungen nicht ueberholen. Ohne Bewertungen gibt es den Mittelwert -
+ * Wenige Bewertungen sind wenig aussagekräftig, deshalb wird der Ausschlag
+ * gedämpft: ein Betrieb mit 5,0 aus einer Bewertung soll einen mit 4,7 aus
+ * 200 Bewertungen nicht überholen. Ohne Bewertungen gibt es den Mittelwert -
  * neue Betriebe sollen eine Chance bekommen.
  */
 function ratingFactor(rating: number | null, reviewCount: number): number {
@@ -128,7 +128,7 @@ function ratingFactor(rating: number | null, reviewCount: number): number {
 /**
  * Preis.
  *
- * Guenstiger ist besser, aber nur maessig gewichtet: der billigste Anbieter
+ * Günstiger ist besser, aber nur mäßig gewichtet: der billigste Anbieter
  * ist selten der beste. Ohne Preisangabe gibt es den Mittelwert.
  */
 function priceFactor(minCents: number | null, maxCents: number | null, referenceCents: number | null): number {
@@ -142,7 +142,7 @@ function priceFactor(minCents: number | null, maxCents: number | null, reference
 
 function responseFactor(avgResponseMinutes: number | null): number {
   if (avgResponseMinutes === null) return 0.5;
-  // Unter 15 Minuten ist hervorragend, ab 24 Stunden zaehlt es nicht mehr.
+  // Unter 15 Minuten ist hervorragend, ab 24 Stunden zählt es nicht mehr.
   if (avgResponseMinutes <= 15) return 1;
   if (avgResponseMinutes >= 1440) return 0;
   return clamp(1 - (avgResponseMinutes - 15) / (1440 - 15), 0, 1);
@@ -164,10 +164,10 @@ function describe(factor: keyof MatchWeights, candidate: CandidateInput, value: 
       return `${candidate.rating.toFixed(1).replace(".", ",")} aus ${candidate.reviewCount} Bewertungen`;
     case "price":
       if (value <= 0.5) return null;
-      return "Preislich guenstig";
+      return "Preislich günstig";
     case "experience":
       if (candidate.completedJobCount === 0) return null;
-      return `${candidate.completedJobCount} abgeschlossene Auftraege`;
+      return `${candidate.completedJobCount} abgeschlossene Aufträge`;
     case "responseTime":
       if (candidate.avgResponseMinutes === null) return null;
       return `Antwortet im Schnitt in ${formatMinutes(candidate.avgResponseMinutes)}`;
@@ -188,7 +188,7 @@ function midpoint(min: number | null, max: number | null): number | null {
   return min ?? max;
 }
 
-/** Waechst von 0 gegen 1 und erreicht bei `half` genau 0,5. */
+/** Wächst von 0 gegen 1 und erreicht bei `half` genau 0,5. */
 function saturate(value: number, half: number): number {
   if (value <= 0) return 0;
   return value / (value + half);

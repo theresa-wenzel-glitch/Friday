@@ -1,10 +1,10 @@
 import type { IncomingMessage } from "node:http";
 
 /**
- * Kuerzt eine IP-Adresse auf /24 (IPv4) bzw. /48 (IPv6).
+ * Kürzt eine IP-Adresse auf /24 (IPv4) bzw. /48 (IPv6).
  *
  * Das reicht, um Missbrauch zu erkennen und Anfragen zu begrenzen, speichert
- * aber keinen vollstaendigen Bewegungsverlauf einer einzelnen Person.
+ * aber keinen vollständigen Bewegungsverlauf einer einzelnen Person.
  */
 export function ipPrefix(address: string | undefined): string {
   if (!address) return "unbekannt";
@@ -23,8 +23,8 @@ export function ipPrefix(address: string | undefined): string {
 
 export function clientIpPrefix(req: IncomingMessage): string {
   // Hinter einem Reverse Proxy steht die echte Adresse im ersten Eintrag von
-  // X-Forwarded-For. Der Header ist faelschbar - er darf deshalb nur fuer
-  // Rate Limiting und Protokollierung genutzt werden, nie fuer Berechtigungen.
+  // X-Forwarded-For. Der Header ist fälschbar - er darf deshalb nur für
+  // Rate Limiting und Protokollierung genutzt werden, nie für Berechtigungen.
   const forwarded = req.headers["x-forwarded-for"];
   const first = Array.isArray(forwarded) ? forwarded[0] : forwarded?.split(",")[0];
   return ipPrefix(first?.trim() ?? req.socket.remoteAddress ?? undefined);

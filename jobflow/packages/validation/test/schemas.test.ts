@@ -20,7 +20,7 @@ describe("registerSchema", () => {
     if (result.ok) assert.equal(result.value.role, "CUSTOMER");
   });
 
-  it("laesst ADMIN nicht als selbst gewaehlte Rolle zu", () => {
+  it("lässt ADMIN nicht als selbst gewählte Rolle zu", () => {
     const result = validate(registerSchema, {
       email: "max@example.test",
       name: "Max Mustermann",
@@ -30,7 +30,7 @@ describe("registerSchema", () => {
     assert.equal(result.ok, false);
   });
 
-  it("weist zu kurze Passwoerter zurueck", () => {
+  it("weist zu kurze Passwörter zurück", () => {
     const result = validate(registerSchema, {
       email: "max@example.test",
       name: "Max Mustermann",
@@ -50,16 +50,16 @@ describe("createRequestSchema", () => {
     if (result.ok) assert.equal(result.value.urgency, "NORMAL");
   });
 
-  it("weist eine zu kurze Beschreibung zurueck", () => {
+  it("weist eine zu kurze Beschreibung zurück", () => {
     assert.equal(validate(createRequestSchema, { description: "kaputt" }).ok, false);
   });
 
-  it("verlangt Breiten- und Laengengrad gemeinsam", () => {
+  it("verlangt Breiten- und Längengrad gemeinsam", () => {
     const result = validate(createRequestSchema, { ...base, latitude: 51.45 });
     assert.equal(result.ok, false);
   });
 
-  it("weist einen Zeitraum zurueck, der rueckwaerts laeuft", () => {
+  it("weist einen Zeitraum zurück, der rückwärts laeuft", () => {
     const result = validate(createRequestSchema, {
       ...base,
       desiredFrom: "2026-09-10T08:00:00Z",
@@ -72,29 +72,29 @@ describe("createRequestSchema", () => {
 describe("createOfferSchema", () => {
   const base = {
     requestId: "6f2b1e4a-9c3d-4b1f-8e2a-0d4c5b6a7e8f",
-    description: "Pruefung und Reparatur der Heizungsanlage.",
+    description: "Prüfung und Reparatur der Heizungsanlage.",
     validUntil: "2026-09-05T00:00:00Z",
   };
 
-  it("berechnet keine Gesamtsumme, verlangt aber einen Betrag groesser 0", () => {
+  it("berechnet keine Gesamtsumme, verlangt aber einen Betrag größer 0", () => {
     assert.equal(validate(createOfferSchema, { ...base, laborCents: 0 }).ok, false);
     assert.equal(validate(createOfferSchema, { ...base, laborCents: 8000 }).ok, true);
   });
 
-  it("weist Nachkommastellen bei Centbetraegen zurueck", () => {
+  it("weist Nachkommastellen bei Centbeträgen zurück", () => {
     assert.equal(validate(createOfferSchema, { ...base, laborCents: 80.5 }).ok, false);
   });
 
-  it("weist negative Betraege zurueck", () => {
+  it("weist negative Beträge zurück", () => {
     assert.equal(validate(createOfferSchema, { ...base, laborCents: 8000, travelCents: -100 }).ok, false);
   });
 });
 
 describe("aiAnalysisResultSchema", () => {
-  it("nimmt ein vollstaendiges Ergebnis an", () => {
+  it("nimmt ein vollständiges Ergebnis an", () => {
     const result = validate(aiAnalysisResultSchema, {
       categorySlug: "heizung",
-      summary: "Heizkoerper wird nicht warm",
+      summary: "Heizkörper wird nicht warm",
       urgency: "NORMAL",
       questions: ["Seit wann?"],
       confidence: 0.91,
@@ -102,7 +102,7 @@ describe("aiAnalysisResultSchema", () => {
     assert.equal(result.ok, true);
   });
 
-  it("weist eine Konfidenz ausserhalb von 0 bis 1 zurueck", () => {
+  it("weist eine Konfidenz außerhalb von 0 bis 1 zurück", () => {
     const result = validate(aiAnalysisResultSchema, {
       categorySlug: null,
       summary: "Etwas ist kaputt",
@@ -111,8 +111,8 @@ describe("aiAnalysisResultSchema", () => {
     assert.equal(result.ok, false);
   });
 
-  it("weist einen Slug mit unerwarteten Zeichen zurueck", () => {
-    // Genau der Fall, gegen den die Pruefung schuetzt: ein Modell erfindet
+  it("weist einen Slug mit unerwarteten Zeichen zurück", () => {
+    // Genau der Fall, gegen den die Prüfung schützt: ein Modell erfindet
     // einen Wert, der so nie in der Datenbank stehen darf.
     const result = validate(aiAnalysisResultSchema, {
       categorySlug: "'; DROP TABLE categories; --",
@@ -122,7 +122,7 @@ describe("aiAnalysisResultSchema", () => {
     assert.equal(result.ok, false);
   });
 
-  it("begrenzt die Zahl der Rueckfragen", () => {
+  it("begrenzt die Zahl der Rückfragen", () => {
     const result = validate(aiAnalysisResultSchema, {
       categorySlug: null,
       summary: "Etwas ist kaputt",

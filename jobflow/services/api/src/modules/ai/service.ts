@@ -60,8 +60,8 @@ export class AiService {
    * Analysiert eine Anfrage und legt das Ergebnis ab.
    *
    * Der Ablauf ist bewusst so herum: App -> API -> KI -> Validierung -> Datenbank.
-   * Die KI bekommt nur Text und liefert nur Text zurueck. Welche Kategorie
-   * tatsaechlich gesetzt wird, entscheidet das Backend anhand der Kategorien,
+   * Die KI bekommt nur Text und liefert nur Text zurück. Welche Kategorie
+   * tatsächlich gesetzt wird, entscheidet das Backend anhand der Kategorien,
    * die es wirklich gibt.
    */
   async analyze(requestId: string, customerId: string): Promise<AiAnalysisDetail> {
@@ -109,13 +109,13 @@ export class AiService {
       });
     } catch (error) {
       if (error instanceof AiUnavailableError) {
-        throw new ApiError(503, "AI_UNAVAILABLE", "Die Analyse ist gerade nicht moeglich. Bitte versuche es erneut.");
+        throw new ApiError(503, "AI_UNAVAILABLE", "Die Analyse ist gerade nicht möglich. Bitte versuche es erneut.");
       }
       throw error;
     }
 
-    // Auch das Ergebnis des eigenen Providers wird geprueft. Wer hier eine
-    // Ausnahme macht, hat die naechste Provider-Implementierung schon vergessen.
+    // Auch das Ergebnis des eigenen Providers wird geprüft. Wer hier eine
+    // Ausnahme macht, hat die nächste Provider-Implementierung schon vergessen.
     const parsed = validate(aiAnalysisResultSchema, raw);
     if (!parsed.ok) {
       throw new ApiError(503, "AI_UNAVAILABLE", "Die Analyse lieferte kein verwertbares Ergebnis.");
@@ -141,8 +141,8 @@ export class AiService {
         questions.push(inserted.rows[0] as QuestionRow);
       }
 
-      // Die Kategorie wird nur ergaenzt, nie ueberschrieben: hat der Kunde
-      // selbst eine gewaehlt, wiegt das schwerer als ein Vorschlag der KI.
+      // Die Kategorie wird nur ergänzt, nie überschrieben: hat der Kunde
+      // selbst eine gewählt, wiegt das schwerer als ein Vorschlag der KI.
       if (categoryId !== null && row.category_id === null) {
         await client.query("UPDATE requests SET category_id = $2 WHERE id = $1", [requestId, categoryId]);
       }
@@ -164,7 +164,7 @@ export class AiService {
     });
   }
 
-  /** Die juengste Analyse einer Anfrage. */
+  /** Die jüngste Analyse einer Anfrage. */
   async latest(requestId: string, userId: string): Promise<AiAnalysisDetail | null> {
     const analysis = await this.db.query<AnalysisRow>(
       `SELECT a.*
@@ -193,7 +193,7 @@ export class AiService {
     return { ...mapAnalysis(row), questions: questions.rows.map(mapQuestion) };
   }
 
-  /** Beantwortet eine Rueckfrage. Nur der Kunde der Anfrage darf das. */
+  /** Beantwortet eine Rückfrage. Nur der Kunde der Anfrage darf das. */
   async answerQuestion(questionId: string, customerId: string, answer: string): Promise<AiQuestion> {
     const result = await this.db.query<QuestionRow>(
       `UPDATE ai_questions q
@@ -205,14 +205,14 @@ export class AiService {
       [questionId, customerId, answer],
     );
     const row = result.rows[0];
-    if (row === undefined) throw ApiError.notFound("Diese Rueckfrage gibt es nicht.");
+    if (row === undefined) throw ApiError.notFound("Diese Rückfrage gibt es nicht.");
     return mapQuestion(row);
   }
 
   /**
    * Erzeugt einen Textvorschlag.
    *
-   * Wichtig: der Vorschlag wird zurueckgegeben, nicht abgeschickt. Ueber Inhalt
+   * Wichtig: der Vorschlag wird zurückgegeben, nicht abgeschickt. Über Inhalt
    * und Versand entscheidet immer ein Mensch.
    */
   async suggestOfferText(context: string): Promise<string> {
@@ -220,7 +220,7 @@ export class AiService {
       return await this.provider.suggestText({ kind: "OFFER_DESCRIPTION", context });
     } catch (error) {
       if (error instanceof AiUnavailableError) {
-        throw new ApiError(503, "AI_UNAVAILABLE", "Der Textvorschlag ist gerade nicht moeglich.");
+        throw new ApiError(503, "AI_UNAVAILABLE", "Der Textvorschlag ist gerade nicht möglich.");
       }
       throw error;
     }
@@ -231,7 +231,7 @@ export class AiService {
       return await this.provider.suggestText({ kind: "CHAT_REPLY", context, ...(hint ? { hint } : {}) });
     } catch (error) {
       if (error instanceof AiUnavailableError) {
-        throw new ApiError(503, "AI_UNAVAILABLE", "Der Textvorschlag ist gerade nicht moeglich.");
+        throw new ApiError(503, "AI_UNAVAILABLE", "Der Textvorschlag ist gerade nicht möglich.");
       }
       throw error;
     }

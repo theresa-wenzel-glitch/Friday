@@ -13,11 +13,11 @@ export interface Principal {
 }
 
 /**
- * Alles, was ein Handler ueber die laufende Anfrage wissen muss.
+ * Alles, was ein Handler über die laufende Anfrage wissen muss.
  *
- * Die Berechtigungspruefung laeuft ausschliesslich hier und in den Services -
+ * Die Berechtigungsprüfung laeuft ausschließlich hier und in den Services -
  * niemals im Client. Ein Handler, der `ctx.requireUser()` nicht aufruft, ist
- * oeffentlich, und das soll man ihm ansehen.
+ * öffentlich, und das soll man ihm ansehen.
  */
 export class RequestContext {
   readonly req: IncomingMessage;
@@ -25,7 +25,7 @@ export class RequestContext {
   readonly params: Record<string, string>;
   readonly query: URLSearchParams;
   readonly app: AppServices;
-  /** Auf /24 bzw. /48 gekuerzte Client-Adresse - fuer Rate Limiting und Protokoll. */
+  /** Auf /24 bzw. /48 gekürzte Client-Adresse - für Rate Limiting und Protokoll. */
   readonly ipPrefix: string;
 
   private cachedBody: unknown;
@@ -64,14 +64,14 @@ export class RequestContext {
     return this.cachedBody;
   }
 
-  /** Liest den Rumpf und prueft ihn gegen ein Schema. */
+  /** Liest den Rumpf und prüft ihn gegen ein Schema. */
   async input<T>(schema: Validator<T>): Promise<T> {
     const result = validate(schema, await this.body());
     if (!result.ok) throw ApiError.validation(result.fields);
     return result.value;
   }
 
-  /** Prueft die Query-Parameter gegen ein Schema. */
+  /** Prüft die Query-Parameter gegen ein Schema. */
   queryInput<T>(schema: Validator<T>): T {
     const raw: Record<string, string> = {};
     for (const [key, value] of this.query.entries()) raw[key] = value;
@@ -80,7 +80,7 @@ export class RequestContext {
     return result.value;
   }
 
-  /** Angemeldeter Nutzer oder null. Fuer Endpunkte, die beides erlauben. */
+  /** Angemeldeter Nutzer oder null. Für Endpunkte, die beides erlauben. */
   async currentUser(): Promise<Principal | null> {
     if (!this.principalResolved) {
       this.principal = await this.app.authenticate(this.req);
@@ -89,7 +89,7 @@ export class RequestContext {
     return this.principal;
   }
 
-  /** Angemeldeter Nutzer - wirft, wenn kein gueltiges Token vorliegt. */
+  /** Angemeldeter Nutzer - wirft, wenn kein gültiges Token vorliegt. */
   async requireUser(): Promise<Principal> {
     const principal = await this.currentUser();
     if (principal === null) throw ApiError.unauthenticated();
@@ -100,7 +100,7 @@ export class RequestContext {
   async requireRole(...roles: UserRole[]): Promise<Principal> {
     const principal = await this.requireUser();
     if (!roles.includes(principal.user.role)) {
-      throw ApiError.forbidden("Diese Aktion ist fuer deine Rolle nicht vorgesehen.");
+      throw ApiError.forbidden("Diese Aktion ist für deine Rolle nicht vorgesehen.");
     }
     return principal;
   }

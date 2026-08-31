@@ -62,8 +62,8 @@ export async function listApplied(pool: Pool): Promise<AppliedMigration[]> {
  * Wendet alle noch offenen Migrationen an.
  *
  * Jede Migration laeuft in ihrer eigenen Transaktion: entweder sie geht
- * vollstaendig durch oder gar nicht. Bereits angewendete Dateien werden ueber
- * ihre Pruefsumme verglichen - wird eine Migration nachtraeglich veraendert,
+ * vollständig durch oder gar nicht. Bereits angewendete Dateien werden über
+ * ihre Prüfsumme verglichen - wird eine Migration nachträglich verändert,
  * bricht der Lauf ab, statt zwei Umgebungen auseinanderlaufen zu lassen.
  */
 export async function migrate(pool: Pool, log: (message: string) => void = () => {}): Promise<string[]> {
@@ -85,8 +85,8 @@ export async function migrate(pool: Pool, log: (message: string) => void = () =>
       if (knownChecksum !== undefined) {
         if (knownChecksum !== file.checksum) {
           throw new Error(
-            `Migration ${file.filename} wurde nachtraeglich veraendert. ` +
-              "Bereits angewendete Migrationen duerfen nicht bearbeitet werden - " +
+            `Migration ${file.filename} wurde nachträglich verändert. ` +
+              "Bereits angewendete Migrationen dürfen nicht bearbeitet werden - " +
               "bitte stattdessen eine neue Migration anlegen.",
           );
         }
@@ -118,7 +118,7 @@ export async function migrate(pool: Pool, log: (message: string) => void = () =>
 
 /**
  * Spielt die Seed-Dateien ein. Sie sind idempotent formuliert, ein zweiter
- * Lauf aendert also nichts.
+ * Lauf ändert also nichts.
  */
 export async function seed(pool: Pool, log: (message: string) => void = () => {}): Promise<string[]> {
   const files = await readSqlFiles(SEEDS_DIR);
@@ -146,10 +146,10 @@ export async function seed(pool: Pool, log: (message: string) => void = () => {}
 }
 
 /**
- * Leert das Schema vollstaendig und baut es neu auf.
+ * Leert das Schema vollständig und baut es neu auf.
  *
- * Nur fuer Entwicklung und Tests gedacht - deshalb die ausdrueckliche
- * Bestaetigung im CLI und die Sperre gegen NODE_ENV=production.
+ * Nur für Entwicklung und Tests gedacht - deshalb die ausdrückliche
+ * Bestätigung im CLI und die Sperre gegen NODE_ENV=production.
  */
 export async function reset(pool: Pool, log: (message: string) => void = () => {}): Promise<void> {
   const client = await pool.connect();

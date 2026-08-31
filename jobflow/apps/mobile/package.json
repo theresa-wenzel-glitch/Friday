@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "main": "expo-router/entry",
-  "description": "JobFlow fuer iOS und Android. Eine Codebasis, zwei Rollen: Kunde und Unternehmen.",
+  "description": "JobFlow für iOS und Android. Eine Codebasis, zwei Rollen: Kunde und Unternehmen.",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",

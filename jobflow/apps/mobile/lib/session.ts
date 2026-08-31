@@ -6,9 +6,9 @@ import { setAuthToken } from "./api.js";
 /**
  * Sitzungsverwaltung.
  *
- * Das Token liegt im sicheren Speicher des Geraets (Keychain bzw. Keystore),
- * nicht in AsyncStorage: dort waere es auf einem entsperrten oder gerooteten
- * Geraet im Klartext lesbar.
+ * Das Token liegt im sicheren Speicher des Geräts (Keychain bzw. Keystore),
+ * nicht in AsyncStorage: dort wäre es auf einem entsperrten oder gerooteten
+ * Gerät im Klartext lesbar.
  */
 const TOKEN_KEY = "jobflow.session.token";
 
@@ -34,9 +34,9 @@ export async function readStoredToken(): Promise<string | null> {
   try {
     return await SecureStore.getItemAsync(TOKEN_KEY);
   } catch {
-    // Auf manchen Geraeten ist der sichere Speicher nicht verfuegbar. Dann
+    // Auf manchen Geräten ist der sichere Speicher nicht verfügbar. Dann
     // muss sich der Nutzer eben neu anmelden - das ist besser, als das Token
-    // ersatzweise ungeschuetzt abzulegen.
+    // ersatzweise ungeschützt abzulegen.
     return null;
   }
 }
@@ -47,7 +47,7 @@ export async function storeToken(token: string | null): Promise<void> {
     if (token === null) await SecureStore.deleteItemAsync(TOKEN_KEY);
     else await SecureStore.setItemAsync(TOKEN_KEY, token);
   } catch {
-    // Siehe oben: nicht speichern zu koennen ist unschoen, aber kein Grund,
+    // Siehe oben: nicht speichern zu können ist unschön, aber kein Grund,
     // die Anmeldung scheitern zu lassen.
   }
 }

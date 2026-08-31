@@ -4,18 +4,18 @@ import type { AiAnalysisResult } from "@jobflow/types";
  * Die Schnittstelle zur KI.
  *
  * Der springende Punkt: die KI redet nie direkt mit der Datenbank. Sie bekommt
- * einen Text und liefert ein Ergebnis in dieser Form zurueck. Das Backend
+ * einen Text und liefert ein Ergebnis in dieser Form zurück. Das Backend
  * validiert es und entscheidet, was gespeichert wird.
  *
- * Dadurch laesst sich das konkrete Modell austauschen, ohne die Anwendung
- * umzubauen - und ein Fehlverhalten der KI kann nichts kaputt machen, was das
- * Backend nicht ohnehin erlauben wuerde.
+ * Dadurch lässt sich das konkrete Modell austauschen, ohne die Anwendung
+ * umzubaün - und ein Fehlverhalten der KI kann nichts kaputt machen, was das
+ * Backend nicht ohnehin erlauben würde.
  */
 export interface AiProvider {
   /** Name inklusive Version, wird zur Analyse gespeichert, z. B. "rules@1". */
   readonly name: string;
   analyze(input: AiAnalysisInput): Promise<AiAnalysisResult>;
-  /** Formuliert einen Vorschlagstext - fuer Angebote und Chatantworten. */
+  /** Formuliert einen Vorschlagstext - für Angebote und Chatantworten. */
   suggestText(input: AiSuggestionInput): Promise<string>;
 }
 
@@ -23,7 +23,7 @@ export interface AiAnalysisInput {
   description: string;
   /** Slugs aller Kategorien, die die Plattform kennt. */
   knownCategorySlugs: string[];
-  /** Bereits beantwortete Rueckfragen, falls die Analyse wiederholt wird. */
+  /** Bereits beantwortete Rückfragen, falls die Analyse wiederholt wird. */
   answeredQuestions?: { question: string; answer: string }[];
   photoCount: number;
 }

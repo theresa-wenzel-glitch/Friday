@@ -4,8 +4,8 @@ import { colors, radii, spacing, typography } from "@jobflow/config";
 /**
  * Der Button von JobFlow.
  *
- * Absichtlich gross und deutlich: die App wird oft unterwegs bedient, teils
- * einhaendig, teils in einem Keller mit schlechtem Licht.
+ * Absichtlich groß und deutlich: die App wird oft unterwegs bedient, teils
+ * einhändig, teils in einem Keller mit schlechtem Licht.
  */
 export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger";
 
@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
     borderRadius: radii.lg,
     alignItems: "center",
     justifyContent: "center",
-    // Empfohlene Mindestgroesse fuer Bedienelemente.
+    // Empfohlene Mindestgröße für Bedienelemente.
     minHeight: 52,
   },
   content: { flexDirection: "row", alignItems: "center", gap: spacing.sm },

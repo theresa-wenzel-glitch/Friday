@@ -21,12 +21,12 @@ describe("string", () => {
     assert.deepEqual(result, { ok: true, value: "Hallo" });
   });
 
-  it("weist einen Text zurueck, der nur aus Leerzeichen besteht", () => {
+  it("weist einen Text zurück, der nur aus Leerzeichen besteht", () => {
     const result = validate(string(), "   ");
     assert.equal(result.ok, false);
   });
 
-  it("achtet auf Mindest- und Hoechstlaenge", () => {
+  it("achtet auf Mindest- und Höchstlänge", () => {
     assert.equal(validate(string({ min: 5 }), "abc").ok, false);
     assert.equal(validate(string({ max: 3 }), "abcd").ok, false);
   });
@@ -38,7 +38,7 @@ describe("email", () => {
     assert.deepEqual(result, { ok: true, value: "max.mustermann@example.test" });
   });
 
-  it("weist offensichtlich ungueltige Adressen zurueck", () => {
+  it("weist offensichtlich ungueltige Adressen zurück", () => {
     for (const value of ["kein-at", "a@b", "@example.test", "a b@example.test", ""]) {
       assert.equal(validate(email(), value).ok, false, `${value} sollte ungueltig sein`);
     }
@@ -52,7 +52,7 @@ describe("optional und nullable", () => {
     assert.deepEqual(result, { ok: true, value: { b: null } });
   });
 
-  it("laesst ein optionales Feld weg, ohne einen Fehler zu melden", () => {
+  it("lässt ein optionales Feld weg, ohne einen Fehler zu melden", () => {
     const schema = object({ name: string(), phone: optional(string()) });
     const result = validate(schema, { name: "Max" });
     assert.deepEqual(result, { ok: true, value: { name: "Max" } });
@@ -79,7 +79,7 @@ describe("object", () => {
     if (!result.ok) assert.ok("inner.value" in result.fields);
   });
 
-  it("weist einen Array als Objekt zurueck", () => {
+  it("weist einen Array als Objekt zurück", () => {
     assert.equal(validate(object({ a: string() }), ["a"]).ok, false);
   });
 });
@@ -91,13 +91,13 @@ describe("array", () => {
     if (!result.ok) assert.ok("1" in result.fields);
   });
 
-  it("achtet auf die Hoechstzahl", () => {
+  it("achtet auf die Höchstzahl", () => {
     assert.equal(validate(array(string(), { max: 2 }), ["a", "b", "c"]).ok, false);
   });
 });
 
 describe("weitere Bausteine", () => {
-  it("oneOf laesst nur bekannte Werte zu", () => {
+  it("oneOf lässt nur bekannte Werte zu", () => {
     const schema = oneOf(["LOW", "NORMAL", "HIGH"] as const);
     assert.deepEqual(validate(schema, "HIGH"), { ok: true, value: "HIGH" });
     assert.equal(validate(schema, "URGENT").ok, false);
@@ -115,7 +115,7 @@ describe("weitere Bausteine", () => {
     assert.deepEqual(result, { ok: true, value: "2026-09-01T10:00:00.000Z" });
   });
 
-  it("uuid weist Werte ohne UUID-Form zurueck", () => {
+  it("uuid weist Werte ohne UUID-Form zurück", () => {
     assert.equal(validate(uuid(), "keine-uuid").ok, false);
     assert.equal(validate(uuid(), "6f2b1e4a-9c3d-4b1f-8e2a-0d4c5b6a7e8f").ok, true);
   });

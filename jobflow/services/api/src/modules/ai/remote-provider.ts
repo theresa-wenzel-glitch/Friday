@@ -6,15 +6,15 @@ import { AiUnavailableError, type AiAnalysisInput, type AiProvider, type AiSugge
  * Anbindung an einen externen KI-Dienst.
  *
  * Was hier passiert, ist wichtiger als es aussieht: die Antwort des Dienstes
- * wird gegen dasselbe Schema geprueft wie eine Eingabe aus der App. Ein Modell
- * ist keine vertrauenswuerdige Quelle - es kann halluzinieren, Felder
+ * wird gegen dasselbe Schema geprüft wie eine Eingabe aus der App. Ein Modell
+ * ist keine vertraünswürdige Quelle - es kann halluzinieren, Felder
  * weglassen oder eine Kategorie erfinden, die es nicht gibt.
  */
 export interface RemoteAiProviderOptions {
   baseUrl: string;
   apiKey: string;
   timeoutMs: number;
-  /** Nur fuer Tests: eigene fetch-Implementierung. */
+  /** Nur für Tests: eigene fetch-Implementierung. */
   fetchImpl?: typeof fetch;
 }
 
@@ -44,8 +44,8 @@ export class RemoteAiProvider implements AiProvider {
       );
     }
 
-    // Auch eine formal gueltige Antwort kann eine Kategorie nennen, die es
-    // nicht gibt. Dann wird sie verworfen statt uebernommen.
+    // Auch eine formal gültige Antwort kann eine Kategorie nennen, die es
+    // nicht gibt. Dann wird sie verworfen statt übernommen.
     if (result.value.categorySlug !== null && !input.knownCategorySlugs.includes(result.value.categorySlug)) {
       return { ...result.value, categorySlug: null, confidence: Math.min(result.value.confidence, 0.3) };
     }
@@ -59,7 +59,7 @@ export class RemoteAiProvider implements AiProvider {
       throw new AiUnavailableError("Die KI hat keinen verwertbaren Text geliefert.");
     }
     // Der Vorschlag geht als Entwurf an das Unternehmen, nicht direkt an den
-    // Kunden - deshalb reicht eine Laengenbegrenzung.
+    // Kunden - deshalb reicht eine Längenbegrenzung.
     return text.trim().slice(0, 3000);
   }
 

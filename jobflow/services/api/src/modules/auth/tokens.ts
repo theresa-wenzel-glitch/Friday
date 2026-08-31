@@ -3,7 +3,7 @@ import { createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 /**
  * Session-Token.
  *
- * Der Client bekommt einen zufaelligen Wert, die Datenbank speichert nur
+ * Der Client bekommt einen zufälligen Wert, die Datenbank speichert nur
  * dessen HMAC. Wer die Datenbank liest, kann sich damit nicht anmelden, und
  * wer den HMAC-Schluessel kennt, kennt trotzdem keine Tokens.
  *

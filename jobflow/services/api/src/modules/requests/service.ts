@@ -61,7 +61,7 @@ export class RequestService {
    *
    * Berechtigt sind der Kunde selbst und jedes Unternehmen, das zu dieser
    * Anfrage vorgeschlagen wurde. Wer keinen Bezug hat, bekommt 404 statt 403 -
-   * sonst liesse sich ueber die Statuscodes erschliessen, welche Anfragen es gibt.
+   * sonst ließe sich über die Statuscodes erschließen, welche Anfragen es gibt.
    */
   async getForUser(requestId: string, userId: string): Promise<ServiceRequestDetail> {
     const result = await this.db.query<RequestRow>(
@@ -91,7 +91,7 @@ export class RequestService {
     return { ...mapRequest(row), photos: photos.rows.map(mapRequestPhoto) };
   }
 
-  /** Die Anfrage eines Kunden - fuer Aktionen, die nur ihm zustehen. */
+  /** Die Anfrage eines Kunden - für Aktionen, die nur ihm zustehen. */
   async getOwned(requestId: string, customerId: string): Promise<ServiceRequest> {
     const result = await this.db.query<RequestRow>(
       "SELECT * FROM requests WHERE id = $1 AND customer_id = $2",
@@ -126,11 +126,11 @@ export class RequestService {
     const existing = await this.getOwned(requestId, customerId);
     if (!EDITABLE_STATUSES.has(existing.status)) {
       throw ApiError.conflict(
-        "Diese Anfrage laesst sich nicht mehr aendern - es liegen bereits Angebote vor.",
+        "Diese Anfrage lässt sich nicht mehr ändern - es liegen bereits Angebote vor.",
       );
     }
 
-    // Nur die tatsaechlich uebergebenen Felder anfassen: ein PATCH soll nicht
+    // Nur die tatsächlich übergebenen Felder anfassen: ein PATCH soll nicht
     // stillschweigend Werte auf null setzen, die der Client gar nicht kannte.
     const columns: Record<string, unknown> = {};
     if (data.title !== undefined) columns["title"] = data.title;
@@ -152,7 +152,7 @@ export class RequestService {
     return mapRequest(result.rows[0] as RequestRow);
   }
 
-  /** Setzt den Status - nur innerhalb erlaubter Uebergaenge. */
+  /** Setzt den Status - nur innerhalb erlaubter Übergänge. */
   async setStatus(requestId: string, status: ServiceRequest["status"]): Promise<void> {
     await this.db.query("UPDATE requests SET status = $2 WHERE id = $1", [requestId, status]);
   }
@@ -160,7 +160,7 @@ export class RequestService {
   async cancel(requestId: string, customerId: string): Promise<ServiceRequest> {
     const existing = await this.getOwned(requestId, customerId);
     if (existing.status === "COMPLETED") {
-      throw ApiError.conflict("Ein abgeschlossener Auftrag laesst sich nicht zurueckziehen.");
+      throw ApiError.conflict("Ein abgeschlossener Auftrag lässt sich nicht zurückziehen.");
     }
     if (existing.status === "ACCEPTED") {
       throw ApiError.conflict(

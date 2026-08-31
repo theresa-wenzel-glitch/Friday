@@ -34,7 +34,7 @@ export default function WelcomeScreen() {
         <Text style={styles.logo}>JobFlow</Text>
         <Text style={styles.slogan}>Von der Anfrage zum Auftrag.</Text>
         <Text style={styles.pitch}>
-          Sag uns einfach, was los ist. Wir kuemmern uns um den Rest.
+          Sag uns einfach, was los ist. Wir kümmern uns um den Rest.
         </Text>
       </View>
 

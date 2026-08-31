@@ -1,14 +1,14 @@
 import type { IncomingMessage } from "node:http";
 import { ApiError } from "./errors.js";
 
-/** Groesse, die ein JSON-Rumpf hoechstens haben darf. Fotos gehen einen eigenen Weg. */
+/** Größe, die ein JSON-Rumpf höchstens haben darf. Fotos gehen einen eigenen Weg. */
 const MAX_JSON_BYTES = 256 * 1024;
 
 /**
  * Liest den Rumpf einer Anfrage als JSON.
  *
- * Die Groesse wird waehrend des Lesens geprueft, nicht danach: sonst koennte
- * ein Client den Speicher des Servers fuellen, bevor die Pruefung greift.
+ * Die Größe wird während des Lesens geprüft, nicht danach: sonst könnte
+ * ein Client den Speicher des Servers füllen, bevor die Prüfung greift.
  */
 export async function readJsonBody(req: IncomingMessage): Promise<unknown> {
   const contentType = req.headers["content-type"] ?? "";
@@ -23,7 +23,7 @@ export async function readJsonBody(req: IncomingMessage): Promise<unknown> {
     const buffer = chunk as Buffer;
     total += buffer.length;
     if (total > MAX_JSON_BYTES) {
-      throw new ApiError(413, "PAYLOAD_TOO_LARGE", "Die Anfrage ist zu gross.");
+      throw new ApiError(413, "PAYLOAD_TOO_LARGE", "Die Anfrage ist zu groß.");
     }
     chunks.push(buffer);
   }
@@ -33,11 +33,11 @@ export async function readJsonBody(req: IncomingMessage): Promise<unknown> {
   try {
     return JSON.parse(Buffer.concat(chunks).toString("utf8"));
   } catch {
-    throw ApiError.validation({}, "Der Anfragetext ist kein gueltiges JSON.");
+    throw ApiError.validation({}, "Der Anfragetext ist kein gültiges JSON.");
   }
 }
 
-/** Liest einen binaeren Rumpf (Foto-Upload) mit harter Groessengrenze. */
+/** Liest einen binären Rumpf (Foto-Upload) mit harter Größengrenze. */
 export async function readBinaryBody(req: IncomingMessage, maxBytes: number): Promise<Buffer> {
   const chunks: Buffer[] = [];
   let total = 0;
@@ -45,7 +45,7 @@ export async function readBinaryBody(req: IncomingMessage, maxBytes: number): Pr
     const buffer = chunk as Buffer;
     total += buffer.length;
     if (total > maxBytes) {
-      throw new ApiError(413, "PAYLOAD_TOO_LARGE", "Die Datei ist zu gross.");
+      throw new ApiError(413, "PAYLOAD_TOO_LARGE", "Die Datei ist zu groß.");
     }
     chunks.push(buffer);
   }

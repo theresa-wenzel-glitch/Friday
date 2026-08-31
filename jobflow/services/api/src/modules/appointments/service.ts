@@ -32,7 +32,7 @@ function mapAppointment(row: AppointmentRow): Appointment {
 
 /** Wie weit im Voraus freie Zeitfenster berechnet werden. */
 const SLOT_HORIZON_DAYS = 21;
-/** Laenge eines vorgeschlagenen Zeitfensters in Minuten. */
+/** Länge eines vorgeschlagenen Zeitfensters in Minuten. */
 const SLOT_MINUTES = 60;
 
 export class AppointmentService {
@@ -41,7 +41,7 @@ export class AppointmentService {
   /**
    * Berechnet freie Zeitfenster aus dem Wochenplan eines Unternehmens.
    *
-   * Der Kunde bekommt ausschliesslich Zeiten zu sehen, die das Unternehmen
+   * Der Kunde bekommt ausschließlich Zeiten zu sehen, die das Unternehmen
    * freigegeben hat, und keine, die bereits belegt sind.
    */
   async availableSlots(businessId: string, from: Date = new Date()): Promise<AvailableSlot[]> {
@@ -99,8 +99,8 @@ export class AppointmentService {
   /**
    * Legt einen Termin zu einem angenommenen Angebot an.
    *
-   * Ohne angenommenes Angebot gibt es keinen Termin - sonst koennte jemand
-   * den Kalender eines Unternehmens fuellen, ohne je einen Auftrag zu erteilen.
+   * Ohne angenommenes Angebot gibt es keinen Termin - sonst könnte jemand
+   * den Kalender eines Unternehmens füllen, ohne je einen Auftrag zu erteilen.
    */
   async create(userId: string, data: CreateAppointmentData): Promise<Appointment> {
     const start = new Date(data.startTime);
@@ -123,12 +123,12 @@ export class AppointmentService {
       const offerRow = offer.rows[0];
       if (offerRow === undefined) throw ApiError.notFound("Dieses Angebot gibt es nicht.");
       if (offerRow.status !== "ACCEPTED") {
-        throw ApiError.conflict("Ein Termin ist erst nach Annahme des Angebots moeglich.");
+        throw ApiError.conflict("Ein Termin ist erst nach Annahme des Angebots möglich.");
       }
 
       // Doppelbelegung verhindern. Der Teilindex in der Datenbank sichert nur
-      // "ein aktiver Termin je Angebot" ab - Ueberschneidungen zwischen
-      // verschiedenen Auftraegen desselben Betriebs muessen hier auffallen.
+      // "ein aktiver Termin je Angebot" ab - Überschneidungen zwischen
+      // verschiedenen Aufträgen desselben Betriebs müssen hier auffallen.
       const conflict = await client.query(
         `SELECT 1
          FROM appointments a

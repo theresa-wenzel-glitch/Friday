@@ -14,7 +14,7 @@ import { Screen } from "../../components/Screen.js";
  * Screen 02 - Startseite des Kunden.
  *
  * Bewusst fast leer. Der wichtigste Weg ist "Problem beschreiben"; alles
- * andere darf davon nicht ablenken. Kategorien sind eine Abkuerzung fuer
+ * andere darf davon nicht ablenken. Kategorien sind eine Abkürzung für
  * Leute, die schon wissen, was sie brauchen - kein Pflichtweg.
  */
 export default function HomeScreen() {
@@ -29,7 +29,7 @@ export default function HomeScreen() {
       .catch(() => setCategories([]));
   }, []);
 
-  // Beim Zurueckkehren auf den Screen neu laden - sonst fehlt die gerade
+  // Beim Zurückkehren auf den Screen neu laden - sonst fehlt die gerade
   // erstellte Anfrage.
   useFocusEffect(
     useCallback(() => {

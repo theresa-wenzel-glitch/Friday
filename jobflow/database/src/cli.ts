@@ -1,5 +1,5 @@
 /**
- * Kommandozeile fuer das Datenbank-Schema.
+ * Kommandozeile für das Datenbank-Schema.
  *
  *   pnpm --filter @jobflow/database migrate
  *   pnpm --filter @jobflow/database seed
@@ -53,7 +53,7 @@ async function main(): Promise<void> {
         }
         if (!process.argv.includes("--yes")) {
           throw new Error(
-            "reset loescht das gesamte Schema. Zum Bestaetigen mit --yes aufrufen.",
+            "reset löscht das gesamte Schema. Zum Bestätigen mit --yes aufrufen.",
           );
         }
         await reset(pool, log);

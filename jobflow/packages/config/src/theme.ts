@@ -1,13 +1,13 @@
 /**
  * Design-Tokens von JobFlow.
  *
- * Alle Farben, Abstaende und Schriftgroessen stehen hier - und nur hier.
- * Sonst laesst sich das Branding spaeter nicht mehr aendern, ohne hundert
+ * Alle Farben, Abstände und Schriftgrößen stehen hier - und nur hier.
+ * Sonst lässt sich das Branding später nicht mehr ändern, ohne hundert
  * Dateien anzufassen.
  */
 
 export const colors = {
-  /** Primaerfarbe: Violett/Blau. Buttons, aktive Zustaende, Akzente. */
+  /** Primärfarbe: Violett/Blau. Buttons, aktive Zustände, Akzente. */
   primary: "#5B4CF0",
   primaryDark: "#4438C7",
   primaryLight: "#EDEBFE",
@@ -33,8 +33,8 @@ export const colors = {
   errorLight: "#FCEAEB",
 
   /**
-   * Eigene Farbe fuer alles, was von der KI kommt. KI-Inhalte muessen optisch
-   * erkennbar sein und duerfen nicht wie gesicherte Fakten aussehen.
+   * Eigene Farbe für alles, was von der KI kommt. KI-Inhalte müssen optisch
+   * erkennbar sein und dürfen nicht wie gesicherte Fakten aussehen.
    */
   ai: "#7A5AF8",
   aiLight: "#F1EDFE",
@@ -51,7 +51,7 @@ export const spacing = {
   xxxl: 48,
 } as const;
 
-/** Grosse, weiche Radien - das praegt den Charakter der Oberflaeche. */
+/** Große, weiche Radien - das prägt den Charakter der Oberfläche. */
 export const radii = {
   sm: 8,
   md: 12,
@@ -61,7 +61,7 @@ export const radii = {
 } as const;
 
 export const typography = {
-  /** Inter als Grundschrift, mit Systemschrift als Rueckfallebene. */
+  /** Inter als Grundschrift, mit Systemschrift als Rückfallebene. */
   fontFamily: "Inter",
   sizes: {
     caption: 12,

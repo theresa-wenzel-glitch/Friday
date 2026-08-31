@@ -39,7 +39,7 @@ export class CategoryService {
    * Kategorien als Baum - das ist die Form, die die Startseite braucht.
    *
    * Der Baum wird im Speicher gebaut statt mit einer rekursiven Abfrage: es
-   * sind wenige Dutzend Zeilen, und die Kategorienliste eignet sich spaeter
+   * sind wenige Dutzend Zeilen, und die Kategorienliste eignet sich später
    * gut zum Zwischenspeichern.
    */
   async tree(): Promise<CategoryNode[]> {
@@ -56,7 +56,7 @@ export class CategoryService {
         continue;
       }
       const parent = nodes.get(node.parentId);
-      // Ist die Oberkategorie inaktiv, waere die Unterkategorie nicht
+      // Ist die Oberkategorie inaktiv, wäre die Unterkategorie nicht
       // erreichbar. Sie wird dann wie eine eigene Wurzel behandelt, statt
       // stillschweigend zu verschwinden.
       if (parent === undefined) roots.push(node);

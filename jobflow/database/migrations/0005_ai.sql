@@ -1,4 +1,4 @@
--- 0005 KI-Analysen und Rueckfragen.
+-- 0005 KI-Analysen und Rückfragen.
 --
 -- Die KI schreibt nie direkt in die Datenbank. Ihr Ergebnis geht durch die
 -- Validierung im Backend und landet erst danach hier.
@@ -10,14 +10,14 @@ CREATE TABLE ai_analyses (
   summary     text NOT NULL CHECK (length(summary) > 0),
   urgency     text NOT NULL CHECK (urgency IN ('LOW', 'NORMAL', 'HIGH')),
   confidence  numeric(4, 3) NOT NULL CHECK (confidence >= 0 AND confidence <= 1),
-  -- Welcher Provider das Ergebnis erzeugt hat, z. B. "rules@1". Damit laesst
-  -- sich spaeter nachvollziehen, welches Modell welche Qualitaet geliefert hat.
+  -- Welcher Provider das Ergebnis erzeugt hat, z. B. "rules@1". Damit lässt
+  -- sich später nachvollziehen, welches Modell welche Qualität geliefert hat.
   provider    text NOT NULL,
   created_at  timestamptz NOT NULL DEFAULT now()
 );
 
--- Eine Anfrage kann mehrfach analysiert werden (z. B. nach Rueckfragen);
--- die juengste Analyse zaehlt.
+-- Eine Anfrage kann mehrfach analysiert werden (z. B. nach Rückfragen);
+-- die jüngste Analyse zählt.
 CREATE INDEX ai_analyses_request_idx ON ai_analyses (request_id, created_at DESC);
 
 CREATE TABLE ai_questions (

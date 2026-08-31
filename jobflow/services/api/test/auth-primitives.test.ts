@@ -10,34 +10,34 @@ describe("Passwort-Hashing", () => {
     assert.equal(await verifyPassword("ein-langes-passwort", hash), true);
   });
 
-  it("weist ein falsches Passwort zurueck", async () => {
+  it("weist ein falsches Passwort zurück", async () => {
     const hash = await hashPassword("ein-langes-passwort");
     assert.equal(await verifyPassword("ein-anderes-passwort", hash), false);
   });
 
-  it("erzeugt fuer dasselbe Passwort unterschiedliche Hashes", async () => {
-    // Ohne zufaelliges Salt waeren gleiche Passwoerter in der Datenbank
+  it("erzeugt für dasselbe Passwort unterschiedliche Hashes", async () => {
+    // Ohne zufälliges Salt wären gleiche Passwörter in der Datenbank
     // aneinander erkennbar.
     const a = await hashPassword("ein-langes-passwort");
     const b = await hashPassword("ein-langes-passwort");
     assert.notEqual(a, b);
   });
 
-  it("enthaelt das Klartextpasswort nicht", async () => {
+  it("enthält das Klartextpasswort nicht", async () => {
     const hash = await hashPassword("ein-langes-passwort");
     assert.ok(!hash.includes("ein-langes-passwort"));
   });
 
   it("behandelt gleichwertige Unicode-Schreibweisen gleich", async () => {
-    // "ä" laesst sich als ein Zeichen oder als a + Kombinationszeichen
-    // eingeben. Fuer den Nutzer ist es dasselbe Passwort.
+    // "ä" lässt sich als ein Zeichen oder als a + Kombinationszeichen
+    // eingeben. Für den Nutzer ist es dasselbe Passwort.
     const composed = "paßwort-ähnlich";
     const decomposed = "paßwort-ähnlich";
     const hash = await hashPassword(composed);
     assert.equal(await verifyPassword(decomposed, hash), true);
   });
 
-  it("stuerzt bei einem unbrauchbaren gespeicherten Hash nicht ab", async () => {
+  it("stürzt bei einem unbrauchbaren gespeicherten Hash nicht ab", async () => {
     for (const broken of ["", "unsinn", "scrypt$a$b$c$d$e", "argon2$1$2$3$x$y"]) {
       assert.equal(await verifyPassword("egal", broken), false);
     }
@@ -75,8 +75,8 @@ describe("Session-Token", () => {
   });
 });
 
-describe("IP-Kuerzung", () => {
-  it("kuerzt IPv4 auf /24", () => {
+describe("IP-Kürzung", () => {
+  it("kürzt IPv4 auf /24", () => {
     assert.equal(ipPrefix("192.168.10.42"), "192.168.10.0/24");
   });
 
@@ -84,7 +84,7 @@ describe("IP-Kuerzung", () => {
     assert.equal(ipPrefix("::ffff:192.168.10.42"), "192.168.10.0/24");
   });
 
-  it("kuerzt IPv6 auf /48", () => {
+  it("kürzt IPv6 auf /48", () => {
     assert.equal(ipPrefix("2001:0db8:85a3:0000:0000:8a2e:0370:7334"), "2001:0db8:85a3::/48");
   });
 

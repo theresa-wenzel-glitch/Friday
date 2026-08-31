@@ -2,7 +2,7 @@
   "name": "jobflow",
   "version": "0.1.0",
   "private": true,
-  "description": "JobFlow - von der Anfrage zum Auftrag. Marktplatz und KI-Assistent fuer Dienstleistungen.",
+  "description": "JobFlow - von der Anfrage zum Auftrag. Marktplatz und KI-Assistent für Dienstleistungen.",
   "engines": {
     "node": ">=22.6.0"
   },

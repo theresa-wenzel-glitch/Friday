@@ -1,4 +1,4 @@
--- 0003 Unternehmen, Leistungen, Mitarbeiter und Verfuegbarkeit.
+-- 0003 Unternehmen, Leistungen, Mitarbeiter und Verfügbarkeit.
 
 CREATE TABLE businesses (
   id                   uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -29,7 +29,7 @@ CREATE TRIGGER businesses_touch_updated_at
   BEFORE UPDATE ON businesses
   FOR EACH ROW EXECUTE FUNCTION jobflow_touch_updated_at();
 
--- Grobfilter fuer das Matching: erst ueber das Rechteck vorselektieren,
+-- Grobfilter für das Matching: erst über das Rechteck vorselektieren,
 -- danach die genaue Entfernung berechnen.
 CREATE INDEX businesses_location_idx ON businesses (latitude, longitude)
   WHERE latitude IS NOT NULL;
@@ -40,7 +40,7 @@ CREATE TABLE business_services (
   category_id      uuid NOT NULL REFERENCES categories(id) ON DELETE RESTRICT,
   name             text NOT NULL CHECK (length(name) > 0),
   description      text,
-  -- Preise in Cent. Geld gehoert nie in eine Gleitkommazahl.
+  -- Preise in Cent. Geld gehört nie in eine Gleitkommazahl.
   price_min_cents  integer CHECK (price_min_cents IS NULL OR price_min_cents >= 0),
   price_max_cents  integer CHECK (price_max_cents IS NULL OR price_max_cents >= 0),
   active           boolean NOT NULL DEFAULT true,
@@ -64,7 +64,7 @@ CREATE TABLE business_members (
 
 CREATE INDEX business_members_user_idx ON business_members (user_id);
 
--- Woechentlich wiederkehrende Verfuegbarkeit. Der Kunde bekommt spaeter nur
+-- Wöchentlich wiederkehrende Verfügbarkeit. Der Kunde bekommt später nur
 -- Zeitfenster angeboten, die hier hinterlegt sind.
 CREATE TABLE business_availability (
   id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),

@@ -23,7 +23,7 @@ describe("Router", () => {
     assert.equal(router.match("GET", "/x/a%2Fb")?.params["value"], "a/b");
   });
 
-  it("liefert null fuer einen unbekannten Pfad", () => {
+  it("liefert null für einen unbekannten Pfad", () => {
     const router = new Router().get("/health", noop);
     assert.equal(router.match("GET", "/gibt-es-nicht"), null);
   });
@@ -36,13 +36,13 @@ describe("Router", () => {
     );
   });
 
-  it("haengt Module unter einem Praefix ein", () => {
+  it("hängt Module unter einem Präfix ein", () => {
     const inner = new Router().get("/:id", noop);
     const router = new Router().mount("/requests", inner);
     assert.equal(router.match("GET", "/requests/123")?.params["id"], "123");
   });
 
-  it("unterscheidet Pfade unterschiedlicher Laenge", () => {
+  it("unterscheidet Pfade unterschiedlicher Länge", () => {
     const router = new Router().get("/businesses/me", noop).get("/businesses/:id", noop);
     assert.deepEqual(router.match("GET", "/businesses/me")?.params, {});
     assert.equal(router.match("GET", "/businesses/abc")?.params["id"], "abc");
@@ -50,7 +50,7 @@ describe("Router", () => {
 
   it("bevorzugt die zuerst eingetragene Route bei gleichem Muster", () => {
     // "/businesses/me" ist vor "/businesses/:id" eingetragen und gewinnt
-    // deshalb - sonst wuerde "me" als Unternehmens-ID gelesen.
+    // deshalb - sonst würde "me" als Unternehmens-ID gelesen.
     const seen: string[] = [];
     const router = new Router()
       .get("/businesses/me", async () => {
@@ -69,7 +69,7 @@ describe("Router", () => {
 });
 
 describe("Rate Limiting", () => {
-  it("laesst Anfragen bis zur Grenze durch", () => {
+  it("lässt Anfragen bis zur Grenze durch", () => {
     const limiter = new RateLimiter();
     const rule = { limit: 3, windowMs: 1000 };
     assert.equal(limiter.check("a", rule, 0), true);
@@ -78,7 +78,7 @@ describe("Rate Limiting", () => {
     assert.equal(limiter.check("a", rule, 0), false);
   });
 
-  it("zaehlt Schluessel getrennt", () => {
+  it("zählt Schluessel getrennt", () => {
     const limiter = new RateLimiter();
     const rule = { limit: 1, windowMs: 1000 };
     assert.equal(limiter.check("a", rule, 0), true);

@@ -8,9 +8,9 @@ import { mapJob, type JobRow } from "./mapper.js";
 /**
  * Erlaubte Statuswechsel eines Auftrags.
  *
- * Ohne diese Tabelle liesse sich ein abgeschlossener Auftrag ueber die API
- * wieder auf "geplant" zuruecksetzen - und damit eine zweite Bewertung
- * ermoeglichen.
+ * Ohne diese Tabelle ließe sich ein abgeschlossener Auftrag über die API
+ * wieder auf "geplant" zurücksetzen - und damit eine zweite Bewertung
+ * ermöglichen.
  */
 const ALLOWED_TRANSITIONS: Record<JobStatus, JobStatus[]> = {
   SCHEDULED: ["IN_PROGRESS", "CANCELLED"],
@@ -52,11 +52,11 @@ export class JobService {
   }
 
   /**
-   * Aendert den Status eines Auftrags.
+   * Ändert den Status eines Auftrags.
    *
-   * Den Fortschritt meldet das ausfuehrende Unternehmen; abbrechen duerfen
+   * Den Fortschritt meldet das ausführende Unternehmen; abbrechen dürfen
    * beide Seiten. Ein Kunde soll einen Auftrag nicht selbst als erledigt
-   * markieren koennen - das ist die Aussage des Betriebs.
+   * markieren können - das ist die Aussage des Betriebs.
    */
   async setStatus(jobId: string, userId: string, status: JobStatus): Promise<Job> {
     return withTransaction(this.db, async (client) => {
@@ -81,7 +81,7 @@ export class JobService {
         );
       }
       if (status !== "CANCELLED" && !row.is_business) {
-        throw ApiError.forbidden("Den Fortschritt meldet das ausfuehrende Unternehmen.");
+        throw ApiError.forbidden("Den Fortschritt meldet das ausführende Unternehmen.");
       }
 
       const updated = await client.query<JobRow>(
@@ -100,7 +100,7 @@ export class JobService {
           "UPDATE appointments SET status = 'COMPLETED' WHERE offer_id = $1 AND status = 'CONFIRMED'",
           [row.offer_id],
         );
-        // Erfahrung fortschreiben - sie fliesst ins Matching ein.
+        // Erfahrung fortschreiben - sie fließt ins Matching ein.
         await client.query(
           "UPDATE businesses SET completed_job_count = completed_job_count + 1 WHERE id = $1",
           [row.business_id],

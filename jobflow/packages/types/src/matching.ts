@@ -4,8 +4,8 @@ import type { Business } from "./business.js";
 /**
  * Gewichte des Matching-Scores. Summe: 100.
  *
- * Das ist ein Startmodell. Sobald echte Daten vorliegen, gehoeren die Gewichte
- * anhand der Frage nachjustiert, welche Faktoren tatsaechlich zu Auftraegen fuehren.
+ * Das ist ein Startmodell. Sobald echte Daten vorliegen, gehören die Gewichte
+ * anhand der Frage nachjustiert, welche Faktoren tatsächlich zu Aufträgen führen.
  */
 export interface MatchWeights {
   service: number;
@@ -27,11 +27,11 @@ export const DEFAULT_MATCH_WEIGHTS: MatchWeights = {
   responseTime: 5,
 };
 
-/** Warum ein Unternehmen vorgeschlagen wird - fuer die Anzeige in der App. */
+/** Warum ein Unternehmen vorgeschlagen wird - für die Anzeige in der App. */
 export interface MatchReason {
   /** Welcher Faktor, z. B. "distance". */
   factor: keyof MatchWeights;
-  /** Erklaerung in einem kurzen Satz, z. B. "3,2 km entfernt". */
+  /** Erklärung in einem kurzen Satz, z. B. "3,2 km entfernt". */
   label: string;
   /** Beitrag dieses Faktors zum Gesamtscore, 0 - Gewicht des Faktors. */
   points: number;

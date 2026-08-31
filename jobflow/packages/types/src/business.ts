@@ -1,25 +1,25 @@
 import type { IsoDateTime, Uuid } from "./common.js";
 
-/** Ein Dienstleister. Gehoert genau einem Benutzer mit der Rolle BUSINESS. */
+/** Ein Dienstleister. Gehört genau einem Benutzer mit der Rolle BUSINESS. */
 export interface Business {
   id: Uuid;
   ownerId: Uuid;
   name: string;
   description: string | null;
-  /** Von der Administration geprueft (Gewerbeanmeldung, Impressum ...). */
+  /** Von der Administration geprüft (Gewerbeanmeldung, Impressum ...). */
   verified: boolean;
   verifiedAt: IsoDateTime | null;
   /** Durchschnitt aller Bewertungen, 1.0 - 5.0, null solange keine vorliegt. */
   rating: number | null;
   reviewCount: number;
-  /** Betriebssitz. Grundlage fuer die Entfernungsberechnung im Matching. */
+  /** Betriebssitz. Grundlage für die Entfernungsberechnung im Matching. */
   latitude: number | null;
   longitude: number | null;
-  /** Wie weit das Unternehmen zu einem Auftrag faehrt, in Kilometern. */
+  /** Wie weit das Unternehmen zu einem Auftrag fährt, in Kilometern. */
   serviceRadiusKm: number;
   /** Median der Antwortzeit auf neue Anfragen, in Minuten. Null = noch keine Daten. */
   avgResponseMinutes: number | null;
-  /** Abgeschlossene Auftraege - fliesst als "Erfahrung" ins Matching ein. */
+  /** Abgeschlossene Aufträge - fließt als "Erfahrung" ins Matching ein. */
   completedJobCount: number;
   createdAt: IsoDateTime;
   updatedAt: IsoDateTime;
@@ -40,8 +40,8 @@ export interface BusinessService {
 }
 
 /**
- * Woechentlich wiederkehrende Verfuegbarkeit.
- * Der Kunde sieht spaeter nur Zeitfenster, die hier freigegeben sind.
+ * Wöchentlich wiederkehrende Verfügbarkeit.
+ * Der Kunde sieht später nur Zeitfenster, die hier freigegeben sind.
  */
 export interface AvailabilitySlot {
   id: Uuid;

@@ -1,10 +1,10 @@
 import type { ApiErrorCode } from "@jobflow/types";
 
 /**
- * Fehler, die bewusst nach aussen gehen.
+ * Fehler, die bewusst nach außen gehen.
  *
- * Alles andere (Programmierfehler, Datenbankausfaelle) wird zu einem
- * INTERNAL_ERROR ohne Details - interne Meldungen gehoeren ins Log, nicht
+ * Alles andere (Programmierfehler, Datenbankausfälle) wird zu einem
+ * INTERNAL_ERROR ohne Details - interne Meldungen gehören ins Log, nicht
  * in die Antwort an einen fremden Client.
  */
 export class ApiError extends Error {
@@ -20,7 +20,7 @@ export class ApiError extends Error {
     this.fields = fields;
   }
 
-  static validation(fields: Record<string, string>, message = "Bitte pruefe deine Eingaben."): ApiError {
+  static validation(fields: Record<string, string>, message = "Bitte prüfe deine Eingaben."): ApiError {
     return new ApiError(422, "VALIDATION_FAILED", message, fields);
   }
 
@@ -29,9 +29,9 @@ export class ApiError extends Error {
   }
 
   /**
-   * Bewusst auch dann, wenn ein Objekt existiert, aber jemand anderem gehoert:
-   * ein 404 verraet weniger als ein 403. Ausnahme sind Faelle, in denen der
-   * Nutzer das Objekt sehen darf, nur die Aktion nicht ausfuehren.
+   * Bewusst auch dann, wenn ein Objekt existiert, aber jemand anderem gehört:
+   * ein 404 verrät weniger als ein 403. Ausnahme sind Fälle, in denen der
+   * Nutzer das Objekt sehen darf, nur die Aktion nicht ausführen.
    */
   static forbidden(message = "Dazu fehlt dir die Berechtigung."): ApiError {
     return new ApiError(403, "FORBIDDEN", message);

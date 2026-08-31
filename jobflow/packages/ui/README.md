@@ -1,17 +1,17 @@
 # packages/ui — noch nicht gebaut
 
-Hier sollen spaeter die UI-Komponenten liegen, die sich Mobile- und Web-App
+Hier sollen später die UI-Komponenten liegen, die sich Mobile- und Web-App
 teilen.
 
-**Warum noch nicht:** Solange es nur eine Oberflaeche gibt, waere ein
+**Warum noch nicht:** Solange es nur eine Oberfläche gibt, wäre ein
 gemeinsames Paket eine Abstraktion ohne zweiten Verwender — und damit
-zuverlaessig die falsche. Die Komponenten liegen deshalb vorerst direkt in
+zuverlässig die falsche. Die Komponenten liegen deshalb vorerst direkt in
 `apps/mobile/components/`.
 
-**Was schon geteilt wird:** Die Design-Tokens. Farben, Abstaende, Radien und
-Schriftgroessen stehen in `@jobflow/config` und werden von der Mobile-App nur
-noch verwendet, nicht mehr definiert. Damit laesst sich das Branding an einer
-Stelle aendern, und die Web-App wird spaeter dieselben Werte benutzen.
+**Was schon geteilt wird:** Die Design-Tokens. Farben, Abstände, Radien und
+Schriftgrößen stehen in `@jobflow/config` und werden von der Mobile-App nur
+noch verwendet, nicht mehr definiert. Damit lässt sich das Branding an einer
+Stelle ändern, und die Web-App wird später dieselben Werte benutzen.
 
 Sobald `apps/web` existiert, wandern die Komponenten hierher, die beide
-Oberflaechen wirklich gemeinsam haben.
+Oberflächen wirklich gemeinsam haben.

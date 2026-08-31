@@ -1,9 +1,9 @@
 -- 0001 Fundament: Hilfsfunktionen und Benutzer.
 --
 -- gen_random_uuid() ist seit PostgreSQL 13 im Kern enthalten, daher braucht
--- JobFlow keine zusaetzliche Extension.
+-- JobFlow keine zusätzliche Extension.
 
--- Haelt updated_at aktuell, ohne dass jede Abfrage daran denken muss.
+-- Hält updated_at aktuell, ohne dass jede Abfrage daran denken muss.
 CREATE OR REPLACE FUNCTION jobflow_touch_updated_at() RETURNS trigger AS $$
 BEGIN
   NEW.updated_at = now();
@@ -21,7 +21,7 @@ CREATE TABLE users (
   password_hash text NOT NULL,
   role          text NOT NULL CHECK (role IN ('CUSTOMER', 'BUSINESS', 'BUSINESS_EMPLOYEE', 'ADMIN')),
   phone         text,
-  -- Gesetzt, sobald ein Konto gesperrt wurde. Gesperrte Konten koennen sich
+  -- Gesetzt, sobald ein Konto gesperrt wurde. Gesperrte Konten können sich
   -- nicht anmelden und bestehende Sessions werden verworfen.
   blocked_at    timestamptz,
   created_at    timestamptz NOT NULL DEFAULT now(),
@@ -35,7 +35,7 @@ CREATE TRIGGER users_touch_updated_at
   FOR EACH ROW EXECUTE FUNCTION jobflow_touch_updated_at();
 
 -- Sessions liegen in der Datenbank, damit eine Abmeldung sofort wirkt und
--- gesperrte Konten wirklich ausgesperrt sind. Ein reines JWT koennte das nicht.
+-- gesperrte Konten wirklich ausgesperrt sind. Ein reines JWT könnte das nicht.
 CREATE TABLE sessions (
   id         uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id    uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,

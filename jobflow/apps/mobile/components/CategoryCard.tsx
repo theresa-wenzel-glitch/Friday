@@ -32,7 +32,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     gap: spacing.sm,
-    // Drei Karten pro Zeile mit den Abstaenden dazwischen.
+    // Drei Karten pro Zeile mit den Abständen dazwischen.
     flexBasis: "30%",
     flexGrow: 1,
     minHeight: 96,

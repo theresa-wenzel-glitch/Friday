@@ -1,10 +1,10 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 
 /**
- * CORS nur fuer ausdruecklich erlaubte Origins.
+ * CORS nur für ausdrücklich erlaubte Origins.
  *
  * Kein "*": die API antwortet mit nutzerbezogenen Daten und muss wissen,
- * welche Web-Oberflaechen sie ansprechen duerfen. Die Mobile-App ist von CORS
+ * welche Web-Oberflächen sie ansprechen dürfen. Die Mobile-App ist von CORS
  * ohnehin nicht betroffen.
  */
 export function applyCors(req: IncomingMessage, res: ServerResponse, allowed: string[]): void {

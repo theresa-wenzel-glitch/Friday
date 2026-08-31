@@ -8,7 +8,7 @@ interface Props {
   accessibilityLabel?: string;
 }
 
-/** Grosse, weich gerundete Karte - das praegende Element der Oberflaeche. */
+/** Große, weich gerundete Karte - das prägende Element der Oberfläche. */
 export function Card({ children, onPress, style, accessibilityLabel }: Props) {
   if (onPress === undefined) {
     return <View style={[styles.card, style]}>{children}</View>;

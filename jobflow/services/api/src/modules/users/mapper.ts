@@ -16,9 +16,9 @@ export interface UserRow {
 /**
  * Datenbankzeile -> API-Objekt.
  *
- * Diese Uebersetzung ist die Stelle, an der password_hash verschwindet. Sie
+ * Diese Übersetzung ist die Stelle, an der password_hash verschwindet. Sie
  * findet an genau einer Stelle statt, damit der Hash nicht irgendwann doch
- * ueber einen neuen Endpunkt nach aussen gelangt.
+ * über einen neuen Endpunkt nach außen gelangt.
  */
 export function mapUser(row: UserRow): User {
   return {

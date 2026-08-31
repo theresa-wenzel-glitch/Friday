@@ -4,16 +4,16 @@ import type { AiAnalysisInput, AiProvider, AiSuggestionInput } from "./provider.
 /**
  * Ein regelbasierter Provider ohne externen Dienst.
  *
- * Er ist kein Ersatz fuer ein Sprachmodell, aber er erfuellt genau denselben
- * Vertrag. Damit laesst sich die gesamte Plattform - Anfrage, Rueckfragen,
+ * Er ist kein Ersatz für ein Sprachmodell, aber er erfüllt genau denselben
+ * Vertrag. Damit lässt sich die gesamte Plattform - Anfrage, Rückfragen,
  * Matching, Angebot - entwickeln und testen, ohne von einem Modell und dessen
- * Kosten abzuhaengen. Der Austausch gegen ein echtes Modell ist spaeter eine
+ * Kosten abzuhängen. Der Austausch gegen ein echtes Modell ist später eine
  * Zeile in der Konfiguration.
  */
 
 interface Rule {
   slug: string;
-  /** Woerter, die auf diese Kategorie hindeuten. */
+  /** Wörter, die auf diese Kategorie hindeuten. */
   keywords: string[];
   summary: string;
   questions: string[];
@@ -25,7 +25,7 @@ const RULES: Rule[] = [
     keywords: ["heizung", "heizkörper", "heizkoerper", "thermostat", "warmwasser", "therme", "kessel"],
     summary: "Die Heizung arbeitet nicht wie erwartet.",
     questions: [
-      "Sind mehrere Heizkoerper betroffen oder nur einer?",
+      "Sind mehrere Heizkörper betroffen oder nur einer?",
       "Seit wann besteht das Problem?",
       "Welche Heizungsanlage ist verbaut?",
     ],
@@ -33,33 +33,33 @@ const RULES: Rule[] = [
   {
     slug: "sanitaer",
     keywords: ["waschbecken", "wasserhahn", "abfluss", "toilette", "wc", "dusche", "rohr", "tropft", "undicht", "verstopft", "spülkasten", "spuelkasten"],
-    summary: "An der Sanitaerinstallation tritt ein Defekt auf.",
+    summary: "An der Sanitärinstallation tritt ein Defekt auf.",
     questions: [
       "Wo genau tritt das Wasser aus?",
       "Seit wann besteht das Problem?",
-      "Laesst sich das Wasser abstellen?",
+      "Lässt sich das Wasser abstellen?",
     ],
   },
   {
     slug: "elektrik",
     keywords: ["strom", "steckdose", "sicherung", "lichtschalter", "kabel", "fi", "kurzschluss", "lampe"],
-    summary: "Es liegt eine Stoerung an der Elektroinstallation vor.",
+    summary: "Es liegt eine Störung an der Elektroinstallation vor.",
     questions: [
       "Ist nur ein Raum betroffen oder die ganze Wohnung?",
-      "Hat die Sicherung ausgeloest?",
+      "Hat die Sicherung ausgelöst?",
     ],
   },
   {
     slug: "maler",
     keywords: ["streichen", "malern", "tapete", "wand", "anstrich", "lackieren", "farbe"],
-    summary: "Es werden Malerarbeiten benoetigt.",
-    questions: ["Wie viele Quadratmeter sind es ungefaehr?", "Sind die Waende vorbereitet?"],
+    summary: "Es werden Malerarbeiten benötigt.",
+    questions: ["Wie viele Quadratmeter sind es ungefähr?", "Sind die Wände vorbereitet?"],
   },
   {
     slug: "dach",
     keywords: ["dach", "ziegel", "dachrinne", "regenrinne", "dachfenster", "undichtes dach"],
     summary: "Am Dach besteht ein Schaden.",
-    questions: ["Tritt bereits Wasser ins Gebaeude ein?", "Wie viele Geschosse hat das Gebaeude?"],
+    questions: ["Tritt bereits Wasser ins Gebäude ein?", "Wie viele Geschosse hat das Gebäude?"],
   },
   {
     slug: "schluessel",
@@ -70,20 +70,20 @@ const RULES: Rule[] = [
   {
     slug: "kfz-reparatur",
     keywords: ["auto", "motor", "bremse", "kupplung", "auspuff", "werkstatt", "fahrzeug", "pkw"],
-    summary: "Am Fahrzeug ist eine Reparatur noetig.",
+    summary: "Am Fahrzeug ist eine Reparatur nötig.",
     questions: ["Welches Fahrzeugmodell und Baujahr?", "Ist das Fahrzeug noch fahrbereit?"],
   },
   {
     slug: "kfz-reifen",
     keywords: ["reifen", "felge", "reifenwechsel", "platten", "winterreifen", "sommerreifen"],
     summary: "Es geht um Reifen oder einen Reifenwechsel.",
-    questions: ["Welche Reifengroesse wird benoetigt?", "Sind die Reifen bereits vorhanden?"],
+    questions: ["Welche Reifengröße wird benötigt?", "Sind die Reifen bereits vorhanden?"],
   },
   {
     slug: "reinigung",
     keywords: ["putzen", "reinigung", "sauber", "fenster putzen", "grundreinigung", "haushalt"],
-    summary: "Es werden Reinigungsarbeiten benoetigt.",
-    questions: ["Wie gross ist die zu reinigende Flaeche?", "Einmalig oder regelmaessig?"],
+    summary: "Es werden Reinigungsarbeiten benötigt.",
+    questions: ["Wie groß ist die zu reinigende Fläche?", "Einmalig oder regelmäßig?"],
   },
   {
     slug: "umzug",
@@ -95,25 +95,25 @@ const RULES: Rule[] = [
     slug: "montage",
     keywords: ["aufbauen", "montage", "schrank", "regal", "küche montieren", "kueche montieren", "möbel aufbauen"],
     summary: "Es sollen Moebel montiert werden.",
-    questions: ["Um welche Moebelstuecke geht es?", "Liegt eine Aufbauanleitung vor?"],
+    questions: ["Um welche Möbelstücke geht es?", "Liegt eine Aufbauanleitung vor?"],
   },
   {
     slug: "gartenpflege",
     keywords: ["rasen", "hecke", "unkraut", "garten", "mähen", "maehen", "beet"],
     summary: "Der Garten soll gepflegt werden.",
-    questions: ["Wie gross ist die Flaeche ungefaehr?", "Einmalig oder regelmaessig?"],
+    questions: ["Wie groß ist die Fläche ungefähr?", "Einmalig oder regelmäßig?"],
   },
   {
     slug: "baumpflege",
     keywords: ["baum", "baumfällung", "baumfaellung", "äste", "aeste", "stubben"],
-    summary: "An Baeumen sind Arbeiten noetig.",
-    questions: ["Wie hoch ist der Baum ungefaehr?", "Steht er frei zugaenglich?"],
+    summary: "An Bäumen sind Arbeiten nötig.",
+    questions: ["Wie hoch ist der Baum ungefähr?", "Steht er frei zugänglich?"],
   },
   {
     slug: "nachhilfe",
     keywords: ["nachhilfe", "mathe", "lernen", "schule", "hausaufgaben", "abitur"],
-    summary: "Es wird Unterstuetzung beim Lernen gesucht.",
-    questions: ["Um welches Fach und welche Klassenstufe geht es?", "Praesenz oder online?"],
+    summary: "Es wird Unterstützung beim Lernen gesucht.",
+    questions: ["Um welches Fach und welche Klassenstufe geht es?", "Präsenz oder online?"],
   },
   {
     slug: "fotografie",
@@ -123,13 +123,13 @@ const RULES: Rule[] = [
   },
 ];
 
-/** Woerter, die auf hohe Dringlichkeit hindeuten. */
+/** Wörter, die auf hohe Dringlichkeit hindeuten. */
 const URGENT_KEYWORDS = [
-  "notfall", "dringend", "sofort", "läuft aus", "laeuft aus", "überschwemmt", "ueberschwemmt",
+  "notfall", "dringend", "sofort", "läuft aus", "laeuft aus", "überschwemmt", "überschwemmt",
   "wasserschaden", "kein strom", "ausgesperrt", "gasgeruch", "brennt", "friert",
 ];
 
-const RELAXED_KEYWORDS = ["irgendwann", "keine eile", "gelegentlich", "in den nächsten wochen", "in den naechsten wochen"];
+const RELAXED_KEYWORDS = ["irgendwann", "keine eile", "gelegentlich", "in den nächsten wochen", "in den nächsten wochen"];
 
 function normalize(text: string): string {
   return text.toLowerCase().replace(/\s+/g, " ");
@@ -158,14 +158,14 @@ export class RulesAiProvider implements AiProvider {
 
     if (best === null) {
       // Keine Regel greift. Dann sagt der Provider das ehrlich - eine geratene
-      // Kategorie mit hoher Konfidenz waere schlimmer als gar keine.
+      // Kategorie mit hoher Konfidenz wäre schlimmer als gar keine.
       return {
         categorySlug: null,
         summary: summarizeUnknown(input.description),
         urgency,
         questions: [
           "Um welche Art von Leistung geht es genau?",
-          "Wo soll die Arbeit ausgefuehrt werden?",
+          "Wo soll die Arbeit ausgeführt werden?",
         ],
         confidence: 0.2,
       };
@@ -175,7 +175,7 @@ export class RulesAiProvider implements AiProvider {
     const asked = new Set((input.answeredQuestions ?? []).map((q) => q.question));
     const open = best.rule.questions.filter((question) => !asked.has(question));
 
-    // Ein Foto ersetzt oft eine Rueckfrage.
+    // Ein Foto ersetzt oft eine Rückfrage.
     const questions = input.photoCount > 0 ? open.slice(0, 2) : open.slice(0, 3);
 
     return {
@@ -183,7 +183,7 @@ export class RulesAiProvider implements AiProvider {
       summary: best.rule.summary,
       urgency,
       questions,
-      // Mehrere passende Stichwoerter erhoehen die Zuversicht, aber nie auf 1:
+      // Mehrere passende Stichwörter erhöhen die Zuversicht, aber nie auf 1:
       // ein Regelwerk kann sich nicht sicher sein.
       confidence: Math.min(0.9, 0.55 + best.hits * 0.1),
     };
@@ -192,14 +192,14 @@ export class RulesAiProvider implements AiProvider {
   async suggestText(input: AiSuggestionInput): Promise<string> {
     if (input.kind === "OFFER_DESCRIPTION") {
       return [
-        "Vielen Dank fuer Ihre Anfrage.",
-        `Wir kuemmern uns um folgendes Anliegen: ${input.context}`,
-        "Das Angebot umfasst Anfahrt, Arbeitszeit und das benoetigte Material.",
-        "Sollte sich vor Ort ein groesserer Aufwand zeigen, stimmen wir uns vorher mit Ihnen ab.",
+        "Vielen Dank für Ihre Anfrage.",
+        `Wir kümmern uns um folgendes Anliegen: ${input.context}`,
+        "Das Angebot umfasst Anfahrt, Arbeitszeit und das benötigte Material.",
+        "Sollte sich vor Ort ein größerer Aufwand zeigen, stimmen wir uns vorher mit Ihnen ab.",
       ].join(" ");
     }
     return [
-      "Hallo, vielen Dank fuer Ihre Nachricht.",
+      "Hallo, vielen Dank für Ihre Nachricht.",
       input.hint ? `${input.hint}` : "Wir melden uns zeitnah mit einem konkreten Vorschlag.",
     ].join(" ");
   }
@@ -208,9 +208,9 @@ export class RulesAiProvider implements AiProvider {
 /**
  * Zusammenfassung, wenn keine Regel greift.
  *
- * Aus einer sehr kurzen Beschreibung laesst sich keine Zusammenfassung bilden.
- * Dann sagt der Provider das ausdruecklich, statt den Text durchzureichen - ein
- * Ergebnis, das der eigene Vertrag nicht erfuellt, waere schlimmer als eine
+ * Aus einer sehr kurzen Beschreibung lässt sich keine Zusammenfassung bilden.
+ * Dann sagt der Provider das ausdrücklich, statt den Text durchzureichen - ein
+ * Ergebnis, das der eigene Vertrag nicht erfüllt, wäre schlimmer als eine
  * ehrliche Auskunft.
  */
 function summarizeUnknown(description: string): string {

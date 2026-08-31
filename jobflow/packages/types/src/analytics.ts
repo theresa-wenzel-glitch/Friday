@@ -1,5 +1,5 @@
 /**
- * Produktereignisse fuer den Funnel.
+ * Produktereignisse für den Funnel.
  *
  * Wir messen den Weg von der Anfrage zum Auftrag - nicht Downloads.
  * Die Ereignisse enthalten bewusst keine personenbezogenen Freitexte.

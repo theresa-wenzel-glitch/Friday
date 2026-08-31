@@ -32,8 +32,8 @@ export function createApiServer(app: AppServices): Server {
       })
       .finally(() => {
         const durationMs = Number(process.hrtime.bigint() - startedAt) / 1_000_000;
-        // Der Pfad wird ohne Query protokolliert - dort koennen Suchbegriffe
-        // und andere persoenliche Angaben stehen.
+        // Der Pfad wird ohne Query protokolliert - dort können Suchbegriffe
+        // und andere persönliche Angaben stehen.
         app.logger.info("request", {
           method: req.method,
           path: url.pathname,
@@ -69,7 +69,7 @@ async function handle(
 
     const data = await match.handler(ctx);
     // Ein Handler, der selbst geantwortet hat (etwa ein Datei-Download),
-    // liefert undefined zurueck.
+    // liefert undefined zurück.
     if (res.writableEnded) return;
     sendJson(res, statusFor(req.method ?? "GET", data), success(data ?? null));
   } catch (error) {
@@ -78,8 +78,8 @@ async function handle(
       return;
     }
 
-    // Alles andere ist ein Fehler auf unserer Seite. Details gehoeren ins Log,
-    // nicht in die Antwort - sonst verraet eine Fehlermeldung die Struktur der
+    // Alles andere ist ein Fehler auf unserer Seite. Details gehören ins Log,
+    // nicht in die Antwort - sonst verrät eine Fehlermeldung die Struktur der
     // Datenbank.
     app.logger.error("unbehandelter Fehler", {
       path: url.pathname,

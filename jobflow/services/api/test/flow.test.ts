@@ -18,9 +18,9 @@ import { expectOk, skipUnlessDatabase, startHarness, TestClient, uniqueEmail, ty
  * Der komplette Weg durch die Plattform - einmal von vorne bis hinten.
  *
  * Genau dieser Ablauf ist JobFlow:
- *   Anfrage -> KI -> Rueckfragen -> Matching -> Angebot -> Termin -> Auftrag -> Bewertung
+ *   Anfrage -> KI -> Rückfragen -> Matching -> Angebot -> Termin -> Auftrag -> Bewertung
  *
- * Solange dieser Test durchlaeuft, funktioniert der Kern des Produkts.
+ * Solange dieser Test durchläuft, funktioniert der Kern des Produkts.
  */
 describe("Der Weg von der Anfrage zum Auftrag", skipUnlessDatabase, () => {
   let harness: TestHarness;
@@ -37,7 +37,7 @@ describe("Der Weg von der Anfrage zum Auftrag", skipUnlessDatabase, () => {
     await harness.close();
   });
 
-  it("laeuft vollstaendig durch", async () => {
+  it("laeuft vollständig durch", async () => {
     // --- 1. Konten anlegen -------------------------------------------------
     const kundenKonto = expectOk<AuthResult>(
       await kunde.post("/auth/register", {
@@ -62,20 +62,20 @@ describe("Der Weg von der Anfrage zum Auftrag", skipUnlessDatabase, () => {
     );
     betrieb.setToken(betriebsKonto.token);
 
-    // Zum Unternehmenskonto entsteht sofort ein Profil - sonst muesste jede
-    // spaetere Abfrage den Sonderfall "Konto ohne Unternehmen" behandeln.
+    // Zum Unternehmenskonto entsteht sofort ein Profil - sonst müsste jede
+    // spätere Abfrage den Sonderfall "Konto ohne Unternehmen" behandeln.
     const profil = expectOk<Business>(await betrieb.get("/businesses/me"), "Unternehmensprofil");
     assert.equal(profil.name, "HeizPro");
 
     // --- 2. Unternehmen einrichten ----------------------------------------
     const kategorien = expectOk<Category[]>(await kunde.get("/categories"), "Kategorien");
     const heizung = kategorien.find((category) => category.slug === "heizung");
-    assert.ok(heizung, "Die Seed-Daten muessen die Kategorie Heizung enthalten.");
+    assert.ok(heizung, "Die Seed-Daten müssen die Kategorie Heizung enthalten.");
 
     expectOk<Business>(
       await betrieb.patch("/businesses/me", {
         name: "HeizPro",
-        description: "Heizungsbau und Sanitaerinstallation im Ruhrgebiet.",
+        description: "Heizungsbau und Sanitärinstallation im Ruhrgebiet.",
         latitude: 51.4508,
         longitude: 7.0131,
         serviceRadiusKm: 40,
@@ -87,7 +87,7 @@ describe("Der Weg von der Anfrage zum Auftrag", skipUnlessDatabase, () => {
       await betrieb.post("/businesses/me/services", {
         categoryId: heizung.id,
         name: "Heizungsreparatur",
-        description: "Stoerungssuche und Reparatur an Heizungsanlagen.",
+        description: "Störungssuche und Reparatur an Heizungsanlagen.",
         priceMinCents: 8000,
         priceMaxCents: 25000,
       }),
@@ -102,7 +102,7 @@ describe("Der Weg von der Anfrage zum Auftrag", skipUnlessDatabase, () => {
           { weekday: 2, startTime: "09:00", endTime: "17:00" },
         ],
       }),
-      "Verfuegbarkeit hinterlegen",
+      "Verfügbarkeit hinterlegen",
     );
 
     // --- 3. Anfrage: "Meine Heizung wird nicht warm." ----------------------
@@ -133,19 +133,19 @@ describe("Der Weg von der Anfrage zum Auftrag", skipUnlessDatabase, () => {
       "Analyse",
     );
     assert.equal(analyse.categoryId, heizung.id, "Die KI soll die Heizung erkennen.");
-    assert.ok(analyse.questions.length > 0, "Es soll Rueckfragen geben.");
+    assert.ok(analyse.questions.length > 0, "Es soll Rückfragen geben.");
     assert.ok(analyse.confidence > 0 && analyse.confidence <= 1);
 
-    // --- 5. Rueckfragen beantworten ---------------------------------------
+    // --- 5. Rückfragen beantworten ---------------------------------------
     const ersteFrage = analyse.questions[0];
     assert.ok(ersteFrage);
     const beantwortet = expectOk<{ answer: string | null }>(
       await kunde.post(`/requests/${anfrage.id}/questions/${ersteFrage.id}`, {
-        answer: "Alle Heizkoerper sind betroffen, seit gestern Abend.",
+        answer: "Alle Heizkörper sind betroffen, seit gestern Abend.",
       }),
-      "Rueckfrage beantworten",
+      "Rückfrage beantworten",
     );
-    assert.equal(beantwortet.answer, "Alle Heizkoerper sind betroffen, seit gestern Abend.");
+    assert.equal(beantwortet.answer, "Alle Heizkörper sind betroffen, seit gestern Abend.");
 
     // --- 6. Matching ------------------------------------------------------
     const treffer = expectOk<MatchWithBusiness[]>(
@@ -157,7 +157,7 @@ describe("Der Weg von der Anfrage zum Auftrag", skipUnlessDatabase, () => {
     assert.ok(treffer0);
     assert.equal(treffer0.business.id, profil.id);
     assert.ok(treffer0.score > 0 && treffer0.score <= 100);
-    assert.ok(treffer0.reasons.length > 0, "Der Vorschlag muss begruendet sein.");
+    assert.ok(treffer0.reasons.length > 0, "Der Vorschlag muss begründet sein.");
     assert.ok(
       treffer0.distanceKm !== null && treffer0.distanceKm < 5,
       "Essen liegt nur wenige Kilometer entfernt.",
@@ -169,7 +169,7 @@ describe("Der Weg von der Anfrage zum Auftrag", skipUnlessDatabase, () => {
     assert.equal(anfragenDesBetriebs[0]?.requestId, anfrage.id);
 
     // Es darf die Anfrage lesen - inklusive der KI-Zusammenfassung.
-    const gelesen = expectOk<ServiceRequest>(await betrieb.get(`/requests/${anfrage.id}`), "Anfrage oeffnen");
+    const gelesen = expectOk<ServiceRequest>(await betrieb.get(`/requests/${anfrage.id}`), "Anfrage öffnen");
     assert.equal(gelesen.id, anfrage.id);
     const zusammenfassung = expectOk<AiAnalysisDetail>(
       await betrieb.get(`/requests/${anfrage.id}/analysis`),
@@ -184,7 +184,7 @@ describe("Der Weg von der Anfrage zum Auftrag", skipUnlessDatabase, () => {
     );
     assert.ok(vorschlag.text.length > 20);
     // Der Vorschlag ist als KI-Text gekennzeichnet - der Betrieb entscheidet,
-    // ob er ihn uebernimmt.
+    // ob er ihn übernimmt.
     assert.equal(vorschlag.isAiGenerated, true);
 
     const angebot = expectOk<Offer>(
@@ -225,7 +225,7 @@ describe("Der Weg von der Anfrage zum Auftrag", skipUnlessDatabase, () => {
       await kunde.get(`/businesses/${profil.id}/availability`),
       "Freie Zeiten",
     );
-    assert.ok(freieZeiten.length > 0, "Aus dem Wochenplan muessen sich Zeitfenster ergeben.");
+    assert.ok(freieZeiten.length > 0, "Aus dem Wochenplan müssen sich Zeitfenster ergeben.");
 
     const ersterSlot = freieZeiten[0];
     assert.ok(ersterSlot);
@@ -240,13 +240,13 @@ describe("Der Weg von der Anfrage zum Auftrag", skipUnlessDatabase, () => {
     assert.equal(termin.status, "CONFIRMED");
 
     // --- 12. Chat ---------------------------------------------------------
-    const gespraeche = expectOk<{ id: string }[]>(await kunde.get("/conversations"), "Gespraeche");
-    assert.equal(gespraeche.length, 1, "Zum Angebot gehoert ein Gespraechsfaden.");
+    const gespraeche = expectOk<{ id: string }[]>(await kunde.get("/conversations"), "Gespräche");
+    assert.equal(gespraeche.length, 1, "Zum Angebot gehört ein Gesprächsfaden.");
     const gespraech = gespraeche[0];
     assert.ok(gespraech);
 
     expectOk(
-      await kunde.post(`/conversations/${gespraech.id}/messages`, { body: "Wann koennen Sie kommen?" }),
+      await kunde.post(`/conversations/${gespraech.id}/messages`, { body: "Wann können Sie kommen?" }),
       "Nachricht senden",
     );
     const nachrichten = expectOk<{ body: string; isAiGenerated: boolean }[]>(
@@ -256,14 +256,14 @@ describe("Der Weg von der Anfrage zum Auftrag", skipUnlessDatabase, () => {
     assert.equal(nachrichten.length, 1);
     assert.equal(nachrichten[0]?.isAiGenerated, false);
 
-    // --- 13. Auftrag durchfuehren -----------------------------------------
+    // --- 13. Auftrag durchführen -----------------------------------------
     expectOk<Job>(
       await betrieb.patch(`/jobs/${angenommen.job.id}/status`, { status: "IN_PROGRESS" }),
       "Auftrag beginnen",
     );
     const fertig = expectOk<Job>(
       await betrieb.patch(`/jobs/${angenommen.job.id}/status`, { status: "COMPLETED" }),
-      "Auftrag abschliessen",
+      "Auftrag abschließen",
     );
     assert.equal(fertig.status, "COMPLETED");
     assert.ok(fertig.completedAt !== null);
@@ -279,13 +279,13 @@ describe("Der Weg von der Anfrage zum Auftrag", skipUnlessDatabase, () => {
       await kunde.post("/reviews", {
         jobId: angenommen.job.id,
         rating: 5,
-        text: "Sehr freundlicher und zuverlaessiger Service.",
+        text: "Sehr freundlicher und zuverlässiger Service.",
       }),
       "Bewertung",
     );
     assert.equal(bewertung.rating, 5);
 
-    // Der Durchschnitt wird am Unternehmen fortgeschrieben - sonst muesste das
+    // Der Durchschnitt wird am Unternehmen fortgeschrieben - sonst müsste das
     // Matching bei jeder Anfrage alle Bewertungen zusammenrechnen.
     const nachBewertung = expectOk<Business>(await betrieb.get("/businesses/me"), "Profil nach Bewertung");
     assert.equal(nachBewertung.rating, 5);
@@ -307,7 +307,7 @@ describe("Der Weg von der Anfrage zum Auftrag", skipUnlessDatabase, () => {
 
   it("zeichnet den Funnel als Ereignisse auf", async () => {
     // Downloads sind nicht die Kennzahl. Wir wollen wissen, wie viele Anfragen
-    // tatsaechlich zu Auftraegen werden - dafuer braucht es diese Ereignisse.
+    // tatsächlich zu Aufträgen werden - dafür braucht es diese Ereignisse.
     const result = await harness.app.db.query<{ name: string; count: string }>(
       "SELECT name, count(*)::text AS count FROM analytics_events GROUP BY name",
     );

@@ -46,7 +46,7 @@ export default function DashboardScreen() {
           setStatistics(stats);
           setMatches(newMatches);
         } catch {
-          // Ohne Daten bleibt der Screen leer, statt abzustuerzen.
+          // Ohne Daten bleibt der Screen leer, statt abzustürzen.
         } finally {
           if (!cancelled) setLoading(false);
         }
@@ -76,9 +76,9 @@ export default function DashboardScreen() {
 
       {incomplete ? (
         <Card style={styles.hint}>
-          <Text style={styles.hintTitle}>Profil vervollstaendigen</Text>
+          <Text style={styles.hintTitle}>Profil vervollständigen</Text>
           <Text style={styles.hintText}>
-            Ohne Standort und Leistungen findet dich das Matching nicht. Beides laesst sich im Profil
+            Ohne Standort und Leistungen findet dich das Matching nicht. Beides lässt sich im Profil
             hinterlegen.
           </Text>
         </Card>
@@ -87,14 +87,14 @@ export default function DashboardScreen() {
       <View style={styles.tiles}>
         <Tile label="Neue Anfragen" value={String(statistics?.matchCount ?? 0)} />
         <Tile label="Angebote" value={String(statistics?.offerCount ?? 0)} />
-        <Tile label="Auftraege" value={String(statistics?.jobCount ?? 0)} />
+        <Tile label="Aufträge" value={String(statistics?.jobCount ?? 0)} />
         <Tile label="Angebotsquote" value={`${statistics?.offerRate ?? 0} %`} />
       </View>
 
       <Card>
         <Text style={styles.sectionTitle}>Kennzahlen</Text>
         <Metric
-          label="Aus Angeboten werden Auftraege"
+          label="Aus Angeboten werden Aufträge"
           value={`${statistics?.winRate ?? 0} %`}
         />
         <Metric
@@ -128,7 +128,7 @@ export default function DashboardScreen() {
             <Card
               key={match.id}
               onPress={() => router.push(`/(app)/requests/${match.requestId}`)}
-              accessibilityLabel="Anfrage oeffnen"
+              accessibilityLabel="Anfrage öffnen"
             >
               <View style={styles.matchHeader}>
                 <Text style={styles.matchScore}>Passung {match.score}</Text>

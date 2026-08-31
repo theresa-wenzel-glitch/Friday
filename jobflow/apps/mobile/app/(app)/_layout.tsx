@@ -8,15 +8,18 @@ import { useSession } from "../../lib/session.js";
  * Die Navigation der angemeldeten App.
  *
  * Kunde und Unternehmen sehen unterschiedliche Reiter. Das ist der Kern der
- * Entscheidung, beide Rollen in einer Codebasis zu fuehren: dieselben
- * Komponenten und derselbe Datenfluss, aber zwei getrennte Oberflaechen.
+ * Entscheidung, beide Rollen in einer Codebasis zu führen: dieselben
+ * Komponenten und derselbe Datenfluss, aber zwei getrennte Oberflächen.
+ *
+ * Detailseiten bekommen href: null - sie sind über den Ablauf erreichbar und
+ * hätten in der Leiste nichts verloren.
  */
 export default function AppLayout() {
   const { user, loading } = useSession();
 
   useEffect(() => {
-    // Ohne Anmeldung gibt es hier nichts zu sehen. Verbindlich prueft das
-    // ohnehin das Backend - dies ist nur die Fuehrung durch die App.
+    // Ohne Anmeldung gibt es hier nichts zu sehen. Verbindlich prüft das
+    // ohnehin das Backend - dies ist nur die Führung durch die App.
     if (!loading && user === null) router.replace("/");
   }, [user, loading]);
 
@@ -64,14 +67,45 @@ export default function AppLayout() {
         }}
       />
       <Tabs.Screen
+        name="jobs/index"
+        options={{
+          title: "Aufträge",
+          href: isBusiness ? "/(app)/jobs" : null,
+          tabBarIcon: ({ color }) => <TabIcon icon="🧾" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="chat"
+        options={{
+          title: "Chat",
+          tabBarIcon: ({ color }) => <TabIcon icon="💬" color={color} />,
+        }}
+      />
+      <Tabs.Screen
         name="profile"
         options={{
           title: "Profil",
+          href: isBusiness ? null : "/(app)/profile",
           tabBarIcon: ({ color }) => <TabIcon icon="👤" color={color} />,
         }}
       />
-      {/* Detailseiten gehoeren nicht in die Leiste. */}
+      <Tabs.Screen
+        name="business-profile"
+        options={{
+          title: "Profil",
+          href: isBusiness ? "/(app)/business-profile" : null,
+          tabBarIcon: ({ color }) => <TabIcon icon="🏢" color={color} />,
+        }}
+      />
+
+      {/* Über den Ablauf erreichbar, nicht über die Leiste. */}
       <Tabs.Screen name="requests/[id]" options={{ href: null }} />
+      <Tabs.Screen name="offers/[id]" options={{ href: null }} />
+      <Tabs.Screen name="jobs/[id]" options={{ href: null }} />
+      <Tabs.Screen name="appointment" options={{ href: null }} />
+      <Tabs.Screen name="review" options={{ href: null }} />
+      <Tabs.Screen name="create-offer" options={{ href: null }} />
+      <Tabs.Screen name="statistics" options={{ href: null }} />
     </Tabs>
   );
 }

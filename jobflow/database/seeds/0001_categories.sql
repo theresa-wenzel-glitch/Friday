@@ -1,8 +1,8 @@
 -- Startkategorien.
 --
--- Das sind Ausgangsdaten, keine feste Struktur: spaeter werden Kategorien
--- ueber die Administration gepflegt. Die Seeds sind idempotent, ein zweiter
--- Lauf aendert nichts.
+-- Das sind Ausgangsdaten, keine feste Struktur: später werden Kategorien
+-- über die Administration gepflegt. Die Seeds sind idempotent, ein zweiter
+-- Lauf ändert nichts.
 
 INSERT INTO categories (slug, name, icon, parent_id, position) VALUES
   ('handwerk',         'Handwerk',           '🔨', NULL, 10),
@@ -16,13 +16,13 @@ ON CONFLICT (slug) DO NOTHING;
 INSERT INTO categories (slug, name, icon, parent_id, position)
 SELECT v.slug, v.name, v.icon, p.id, v.position
 FROM (VALUES
-  ('sanitaer',     'Sanitaer',            '🚿', 'handwerk', 10),
+  ('sanitaer',     'Sanitär',            '🚿', 'handwerk', 10),
   ('elektrik',     'Elektrik',            '💡', 'handwerk', 20),
   ('heizung',      'Heizung',             '🔥', 'handwerk', 30),
   ('maler',        'Maler',               '🎨', 'handwerk', 40),
   ('dach',         'Dach',                '🏘️', 'handwerk', 50),
   ('schreiner',    'Schreiner',           '🪚', 'handwerk', 60),
-  ('schluessel',   'Schluesseldienst',    '🔑', 'handwerk', 70),
+  ('schluessel',   'Schlüsseldienst',    '🔑', 'handwerk', 70),
 
   ('kfz-reparatur', 'Reparatur',          '🔧', 'auto', 10),
   ('kfz-reifen',    'Reifen',             '🛞', 'auto', 20),
@@ -30,7 +30,7 @@ FROM (VALUES
 
   ('reinigung',    'Reinigung',           '🧽', 'haushalt', 10),
   ('umzug',        'Umzug',               '📦', 'haushalt', 20),
-  ('montage',      'Moebelmontage',       '🪛', 'haushalt', 30),
+  ('montage',      'Möbelmontage',       '🪛', 'haushalt', 30),
 
   ('gartenpflege', 'Gartenpflege',        '✂️', 'garten', 10),
   ('gartenbau',    'Gartengestaltung',    '🌱', 'garten', 20),

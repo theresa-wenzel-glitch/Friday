@@ -16,15 +16,15 @@ CREATE INDEX analytics_events_name_idx ON analytics_events (name, created_at DES
 CREATE INDEX analytics_events_request_idx ON analytics_events (request_id) WHERE request_id IS NOT NULL;
 
 -- Protokoll sicherheitsrelevanter Aktionen (Anmeldung, Sperrung, Verifizierung,
--- Angebotsannahme). Wird nur geschrieben, nie geaendert.
+-- Angebotsannahme). Wird nur geschrieben, nie geändert.
 CREATE TABLE audit_log (
   id          bigserial PRIMARY KEY,
   actor_id    uuid REFERENCES users(id) ON DELETE SET NULL,
   action      text NOT NULL,
   entity_type text,
   entity_id   uuid,
-  -- Auf /24 bzw. /48 gekuerzte IP-Adresse: genug fuer Missbrauchserkennung,
-  -- ohne einen vollstaendigen Bewegungsverlauf zu speichern.
+  -- Auf /24 bzw. /48 gekürzte IP-Adresse: genug für Missbrauchserkennung,
+  -- ohne einen vollständigen Bewegungsverlauf zu speichern.
   ip_prefix   text,
   detail      jsonb NOT NULL DEFAULT '{}'::jsonb,
   created_at  timestamptz NOT NULL DEFAULT now()

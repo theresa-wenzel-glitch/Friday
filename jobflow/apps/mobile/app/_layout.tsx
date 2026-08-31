@@ -12,7 +12,7 @@ import { readStoredToken, SessionContext, storeToken, type SessionState } from "
  *
  * Hier entsteht die Sitzung, und von hier aus verzweigt die App in den
  * Kunden- oder den Unternehmensbereich. Beide Rollen teilen sich dieselbe
- * Codebasis, bekommen aber voellig unterschiedliche Oberflaechen.
+ * Codebasis, bekommen aber völlig unterschiedliche Oberflächen.
  */
 export default function RootLayout() {
   const [user, setUser] = useState<User | null>(null);
@@ -22,7 +22,7 @@ export default function RootLayout() {
     try {
       setUser(await api.get<User>("/me"));
     } catch {
-      // Token abgelaufen, zurueckgezogen oder Konto gesperrt.
+      // Token abgelaufen, zurückgezogen oder Konto gesperrt.
       await storeToken(null);
       setUser(null);
     }
@@ -53,7 +53,7 @@ export default function RootLayout() {
       },
       signOut: async () => {
         // Erst serverseitig abmelden, damit das Token sofort wertlos wird -
-        // und danach lokal aufraeumen, auch wenn der Aufruf scheitert.
+        // und danach lokal aufräumen, auch wenn der Aufruf scheitert.
         try {
           await api.post("/auth/logout");
         } catch {

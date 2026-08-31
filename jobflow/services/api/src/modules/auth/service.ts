@@ -48,14 +48,14 @@ export class AuthService {
 
       const row = inserted.rows[0];
       if (row === undefined) {
-        // Die Adresse ist bereits vergeben. Das laesst sich bei einer
+        // Die Adresse ist bereits vergeben. Das lässt sich bei einer
         // Registrierung nicht verbergen - der Nutzer muss ja erfahren, dass er
         // sich stattdessen anmelden soll.
         throw ApiError.conflict("Zu dieser E-Mail-Adresse gibt es bereits ein Konto.");
       }
 
       // Ein Unternehmenskonto bekommt sofort ein - noch leeres - Profil.
-      // Sonst muesste jede spaetere Abfrage den Sonderfall "Konto ohne
+      // Sonst müsste jede spätere Abfrage den Sonderfall "Konto ohne
       // Unternehmen" behandeln.
       if (row.role === "BUSINESS") {
         const business = await client.query<{ id: string }>(
@@ -86,7 +86,7 @@ export class AuthService {
     const found = await this.db.query<UserRow>("SELECT * FROM users WHERE email = $1", [email]);
     const row = found.rows[0];
 
-    // Auch wenn es das Konto nicht gibt, wird ein Hash geprueft. Sonst waere an
+    // Auch wenn es das Konto nicht gibt, wird ein Hash geprüft. Sonst wäre an
     // der Antwortzeit ablesbar, welche Adressen registriert sind.
     const storedHash = row?.password_hash ?? DUMMY_PASSWORD_HASH;
     const passwordOk = await verifyPassword(password, storedHash);
@@ -115,15 +115,15 @@ export class AuthService {
     await this.db.query("DELETE FROM sessions WHERE id = $1", [sessionId]);
   }
 
-  /** Meldet den Nutzer auf allen Geraeten ab. */
+  /** Meldet den Nutzer auf allen Geräten ab. */
   async logoutEverywhere(userId: string): Promise<void> {
     await this.db.query("DELETE FROM sessions WHERE user_id = $1", [userId]);
   }
 
   /**
-   * Loest das Bearer-Token in einen Nutzer auf.
+   * Löst das Bearer-Token in einen Nutzer auf.
    *
-   * Liefert null statt zu werfen: manche Endpunkte duerfen mit und ohne
+   * Liefert null statt zu werfen: manche Endpunkte dürfen mit und ohne
    * Anmeldung aufgerufen werden.
    */
   async authenticate(req: IncomingMessage): Promise<Principal | null> {
@@ -144,7 +144,7 @@ export class AuthService {
     // Eine Sperrung wirkt sofort, auch auf bereits ausgestellte Tokens.
     if (row.blocked_at !== null) return null;
 
-    // Nur grob fortschreiben - ein Schreibzugriff pro Anfrage waere Verschwendung.
+    // Nur grob fortschreiben - ein Schreibzugriff pro Anfrage wäre Verschwendung.
     void this.db
       .query("UPDATE sessions SET last_seen_at = now() WHERE id = $1 AND last_seen_at < now() - interval '5 minutes'", [
         row.session_id,
@@ -171,7 +171,7 @@ export class AuthService {
 }
 
 /**
- * Ein gueltig aufgebauter, aber unerreichbarer Hash. Er dient nur dazu, dass
+ * Ein gültig aufgebauter, aber unerreichbarer Hash. Er dient nur dazu, dass
  * die Anmeldung bei unbekannten Adressen dieselbe Arbeit leistet wie bei
  * bekannten.
  */

@@ -6,7 +6,7 @@ export default function AuthLayout() {
     <Stack
       screenOptions={{
         headerShown: true,
-        headerBackTitle: "Zurueck",
+        headerBackTitle: "Zurück",
         headerTintColor: colors.primary,
         headerStyle: { backgroundColor: colors.background },
         headerShadowVisible: false,

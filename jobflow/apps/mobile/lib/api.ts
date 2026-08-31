@@ -4,9 +4,9 @@ import type { ApiResponse } from "@jobflow/types";
 /**
  * Der zentrale API-Client.
  *
- * Die Adresse steht in der Konfiguration, nicht im Quelltext - sonst laesst
+ * Die Adresse steht in der Konfiguration, nicht im Quelltext - sonst lässt
  * sich die App nicht gegen verschiedene Umgebungen betreiben. Geheimnisse
- * gehoeren ohnehin nie in eine mobile App: alles, was in ihr steckt, kann
+ * gehören ohnehin nie in eine mobile App: alles, was in ihr steckt, kann
  * ausgelesen werden.
  */
 const API_URL =
@@ -42,9 +42,9 @@ interface RequestOptions {
 }
 
 /**
- * Fuehrt einen API-Aufruf aus und packt die Huelle { success, data, error }
+ * Führt einen API-Aufruf aus und packt die Hülle { success, data, error }
  * aus. Die Screens bekommen dadurch entweder die Nutzdaten oder eine
- * Ausnahme - und muessen nicht jedes Mal dasselbe pruefen.
+ * Ausnahme - und müssen nicht jedes Mal dasselbe prüfen.
  */
 export async function apiCall<T>(path: string, options: RequestOptions = {}): Promise<T> {
   const { method = "GET", body, signal } = options;
@@ -63,7 +63,7 @@ export async function apiCall<T>(path: string, options: RequestOptions = {}): Pr
     });
   } catch (error) {
     // Kein Netz, falsche Adresse, Server nicht erreichbar. Der Nutzer soll
-    // etwas Verstaendliches lesen, keinen fetch-Fehler.
+    // etwas Verständliches lesen, keinen fetch-Fehler.
     throw new ApiClientError(0, "NETWORK_ERROR", "Keine Verbindung zu JobFlow. Bist du online?");
   }
 

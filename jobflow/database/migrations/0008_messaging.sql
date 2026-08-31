@@ -1,7 +1,7 @@
 -- 0008 Chat.
 --
 -- Jede Kombination aus Anfrage und Unternehmen bekommt genau eine Konversation.
--- So bleibt der Verlauf am Auftrag haengen und nicht an zwei Personen.
+-- So bleibt der Verlauf am Auftrag hängen und nicht an zwei Personen.
 
 CREATE TABLE conversations (
   id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -21,8 +21,8 @@ CREATE TABLE messages (
   conversation_id uuid NOT NULL REFERENCES conversations(id) ON DELETE CASCADE,
   sender_id       uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   body            text NOT NULL CHECK (length(body) > 0),
-  -- Muss in der Oberflaeche sichtbar gemacht werden: KI-Texte duerfen nicht
-  -- aussehen, als haette sie ein Mensch geschrieben.
+  -- Muss in der Oberfläche sichtbar gemacht werden: KI-Texte dürfen nicht
+  -- aussehen, als hätte sie ein Mensch geschrieben.
   is_ai_generated boolean NOT NULL DEFAULT false,
   created_at      timestamptz NOT NULL DEFAULT now()
 );

@@ -62,7 +62,7 @@ export class BusinessService {
    * Das Unternehmen des angemeldeten Nutzers.
    *
    * Diese Methode ist der Angelpunkt der Zugriffskontrolle auf der
-   * Unternehmensseite: jede Aktion eines Betriebs geht ueber die hier
+   * Unternehmensseite: jede Aktion eines Betriebs geht über die hier
    * ermittelte businessId. Ein Unternehmen kann damit gar nicht erst die Daten
    * eines anderen anfragen.
    */
@@ -73,7 +73,7 @@ export class BusinessService {
     );
     const row = result.rows[0];
     if (row === undefined) {
-      throw ApiError.forbidden("Zu diesem Konto gehoert kein Unternehmen.");
+      throw ApiError.forbidden("Zu diesem Konto gehört kein Unternehmen.");
     }
     return { businessId: row.business_id, role: row.role };
   }
@@ -151,7 +151,7 @@ export class BusinessService {
   }
 
   async removeService(businessId: string, serviceId: string): Promise<void> {
-    // Nicht loeschen, sondern deaktivieren: bestehende Anfragen und Angebote
+    // Nicht löschen, sondern deaktivieren: bestehende Anfragen und Angebote
     // verweisen darauf, und ihre Geschichte soll nachvollziehbar bleiben.
     const result = await this.db.query(
       "UPDATE business_services SET active = false WHERE id = $1 AND business_id = $2",
@@ -188,7 +188,7 @@ export class BusinessService {
     });
   }
 
-  /** Kennzahlen fuer das Dashboard eines Unternehmens. */
+  /** Kennzahlen für das Dashboard eines Unternehmens. */
   async statistics(businessId: string): Promise<{
     matchCount: number;
     offerCount: number;
@@ -228,7 +228,7 @@ export class BusinessService {
       matchCount,
       offerCount,
       jobCount,
-      // Anteil der Anfragen, auf die tatsaechlich ein Angebot folgte.
+      // Anteil der Anfragen, auf die tatsächlich ein Angebot folgte.
       offerRate: matchCount === 0 ? 0 : Math.round((offerCount / matchCount) * 100),
       // Anteil der Angebote, die zu einem Auftrag wurden.
       winRate: offerCount === 0 ? 0 : Math.round((jobCount / offerCount) * 100),

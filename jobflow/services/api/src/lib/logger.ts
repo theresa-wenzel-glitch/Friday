@@ -1,8 +1,8 @@
 /**
  * Strukturierte Logausgabe auf stdout.
  *
- * Keine Abhaengigkeit noetig: eine Zeile JSON pro Ereignis laesst sich von
- * jedem Log-System einlesen. Personenbezogene Inhalte gehoeren nicht ins Log -
+ * Keine Abhängigkeit nötig: eine Zeile JSON pro Ereignis lässt sich von
+ * jedem Log-System einlesen. Personenbezogene Inhalte gehören nicht ins Log -
  * IDs ja, Beschreibungen und E-Mail-Adressen nein.
  */
 export type LogLevel = "debug" | "info" | "warn" | "error";
@@ -39,7 +39,7 @@ export function createLogger(minLevel: LogLevel = "info"): Logger {
   };
 }
 
-/** Verwirft jede Ausgabe - fuer Tests. */
+/** Verwirft jede Ausgabe - für Tests. */
 export const silentLogger: Logger = {
   debug: () => {},
   info: () => {},

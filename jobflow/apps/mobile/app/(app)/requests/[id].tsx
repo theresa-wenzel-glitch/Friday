@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
-import { useFocusEffect, useLocalSearchParams } from "expo-router";
+import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import type {
   AiAnalysisDetail,
   MatchWithBusiness,
@@ -8,6 +8,7 @@ import type {
   ServiceRequestDetail,
 } from "@jobflow/types";
 import { colors, offerStatusLabels, spacing, typography } from "@jobflow/config";
+import { formatEuro } from "../../../lib/format.js";
 import { api, ApiClientError } from "../../../lib/api.js";
 import { useSession } from "../../../lib/session.js";
 import { AiNotice } from "../../../components/AiNotice.js";
@@ -22,7 +23,7 @@ import { StatusTimeline } from "../../../components/StatusTimeline.js";
 /**
  * Die Detailansicht einer Anfrage.
  *
- * Sie fuehrt den Kunden durch den Ablauf: analysieren, Rueckfragen
+ * Sie führt den Kunden durch den Ablauf: analysieren, Rückfragen
  * beantworten, Anbieter suchen, Angebot annehmen. Jeder Schritt ist genau
  * dann sichtbar, wenn er an der Reihe ist.
  */
@@ -50,7 +51,7 @@ export default function RequestDetailScreen() {
       return;
     }
 
-    // Analyse, Vorschlaege und Angebote gibt es noch nicht in jeder Phase -
+    // Analyse, Vorschläge und Angebote gibt es noch nicht in jeder Phase -
     // ein 404 ist hier kein Fehler, sondern eine Auskunft.
     await Promise.all([
       api
@@ -138,7 +139,7 @@ export default function RequestDetailScreen() {
         </AiNotice>
       ) : null}
 
-      {/* Schritt 2: die wenigen offenen Rueckfragen beantworten. */}
+      {/* Schritt 2: die wenigen offenen Rückfragen beantworten. */}
       {isCustomer && openQuestions.length > 0 ? (
         <Card>
           <Text style={styles.sectionTitle}>
@@ -190,7 +191,7 @@ export default function RequestDetailScreen() {
             <Card key={match.id}>
               <View style={styles.businessHeader}>
                 <Text style={styles.businessName}>{match.business.name}</Text>
-                {match.business.verified ? <Badge label="Geprueft" tone="success" /> : null}
+                {match.business.verified ? <Badge label="Geprüft" tone="success" /> : null}
               </View>
               <Text style={styles.businessMeta}>
                 {match.business.rating === null
@@ -209,14 +210,19 @@ export default function RequestDetailScreen() {
         </View>
       ) : null}
 
-      {/* Schritt 4: Angebote vergleichen und annehmen. */}
+      {/* Schritt 4: Angebote vergleichen. Angenommen wird auf der Detailseite,
+          wo der Preis vollständig aufgeschlüsselt steht. */}
       {offers.length > 0 ? (
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>
             {offers.length} {offers.length === 1 ? "Angebot" : "Angebote"} erhalten
           </Text>
           {offers.map((offer) => (
-            <Card key={offer.id}>
+            <Card
+              key={offer.id}
+              onPress={() => router.push(`/(app)/offers/${offer.id}`)}
+              accessibilityLabel="Angebot ansehen"
+            >
               <View style={styles.offerHeader}>
                 <Text style={styles.offerTotal}>{formatEuro(offer.totalCents)}</Text>
                 <Badge
@@ -224,49 +230,28 @@ export default function RequestDetailScreen() {
                   tone={offer.status === "ACCEPTED" ? "success" : "neutral"}
                 />
               </View>
-              <View style={styles.offerLines}>
-                <OfferLine label="Arbeitskosten" cents={offer.laborCents} />
-                <OfferLine label="Material" cents={offer.materialCents} />
-                <OfferLine label="Anfahrt" cents={offer.travelCents} />
-              </View>
-              <Text style={styles.offerDescription}>{offer.description}</Text>
+              <Text style={styles.offerDescription} numberOfLines={2}>
+                {offer.description}
+              </Text>
               {offer.descriptionAiAssisted ? (
-                <Text style={styles.aiHint}>Beschreibung mit KI-Unterstuetzung verfasst.</Text>
-              ) : null}
-              {isCustomer && offer.status === "PENDING" ? (
-                <View style={styles.offerActions}>
-                  <Button
-                    title="Angebot annehmen"
-                    loading={busy === offer.id}
-                    onPress={() => run(offer.id, () => api.post(`/offers/${offer.id}/accept`))}
-                  />
-                  <Button
-                    title="Ablehnen"
-                    variant="ghost"
-                    onPress={() => run(`${offer.id}-decline`, () => api.post(`/offers/${offer.id}/decline`))}
-                  />
-                </View>
+                <Text style={styles.aiHint}>Beschreibung mit KI-Unterstützung verfasst.</Text>
               ) : null}
             </Card>
           ))}
         </View>
       ) : null}
+
+      {/* Die Sicht des Unternehmens: auf diese Anfrage antworten. */}
+      {!isCustomer ? (
+        <Button
+          title="Angebot erstellen"
+          loading={busy === "offer"}
+          onPress={() => router.push(`/(app)/create-offer?requestId=${request.id}`)}
+        />
+      ) : null}
+
     </Screen>
   );
-}
-
-function OfferLine({ label, cents }: { label: string; cents: number }) {
-  return (
-    <View style={styles.offerLine}>
-      <Text style={styles.offerLineLabel}>{label}</Text>
-      <Text style={styles.offerLineValue}>{formatEuro(cents)}</Text>
-    </View>
-  );
-}
-
-/** Cent in eine deutsche Euro-Darstellung. Gerechnet wird immer in Cent. */
-export function formatEuro(cents: number): string {
-  return `${(cents / 100).toFixed(2).replace(".", ",")} €`;
 }
 
 const styles = StyleSheet.create({
@@ -302,11 +287,6 @@ const styles = StyleSheet.create({
     fontWeight: typography.weights.bold,
     color: colors.text,
   },
-  offerLines: { gap: spacing.xs, marginVertical: spacing.md },
-  offerLine: { flexDirection: "row", justifyContent: "space-between" },
-  offerLineLabel: { fontSize: typography.sizes.small, color: colors.textMuted },
-  offerLineValue: { fontSize: typography.sizes.small, color: colors.text },
   offerDescription: { fontSize: typography.sizes.small, color: colors.text, lineHeight: 20 },
   aiHint: { fontSize: typography.sizes.caption, color: colors.ai, marginTop: spacing.sm },
-  offerActions: { gap: spacing.sm, marginTop: spacing.lg },
 });

@@ -36,24 +36,24 @@ describe("Regelbasierte Analyse", () => {
     const beschreibungen = [
       "Meine Heizung wird nicht warm.",
       "Ich brauche jemanden, der meinen Rasen maeht.",
-      "Das Auto macht komische Geraeusche beim Bremsen.",
-      "Voellig unklares Anliegen ohne erkennbare Kategorie.",
+      "Das Auto macht komische Geräusche beim Bremsen.",
+      "Völlig unklares Anliegen ohne erkennbare Kategorie.",
       "🙂",
     ];
     for (const beschreibung of beschreibungen) {
       const result = await analyze(beschreibung);
       const parsed = validate(aiAnalysisResultSchema, result);
-      assert.equal(parsed.ok, true, `Schema verletzt fuer: ${beschreibung}`);
+      assert.equal(parsed.ok, true, `Schema verletzt für: ${beschreibung}`);
     }
   });
 
   it("gibt zu, wenn es die Kategorie nicht erkennt - statt zu raten", async () => {
-    const result = await analyze("Ich haette gerne etwas, das ich nicht naeher beschreiben kann.");
+    const result = await analyze("Ich hätte gerne etwas, das ich nicht näher beschreiben kann.");
     assert.equal(result.categorySlug, null);
     assert.ok(result.confidence <= 0.3, `confidence=${result.confidence}`);
   });
 
-  it("schlaegt nie eine Kategorie vor, die die Plattform nicht kennt", async () => {
+  it("schlägt nie eine Kategorie vor, die die Plattform nicht kennt", async () => {
     // Wenn "heizung" nicht existiert, darf sie auch nicht vorgeschlagen werden.
     const result = await analyze("Meine Heizung wird nicht warm.", {
       knownCategorySlugs: ["sanitaer", "elektrik"],
@@ -62,7 +62,7 @@ describe("Regelbasierte Analyse", () => {
   });
 
   it("erkennt Dringlichkeit an den Formulierungen", async () => {
-    const notfall = await analyze("Notfall: Wasserschaden, es laeuft aus dem Heizkoerper!");
+    const notfall = await analyze("Notfall: Wasserschaden, es laeuft aus dem Heizkörper!");
     assert.equal(notfall.urgency, "HIGH");
 
     const entspannt = await analyze("Die Heizung tropft leicht, hat aber keine Eile.");
@@ -72,13 +72,13 @@ describe("Regelbasierte Analyse", () => {
     assert.equal(normal.urgency, "NORMAL");
   });
 
-  it("stellt weniger Rueckfragen, wenn Fotos vorliegen", async () => {
+  it("stellt weniger Rückfragen, wenn Fotos vorliegen", async () => {
     const ohne = await analyze("Meine Heizung wird nicht warm.", { photoCount: 0 });
     const mit = await analyze("Meine Heizung wird nicht warm.", { photoCount: 2 });
     assert.ok(mit.questions.length <= ohne.questions.length);
   });
 
-  it("wiederholt keine bereits beantworteten Rueckfragen", async () => {
+  it("wiederholt keine bereits beantworteten Rückfragen", async () => {
     const erste = await analyze("Meine Heizung wird nicht warm.");
     const beantwortet = erste.questions.slice(0, 1).map((question) => ({ question, answer: "Seit gestern." }));
     const zweite = await analyze("Meine Heizung wird nicht warm.", { answeredQuestions: beantwortet });
@@ -88,14 +88,14 @@ describe("Regelbasierte Analyse", () => {
   });
 
   it("bleibt bei der Konfidenz unter 1 - ein Regelwerk kann nicht sicher sein", async () => {
-    const result = await analyze("Heizung Heizkoerper Thermostat Warmwasser Therme Kessel");
+    const result = await analyze("Heizung Heizkörper Thermostat Warmwasser Therme Kessel");
     assert.ok(result.confidence < 1);
   });
 
-  it("liefert einen Textvorschlag fuer ein Angebot", async () => {
+  it("liefert einen Textvorschlag für ein Angebot", async () => {
     const text = await provider.suggestText({
       kind: "OFFER_DESCRIPTION",
-      context: "Heizkoerper wird nicht warm",
+      context: "Heizkörper wird nicht warm",
     });
     assert.ok(text.length > 20);
   });

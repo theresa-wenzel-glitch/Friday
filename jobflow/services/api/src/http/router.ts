@@ -8,7 +8,7 @@ export type Handler = (ctx: RequestContext) => Promise<unknown>;
 
 interface Route {
   method: HttpMethod;
-  /** Segmente des Pfads; ":name" steht fuer einen Parameter. */
+  /** Segmente des Pfads; ":name" steht für einen Parameter. */
   segments: string[];
   handler: Handler;
 }
@@ -17,8 +17,8 @@ interface Route {
  * Ein sehr kleiner Router.
  *
  * Bewusst ohne Framework: JobFlow braucht Pfadparameter und sonst nichts.
- * Ein eigener Router in fuenfzig Zeilen ist leichter zu pruefen als eine
- * Abhaengigkeit, die zehnmal so viel kann.
+ * Ein eigener Router in fünfzig Zeilen ist leichter zu prüfen als eine
+ * Abhängigkeit, die zehnmal so viel kann.
  */
 export class Router {
   private readonly routes: Route[] = [];
@@ -41,7 +41,7 @@ export class Router {
     return this.add("DELETE", pattern, handler);
   }
 
-  /** Haengt die Routen eines Moduls unter einem Praefix ein. */
+  /** Hängt die Routen eines Moduls unter einem Präfix ein. */
   mount(prefix: string, other: Router): this {
     const prefixSegments = splitPath(prefix);
     for (const route of other.routes) {
@@ -64,7 +64,7 @@ export class Router {
     // Der Pfad gibt es, nur nicht mit dieser Methode - das ist eine andere
     // Aussage als "gibt es nicht" und hilft beim Debuggen der Clients.
     if (pathExists) {
-      throw new ApiError(405, "NOT_FOUND", `Die Methode ${method} ist fuer diesen Pfad nicht erlaubt.`);
+      throw new ApiError(405, "NOT_FOUND", `Die Methode ${method} ist für diesen Pfad nicht erlaubt.`);
     }
     return null;
   }

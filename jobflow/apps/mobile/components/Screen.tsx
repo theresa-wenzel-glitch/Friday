@@ -8,7 +8,7 @@ interface Props {
   style?: ViewStyle;
 }
 
-/** Grundgeruest jedes Screens: sicherer Bereich, Hintergrund, grosszuegige Abstaende. */
+/** Grundgerüst jedes Screens: sicherer Bereich, Hintergrund, großzügige Abstände. */
 export function Screen({ children, scroll = true, style }: Props) {
   const content = <View style={[styles.content, style]}>{children}</View>;
 

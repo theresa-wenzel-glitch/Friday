@@ -13,7 +13,7 @@ export interface AuditEntry {
 /**
  * Protokolliert eine sicherheitsrelevante Aktion.
  *
- * Bewusst mit demselben Client wie die eigentliche Aenderung: entweder beides
+ * Bewusst mit demselben Client wie die eigentliche Änderung: entweder beides
  * oder nichts. Ein Protokoll, das den Vorgang nicht mitbekommt, ist wertlos.
  */
 export async function recordAudit(client: Queryable, entry: AuditEntry): Promise<void> {
@@ -40,7 +40,7 @@ export interface EventEntry {
 }
 
 /**
- * Schreibt ein Produktereignis fuer den Funnel.
+ * Schreibt ein Produktereignis für den Funnel.
  *
  * Wir messen den Weg von der Anfrage zum Auftrag - nicht Downloads. Deshalb
  * enthalten die Eigenschaften nur Kennzahlen und IDs, keine Freitexte der Nutzer.

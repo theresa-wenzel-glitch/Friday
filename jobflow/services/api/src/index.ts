@@ -25,7 +25,7 @@ function main(): void {
     server.close(() => {
       void app.shutdown().then(() => process.exit(0));
     });
-    // Falls eine Verbindung haengt, nicht ewig warten.
+    // Falls eine Verbindung hängt, nicht ewig warten.
     setTimeout(() => process.exit(1), 10_000).unref();
   };
 

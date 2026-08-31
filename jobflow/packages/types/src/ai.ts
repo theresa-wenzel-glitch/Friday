@@ -14,9 +14,9 @@ export interface AiAnalysisResult {
   /** Kurze Zusammenfassung des Problems in einem Satz. */
   summary: string;
   urgency: Urgency;
-  /** Nur die wirklich noetigen Rueckfragen - kein 30-Felder-Formular. */
+  /** Nur die wirklich nötigen Rückfragen - kein 30-Felder-Formular. */
   questions: string[];
-  /** Selbsteinschaetzung des Providers, 0.0 - 1.0. */
+  /** Selbsteinschätzung des Providers, 0.0 - 1.0. */
   confidence: number;
 }
 
@@ -33,7 +33,7 @@ export interface AiAnalysis {
   createdAt: IsoDateTime;
 }
 
-/** Eine Rueckfrage der KI und - sobald vorhanden - die Antwort des Kunden. */
+/** Eine Rückfrage der KI und - sobald vorhanden - die Antwort des Kunden. */
 export interface AiQuestion {
   id: Uuid;
   analysisId: Uuid;
@@ -43,7 +43,7 @@ export interface AiQuestion {
   answeredAt: IsoDateTime | null;
 }
 
-/** Analyse mit Rueckfragen, so wie die App sie anzeigt. */
+/** Analyse mit Rückfragen, so wie die App sie anzeigt. */
 export interface AiAnalysisDetail extends AiAnalysis {
   questions: AiQuestion[];
 }

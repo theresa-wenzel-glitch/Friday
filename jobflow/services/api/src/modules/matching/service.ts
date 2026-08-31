@@ -6,7 +6,7 @@ import { recordEvent } from "../analytics/audit.js";
 import { mapBusiness, type BusinessRow } from "../businesses/mapper.js";
 import { scoreCandidate, type CandidateInput } from "./engine.js";
 
-/** Wie viele Unternehmen hoechstens vorgeschlagen werden. */
+/** Wie viele Unternehmen höchstens vorgeschlagen werden. */
 const MAX_MATCHES = 10;
 /** Unterhalb dieses Scores lohnt sich der Vorschlag nicht. */
 const MIN_SCORE = 25;
@@ -57,9 +57,9 @@ export class MatchingService {
   /**
    * Ermittelt passende Unternehmen und speichert sie als Matches.
    *
-   * Die Datenbank uebernimmt nur die Vorauswahl - Kategorie, Umkreis,
-   * Verfuegbarkeit. Bewertet wird danach in der Engine, damit sich die
-   * Gewichtung aendern laesst, ohne SQL anzufassen.
+   * Die Datenbank übernimmt nur die Vorauswahl - Kategorie, Umkreis,
+   * Verfügbarkeit. Bewertet wird danach in der Engine, damit sich die
+   * Gewichtung ändern lässt, ohne SQL anzufassen.
    */
   async generate(requestId: string, customerId: string): Promise<MatchWithBusiness[]> {
     const request = await this.db.query<{
@@ -76,7 +76,7 @@ export class MatchingService {
     if (row === undefined) throw ApiError.notFound("Diese Anfrage gibt es nicht.");
     if (row.category_id === null) {
       throw ApiError.conflict(
-        "Zu dieser Anfrage steht noch keine Kategorie fest. Bitte zuerst die Analyse durchfuehren.",
+        "Zu dieser Anfrage steht noch keine Kategorie fest. Bitte zuerst die Analyse durchführen.",
       );
     }
     if (row.status === "CANCELLED" || row.status === "COMPLETED") {
@@ -86,8 +86,8 @@ export class MatchingService {
     const candidates = await this.loadCandidates(row.id, row.category_id, row.latitude, row.longitude);
     if (candidates.length === 0) return [];
 
-    // Bezugspreis fuer den Preisfaktor: der Median der angebotenen Spannen.
-    // Ein Mittelwert waere durch einzelne Ausreisser leicht zu verzerren.
+    // Bezugspreis für den Preisfaktor: der Median der angebotenen Spannen.
+    // Ein Mittelwert wäre durch einzelne Ausreißer leicht zu verzerren.
     const referencePriceCents = medianPrice(candidates);
 
     const scored = candidates
@@ -118,8 +118,8 @@ export class MatchingService {
         stored.push(result.rows[0] as MatchRow);
       }
 
-      // Erst wenn tatsaechlich jemand gefunden wurde, wechselt die Anfrage in
-      // den Status MATCHING. Ein "wir suchen" ohne Ergebnis waere irrefuehrend.
+      // Erst wenn tatsächlich jemand gefunden wurde, wechselt die Anfrage in
+      // den Status MATCHING. Ein "wir suchen" ohne Ergebnis wäre irreführend.
       await client.query(
         "UPDATE requests SET status = 'MATCHING' WHERE id = $1 AND status IN ('DRAFT', 'ANALYZING', 'OPEN')",
         [requestId],
@@ -147,7 +147,7 @@ export class MatchingService {
     });
   }
 
-  /** Die gespeicherten Vorschlaege zu einer Anfrage - nur fuer den Kunden. */
+  /** Die gespeicherten Vorschläge zu einer Anfrage - nur für den Kunden. */
   async listForRequest(requestId: string, customerId: string): Promise<MatchWithBusiness[]> {
     const result = await this.db.query<MatchRow & { business: BusinessRow }>(
       `SELECT m.*, to_jsonb(b.*) AS business
@@ -227,7 +227,7 @@ export class MatchingService {
            WHERE m.request_id = $1 AND m.business_id = b.id AND m.status = 'DECLINED'
          )
        GROUP BY b.id
-       -- Ausserhalb des Einsatzradius braucht die Engine gar nicht erst zu rechnen.
+       -- Außerhalb des Einsatzradius braucht die Engine gar nicht erst zu rechnen.
        HAVING jobflow_distance_km($3, $4, b.latitude, b.longitude) IS NULL
            OR jobflow_distance_km($3, $4, b.latitude, b.longitude) <= b.service_radius_km`,
       [requestId, categoryId, latitude, longitude],
@@ -271,7 +271,7 @@ function medianPrice(candidates: CandidateRow[]): number | null {
     : ((values[middle - 1] as number) + (values[middle] as number)) / 2;
 }
 
-/** to_jsonb liefert Zeitstempel als String zurueck - der Mapper erwartet Date. */
+/** to_jsonb liefert Zeitstempel als String zurück - der Mapper erwartet Date. */
 function reviveDates(row: BusinessRow): BusinessRow {
   return {
     ...row,

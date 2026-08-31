@@ -3,7 +3,7 @@ import { describe, it } from "node:test";
 import { DEFAULT_MATCH_WEIGHTS } from "@jobflow/types";
 import { scoreCandidate, type CandidateInput } from "../src/modules/matching/engine.js";
 
-/** Ein durchschnittlicher Betrieb ohne Auffaelligkeiten. */
+/** Ein durchschnittlicher Betrieb ohne Auffälligkeiten. */
 function candidate(overrides: Partial<CandidateInput> = {}): CandidateInput {
   return {
     businessId: "b1",
@@ -43,7 +43,7 @@ describe("Matching-Score", () => {
     assert.ok(best.score > worst.score);
   });
 
-  it("gewichtet die passende Leistung am staerksten", () => {
+  it("gewichtet die passende Leistung am stärksten", () => {
     const exact = scoreCandidate(candidate({ matchesCategory: true, matchesParentCategory: false }));
     const parentOnly = scoreCandidate(candidate({ matchesCategory: false, matchesParentCategory: true }));
     const neither = scoreCandidate(candidate({ matchesCategory: false, matchesParentCategory: false }));
@@ -55,28 +55,28 @@ describe("Matching-Score", () => {
     assert.equal(exact.score - neither.score, DEFAULT_MATCH_WEIGHTS.service);
   });
 
-  it("schliesst Betriebe ausserhalb ihres Einsatzradius vom Entfernungspunkt aus", () => {
+  it("schließt Betriebe außerhalb ihres Einsatzradius vom Entfernungspunkt aus", () => {
     const inside = scoreCandidate(candidate({ distanceKm: 29, serviceRadiusKm: 30 }));
     const outside = scoreCandidate(candidate({ distanceKm: 31, serviceRadiusKm: 30 }));
     assert.ok(inside.score > outside.score);
     assert.ok(!outside.reasons.some((reason) => reason.factor === "distance" && reason.points > 0));
   });
 
-  it("bevorzugt den naeheren Betrieb bei sonst gleichen Daten", () => {
+  it("bevorzugt den näheren Betrieb bei sonst gleichen Daten", () => {
     const near = scoreCandidate(candidate({ distanceKm: 2 }));
     const far = scoreCandidate(candidate({ distanceKm: 25 }));
     assert.ok(near.score > far.score);
   });
 
-  it("laesst wenige Bestbewertungen nicht viele gute Bewertungen ueberholen", () => {
-    // Genau der Fall, den ein ungedaempfter Durchschnitt falsch macht:
+  it("lässt wenige Bestbewertungen nicht viele gute Bewertungen überholen", () => {
+    // Genau der Fall, den ein ungedämpfter Durchschnitt falsch macht:
     // 5,0 aus einer einzigen Bewertung sagt fast nichts aus.
     const oneFiveStar = scoreCandidate(candidate({ rating: 5, reviewCount: 1 }));
     const manyGood = scoreCandidate(candidate({ rating: 4.7, reviewCount: 200 }));
     assert.ok(manyGood.score >= oneFiveStar.score);
   });
 
-  it("benachteiligt einen neuen Betrieb ohne Bewertungen nicht uebermaessig", () => {
+  it("benachteiligt einen neuen Betrieb ohne Bewertungen nicht übermäßig", () => {
     const fresh = scoreCandidate(candidate({ rating: null, reviewCount: 0, completedJobCount: 0, avgResponseMinutes: null }));
     const bad = scoreCandidate(candidate({ rating: 1.2, reviewCount: 80, completedJobCount: 0, avgResponseMinutes: 2000 }));
     assert.ok(fresh.score > bad.score, `fresh=${fresh.score} bad=${bad.score}`);
@@ -89,7 +89,7 @@ describe("Matching-Score", () => {
     assert.equal(unknown.distanceKm, null);
   });
 
-  it("belohnt den guenstigeren Anbieter gegenueber dem Referenzpreis", () => {
+  it("belohnt den günstigeren Anbieter gegenüber dem Referenzpreis", () => {
     const cheap = scoreCandidate(candidate({ priceMinCents: 6000, priceMaxCents: 8000 }), {
       referencePriceCents: 12000,
     });
@@ -99,7 +99,7 @@ describe("Matching-Score", () => {
     assert.ok(cheap.score > expensive.score);
   });
 
-  it("liefert nachvollziehbare Gruende, absteigend nach Gewicht", () => {
+  it("liefert nachvollziehbare Gründe, absteigend nach Gewicht", () => {
     const scored = scoreCandidate(candidate());
     assert.ok(scored.reasons.length > 0);
     for (let i = 1; i < scored.reasons.length; i += 1) {
@@ -109,7 +109,7 @@ describe("Matching-Score", () => {
     assert.equal(distance?.label, "5,0 km entfernt");
   });
 
-  it("nennt keinen Grund fuer einen Faktor, zu dem nichts bekannt ist", () => {
+  it("nennt keinen Grund für einen Faktor, zu dem nichts bekannt ist", () => {
     const scored = scoreCandidate(candidate({ rating: null, reviewCount: 0, avgResponseMinutes: null, completedJobCount: 0 }));
     assert.ok(!scored.reasons.some((reason) => reason.factor === "rating"));
     assert.ok(!scored.reasons.some((reason) => reason.factor === "responseTime"));

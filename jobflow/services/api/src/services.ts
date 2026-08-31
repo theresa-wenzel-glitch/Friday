@@ -25,9 +25,9 @@ import { ReviewService } from "./modules/reviews/service.js";
  *
  * Das ist der modulare Monolith in Reinform: eine Anwendung, aber innen sauber
  * nach Fachbereichen getrennt. Kein Modul greift auf die Tabellen eines anderen
- * zu, sondern nur auf dessen Service. Wenn spaeter ein Bereich wirklich eigene
- * Ressourcen braucht, laesst er sich hier herausloesen - vorher waeren
- * Microservices nur zusaetzliche Arbeit ohne Nutzen.
+ * zu, sondern nur auf dessen Service. Wenn später ein Bereich wirklich eigene
+ * Ressourcen braucht, lässt er sich hier herauslösen - vorher wären
+ * Microservices nur zusätzliche Arbeit ohne Nutzen.
  */
 export interface AppServices {
   config: Config;
@@ -48,9 +48,9 @@ export interface AppServices {
   conversations: ConversationService;
   reviews: ReviewService;
 
-  /** Loest das Bearer-Token auf. Liegt hier, damit der Kontext nicht am AuthService haengt. */
+  /** Löst das Bearer-Token auf. Liegt hier, damit der Kontext nicht am AuthService hängt. */
   authenticate(req: IncomingMessage): Promise<Principal | null>;
-  /** Schliesst alle Verbindungen. */
+  /** Schließt alle Verbindungen. */
   shutdown(): Promise<void>;
 }
 
@@ -105,7 +105,7 @@ export function buildServices(options: BuildOptions): AppServices {
 
     authenticate: (req) => auth.authenticate(req),
     shutdown: async () => {
-      // Nur schliessen, wenn der Pool hier entstanden ist - im Test gehoert er
+      // Nur schließen, wenn der Pool hier entstanden ist - im Test gehört er
       // dem Aufrufer.
       if (options.db === undefined) await db.end();
     },

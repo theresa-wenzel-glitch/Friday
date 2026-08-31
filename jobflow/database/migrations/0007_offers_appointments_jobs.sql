@@ -1,10 +1,10 @@
--- 0007 Angebote, Termine, Auftraege.
+-- 0007 Angebote, Termine, Aufträge.
 
 CREATE TABLE offers (
   id                      uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   request_id              uuid NOT NULL REFERENCES requests(id) ON DELETE CASCADE,
   business_id             uuid NOT NULL REFERENCES businesses(id) ON DELETE CASCADE,
-  -- Alle Betraege in Cent.
+  -- Alle Beträge in Cent.
   labor_cents             integer NOT NULL CHECK (labor_cents >= 0),
   material_cents          integer NOT NULL DEFAULT 0 CHECK (material_cents >= 0),
   travel_cents            integer NOT NULL DEFAULT 0 CHECK (travel_cents >= 0),
@@ -12,7 +12,7 @@ CREATE TABLE offers (
   -- Summe gar nicht erst von der Anwendung abweichen kann.
   total_cents             integer GENERATED ALWAYS AS (labor_cents + material_cents + travel_cents) STORED,
   description             text NOT NULL CHECK (length(description) > 0),
-  -- Kennzeichnet, ob der Text aus einem KI-Vorschlag stammt. Ueber Preis und
+  -- Kennzeichnet, ob der Text aus einem KI-Vorschlag stammt. Über Preis und
   -- Inhalt entscheidet immer das Unternehmen, nie die KI.
   description_ai_assisted boolean NOT NULL DEFAULT false,
   valid_until             timestamptz NOT NULL,
@@ -31,7 +31,7 @@ CREATE TRIGGER offers_touch_updated_at
 CREATE INDEX offers_request_idx ON offers (request_id, created_at DESC);
 CREATE INDEX offers_business_idx ON offers (business_id, created_at DESC);
 
--- Pro Anfrage darf hoechstens ein Angebot angenommen sein. Der Teilindex
+-- Pro Anfrage darf höchstens ein Angebot angenommen sein. Der Teilindex
 -- erzwingt das in der Datenbank statt nur in der Anwendungslogik.
 CREATE UNIQUE INDEX offers_one_accepted_per_request
   ON offers (request_id) WHERE status = 'ACCEPTED';
@@ -62,8 +62,8 @@ CREATE UNIQUE INDEX appointments_one_active_per_offer
 CREATE TABLE jobs (
   id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   offer_id     uuid NOT NULL UNIQUE REFERENCES offers(id) ON DELETE CASCADE,
-  -- request_id, business_id und customer_id waeren ueber offer herleitbar.
-  -- Sie stehen hier trotzdem, weil praktisch jede Abfrage auf Auftraege nach
+  -- request_id, business_id und customer_id wären über offer herleitbar.
+  -- Sie stehen hier trotzdem, weil praktisch jede Abfrage auf Aufträge nach
   -- genau diesen drei Feldern filtert.
   request_id   uuid NOT NULL REFERENCES requests(id) ON DELETE CASCADE,
   business_id  uuid NOT NULL REFERENCES businesses(id) ON DELETE CASCADE,

@@ -40,7 +40,7 @@ export default function ProfileScreen() {
         <Text style={styles.sectionTitle}>Deine Daten</Text>
         <Text style={styles.text}>
           JobFlow speichert deine Anfragen, Angebote und Termine. Standortangaben werden nur so genau
-          gespeichert, wie es fuer die Vermittlung noetig ist - die vollstaendige Adresse erfaehrt erst
+          gespeichert, wie es für die Vermittlung nötig ist - die vollständige Adresse erfährt erst
           das Unternehmen, das du beauftragst.
         </Text>
       </Card>
