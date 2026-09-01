@@ -6,6 +6,7 @@ import { withTransaction } from "../../db/pool.js";
 import { ApiError } from "../../http/errors.js";
 import { recordAudit, recordEvent } from "../analytics/audit.js";
 import { mapJob, type JobRow } from "../jobs/mapper.js";
+import type { BillingService } from "../billing/service.js";
 
 export type CreateOfferData = Parsed<typeof createOfferSchema>;
 
@@ -44,7 +45,10 @@ export function mapOffer(row: OfferRow): Offer {
 }
 
 export class OfferService {
-  constructor(private readonly db: Db) {}
+  constructor(
+    private readonly db: Db,
+    private readonly billing: BillingService,
+  ) {}
 
   /**
    * Ein Unternehmen gibt ein Angebot ab.
@@ -74,6 +78,19 @@ export class OfferService {
       }
       if (["ACCEPTED", "COMPLETED", "CANCELLED"].includes(requestRow.status)) {
         throw ApiError.conflict("Diese Anfrage nimmt keine Angebote mehr an.");
+      }
+
+      // Guthaben prüfen und verbrauchen, bevor das Angebot entsteht - im
+      // selben Client wie der Rest. Zwei gleichzeitige Angebote sähen sonst
+      // beide die letzte freie Stelle.
+      const bereitsAbgegeben = await client.query(
+        "SELECT 1 FROM offers WHERE request_id = $1 AND business_id = $2",
+        [data.requestId, businessId],
+      );
+      // Ein überarbeitetes Angebot zur selben Anfrage zählt nicht erneut:
+      // sonst kostete jede Korrektur ein weiteres Kontingent.
+      if (bereitsAbgegeben.rowCount === 0) {
+        await this.billing.consumeOffer(client, businessId);
       }
 
       const inserted = await client.query<OfferRow>(

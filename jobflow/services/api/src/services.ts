@@ -10,6 +10,10 @@ import type { AiProvider } from "./modules/ai/provider.js";
 import { RulesAiProvider } from "./modules/ai/rules-provider.js";
 import { RemoteAiProvider } from "./modules/ai/remote-provider.js";
 import { AppointmentService } from "./modules/appointments/service.js";
+import { BillingService } from "./modules/billing/service.js";
+import type { PaymentProvider } from "./modules/billing/provider.js";
+import { ManualPaymentProvider } from "./modules/billing/manual-provider.js";
+import { StripeProvider } from "./modules/billing/stripe-provider.js";
 import { AuthService } from "./modules/auth/service.js";
 import { BusinessService } from "./modules/businesses/service.js";
 import { CategoryService } from "./modules/categories/service.js";
@@ -35,8 +39,10 @@ export interface AppServices {
   logger: Logger;
   rateLimiter: RateLimiter;
   aiProvider: AiProvider;
+  paymentProvider: PaymentProvider;
 
   auth: AuthService;
+  billing: BillingService;
   categories: CategoryService;
   businesses: BusinessService;
   requests: RequestService;
@@ -59,6 +65,7 @@ export interface BuildOptions {
   db?: Db;
   logger?: Logger;
   aiProvider?: AiProvider;
+  paymentProvider?: PaymentProvider;
 }
 
 export function createAiProvider(config: Config): AiProvider {
@@ -72,11 +79,31 @@ export function createAiProvider(config: Config): AiProvider {
   return new RulesAiProvider();
 }
 
+/**
+ * Wählt den Zahlungsanbieter.
+ *
+ * Ohne Schlüssel bleibt es beim Anbieter, der ehrlich nichts tut - siehe
+ * ManualPaymentProvider. Ein Provider, der so täte, als sei bezahlt worden,
+ * wäre der gefährlichere Ausgangszustand.
+ */
+export function createPaymentProvider(config: Config): PaymentProvider {
+  if (config.billing.provider !== "stripe") return new ManualPaymentProvider();
+  const preise: { PRO?: string; BUSINESS?: string } = {};
+  if (config.billing.stripePriceIds.PRO !== null) preise.PRO = config.billing.stripePriceIds.PRO;
+  if (config.billing.stripePriceIds.BUSINESS !== null) preise.BUSINESS = config.billing.stripePriceIds.BUSINESS;
+  return new StripeProvider({
+    secretKey: config.billing.stripeSecretKey as string,
+    webhookSecret: config.billing.stripeWebhookSecret as string,
+    priceIds: preise,
+  });
+}
+
 export function buildServices(options: BuildOptions): AppServices {
   const { config } = options;
   const db = options.db ?? createPool(config.databaseUrl);
   const logger = options.logger ?? createLogger(config.isProduction ? "info" : "debug");
   const aiProvider = options.aiProvider ?? createAiProvider(config);
+  const paymentProvider = options.paymentProvider ?? createPaymentProvider(config);
 
   const auth = new AuthService({
     db,
@@ -84,20 +111,24 @@ export function buildServices(options: BuildOptions): AppServices {
     sessionTtlSeconds: config.sessionTtlSeconds,
   });
 
+  const billing = new BillingService(db);
+
   const services: AppServices = {
     config,
     db,
     logger,
     rateLimiter: new RateLimiter(),
     aiProvider,
+    paymentProvider,
 
     auth,
+    billing,
     categories: new CategoryService(db),
     businesses: new BusinessService(db),
     requests: new RequestService(db),
     ai: new AiService(db, aiProvider),
     matching: new MatchingService(db),
-    offers: new OfferService(db),
+    offers: new OfferService(db, billing),
     appointments: new AppointmentService(db),
     jobs: new JobService(db),
     conversations: new ConversationService(db),

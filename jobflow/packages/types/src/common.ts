@@ -35,6 +35,8 @@ export const API_ERROR_CODES = [
   "NOT_FOUND",
   "CONFLICT",
   "RATE_LIMITED",
+  // 402: die Aktion ist erlaubt, aber das Paket gibt sie nicht her.
+  "PLAN_LIMIT_REACHED",
   "PAYLOAD_TOO_LARGE",
   "UNSUPPORTED_MEDIA_TYPE",
   "AI_UNAVAILABLE",

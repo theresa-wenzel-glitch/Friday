@@ -661,6 +661,68 @@ const BEISPIEL_BETRIEBE = [
     antwortet: true }
 ];
 
+/**
+ * Die Pakete.
+ *
+ * Dieselben Werte wie in database/seeds/0002_subscription_plans.sql. Die
+ * Preise sind ausdrücklich Hypothesen: erst echte Nutzer zeigen, welche
+ * Zahlungsbereitschaft besteht.
+ */
+const PAKETE = [
+  {
+    code: "FREE", name: "Free", preisCent: 0,
+    angeboteProMonat: 5,
+    kiAssistent: false,
+    zeile: "Zum Ausprobieren",
+    enthalten: [
+      "Unternehmensprofil",
+      "5 Angebote pro Monat",
+      "Grundlegendes Dashboard"
+    ]
+  },
+  {
+    code: "PRO", name: "Pro", preisCent: 2900,
+    angeboteProMonat: 50,
+    kiAssistent: true,
+    zeile: "Für laufenden Betrieb",
+    empfohlen: true,
+    enthalten: [
+      "50 Angebote pro Monat",
+      "KI-Textvorschläge für Angebote",
+      "Kalender und Verfügbarkeit",
+      "Statistiken"
+    ]
+  },
+  {
+    code: "BUSINESS", name: "Business", preisCent: 7900,
+    angeboteProMonat: null,
+    kiAssistent: true,
+    zeile: "Für mehrere Mitarbeiter",
+    enthalten: [
+      "Unbegrenzte Angebote",
+      "Mehrere Mitarbeiter",
+      "Mehrere Standorte",
+      "Erweiterte Statistiken"
+    ]
+  }
+];
+
+const paketVon = (code) => PAKETE.find((p) => p.code === code) ?? PAKETE[0];
+
+/**
+ * Zahlungsarten, die auf der Bezahlseite des Anbieters zur Verfügung stehen.
+ *
+ * Sie werden hier nur benannt, nicht abgefragt: JobFlow sieht niemals eine
+ * Kartennummer. Der Bezahlvorgang läuft beim Anbieter.
+ */
+const ZAHLUNGSARTEN = [
+  { icon: "\u{1F4B3}", name: "Kreditkarte", zusatz: "Visa, Mastercard, American Express" },
+  { icon: "\u{1F535}", name: "PayPal", zusatz: "" },
+  { icon: "\u{1F3E6}", name: "SEPA-Lastschrift", zusatz: "" },
+  { icon: "\u{1F34E}", name: "Apple Pay", zusatz: "" },
+  { icon: "\u{1F7E2}", name: "Google Pay", zusatz: "" }
+];
+
 /* ==========================================================================
    2. Die Regel-KI
    Übernommen aus services/api/src/modules/ai/rules-provider.ts.
@@ -1053,6 +1115,49 @@ const angeboteZu = (anfrageId) => db.angebote.filter((a) => a.anfrageId === anfr
 const terminZu = (angebotId) => db.termine.find((t) => t.angebotId === angebotId && t.status !== "ABGESAGT") ?? null;
 const auftragZuAngebot = (angebotId) => db.auftraege.find((a) => a.angebotId === angebotId) ?? null;
 const gesamt = (angebot) => angebot.arbeitCent + angebot.materialCent + angebot.anfahrtCent;
+
+/* --- Pakete und Guthaben ---------------------------------------------------
+
+   Dieselbe Regel wie im Backend: der Verbrauch hängt am Abrechnungsmonat und
+   wird beim Monatswechsel zurückgesetzt. Ein Angebot zu einer Anfrage, zu der
+   bereits eines abgegeben wurde, zählt nicht erneut - sonst kostete jede
+   Korrektur ein weiteres Kontingent.                                          */
+
+function aktuellerMonat() {
+  const jetzt = new Date();
+  return `${jetzt.getFullYear()}-${String(jetzt.getMonth() + 1).padStart(2, "0")}`;
+}
+
+/** Verbrauch des laufenden Monats, bei Monatswechsel zurückgesetzt. */
+function verbrauchVon(betrieb) {
+  if (betrieb === null) return { monat: aktuellerMonat(), angebote: 0 };
+  if (betrieb.verbrauch === undefined || betrieb.verbrauch.monat !== aktuellerMonat()) {
+    betrieb.verbrauch = { monat: aktuellerMonat(), angebote: 0 };
+    speichere();
+  }
+  return betrieb.verbrauch;
+}
+
+/** Was der Betrieb gerade darf. */
+function guthaben(betrieb) {
+  const paket = paketVon(betrieb?.paket ?? "FREE");
+  const verbrauch = verbrauchVon(betrieb);
+  const grenze = paket.angeboteProMonat;
+  return {
+    paket,
+    verbraucht: verbrauch.angebote,
+    grenze,
+    uebrig: grenze === null ? null : Math.max(0, grenze - verbrauch.angebote),
+    darfAngebotSenden: grenze === null || verbrauch.angebote < grenze,
+    darfKiNutzen: paket.kiAssistent
+  };
+}
+
+function verbrauchZaehlen(betrieb) {
+  const verbrauch = verbrauchVon(betrieb);
+  verbrauch.angebote += 1;
+  speichere();
+}
 
 /* ==========================================================================
    5. Abläufe
@@ -2162,6 +2267,7 @@ bildschirme.dashboard = () => {
     !db.angebote.some((ang) => ang.anfrageId === a.id && ang.betriebId === betrieb.id));
   const laufende = db.auftraege.filter((a) => a.betriebId === betrieb?.id && a.status !== "ABGESCHLOSSEN");
   const unvollstaendig = betrieb !== null && betrieb.leistungen.length === 0;
+  const stand = guthaben(betrieb);
 
   return `
   <div class="screen">
@@ -2177,6 +2283,19 @@ bildschirme.dashboard = () => {
           Ohne hinterlegte Leistung wirst du zu keiner Anfrage vorgeschlagen. Das dauert eine Minute.
         </p>
         <button class="jf-btn jf-btn--primary jf-btn--sm" data-tu="gehe" data-wert="betriebProfil">Jetzt einrichten</button>
+      </div>` : ""}
+
+    ${stand.grenze !== null && stand.uebrig !== null && stand.uebrig <= 1 ? `
+      <div class="jf-card" style="background:${stand.uebrig === 0 ? "var(--jf-error-light)" : "var(--jf-warning-light)"}">
+        <p class="jf-body" style="font-weight:600;color:${stand.uebrig === 0 ? "var(--jf-error)" : "var(--jf-warning)"}">
+          ${stand.uebrig === 0 ? "Guthaben aufgebraucht" : "Noch ein Angebot frei"}
+        </p>
+        <p class="jf-muted">
+          ${stand.uebrig === 0
+            ? "In diesem Monat sind keine weiteren Angebote möglich."
+            : "Danach sind in diesem Monat keine weiteren Angebote möglich."}
+        </p>
+        <button class="jf-btn jf-btn--primary jf-btn--sm" data-tu="gehe" data-wert="pakete">Pakete ansehen</button>
       </div>` : ""}
 
     <div class="jf-tiles">
@@ -2209,11 +2328,15 @@ function betriebAnfrageKarte(anfrage) {
   const unter = anfrage.kategorie ? UNTERKATEGORIEN[anfrage.kategorie] : null;
   const betrieb = eigenerBetrieb();
   const treffer = anfrage.vermittelt.find((v) => v.betriebId === betrieb?.id);
+  const eigenes = db.angebote.find((a) => a.anfrageId === anfrage.id && a.betriebId === betrieb?.id) ?? null;
   return `
-    <button class="jf-card" data-tu="gehe" data-wert="betriebAnfrage" data-id="${anfrage.id}">
+    <button class="jf-card" data-tu="gehe" data-wert="betriebAnfrage" data-id="${anfrage.id}"
+      ${eigenes !== null ? 'style="opacity:.72"' : ""}>
       <div class="jf-row jf-row--between">
         ${unter ? `<span class="jf-badge jf-badge--primary">${unter.icon} ${esc(unter.name)}</span>` : '<span class="jf-badge">Ohne Kategorie</span>'}
-        ${treffer ? `<span class="jf-badge">Passung ${treffer.punkte}</span>` : ""}
+        ${eigenes !== null
+          ? `<span class="jf-badge ${eigenes.status === "ANGENOMMEN" ? "jf-badge--success" : ""}">${eigenes.status === "ANGENOMMEN" ? "Auftrag gewonnen" : "Angebot abgegeben"}</span>`
+          : treffer ? `<span class="jf-badge">Passung ${treffer.punkte}</span>` : ""}
       </div>
       <p class="jf-body" style="font-weight:600">${esc(anfrage.beschreibung)}</p>
       <p class="jf-caption">
@@ -2241,7 +2364,11 @@ function auftragKarteBetrieb(auftrag) {
 
 bildschirme.betriebAnfragen = () => {
   const betrieb = eigenerBetrieb();
-  const alle = anfragenFuerBetrieb(betrieb);
+  const beantwortet = (anfrage) =>
+    db.angebote.some((a) => a.anfrageId === anfrage.id && a.betriebId === betrieb?.id);
+  // Was noch unbeantwortet ist, steht oben: das ist die Arbeit, die ansteht.
+  const alle = [...anfragenFuerBetrieb(betrieb)]
+    .sort((a, b) => Number(beantwortet(a)) - Number(beantwortet(b)));
   return `
   <div class="screen">
     <h1 class="jf-h1">Anfragen</h1>
@@ -2422,12 +2549,162 @@ bildschirme.betriebStatistik = () => {
   </div>`;
 };
 
+/**
+ * Die Preisübersicht.
+ *
+ * Sie erscheint an zwei Stellen: direkt nach der Registrierung als Betrieb -
+ * dann überspringbar - und sobald das Guthaben erschöpft ist. Im zweiten Fall
+ * steht oben, warum sie erscheint, statt den Nutzer raten zu lassen.
+ */
+bildschirme.pakete = () => {
+  const betrieb = eigenerBetrieb();
+  const stand = guthaben(betrieb);
+  const anlass = ansicht.daten.anlass ?? null;
+  const aktuell = betrieb?.paket ?? "FREE";
+
+  const kopf = anlass === "grenze"
+    ? `<div class="jf-card" style="background:var(--jf-warning-light)">
+         <p class="jf-body" style="font-weight:600;color:var(--jf-warning)">Dein Guthaben für diesen Monat ist aufgebraucht</p>
+         <p class="jf-muted">
+           Im Paket ${esc(stand.paket.name)} sind ${stand.grenze} Angebote pro Monat enthalten.
+           Am ${esc(naechsterMonatsersterText())} gibt es wieder neues Guthaben &mdash; oder du wechselst jetzt.
+         </p>
+       </div>`
+    : anlass === "ki"
+    ? `<div class="jf-card" style="background:var(--jf-ai-light)">
+         <p class="jf-body" style="font-weight:600;color:var(--jf-ai)">Der KI-Assistent gehört zu Pro</p>
+         <p class="jf-muted">
+           Er schlägt dir den Angebotstext vor. Über Preis und Inhalt entscheidest du weiterhin selbst.
+         </p>
+       </div>`
+    : anlass === "start"
+    ? `<p class="jf-muted">
+         Du kannst sofort loslegen &mdash; Free kostet nichts. Wechseln kannst du jederzeit.
+       </p>`
+    : "";
+
+  return `
+  ${appbar("Pakete", anlass === "start" ? null : "betriebProfil")}
+  <div class="screen" style="padding-top:6px">
+    ${anlass !== "start" ? '<h1 class="jf-h1">Pakete</h1>' : '<h1 class="jf-h1">Wähle dein Paket</h1>'}
+    ${kopf}
+
+    ${PAKETE.map((paket) => {
+      const istAktuell = paket.code === aktuell;
+      return `
+        <div class="jf-card" style="${paket.empfohlen ? "border:2px solid var(--jf-primary)" : ""}">
+          <div class="jf-row jf-row--between" style="align-items:flex-start">
+            <div>
+              <p class="jf-h2">${esc(paket.name)}</p>
+              <p class="jf-caption">${esc(paket.zeile)}</p>
+            </div>
+            <div class="jf-row" style="gap:6px">
+              ${paket.empfohlen ? '<span class="jf-badge jf-badge--primary">Empfohlen</span>' : ""}
+              ${istAktuell ? '<span class="jf-badge jf-badge--success">Aktuell</span>' : ""}
+            </div>
+          </div>
+
+          <p style="font-family:var(--font-display);font-size:30px;font-weight:700;color:var(--jf-text);font-variant-numeric:tabular-nums;line-height:1.1">
+            ${paket.preisCent === 0 ? "0 €" : fmtEuroKurz(paket.preisCent)}
+            <span style="font-size:14px;font-weight:500;color:var(--jf-muted)">/Monat</span>
+          </p>
+
+          <div class="jf-stack jf-stack--tight">
+            ${paket.enthalten.map((punkt) => `
+              <p class="jf-body" style="font-size:13.5px">
+                <span style="color:var(--jf-success);font-weight:700">✓</span> ${esc(punkt)}
+              </p>`).join("")}
+          </div>
+
+          ${istAktuell
+            ? '<p class="jf-caption" style="text-align:center">Dein aktuelles Paket</p>'
+            : `<button class="jf-btn ${paket.empfohlen ? "jf-btn--primary" : "jf-btn--secondary"} jf-btn--sm"
+                 data-tu="paketWaehlen" data-wert="${paket.code}">
+                 ${paket.preisCent === 0 ? "Auf Free wechseln" : esc(paket.name) + " wählen"}
+               </button>`}
+        </div>`;
+    }).join("")}
+
+    ${anlass === "start"
+      ? '<button class="jf-btn jf-btn--ghost" data-tu="gehe" data-wert="dashboard">Später entscheiden</button>' : ""}
+
+    <p class="jf-fussnote">
+      Alle Preise zzgl. Umsatzsteuer. Monatlich kündbar.
+      Die Preise sind ein Startmodell und können sich ändern.
+    </p>
+  </div>`;
+};
+
+function naechsterMonatsersterText() {
+  const jetzt = new Date();
+  const naechster = new Date(jetzt.getFullYear(), jetzt.getMonth() + 1, 1);
+  return naechster.toLocaleDateString("de-DE", { day: "numeric", month: "long" });
+}
+
+/**
+ * Der Schritt zur Zahlung.
+ *
+ * Hier stehen die Zahlungsarten, aber ausdrücklich kein Eingabefeld für
+ * Kartendaten. Der Bezahlvorgang läuft auf den Seiten des Zahlungsanbieters -
+ * ein Formular an dieser Stelle wäre bestenfalls überflüssig und schlimmsten-
+ * falls eine Einladung, echte Kartennummern in eine Attrappe zu tippen.
+ */
+bildschirme.zahlung = () => {
+  const paket = paketVon(ansicht.daten.paketCode ?? "PRO");
+  return `
+  ${appbar("Zahlung", "pakete")}
+  <div class="screen" style="padding-top:6px">
+    <div class="jf-card">
+      <div class="jf-row jf-row--between" style="align-items:baseline">
+        <div>
+          <p class="jf-h2">${esc(paket.name)}</p>
+          <p class="jf-caption">Monatlich kündbar</p>
+        </div>
+        <p style="font-family:var(--font-display);font-size:26px;font-weight:700;color:var(--jf-text)">
+          ${fmtEuroKurz(paket.preisCent)}<span style="font-size:13px;font-weight:500;color:var(--jf-muted)">/Monat</span>
+        </p>
+      </div>
+    </div>
+
+    <div class="jf-card">
+      <p class="jf-label" style="margin:0">Zahlungsarten</p>
+      <div class="jf-stack jf-stack--tight">
+        ${ZAHLUNGSARTEN.map((art) => `
+          <div class="jf-row" style="align-items:center;gap:10px;padding:6px 0">
+            <span style="font-size:19px">${art.icon}</span>
+            <div>
+              <p class="jf-body" style="font-size:14px;font-weight:500">${esc(art.name)}</p>
+              ${art.zusatz ? `<p class="jf-caption">${esc(art.zusatz)}</p>` : ""}
+            </div>
+          </div>`).join("")}
+      </div>
+    </div>
+
+    <div class="jf-card" style="background:var(--jf-surface-muted)">
+      <p class="jf-label" style="margin:0">Noch kein Zahlungskonto verknüpft</p>
+      <p class="jf-muted">
+        Der Bezahlvorgang läuft auf den Seiten des Zahlungsanbieters &mdash; JobFlow
+        sieht deine Kartennummer nie. Sobald das Konto verknüpft ist, führt dieser
+        Knopf dorthin.
+      </p>
+      <p class="jf-caption">
+        Bis dahin lässt sich das Paket nicht buchen. Free funktioniert uneingeschränkt weiter.
+      </p>
+    </div>
+
+    <div class="jf-spacer"></div>
+    <button class="jf-btn jf-btn--primary" disabled>Zahlungspflichtig buchen</button>
+    <button class="jf-btn jf-btn--ghost" data-tu="gehe" data-wert="pakete">Zurück zur Übersicht</button>
+  </div>`;
+};
+
 bildschirme.betriebProfil = () => {
   const betrieb = eigenerBetrieb();
   const konto = angemeldet();
   if (betrieb === null) return bildschirme.dashboard();
 
   const alleLeistungen = Object.entries(UNTERKATEGORIEN);
+  const stand = guthaben(betrieb);
   return `
   <div class="screen">
     <h1 class="jf-h1">Unternehmen</h1>
@@ -2453,6 +2730,27 @@ bildschirme.betriebProfil = () => {
           <button class="jf-chip" data-tu="leistung" data-wert="${slug}"
             aria-pressed="${betrieb.leistungen.includes(slug)}">${k.icon} ${esc(k.name)}</button>`).join("")}
       </div>
+    </div>
+
+    <div class="jf-card">
+      <div class="jf-row jf-row--between">
+        <p class="jf-label" style="margin:0">Paket</p>
+        <span class="jf-badge ${stand.paket.code === "FREE" ? "" : "jf-badge--primary"}">${esc(stand.paket.name)}</span>
+      </div>
+      <p class="jf-body" style="font-weight:600;font-size:19px">
+        ${stand.paket.preisCent === 0 ? "0 €" : fmtEuroKurz(stand.paket.preisCent)}
+        <span style="font-size:13px;font-weight:400;color:var(--jf-muted)">/Monat</span>
+      </p>
+      <p class="jf-caption">
+        ${stand.grenze === null
+          ? "Unbegrenzt viele Angebote."
+          : `${stand.verbraucht} von ${stand.grenze} Angeboten in diesem Monat genutzt.`}
+      </p>
+      ${stand.grenze === null ? "" : `
+        <div class="jf-bar__track"><div class="jf-bar__fill"
+          style="width:${Math.min(100, Math.round((stand.verbraucht / stand.grenze) * 100))}%;
+                 background:${stand.uebrig === 0 ? "var(--jf-error)" : "var(--jf-primary)"}"></div></div>`}
+      <button class="jf-btn jf-btn--secondary jf-btn--sm" data-tu="gehe" data-wert="pakete">Pakete ansehen</button>
     </div>
 
     <div class="jf-card">
@@ -2502,7 +2800,8 @@ const REITER_VON = {
   auftrag: "anfragen", bewerten: "anfragen", rueckfragen: "anfragen",
   gespraech: "gespraeche",
   betriebAnfrage: "betriebAnfragen", betriebAngebot: "betriebAnfragen",
-  betriebStatistik: "dashboard"
+  betriebStatistik: "dashboard",
+  pakete: "betriebProfil", zahlung: "betriebProfil"
 };
 
 /* Bildschirme ohne Reiterleiste - dort ist die Navigation Teil des Ablaufs. */
@@ -2601,6 +2900,8 @@ const aktionen = {
         id: neueId("btr"), kontoId: konto.id, name,
         beschreibung: null, ort: "", radiusKm: 30,
         leistungen: [], geprueft: false,
+        paket: "FREE",
+        verbrauch: { monat: aktuellerMonat(), angebote: 0 },
         bewertung: null, anzahlBewertungen: 0, auftraege: 0, antwortMin: null,
         preisVon: null, preisBis: null,
         zeiten: WOCHENTAGE.map((_, i) => ({ tag: i, von: "08:00", bis: "17:00", aktiv: i < 5 }))
@@ -2609,9 +2910,15 @@ const aktionen = {
 
     db.sitzung = konto.id;
     speichere();
+    if (rolle === "BETRIEB") {
+      // Direkt nach der Anmeldung die Pakete zeigen - überspringbar, denn
+      // Free kostet nichts und niemand soll zur Kasse gedrängt werden.
+      gehe("pakete", null, { anlass: "start" });
+      return;
+    }
     ansicht = startAnsicht();
     zeichne();
-    hinweis(rolle === "BETRIEB" ? "Willkommen. Hinterlege als Nächstes deine Leistungen." : "Willkommen bei JobFlow.");
+    hinweis("Willkommen bei JobFlow.");
   },
 
   async anmelden() {
@@ -2806,6 +3113,10 @@ const aktionen = {
   },
 
   angebotstextVorschlag(_wert, id) {
+    if (!guthaben(eigenerBetrieb()).darfKiNutzen) {
+      gehe("pakete", null, { anlass: "ki" });
+      return;
+    }
     const anfrage = anfrageVon(id);
     const zusammenfassung = anfrage?.analyse?.zusammenfassung ?? "das beschriebene Anliegen";
     ansicht.daten = {
@@ -2824,6 +3135,14 @@ const aktionen = {
     const anfrage = anfrageVon(id);
     const betrieb = eigenerBetrieb();
     if (anfrage === null || betrieb === null) return;
+
+    // Ein bereits abgegebenes Angebot zu überarbeiten zählt nicht erneut.
+    const schonAbgegeben = db.angebote.some(
+      (a) => a.anfrageId === anfrage.id && a.betriebId === betrieb.id);
+    if (!schonAbgegeben && !guthaben(betrieb).darfAngebotSenden) {
+      gehe("pakete", null, { anlass: "grenze" });
+      return;
+    }
 
     const arbeit = zuCent(wert("ang-arbeit"));
     const material = zuCent(wert("ang-material"));
@@ -2850,9 +3169,30 @@ const aktionen = {
       erstelltAm: new Date().toISOString()
     });
     if (!["ANGENOMMEN", "ABGESCHLOSSEN"].includes(anfrage.status)) anfrage.status = "ANGEBOTE";
+    if (!schonAbgegeben) verbrauchZaehlen(betrieb);
     speichere();
     gehe("dashboard");
-    hinweis("Angebot gesendet. Der Kunde sieht es sofort.");
+
+    const uebrig = guthaben(betrieb).uebrig;
+    hinweis(uebrig === null
+      ? "Angebot gesendet. Der Kunde sieht es sofort."
+      : `Angebot gesendet. Noch ${uebrig} ${uebrig === 1 ? "Angebot" : "Angebote"} in diesem Monat.`);
+  },
+
+  paketWaehlen(code) {
+    const betrieb = eigenerBetrieb();
+    if (betrieb === null) return;
+
+    // Free braucht keine Zahlung und wird sofort gesetzt. Alles andere führt
+    // zum Bezahlvorgang - und der läuft beim Zahlungsanbieter, nicht hier.
+    if (code === "FREE") {
+      betrieb.paket = "FREE";
+      speichere();
+      gehe("dashboard");
+      hinweis("Paket Free ist aktiv.");
+      return;
+    }
+    gehe("zahlung", null, { paketCode: code });
   },
 
   leistung(w) {

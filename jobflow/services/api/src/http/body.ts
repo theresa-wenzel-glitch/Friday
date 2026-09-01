@@ -37,6 +37,28 @@ export async function readJsonBody(req: IncomingMessage): Promise<unknown> {
   }
 }
 
+/**
+ * Liest den Rumpf unverändert als Text.
+ *
+ * Für Webhooks von Zahlungsanbietern zwingend: die Signatur gilt für genau
+ * diese Zeichenfolge. Wer erst JSON.parse und dann JSON.stringify aufruft,
+ * ändert Reihenfolge und Leerzeichen - und die Prüfung schlägt fehl, obwohl
+ * das Ereignis echt ist.
+ */
+export async function readRawBody(req: IncomingMessage, maxBytes = MAX_JSON_BYTES): Promise<string> {
+  const chunks: Buffer[] = [];
+  let total = 0;
+  for await (const chunk of req) {
+    const buffer = chunk as Buffer;
+    total += buffer.length;
+    if (total > maxBytes) {
+      throw new ApiError(413, "PAYLOAD_TOO_LARGE", "Die Anfrage ist zu groß.");
+    }
+    chunks.push(buffer);
+  }
+  return Buffer.concat(chunks).toString("utf8");
+}
+
 /** Liest einen binären Rumpf (Foto-Upload) mit harter Größengrenze. */
 export async function readBinaryBody(req: IncomingMessage, maxBytes: number): Promise<Buffer> {
   const chunks: Buffer[] = [];

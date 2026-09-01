@@ -178,6 +178,11 @@ describe("Der Weg von der Anfrage zum Auftrag", skipUnlessDatabase, () => {
     assert.ok(zusammenfassung.summary.length > 0);
 
     // --- 8. Textvorschlag und Angebot -------------------------------------
+    // Der KI-Assistent gehört zum Paket Pro. Im echten Betrieb schaltet ihn
+    // der Webhook des Zahlungsanbieters frei; hier wird derselbe Weg direkt
+    // gegangen, damit der Test ohne Zahlungskonto läuft.
+    await harness.app.billing.setPlan(profil.id, "PRO");
+
     const vorschlag = expectOk<{ text: string; isAiGenerated: boolean }>(
       await betrieb.post("/offers/suggest-text", { context: zusammenfassung.summary }),
       "Textvorschlag",

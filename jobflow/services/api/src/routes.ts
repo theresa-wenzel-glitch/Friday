@@ -18,8 +18,11 @@ import {
   uuid,
   withDefault,
 } from "@jobflow/validation";
-import { JOB_STATUSES } from "@jobflow/types";
+import { JOB_STATUSES, PLAN_CODES } from "@jobflow/types";
 import { ApiError } from "./http/errors.js";
+import { readRawBody } from "./http/body.js";
+import { handleWebhookEvent } from "./modules/billing/webhook.js";
+import { WebhookVerificationError } from "./modules/billing/provider.js";
 import { RATE_LIMITS } from "./http/rate-limit.js";
 import { Router } from "./http/router.js";
 import type { RequestContext } from "./http/context.js";
@@ -36,6 +39,44 @@ export function buildRouter(): Router {
 
   router.get("/health", async () => ({ status: "ok" }));
 
+  /**
+   * Der Webhook des Zahlungsanbieters.
+   *
+   * Öffentlich erreichbar - er muss es sein, der Anbieter kennt keine Session.
+   * Die Berechtigung entsteht stattdessen aus der Signatur: ohne gültige
+   * Signatur wird nichts verarbeitet. Deshalb steht die Route hier oben und
+   * nicht bei den übrigen Zahlungsrouten, die eine Anmeldung verlangen.
+   */
+  router.post("/webhooks/payments", async (ctx) => {
+    const roh = await readRawBody(ctx.req);
+    const signatur = ctx.req.headers["stripe-signature"];
+
+    let ereignis;
+    try {
+      ereignis = ctx.app.paymentProvider.verifyWebhook(
+        roh,
+        Array.isArray(signatur) ? signatur[0] : signatur,
+      );
+    } catch (fehler) {
+      if (fehler instanceof WebhookVerificationError) {
+        // Nicht verraten, woran es lag - das wäre eine Anleitung zum Fälschen.
+        ctx.app.logger.warn("Webhook mit ungültiger Signatur abgewiesen", {
+          grund: fehler.message,
+        });
+        throw ApiError.forbidden("Signatur ungültig.");
+      }
+      throw fehler;
+    }
+
+    return handleWebhookEvent(
+      ctx.app.db,
+      ctx.app.billing,
+      ctx.app.paymentProvider,
+      ereignis,
+      ctx.app.logger,
+    );
+  });
+
   router.mount("/auth", authRoutes());
   router.mount("/categories", categoryRoutes());
   router.mount("/requests", requestRoutes());
@@ -47,6 +88,7 @@ export function buildRouter(): Router {
   router.mount("/reviews", reviewRoutes());
   router.mount("/matches", matchRoutes());
   router.mount("/me", meRoutes());
+  router.mount("/billing", billingRoutes());
 
   return router;
 }
@@ -324,6 +366,10 @@ function offerRoutes(): Router {
   router.post("/suggest-text", async (ctx) => {
     const principal = await ctx.requireRole("BUSINESS", "BUSINESS_EMPLOYEE");
     limit(ctx, "ai", principal.user.id);
+    const membership = await ctx.app.businesses.requireMembership(principal.user.id);
+    // Gehört zu Pro. Geprüft wird das hier und nicht in der App: ein
+    // veränderter Client käme sonst an der Grenze vorbei.
+    await ctx.app.billing.consumeAiCall(ctx.app.db, membership.businessId);
     const input = await ctx.input(offerSuggestionSchema);
     return { text: await ctx.app.ai.suggestOfferText(input.context), isAiGenerated: true };
   });
@@ -451,6 +497,74 @@ function conversationRoutes(): Router {
     const input = await ctx.input(chatSuggestionSchema);
     const text = await ctx.app.ai.suggestChatReply(input.context, input.hint || undefined);
     return { text, isAiGenerated: true };
+  });
+
+  return router;
+}
+
+// --- Pakete und Abo --------------------------------------------------------
+
+const planWahlSchema = object({ planCode: oneOf(PLAN_CODES) });
+
+function billingRoutes(): Router {
+  const router = new Router();
+
+  // Die Preise sind öffentlich - sie stehen auf jeder Website.
+  router.get("/plans", async (ctx) => ctx.app.billing.listPlans());
+
+  /** Was der eigene Betrieb gerade darf. Grundlage für die Anzeige in der App. */
+  router.get("/me", async (ctx) => {
+    const principal = await ctx.requireRole("BUSINESS", "BUSINESS_EMPLOYEE");
+    const membership = await ctx.app.businesses.requireMembership(principal.user.id);
+    return ctx.app.billing.entitlements(membership.businessId);
+  });
+
+  /**
+   * Startet den Wechsel eines Pakets.
+   *
+   * Free braucht keine Zahlung und wird sofort gesetzt. Für die bezahlten
+   * Pakete entsteht ein Bezahlvorgang beim Anbieter; freigeschaltet wird erst,
+   * wenn dessen signierter Webhook die Zahlung bestätigt - niemals durch die
+   * Rückleitung des Browsers, die sich fälschen ließe.
+   */
+  router.post("/checkout", async (ctx) => {
+    const principal = await ctx.requireRole("BUSINESS");
+    limit(ctx, "write", principal.user.id);
+    const businessId = await ctx.app.businesses.requireOwner(principal.user.id);
+    const input = await ctx.input(planWahlSchema);
+
+    if (input.planCode === "FREE") {
+      const subscription = await ctx.app.billing.setPlan(businessId, "FREE", { actorId: principal.user.id });
+      return { url: null, appliedDirectly: true, subscription };
+    }
+
+    const plan = (await ctx.app.billing.listPlans()).find((p) => p.code === input.planCode);
+    if (plan === undefined) throw ApiError.validation({ planCode: "Dieses Paket gibt es nicht." });
+
+    if (!ctx.app.paymentProvider.ready) {
+      throw new ApiError(
+        503,
+        "PLAN_LIMIT_REACHED",
+        "Es ist noch kein Zahlungskonto verknüpft. Bezahlte Pakete lassen sich deshalb noch nicht buchen.",
+      );
+    }
+
+    const basis = ctx.app.config.billing.returnUrl;
+    const sitzung = await ctx.app.paymentProvider.createCheckout({
+      businessId,
+      plan,
+      email: principal.user.email,
+      providerCustomerId: null,
+      successUrl: `${basis}?status=erfolg`,
+      cancelUrl: `${basis}?status=abgebrochen`,
+    });
+    return { url: sitzung.url, appliedDirectly: false, subscription: null };
+  });
+
+  router.post("/cancel", async (ctx) => {
+    const principal = await ctx.requireRole("BUSINESS");
+    const businessId = await ctx.app.businesses.requireOwner(principal.user.id);
+    return ctx.app.billing.cancelAtPeriodEnd(businessId);
   });
 
   return router;

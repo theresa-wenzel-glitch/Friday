@@ -24,6 +24,16 @@ export interface Config {
     dir: string;
     maxBytes: number;
   };
+  billing: {
+    /** "stripe" oder "manual". Ohne Schlüssel bleibt es "manual". */
+    provider: "stripe" | "manual";
+    stripeSecretKey: string | null;
+    stripeWebhookSecret: string | null;
+    /** Preis-Kennungen aus dem Stripe-Konto, je Paket. */
+    stripePriceIds: { PRO: string | null; BUSINESS: string | null };
+    /** Wohin der Anbieter nach der Zahlung zurückleitet. */
+    returnUrl: string;
+  };
   isProduction: boolean;
 }
 
@@ -67,6 +77,18 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     throw new ConfigError("SESSION_SECRET steht noch auf dem Beispielwert.");
   }
 
+  const stripeSecretKey = optionalString(env, "STRIPE_SECRET_KEY");
+  const stripeWebhookSecret = optionalString(env, "STRIPE_WEBHOOK_SECRET");
+  if (stripeSecretKey !== null && stripeWebhookSecret === null) {
+    throw new ConfigError(
+      "STRIPE_SECRET_KEY ist gesetzt, STRIPE_WEBHOOK_SECRET fehlt. Ohne Signaturprüfung " +
+        "dürfte jeder Aufrufer Abos freischalten - deshalb startet die API so nicht.",
+    );
+  }
+  if (isProduction && stripeSecretKey !== null && stripeSecretKey.startsWith("sk_test_")) {
+    throw new ConfigError("In der Produktion darf kein Stripe-Testschlüssel verwendet werden.");
+  }
+
   const providerRaw = optionalString(env, "AI_PROVIDER") ?? "rules";
   if (providerRaw !== "rules" && providerRaw !== "remote") {
     throw new ConfigError(`AI_PROVIDER muss "rules" oder "remote" sein, ist aber "${providerRaw}".`);
@@ -98,6 +120,20 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     upload: {
       dir: optionalString(env, "UPLOAD_DIR") ?? "./var/uploads",
       maxBytes: integer(env, "UPLOAD_MAX_BYTES", 8 * 1024 * 1024),
+    },
+    billing: {
+      // Der Anbieter wird nicht konfiguriert, sondern erkannt: sind Schlüssel
+      // da, wird abgerechnet, sonst läuft alles im Paket Free weiter. Das
+      // verhindert den gefährlichsten Fehler - eine Anwendung, die glaubt,
+      // Zahlungen zu verarbeiten, während gar kein Konto verknüpft ist.
+      provider: stripeSecretKey !== null && stripeWebhookSecret !== null ? "stripe" : "manual",
+      stripeSecretKey,
+      stripeWebhookSecret,
+      stripePriceIds: {
+        PRO: optionalString(env, "STRIPE_PRICE_PRO"),
+        BUSINESS: optionalString(env, "STRIPE_PRICE_BUSINESS"),
+      },
+      returnUrl: optionalString(env, "BILLING_RETURN_URL") ?? "https://jobflow.example/konto",
     },
     isProduction,
   };

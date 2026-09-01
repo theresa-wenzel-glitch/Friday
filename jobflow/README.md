@@ -166,3 +166,4 @@ Siehe [`.env.example`](.env.example). Die wichtigsten:
 - [Entwicklungsplan](docs/product/entwicklungsplan.md) — was fertig ist, was fehlt, was als Nächstes sinnvoll ist
 - [Architektur](docs/architecture/übersicht.md) — der Aufbau und die Begründungen
 - [API](docs/api/endpunkte.md) — alle Endpunkte, Fehlercodes, Rate Limits
+- [Zahlungen](docs/zahlungen.md) — Zahlungskonto verknüpfen, Zahlungsarten, Steuern
