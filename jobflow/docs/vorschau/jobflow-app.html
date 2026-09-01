@@ -671,12 +671,16 @@ const BEISPIEL_BETRIEBE = [
 const PAKETE = [
   {
     code: "FREE", name: "Free", preisCent: 0,
-    angeboteProMonat: 5,
+    angeboteProMonat: 3,
+    // Im ersten Kalendermonat mehr: ein Betrieb, der nie einen Auftrag über
+    // JobFlow gewonnen hat, wechselt nicht auf Pro - er geht.
+    angeboteErsterMonat: 10,
     kiAssistent: false,
     zeile: "Zum Ausprobieren",
     enthalten: [
       "Unternehmensprofil",
-      "5 Angebote pro Monat",
+      "3 Angebote pro Monat",
+      "10 im ersten Monat zum Einstieg",
       "Grundlegendes Dashboard"
     ]
   },
@@ -1138,15 +1142,29 @@ function verbrauchVon(betrieb) {
   return betrieb.verbrauch;
 }
 
+/** Ist der Betrieb noch im Kalendermonat seiner Anmeldung? */
+function imErstenMonat(betrieb) {
+  if (betrieb === null || betrieb.angelegtAm === undefined) return false;
+  const angelegt = new Date(betrieb.angelegtAm);
+  const jetzt = new Date();
+  return angelegt.getFullYear() === jetzt.getFullYear() && angelegt.getMonth() === jetzt.getMonth();
+}
+
 /** Was der Betrieb gerade darf. */
 function guthaben(betrieb) {
   const paket = paketVon(betrieb?.paket ?? "FREE");
   const verbrauch = verbrauchVon(betrieb);
-  const grenze = paket.angeboteProMonat;
+
+  // Im ersten Kalendermonat gilt das höhere Guthaben, sofern das Paket eines
+  // vorsieht. Danach das reguläre.
+  const willkommen = imErstenMonat(betrieb) && paket.angeboteErsterMonat !== undefined;
+  const grenze = willkommen ? paket.angeboteErsterMonat : paket.angeboteProMonat;
+
   return {
     paket,
     verbraucht: verbrauch.angebote,
     grenze,
+    willkommen,
     uebrig: grenze === null ? null : Math.max(0, grenze - verbrauch.angebote),
     darfAngebotSenden: grenze === null || verbrauch.angebote < grenze,
     darfKiNutzen: paket.kiAssistent
@@ -2566,8 +2584,11 @@ bildschirme.pakete = () => {
     ? `<div class="jf-card" style="background:var(--jf-warning-light)">
          <p class="jf-body" style="font-weight:600;color:var(--jf-warning)">Dein Guthaben für diesen Monat ist aufgebraucht</p>
          <p class="jf-muted">
-           Im Paket ${esc(stand.paket.name)} sind ${stand.grenze} Angebote pro Monat enthalten.
-           Am ${esc(naechsterMonatsersterText())} gibt es wieder neues Guthaben &mdash; oder du wechselst jetzt.
+           ${stand.willkommen
+             ? `Dein Einstiegsguthaben von ${stand.grenze} Angeboten ist genutzt. Ab dem
+                ${esc(naechsterMonatsersterText())} sind es ${stand.paket.angeboteProMonat} pro Monat.`
+             : `Im Paket ${esc(stand.paket.name)} sind ${stand.grenze} Angebote pro Monat enthalten.
+                Am ${esc(naechsterMonatsersterText())} gibt es wieder neues Guthaben &mdash; oder du wechselst jetzt.`}
          </p>
        </div>`
     : anlass === "ki"
@@ -2626,7 +2647,14 @@ bildschirme.pakete = () => {
     }).join("")}
 
     ${anlass === "start"
-      ? '<button class="jf-btn jf-btn--ghost" data-tu="gehe" data-wert="dashboard">Später entscheiden</button>' : ""}
+      ? `<div class="jf-card" style="background:var(--jf-success-light)">
+           <p class="jf-body" style="font-weight:600;color:var(--jf-success)">Zum Einstieg 10 Angebote geschenkt</p>
+           <p class="jf-muted">
+             Im ersten Monat hast du in Free 10 Angebote statt 3 &mdash; genug, um zu sehen,
+             ob JobFlow dir Aufträge bringt. Danach entscheidest du.
+           </p>
+         </div>
+         <button class="jf-btn jf-btn--ghost" data-tu="gehe" data-wert="dashboard">Später entscheiden</button>` : ""}
 
     <p class="jf-fussnote">
       Alle Preise zzgl. Umsatzsteuer. Monatlich kündbar.
@@ -2745,6 +2773,9 @@ bildschirme.betriebProfil = () => {
         ${stand.grenze === null
           ? "Unbegrenzt viele Angebote."
           : `${stand.verbraucht} von ${stand.grenze} Angeboten in diesem Monat genutzt.`}
+        ${stand.willkommen
+          ? ` Einstiegsguthaben &mdash; ab dem ${esc(naechsterMonatsersterText())} sind es ${stand.paket.angeboteProMonat}.`
+          : ""}
       </p>
       ${stand.grenze === null ? "" : `
         <div class="jf-bar__track"><div class="jf-bar__fill"
@@ -2901,6 +2932,7 @@ const aktionen = {
         beschreibung: null, ort: "", radiusKm: 30,
         leistungen: [], geprueft: false,
         paket: "FREE",
+        angelegtAm: new Date().toISOString(),
         verbrauch: { monat: aktuellerMonat(), angebote: 0 },
         bewertung: null, anzahlBewertungen: 0, auftraege: 0, antwortMin: null,
         preisVon: null, preisBis: null,
@@ -3173,10 +3205,12 @@ const aktionen = {
     speichere();
     gehe("dashboard");
 
-    const uebrig = guthaben(betrieb).uebrig;
-    hinweis(uebrig === null
+    const stand = guthaben(betrieb);
+    hinweis(stand.uebrig === null
       ? "Angebot gesendet. Der Kunde sieht es sofort."
-      : `Angebot gesendet. Noch ${uebrig} ${uebrig === 1 ? "Angebot" : "Angebote"} in diesem Monat.`);
+      : stand.uebrig === 0
+        ? "Angebot gesendet. Damit ist dein Guthaben für diesen Monat aufgebraucht."
+        : `Angebot gesendet. Noch ${stand.uebrig} ${stand.uebrig === 1 ? "Angebot" : "Angebote"} in diesem Monat.`);
   },
 
   paketWaehlen(code) {

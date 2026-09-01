@@ -17,7 +17,7 @@ läuft. Diese Anleitung beschreibt genau das.
 
 | Teil | Wo | Zustand |
 |---|---|---|
-| Pakete Free / Pro / Business | `database/seeds/0002_subscription_plans.sql` | Preise in der Datenbank, änderbar ohne Deployment |
+| Pakete Free / Pro / Business | `database/seeds/0002_subscription_plans.sql` | Preise und Grenzen in der Datenbank, änderbar ohne Deployment |
 | Guthaben und Grenzen | `services/api/src/modules/billing/service.ts` | serverseitig durchgesetzt |
 | Anbieter-Schnittstelle | `services/api/src/modules/billing/provider.ts` | austauschbar |
 | Stripe-Anbindung | `services/api/src/modules/billing/stripe-provider.ts` | fertig, wartet auf Schlüssel |
@@ -27,6 +27,44 @@ läuft. Diese Anleitung beschreibt genau das.
 Ohne Schlüssel läuft alles im Paket **Free** weiter. Die Anwendung tut dann
 nicht so, als sei bezahlt worden — sie sagt ehrlich, dass kein Konto verknüpft
 ist.
+
+## Die Grenzen sind Hypothesen
+
+Free liegt bei **3 Angeboten pro Monat**, im ersten Kalendermonat bei **10**.
+
+Der Einstieg ist kein Geschenk, sondern der Grund, warum die enge Grenze
+überhaupt wirken kann: Ein Betrieb, der nie einen Auftrag über JobFlow gewonnen
+hat, wechselt nicht auf Pro — er meldet sich ab. Erst wer den ersten Auftrag
+erlebt hat, hat einen Grund zu zahlen.
+
+Beide Zahlen sind Startwerte, keine Entscheidungen. Sie stehen in der Datenbank
+und lassen sich ohne Deployment ändern:
+
+```sql
+-- Enger, wenn zu viele im kostenlosen Paket bleiben:
+UPDATE subscription_plans SET monthly_offer_limit = 2 WHERE code = 'FREE';
+
+-- Großzügiger, wenn zu wenige Betriebe überhaupt antworten:
+UPDATE subscription_plans SET first_month_offer_limit = 15 WHERE code = 'FREE';
+```
+
+**Woran du merkst, dass die Grenze zu eng ist:** Die Zahl der Anfragen, auf die
+überhaupt jemand antwortet, sinkt. Das ist gefährlicher als eine zu niedrige
+Abo-Quote — ohne antwortende Betriebe verlieren die Kunden das Vertrauen, und
+dann gibt es niemanden mehr, dem man ein Abo verkaufen könnte.
+
+Die beiden Zahlen, die das zeigen:
+
+```sql
+-- Wie viele Anfragen bekommen mindestens ein Angebot?
+SELECT round(100.0 * count(DISTINCT o.request_id) / nullif(count(DISTINCT r.id), 0), 1) AS prozent
+FROM requests r LEFT JOIN offers o ON o.request_id = r.id;
+
+-- Wie viele Betriebe stoßen an ihre Grenze?
+SELECT count(*) FROM usage_periods u
+JOIN businesses b ON b.id = u.business_id
+WHERE u.period_start = date_trunc('month', now())::date AND u.offers_sent >= 3;
+```
 
 ## Schritt für Schritt
 

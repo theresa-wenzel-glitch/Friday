@@ -105,15 +105,38 @@ export class BillingService {
       [businessId, start],
     );
     const row = result.rows[0] ?? { offers_sent: 0, ai_calls: 0 };
-    const limit = plan.monthlyOfferLimit;
+    const imErstenMonat = await this.isFirstMonth(businessId, client);
+
+    // Im ersten Kalendermonat gilt das höhere Guthaben, sofern das Paket eines
+    // vorsieht. Danach das reguläre - ohne dass jemand etwas umstellen muss.
+    const limit = imErstenMonat && plan.firstMonthOfferLimit !== null
+      ? plan.firstMonthOfferLimit
+      : plan.monthlyOfferLimit;
 
     return {
       periodStart: new Date(`${start}T00:00:00.000Z`).toISOString(),
       offersSent: row.offers_sent,
       offerLimit: limit,
       offersLeft: limit === null ? null : Math.max(0, limit - row.offers_sent),
+      welcomeAllowance: imErstenMonat && plan.firstMonthOfferLimit !== null,
       aiCalls: row.ai_calls,
     };
+  }
+
+  /**
+   * Ist der Betrieb noch im Kalendermonat seiner Anmeldung?
+   *
+   * Bewusst der Kalendermonat und nicht "30 Tage ab Anmeldung": der
+   * Verbrauchszähler läuft ohnehin je Kalendermonat, und zwei verschiedene
+   * Zeitrechnungen im selben Guthaben wären eine sichere Fehlerquelle.
+   */
+  private async isFirstMonth(businessId: string, client: Queryable): Promise<boolean> {
+    const result = await client.query<{ erster_monat: boolean }>(
+      `SELECT date_trunc('month', created_at) = date_trunc('month', now()) AS erster_monat
+       FROM businesses WHERE id = $1`,
+      [businessId],
+    );
+    return result.rows[0]?.erster_monat === true;
   }
 
   /**
@@ -130,7 +153,7 @@ export class BillingService {
       throw new ApiError(
         402,
         "PLAN_LIMIT_REACHED",
-        `Im Paket ${entitlements.plan.name} sind ${String(entitlements.plan.monthlyOfferLimit)} Angebote je Monat enthalten. ` +
+        `Im Paket ${entitlements.plan.name} sind ${String(entitlements.usage.offerLimit)} Angebote je Monat enthalten. ` +
           "Für mehr Anfragen wechsle auf ein größeres Paket.",
       );
     }

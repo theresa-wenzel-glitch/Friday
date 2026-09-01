@@ -7,6 +7,7 @@ interface PlanRow {
   price_cents: number;
   currency: string;
   monthly_offer_limit: number | null;
+  first_month_offer_limit: number | null;
   ai_assistant: boolean;
   calendar: boolean;
   statistics: boolean;
@@ -21,6 +22,7 @@ export function mapPlan(row: PlanRow): SubscriptionPlan {
     priceCents: row.price_cents,
     currency: row.currency,
     monthlyOfferLimit: row.monthly_offer_limit,
+    firstMonthOfferLimit: row.first_month_offer_limit,
     aiAssistant: row.ai_assistant,
     calendar: row.calendar,
     statistics: row.statistics,

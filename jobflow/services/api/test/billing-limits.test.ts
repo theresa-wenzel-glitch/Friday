@@ -77,6 +77,8 @@ describe("Pakete und Guthaben", skipUnlessDatabase, () => {
     assert.deepEqual(pakete.map((p) => p.code), ["FREE", "PRO", "BUSINESS"]);
     assert.equal(pakete[0]?.priceCents, 0);
     assert.equal(pakete[1]?.priceCents, 2900);
+    assert.equal(pakete[0]?.monthlyOfferLimit, 3, "Free ist eng - der Einstieg großzügig.");
+    assert.equal(pakete[0]?.firstMonthOfferLimit, 10);
     assert.equal(pakete[2]?.monthlyOfferLimit, null, "Business ist unbegrenzt");
   });
 
@@ -85,9 +87,19 @@ describe("Pakete und Guthaben", skipUnlessDatabase, () => {
     assert.equal(stand.plan.code, "FREE");
     assert.equal(stand.subscription, null);
     assert.equal(stand.usage.offersSent, 0);
-    assert.equal(stand.usage.offersLeft, 5);
     assert.equal(stand.canSendOffer, true);
     assert.equal(stand.canUseAiAssistant, false, "Der KI-Assistent gehört zu Pro.");
+  });
+
+  it("gibt im ersten Monat das höhere Einstiegsguthaben", async () => {
+    // Der Betrieb wurde gerade angelegt, ist also im ersten Kalendermonat.
+    // Ohne diesen Einstieg hätte ein neuer Betrieb kaum eine Chance, einen
+    // ersten Auftrag zu gewinnen - und wechselt dann nicht auf Pro, sondern geht.
+    const stand = expectOk<Entitlements>(await betrieb.get("/billing/me"), "Guthaben");
+    assert.equal(stand.usage.welcomeAllowance, true);
+    assert.equal(stand.usage.offerLimit, 10, "Erster Monat: 10 statt 3.");
+    assert.equal(stand.plan.monthlyOfferLimit, 3, "Danach greifen 3 pro Monat.");
+    assert.equal(stand.plan.firstMonthOfferLimit, 10);
   });
 
   it("zählt jedes Angebot auf das Guthaben", async () => {
@@ -96,7 +108,7 @@ describe("Pakete und Guthaben", skipUnlessDatabase, () => {
 
     const stand = expectOk<Entitlements>(await betrieb.get("/billing/me"), "Guthaben");
     assert.equal(stand.usage.offersSent, 1);
-    assert.equal(stand.usage.offersLeft, 4);
+    assert.equal(stand.usage.offersLeft, 9, "Von den 10 des ersten Monats bleiben 9.");
   });
 
   it("zählt ein überarbeitetes Angebot nicht erneut", async () => {
@@ -117,10 +129,10 @@ describe("Pakete und Guthaben", skipUnlessDatabase, () => {
       "Eine Korrektur darf kein weiteres Kontingent kosten.");
   });
 
-  it("verweigert das sechste Angebot mit 402 und nennt den Grund", async () => {
+  it("verweigert das Angebot nach dem Guthaben mit 402 und nennt den Grund", async () => {
     // Bis zur Grenze auffüllen.
     let letzteAntwort;
-    for (let i = 0; i < 10; i += 1) {
+    for (let i = 0; i < 15; i += 1) {
       const anfrageId = await anfrageMitMatching();
       letzteAntwort = await angebotAbgeben(anfrageId);
       if (letzteAntwort.status !== 201) break;
@@ -129,6 +141,9 @@ describe("Pakete und Guthaben", skipUnlessDatabase, () => {
     assert.equal(letzteAntwort?.status, 402, "Erwartet wurde 402 Payment Required.");
     assert.equal(letzteAntwort?.body.error?.code, "PLAN_LIMIT_REACHED");
     assert.match(letzteAntwort?.body.error?.message ?? "", /Free/);
+    // Die Meldung nennt die tatsächlich geltende Grenze, nicht die des Pakets:
+    // im ersten Monat sind es 10, nicht 3.
+    assert.match(letzteAntwort?.body.error?.message ?? "", /10 Angebote/);
 
     const stand = expectOk<Entitlements>(await betrieb.get("/billing/me"), "Guthaben");
     assert.equal(stand.usage.offersLeft, 0);

@@ -19,6 +19,14 @@ export interface SubscriptionPlan {
   currency: string;
   /** Angebote je Abrechnungsmonat. null bedeutet unbegrenzt. */
   monthlyOfferLimit: number | null;
+  /**
+   * Guthaben im ersten Kalendermonat eines Betriebs. null bedeutet, dass es
+   * keinen Unterschied gibt.
+   *
+   * Ein enges Free-Paket wirkt nur, wenn der Betrieb vorher erlebt hat, wofür
+   * er zahlen soll - deshalb der großzügigere Einstieg.
+   */
+  firstMonthOfferLimit: number | null;
   aiAssistant: boolean;
   calendar: boolean;
   statistics: boolean;
@@ -51,6 +59,8 @@ export interface UsageSummary {
   offerLimit: number | null;
   /** Wie viele Angebote noch möglich sind; null bei unbegrenzt. */
   offersLeft: number | null;
+  /** Gilt gerade das höhere Guthaben des ersten Monats? */
+  welcomeAllowance: boolean;
   aiCalls: number;
 }
 
