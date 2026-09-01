@@ -15,8 +15,12 @@ Dieser komplette Weg funktioniert und ist als End-to-End-Test abgesichert
 
 ## Erst einmal ansehen
 
-Ohne Installation: [`docs/vorschau/jobflow-vorschau.html`](docs/vorschau/jobflow-vorschau.html)
-im Browser öffnen. Eine einzelne Datei, die den gesamten Ablauf klickbar macht —
+Ohne Installation: [`docs/vorschau/jobflow-app.html`](docs/vorschau/jobflow-app.html)
+im Browser öffnen — die App selbst, mit Konto und gespeicherten Daten. Wer
+stattdessen sehen möchte, welcher API-Aufruf hinter jedem Schritt steckt, nimmt
+[`docs/vorschau/jobflow-vorschau.html`](docs/vorschau/jobflow-vorschau.html).
+
+Zum Ausliefern: [`VEROEFFENTLICHEN.md`](VEROEFFENTLICHEN.md). Eine einzelne Datei, die den gesamten Ablauf klickbar macht —
 Kundenseite und Unternehmensseite, vom Willkommensbildschirm bis zur Bewertung.
 
 Die Regel-KI und die Matching-Berechnung darin sind aus dem Backend übernommen:

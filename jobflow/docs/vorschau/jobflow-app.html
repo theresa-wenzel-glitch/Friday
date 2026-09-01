@@ -1,0 +1,2943 @@
+<title>JobFlow</title>
+<meta name="description" content="Von der Anfrage zum Auftrag. Beschreibe dein Anliegen, JobFlow findet passende Betriebe.">
+<meta name="theme-color" content="#5B4CF0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap">
+
+<style>
+/* ==========================================================================
+   JobFlow
+
+   Diese Fassung läuft vollständig im Browser: kein Server, keine Datenbank.
+   Konten, Anfragen, Angebote und Aufträge liegen im lokalen Speicher des
+   Geräts und bleiben dort erhalten, bis sie gelöscht werden.
+
+   Die Farb- und Abstandswerte stimmen mit packages/config/src/theme.ts
+   überein - dieselbe Quelle, aus der sich auch die native App bedient.
+   ========================================================================== */
+
+:root {
+  --jf-primary: #5B4CF0;
+  --jf-primary-dark: #4438C7;
+  --jf-primary-light: #EDEBFE;
+  --jf-bg: #F6F7FB;
+  --jf-surface: #FFFFFF;
+  --jf-surface-muted: #F0F1F7;
+  --jf-text: #131A34;
+  --jf-muted: #5A6284;
+  --jf-inverted: #FFFFFF;
+  --jf-border: #E3E5EF;
+  --jf-success: #1FA971;
+  --jf-success-light: #E4F7EF;
+  --jf-warning: #E08A1E;
+  --jf-warning-light: #FDF2E1;
+  --jf-error: #D8464F;
+  --jf-error-light: #FCEAEB;
+  --jf-ai: #7A5AF8;
+  --jf-ai-light: #F1EDFE;
+
+  --font-display: "Poppins", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* Der Rand um die App herum, wenn das Fenster breiter ist als die App. */
+  --page: #E7E9F2;
+
+  color-scheme: light;
+}
+
+/* Die App stellt bewusst eine helle Oberfläche dar - so, wie sie auf dem
+   Telefon aussieht. Alle Farben sind ausdrücklich gesetzt, nie geerbt, damit
+   sie auch in einem dunklen Fenster unverändert erscheint. */
+
+* { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--page);
+  color: var(--jf-text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+:focus-visible { outline: 2px solid var(--jf-primary); outline-offset: 2px; border-radius: 6px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    transition-duration: .001ms !important;
+  }
+}
+
+/* --- Rahmen der Anwendung -------------------------------------------------- */
+
+.app {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  /* dvh statt vh: sonst schneidet die Adressleiste mobiler Browser unten ab. */
+  height: 100dvh;
+  max-width: 480px;
+  margin: 0 auto;
+  background: var(--jf-bg);
+  overflow: hidden;
+}
+
+@media (min-width: 520px) {
+  .app {
+    border-left: 1px solid var(--jf-border);
+    border-right: 1px solid var(--jf-border);
+  }
+}
+
+.viewport {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+.screen {
+  padding: 22px 20px 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-height: 100%;
+  animation: hereinschieben .24s cubic-bezier(.22, .9, .3, 1);
+}
+
+@keyframes hereinschieben {
+  from { opacity: 0; transform: translateY(7px); }
+  to { opacity: 1; transform: none; }
+}
+/* ==========================================================================
+   Die App - Bausteine
+   Große runde Karten, klare Buttons, großzügige Abstände.
+   ========================================================================== */
+
+.jf-h1 {
+  font-family: var(--font-display);
+  font-size: 25px; font-weight: 700; line-height: 1.2;
+  color: var(--jf-text); margin: 0; letter-spacing: -.02em;
+  text-wrap: balance;
+}
+.jf-h2 {
+  font-family: var(--font-display);
+  font-size: 18px; font-weight: 600; color: var(--jf-text); margin: 0;
+  letter-spacing: -.01em;
+}
+.jf-greeting { font-size: 15px; color: var(--jf-muted); margin: 0 0 2px; }
+.jf-body { font-size: 14.5px; color: var(--jf-text); margin: 0; line-height: 1.6; }
+.jf-muted { font-size: 13.5px; color: var(--jf-muted); margin: 0; line-height: 1.55; }
+.jf-caption { font-size: 12px; color: var(--jf-muted); margin: 0; }
+.jf-label {
+  font-size: 12.5px; font-weight: 500; color: var(--jf-muted);
+  margin: 0 0 6px; display: block;
+}
+
+.jf-card {
+  background: var(--jf-surface);
+  border-radius: 20px;
+  padding: 18px;
+  box-shadow: 0 4px 12px rgba(19, 26, 52, .06);
+  display: flex; flex-direction: column; gap: 10px;
+  text-align: left; width: 100%; border: none;
+  font-family: inherit; color: inherit;
+}
+button.jf-card { cursor: pointer; transition: transform .12s, box-shadow .12s; }
+button.jf-card:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(19, 26, 52, .1); }
+button.jf-card:active { transform: translateY(0); }
+
+.jf-btn {
+  appearance: none; border: none; cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 15px; font-weight: 600;
+  padding: 15px 20px; border-radius: 16px;
+  min-height: 52px;
+  display: flex; align-items: center; justify-content: center; gap: 9px;
+  width: 100%;
+  transition: filter .12s, transform .12s;
+}
+.jf-btn:hover { filter: brightness(1.06); }
+.jf-btn:active { transform: scale(.985); }
+.jf-btn--primary { background: var(--jf-primary); color: var(--jf-inverted); }
+.jf-btn--secondary { background: var(--jf-primary-light); color: var(--jf-primary-dark); }
+.jf-btn--ghost { background: transparent; color: var(--jf-primary); min-height: 44px; padding: 10px; }
+.jf-btn--danger { background: var(--jf-error-light); color: var(--jf-error); }
+.jf-btn--sm { min-height: 42px; padding: 10px 16px; font-size: 14px; border-radius: 13px; }
+.jf-btn[disabled] { opacity: .45; cursor: not-allowed; }
+.jf-btn__icon { font-size: 17px; line-height: 1; }
+
+.jf-row { display: flex; gap: 10px; }
+.jf-row--between { justify-content: space-between; align-items: center; }
+.jf-stack { display: flex; flex-direction: column; gap: 12px; }
+.jf-stack--tight { gap: 8px; }
+.jf-spacer { flex: 1; }
+
+/* Eingabefelder */
+.jf-input, .jf-textarea {
+  width: 100%;
+  background: var(--jf-surface);
+  border: 1px solid var(--jf-border);
+  border-radius: 13px;
+  padding: 13px 15px;
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: var(--jf-text);
+  min-height: 50px;
+}
+.jf-textarea { min-height: 110px; resize: none; line-height: 1.55; }
+.jf-input:focus, .jf-textarea:focus { outline: 2px solid var(--jf-primary); outline-offset: -1px; border-color: transparent; }
+.jf-input::placeholder, .jf-textarea::placeholder { color: #98A0BC; }
+.jf-hint { font-size: 11.5px; color: var(--jf-muted); margin: 5px 0 0; }
+.jf-error-text { font-size: 11.5px; color: var(--jf-error); margin: 5px 0 0; }
+
+/* Abzeichen */
+.jf-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 4px 11px; border-radius: 999px;
+  font-size: 11.5px; font-weight: 600;
+  background: var(--jf-surface-muted); color: var(--jf-muted);
+  white-space: nowrap;
+}
+.jf-badge--success { background: var(--jf-success-light); color: var(--jf-success); }
+.jf-badge--warning { background: var(--jf-warning-light); color: var(--jf-warning); }
+.jf-badge--error { background: var(--jf-error-light); color: var(--jf-error); }
+.jf-badge--ai { background: var(--jf-ai-light); color: var(--jf-ai); }
+.jf-badge--primary { background: var(--jf-primary-light); color: var(--jf-primary-dark); }
+
+/* Ein Abzeichen als direktes Kind einer Flex-Spalte würde sonst auf die volle
+   Breite gestreckt. In einer Reihe soll es dagegen mittig ausgerichtet bleiben. */
+.jf-card > .jf-badge, .screen > .jf-badge { align-self: flex-start; }
+
+/* Kategorien */
+.jf-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.jf-cat {
+  background: var(--jf-surface); border: none; border-radius: 17px;
+  padding: 15px 6px; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 7px;
+  box-shadow: 0 3px 10px rgba(19, 26, 52, .055);
+  font-family: inherit;
+  transition: transform .12s, box-shadow .12s;
+}
+.jf-cat:hover { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(19, 26, 52, .1); }
+.jf-cat__icon { font-size: 25px; line-height: 1; }
+.jf-cat__name { font-size: 12px; font-weight: 500; color: var(--jf-text); text-align: center; }
+
+/* Auswahl in Reihe (Dringlichkeit, Rolle) */
+.jf-choice {
+  flex: 1; background: var(--jf-surface);
+  border: 2px solid var(--jf-border); border-radius: 13px;
+  padding: 11px 8px; cursor: pointer; font-family: inherit;
+  font-size: 13px; color: var(--jf-muted); text-align: center;
+  transition: border-color .12s, background .12s, color .12s;
+}
+.jf-choice[aria-pressed="true"] {
+  border-color: var(--jf-primary); background: var(--jf-primary-light);
+  color: var(--jf-primary-dark); font-weight: 600;
+}
+
+.jf-option {
+  background: var(--jf-surface); border: 2px solid var(--jf-border);
+  border-radius: 17px; padding: 15px; cursor: pointer;
+  font-family: inherit; text-align: left; width: 100%;
+  display: flex; flex-direction: column; gap: 3px;
+  transition: border-color .12s, background .12s;
+}
+.jf-option[aria-pressed="true"] { border-color: var(--jf-primary); background: var(--jf-primary-light); }
+.jf-option__title { font-size: 14.5px; font-weight: 600; color: var(--jf-text); }
+.jf-option[aria-pressed="true"] .jf-option__title { color: var(--jf-primary-dark); }
+.jf-option__desc { font-size: 12.5px; color: var(--jf-muted); }
+
+/* KI-Bereich: eigene Farbe, damit KI-Inhalte erkennbar bleiben */
+.jf-ai {
+  background: var(--jf-ai-light);
+  border-radius: 18px; padding: 16px;
+  display: flex; flex-direction: column; gap: 9px;
+}
+.jf-ai__head { display: flex; align-items: center; gap: 8px; }
+.jf-ai__title { font-size: 12.5px; font-weight: 600; color: var(--jf-ai); }
+.jf-ai__disclaimer { font-size: 11.5px; color: var(--jf-muted); line-height: 1.5; }
+.jf-ai__field { display: flex; flex-direction: column; gap: 2px; }
+.jf-ai__field dt { font-size: 11.5px; color: var(--jf-muted); }
+.jf-ai__field dd { margin: 0; font-size: 14.5px; font-weight: 600; color: var(--jf-text); }
+
+.jf-thinking { display: flex; flex-direction: column; align-items: center; gap: 18px; padding: 46px 0; }
+.jf-thinking__orb {
+  width: 76px; height: 76px; border-radius: 50%;
+  background: var(--jf-ai-light);
+  display: grid; place-items: center; font-size: 34px;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--jf-ai) 32%, transparent); }
+  50% { box-shadow: 0 0 0 18px color-mix(in srgb, var(--jf-ai) 0%, transparent); }
+}
+.jf-thinking__steps { display: flex; flex-direction: column; gap: 9px; width: 100%; }
+.jf-thinking__step {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 13.5px; color: var(--jf-muted);
+  opacity: .35; transition: opacity .3s, color .3s;
+}
+.jf-thinking__step.is-on { opacity: 1; color: var(--jf-text); }
+.jf-thinking__step.is-on .jf-thinking__tick { color: var(--jf-success); }
+.jf-thinking__tick { color: var(--jf-border); font-weight: 700; }
+
+/* Zeitstrahl des Auftragsstatus */
+.jf-timeline { display: flex; flex-direction: column; }
+.jf-tl { display: flex; gap: 12px; }
+.jf-tl__col { display: flex; flex-direction: column; align-items: center; width: 26px; flex: none; }
+.jf-tl__dot {
+  width: 24px; height: 24px; border-radius: 50%;
+  display: grid; place-items: center;
+  font-size: 11px; font-weight: 700;
+  background: var(--jf-surface-muted); color: var(--jf-muted);
+}
+.jf-tl__dot--done { background: var(--jf-success); color: #fff; }
+.jf-tl__dot--now { background: var(--jf-primary); color: #fff; }
+.jf-tl__line { width: 2px; flex: 1; min-height: 22px; background: var(--jf-border); }
+.jf-tl__line--done { background: var(--jf-success); }
+.jf-tl__label { flex: 1; font-size: 13.5px; color: var(--jf-muted); padding-bottom: 18px; }
+.jf-tl__label--reached { color: var(--jf-text); font-weight: 500; }
+.jf-tl:last-child .jf-tl__label { padding-bottom: 0; }
+
+/* Preisaufstellung */
+.jf-price { display: flex; flex-direction: column; gap: 7px; }
+.jf-price__row { display: flex; justify-content: space-between; font-size: 13.5px; }
+.jf-price__row dt { color: var(--jf-muted); }
+.jf-price__row dd { margin: 0; color: var(--jf-text); font-variant-numeric: tabular-nums; }
+.jf-price__total {
+  display: flex; justify-content: space-between; align-items: baseline;
+  padding-top: 11px; border-top: 1px solid var(--jf-border);
+}
+.jf-price__total dt { font-size: 13.5px; color: var(--jf-muted); }
+.jf-price__total dd {
+  margin: 0; font-family: var(--font-display); font-size: 25px; font-weight: 700;
+  color: var(--jf-text); font-variant-numeric: tabular-nums;
+}
+
+/* Kennzahlen */
+.jf-tiles { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.jf-tile {
+  background: var(--jf-surface); border-radius: 17px; padding: 14px;
+  box-shadow: 0 3px 10px rgba(19, 26, 52, .055);
+  display: flex; flex-direction: column; gap: 2px;
+}
+.jf-tile__value {
+  font-family: var(--font-display); font-size: 25px; font-weight: 700;
+  color: var(--jf-primary); font-variant-numeric: tabular-nums; line-height: 1.1;
+}
+.jf-tile__label { font-size: 11.5px; color: var(--jf-muted); }
+
+.jf-bar { display: flex; flex-direction: column; gap: 5px; }
+.jf-bar__head { display: flex; justify-content: space-between; font-size: 13px; }
+.jf-bar__head span:first-child { color: var(--jf-muted); }
+.jf-bar__head span:last-child { color: var(--jf-text); font-weight: 600; font-variant-numeric: tabular-nums; }
+.jf-bar__track { height: 8px; border-radius: 99px; background: var(--jf-surface-muted); overflow: hidden; }
+.jf-bar__fill { height: 100%; border-radius: 99px; background: var(--jf-primary); }
+
+/* Kalender */
+.jf-cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.jf-cal__wd {
+  text-align: center; font-size: 10.5px; font-weight: 600;
+  color: var(--jf-muted); padding-bottom: 5px;
+}
+.jf-cal__day {
+  aspect-ratio: 1; border: none; background: transparent; border-radius: 11px;
+  font-family: inherit; font-size: 13px; color: var(--jf-text); cursor: pointer;
+  display: grid; place-items: center; font-variant-numeric: tabular-nums;
+}
+.jf-cal__day:hover:not([disabled]) { background: var(--jf-surface-muted); }
+.jf-cal__day[disabled] { color: #C3C8DA; cursor: not-allowed; }
+.jf-cal__day[aria-pressed="true"] { background: var(--jf-primary); color: #fff; font-weight: 600; }
+.jf-cal__day--free { font-weight: 600; }
+.jf-cal__day--free::after {
+  content: ""; width: 4px; height: 4px; border-radius: 50%;
+  background: var(--jf-success); position: absolute; transform: translateY(13px);
+}
+.jf-cal__day { position: relative; }
+.jf-cal__day[aria-pressed="true"]::after { background: #fff; }
+
+.jf-slots { display: grid; grid-template-columns: repeat(2, 1fr); gap: 9px; }
+.jf-slot {
+  border: 2px solid var(--jf-border); background: var(--jf-surface);
+  border-radius: 13px; padding: 12px; cursor: pointer;
+  font-family: inherit; font-size: 14px; color: var(--jf-text);
+  font-variant-numeric: tabular-nums;
+  transition: border-color .12s, background .12s;
+}
+.jf-slot[aria-pressed="true"] {
+  border-color: var(--jf-primary); background: var(--jf-primary-light);
+  color: var(--jf-primary-dark); font-weight: 600;
+}
+
+/* Chat */
+.jf-chat { display: flex; flex-direction: column; gap: 11px; }
+.jf-bubble { max-width: 78%; padding: 11px 14px; border-radius: 17px; font-size: 14px; line-height: 1.5; }
+.jf-bubble--them { align-self: flex-start; background: var(--jf-surface); color: var(--jf-text); border-bottom-left-radius: 6px; }
+.jf-bubble--me { align-self: flex-end; background: var(--jf-primary); color: #fff; border-bottom-right-radius: 6px; }
+.jf-bubble__time { display: block; font-size: 10.5px; opacity: .65; margin-top: 4px; }
+.jf-bubble--ai-mark { border: 1px dashed var(--jf-ai); }
+.jf-composer { display: flex; gap: 8px; align-items: flex-end; }
+.jf-composer .jf-input { min-height: 46px; }
+
+/* Sterne */
+.jf-stars { display: flex; gap: 7px; justify-content: center; }
+.jf-star {
+  background: none; border: none; cursor: pointer; font-size: 37px;
+  line-height: 1; padding: 0; filter: grayscale(1) opacity(.3);
+  transition: filter .12s, transform .12s;
+}
+.jf-star.is-on { filter: none; }
+.jf-star:hover { transform: scale(1.12); }
+
+/* Untere Navigation */
+.jf-nav {
+  flex: none; display: flex; align-items: stretch;
+  background: var(--jf-surface);
+  border-top: 1px solid var(--jf-border);
+  padding: 7px 4px 22px;
+}
+.jf-nav__item {
+  flex: 1; background: none; border: none; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  padding: 5px 2px; font-family: inherit;
+  font-size: 10.5px; color: var(--jf-muted);
+}
+.jf-nav__item.is-active { color: var(--jf-primary); font-weight: 600; }
+.jf-nav__icon { font-size: 19px; line-height: 1; }
+.jf-nav__item--fab .jf-nav__icon {
+  background: var(--jf-primary); color: #fff;
+  width: 42px; height: 42px; border-radius: 50%;
+  display: grid; place-items: center; font-size: 22px;
+  margin-top: -12px; box-shadow: 0 6px 14px color-mix(in srgb, var(--jf-primary) 42%, transparent);
+}
+
+/* Kopfzeile innerhalb eines Screens */
+.jf-topbar { display: flex; align-items: center; gap: 10px; margin: -2px 0 -4px; }
+.jf-back {
+  background: none; border: none; cursor: pointer; padding: 4px 6px 4px 0;
+  font-size: 19px; color: var(--jf-primary); line-height: 1; font-family: inherit;
+}
+.jf-topbar__title { font-family: var(--font-display); font-size: 16px; font-weight: 600; color: var(--jf-text); }
+
+.jf-empty { text-align: center; padding: 30px 12px; display: flex; flex-direction: column; gap: 7px; align-items: center; }
+.jf-empty__icon { font-size: 34px; }
+
+.jf-toast {
+  position: absolute; left: 16px; right: 16px; bottom: 96px; z-index: 5;
+  background: var(--jf-text); color: #fff;
+  padding: 13px 16px; border-radius: 14px; font-size: 13.5px;
+  box-shadow: 0 10px 26px rgba(19, 26, 52, .3);
+  animation: toast-in .25s cubic-bezier(.2, .9, .3, 1);
+}
+@keyframes toast-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+
+/* ==========================================================================
+   Ergänzungen für die eigenständige Anwendung
+   ========================================================================== */
+
+/* Kopfzeile innerhalb eines Screens - ersetzt die Titelleiste des Systems. */
+.jf-appbar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 14px 12px 12px 8px;
+  background: var(--jf-bg);
+  border-bottom: 1px solid transparent;
+}
+.jf-appbar--rand { border-bottom-color: var(--jf-border); }
+.jf-appbar__titel {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--jf-text);
+  flex: 1;
+  text-align: center;
+  padding-right: 40px;
+}
+.jf-appbar__zurueck {
+  width: 40px; height: 40px;
+  display: grid; place-items: center;
+  background: none; border: none; cursor: pointer;
+  font-size: 20px; color: var(--jf-primary);
+  font-family: inherit; border-radius: 12px;
+}
+.jf-appbar__zurueck:hover { background: var(--jf-surface-muted); }
+
+/* Wortmarke auf dem Willkommensbildschirm. */
+.jf-marke {
+  font-family: var(--font-display);
+  font-size: 42px;
+  font-weight: 700;
+  letter-spacing: -.03em;
+  color: var(--jf-primary);
+  line-height: 1;
+}
+
+/* Trennlinie mit Beschriftung. */
+.jf-trenner {
+  display: flex; align-items: center; gap: 12px;
+  color: var(--jf-muted); font-size: 12.5px;
+}
+.jf-trenner::before, .jf-trenner::after {
+  content: ""; flex: 1; height: 1px; background: var(--jf-border);
+}
+
+/* Auswahlliste, z. B. Leistungen eines Betriebs. */
+.jf-auswahl { display: flex; flex-wrap: wrap; gap: 8px; }
+.jf-chip {
+  border: 2px solid var(--jf-border);
+  background: var(--jf-surface);
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-family: inherit; font-size: 13px;
+  color: var(--jf-muted); cursor: pointer;
+  transition: border-color .12s, background .12s, color .12s;
+}
+.jf-chip[aria-pressed="true"] {
+  border-color: var(--jf-primary);
+  background: var(--jf-primary-light);
+  color: var(--jf-primary-dark);
+  font-weight: 600;
+}
+
+/* Wochenplan. */
+.jf-tag {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--jf-border);
+}
+.jf-tag:last-child { border-bottom: none; }
+.jf-tag__name { flex: 1; font-size: 14px; color: var(--jf-text); }
+.jf-tag__zeit {
+  font-size: 13px; color: var(--jf-muted);
+  font-variant-numeric: tabular-nums;
+}
+.jf-schalter {
+  width: 46px; height: 27px; border-radius: 999px;
+  border: none; cursor: pointer; padding: 3px;
+  background: var(--jf-border);
+  transition: background .16s;
+  display: flex;
+}
+.jf-schalter[aria-pressed="true"] { background: var(--jf-primary); }
+.jf-schalter__knopf {
+  width: 21px; height: 21px; border-radius: 50%;
+  background: #fff; transition: transform .16s;
+  box-shadow: 0 1px 3px rgba(19, 26, 52, .3);
+}
+.jf-schalter[aria-pressed="true"] .jf-schalter__knopf { transform: translateX(19px); }
+
+/* Zähler auf dem Reiter, wenn etwas Neues wartet. */
+.jf-nav__punkt {
+  position: absolute;
+  top: 2px; right: calc(50% - 18px);
+  min-width: 17px; height: 17px;
+  border-radius: 999px;
+  background: var(--jf-error);
+  color: #fff;
+  font-size: 10px; font-weight: 700;
+  display: grid; place-items: center;
+  padding: 0 4px;
+}
+.jf-nav__item { position: relative; }
+
+/* Ladeanzeige. */
+.jf-laden {
+  flex: 1; display: grid; place-items: center; gap: 14px;
+  padding: 60px 0; text-align: center;
+}
+.jf-kreisel {
+  width: 34px; height: 34px; border-radius: 50%;
+  border: 3px solid var(--jf-border);
+  border-top-color: var(--jf-primary);
+  animation: drehen .8s linear infinite;
+}
+@keyframes drehen { to { transform: rotate(360deg); } }
+
+/* Ein zurückhaltender Hinweis am Fuß des Profils. */
+.jf-fussnote {
+  font-size: 11.5px;
+  color: var(--jf-muted);
+  line-height: 1.6;
+}
+</style>
+
+<div class="app" id="app">
+  <div class="viewport" id="viewport"></div>
+  <nav class="jf-nav" id="nav" hidden></nav>
+</div>
+
+<script>
+"use strict";
+
+/* ==========================================================================
+   1. Stammdaten
+   ========================================================================== */
+
+const KATEGORIEN = [
+  { slug: "handwerk", name: "Handwerk", icon: "\u{1F528}" },
+  { slug: "auto", name: "Auto", icon: "\u{1F697}" },
+  { slug: "haushalt", name: "Haushalt", icon: "\u{1F3E0}" },
+  { slug: "garten", name: "Garten", icon: "\u{1F333}" },
+  { slug: "dienstleistungen", name: "Service", icon: "\u{1F4F8}" },
+  { slug: "lernen", name: "Lernen", icon: "\u{1F4DA}" }
+];
+
+const UNTERKATEGORIEN = {
+  heizung: { name: "Heizung", parent: "handwerk", icon: "\u{1F525}" },
+  sanitaer: { name: "Sanitär", parent: "handwerk", icon: "\u{1F6BF}" },
+  elektrik: { name: "Elektrik", parent: "handwerk", icon: "\u{1F4A1}" },
+  maler: { name: "Maler", parent: "handwerk", icon: "\u{1F3A8}" },
+  dach: { name: "Dach", parent: "handwerk", icon: "\u{1F3D8}" },
+  schluessel: { name: "Schlüsseldienst", parent: "handwerk", icon: "\u{1F511}" },
+  "kfz-reparatur": { name: "Reparatur", parent: "auto", icon: "\u{1F527}" },
+  "kfz-reifen": { name: "Reifen", parent: "auto", icon: "\u{1F6DE}" },
+  reinigung: { name: "Reinigung", parent: "haushalt", icon: "\u{1F9FD}" },
+  umzug: { name: "Umzug", parent: "haushalt", icon: "\u{1F4E6}" },
+  montage: { name: "Möbelmontage", parent: "haushalt", icon: "\u{1FA9B}" },
+  gartenpflege: { name: "Gartenpflege", parent: "garten", icon: "✂️" },
+  baumpflege: { name: "Baumpflege", parent: "garten", icon: "\u{1F332}" },
+  fotografie: { name: "Fotografie", parent: "dienstleistungen", icon: "\u{1F4F7}" },
+  nachhilfe: { name: "Nachhilfe", parent: "lernen", icon: "✏️" }
+};
+
+/**
+ * Betriebe, die bereits auf der Plattform sind.
+ *
+ * Solange kein Server läuft, stellen sie den Markt dar: sie werden ins
+ * Matching einbezogen und antworten auf Anfragen. Ein selbst angelegter
+ * Betrieb steht gleichberechtigt neben ihnen - nur schreibt der seine
+ * Angebote selbst.
+ */
+const BEISPIEL_BETRIEBE = [
+  { id: "b1", name: "HeizPro Essen", leistungen: ["heizung", "sanitaer"], entfernungKm: 3.2, radiusKm: 40,
+    hatZeiten: true, bewertung: 4.9, anzahlBewertungen: 238, auftraege: 412, antwortMin: 18,
+    preisVon: 9000, preisBis: 15000, geprueft: true, beschreibung: "Heizungsbau und Sanitär seit 1998.",
+    antwortet: true },
+  { id: "b2", name: "WärmeFix", leistungen: ["heizung"], entfernungKm: 4.1, radiusKm: 30,
+    hatZeiten: true, bewertung: 4.7, anzahlBewertungen: 96, auftraege: 148, antwortMin: 42,
+    preisVon: 11000, preisBis: 17000, geprueft: true, beschreibung: "Schnelldienst für Heizungsstörungen.",
+    antwortet: true },
+  { id: "b3", name: "Ruhr Haustechnik", leistungen: ["handwerk"], entfernungKm: 8.7, radiusKm: 50,
+    hatZeiten: false, bewertung: 4.4, anzahlBewertungen: 41, auftraege: 63, antwortMin: 210,
+    preisVon: 8000, preisBis: 22000, geprueft: false, beschreibung: "Haustechnik aus einer Hand - alle Gewerke.",
+    antwortet: true },
+  { id: "b4", name: "Sanitär Kaya", leistungen: ["sanitaer"], entfernungKm: 2.4, radiusKm: 25,
+    hatZeiten: true, bewertung: 4.8, anzahlBewertungen: 154, auftraege: 289, antwortMin: 25,
+    preisVon: 7000, preisBis: 13000, geprueft: true, beschreibung: "Bad, Rohr und Abfluss.", antwortet: true },
+  { id: "b5", name: "Elektro Nowak", leistungen: ["elektrik"], entfernungKm: 5.5, radiusKm: 35,
+    hatZeiten: true, bewertung: 4.6, anzahlBewertungen: 88, auftraege: 176, antwortMin: 55,
+    preisVon: 8500, preisBis: 16000, geprueft: true, beschreibung: "Elektroinstallation und Störungssuche.",
+    antwortet: true },
+  { id: "b6", name: "GartenWerk", leistungen: ["gartenpflege", "baumpflege"], entfernungKm: 6.1, radiusKm: 30,
+    hatZeiten: true, bewertung: 4.8, anzahlBewertungen: 112, auftraege: 203, antwortMin: 33,
+    preisVon: 4000, preisBis: 9000, geprueft: true, beschreibung: "Pflege, Schnitt und Gestaltung.",
+    antwortet: true },
+  { id: "b7", name: "Umzugshelden", leistungen: ["umzug", "montage"], entfernungKm: 9.4, radiusKm: 60,
+    hatZeiten: true, bewertung: 4.5, anzahlBewertungen: 67, auftraege: 121, antwortMin: 70,
+    preisVon: 25000, preisBis: 60000, geprueft: true, beschreibung: "Umzüge im ganzen Ruhrgebiet.",
+    antwortet: true },
+  { id: "b8", name: "Auto Service Bergmann", leistungen: ["kfz-reparatur", "kfz-reifen"], entfernungKm: 4.8, radiusKm: 25,
+    hatZeiten: true, bewertung: 4.6, anzahlBewertungen: 201, auftraege: 508, antwortMin: 40,
+    preisVon: 6000, preisBis: 45000, geprueft: true, beschreibung: "Freie Werkstatt, alle Marken.",
+    antwortet: true },
+  { id: "b9", name: "Glanz Reinigung", leistungen: ["reinigung"], entfernungKm: 3.9, radiusKm: 30,
+    hatZeiten: true, bewertung: 4.3, anzahlBewertungen: 29, auftraege: 88, antwortMin: 90,
+    preisVon: 3000, preisBis: 8000, geprueft: false, beschreibung: "Unterhalts- und Grundreinigung.",
+    antwortet: true },
+  { id: "b10", name: "Maler Schäfer", leistungen: ["maler"], entfernungKm: 7.2, radiusKm: 40,
+    hatZeiten: true, bewertung: 4.9, anzahlBewertungen: 74, auftraege: 139, antwortMin: 28,
+    preisVon: 15000, preisBis: 40000, geprueft: true, beschreibung: "Anstrich, Tapete, Fassade.",
+    antwortet: true }
+];
+
+/* ==========================================================================
+   2. Die Regel-KI
+   Übernommen aus services/api/src/modules/ai/rules-provider.ts.
+   ========================================================================== */
+
+const RULES = [
+  { slug: "heizung",
+    keywords: ["heizung", "heizkörper", "heizkoerper", "thermostat", "warmwasser", "therme", "kessel"],
+    summary: "Die Heizung arbeitet nicht wie erwartet.",
+    questions: ["Sind mehrere Heizkörper betroffen oder nur einer?", "Seit wann besteht das Problem?", "Welche Heizungsanlage ist verbaut?"] },
+  { slug: "sanitaer",
+    keywords: ["waschbecken", "wasserhahn", "abfluss", "toilette", "wc", "dusche", "rohr", "tropft", "undicht", "verstopft", "spülkasten"],
+    summary: "An der Sanitärinstallation tritt ein Defekt auf.",
+    questions: ["Wo genau tritt das Wasser aus?", "Seit wann besteht das Problem?", "Lässt sich das Wasser abstellen?"] },
+  { slug: "elektrik",
+    keywords: ["strom", "steckdose", "sicherung", "lichtschalter", "kabel", "kurzschluss", "lampe"],
+    summary: "Es liegt eine Störung an der Elektroinstallation vor.",
+    questions: ["Ist nur ein Raum betroffen oder die ganze Wohnung?", "Hat die Sicherung ausgelöst?"] },
+  { slug: "maler",
+    keywords: ["streichen", "malern", "tapete", "wand", "anstrich", "lackieren", "farbe"],
+    summary: "Es werden Malerarbeiten benötigt.",
+    questions: ["Wie viele Quadratmeter sind es ungefähr?", "Sind die Wände vorbereitet?"] },
+  { slug: "dach",
+    keywords: ["dach", "ziegel", "dachrinne", "regenrinne", "dachfenster"],
+    summary: "Am Dach besteht ein Schaden.",
+    questions: ["Tritt bereits Wasser ins Gebäude ein?", "Wie viele Geschosse hat das Gebäude?"] },
+  { slug: "schluessel",
+    keywords: ["ausgesperrt", "schlüssel", "schluessel", "schloss"],
+    summary: "Es besteht ein Problem mit Schloss oder Zugang.",
+    questions: ["Befindet sich jemand in der Wohnung?", "Um welche Art von Tür handelt es sich?"] },
+  { slug: "kfz-reparatur",
+    keywords: ["auto", "motor", "bremse", "kupplung", "auspuff", "werkstatt", "fahrzeug", "pkw"],
+    summary: "Am Fahrzeug ist eine Reparatur nötig.",
+    questions: ["Welches Fahrzeugmodell und Baujahr?", "Ist das Fahrzeug noch fahrbereit?"] },
+  { slug: "kfz-reifen",
+    keywords: ["reifen", "felge", "reifenwechsel", "platten", "winterreifen", "sommerreifen"],
+    summary: "Es geht um Reifen oder einen Reifenwechsel.",
+    questions: ["Welche Reifengröße wird benötigt?", "Sind die Reifen bereits vorhanden?"] },
+  { slug: "reinigung",
+    keywords: ["putzen", "reinigung", "sauber", "fenster putzen", "grundreinigung"],
+    summary: "Es werden Reinigungsarbeiten benötigt.",
+    questions: ["Wie groß ist die zu reinigende Fläche?", "Einmalig oder regelmäßig?"] },
+  { slug: "umzug",
+    keywords: ["umzug", "umziehen", "transport", "kisten", "möbel transportieren"],
+    summary: "Es steht ein Umzug oder Transport an.",
+    questions: ["Von welchem in welches Stockwerk?", "Wie viele Zimmer sind es?"] },
+  { slug: "montage",
+    keywords: ["aufbauen", "montage", "schrank", "regal", "möbel aufbauen", "küche montieren"],
+    summary: "Es sollen Möbel montiert werden.",
+    questions: ["Um welche Möbelstücke geht es?", "Liegt eine Aufbauanleitung vor?"] },
+  { slug: "gartenpflege",
+    keywords: ["rasen", "hecke", "unkraut", "garten", "mähen", "maehen", "beet"],
+    summary: "Der Garten soll gepflegt werden.",
+    questions: ["Wie groß ist die Fläche ungefähr?", "Einmalig oder regelmäßig?"] },
+  { slug: "baumpflege",
+    keywords: ["baum", "baumfällung", "äste", "aeste", "stubben"],
+    summary: "An Bäumen sind Arbeiten nötig.",
+    questions: ["Wie hoch ist der Baum ungefähr?", "Steht er frei zugänglich?"] },
+  { slug: "nachhilfe",
+    keywords: ["nachhilfe", "mathe", "lernen", "schule", "hausaufgaben", "abitur"],
+    summary: "Es wird Unterstützung beim Lernen gesucht.",
+    questions: ["Um welches Fach und welche Klassenstufe geht es?", "Präsenz oder online?"] },
+  { slug: "fotografie",
+    keywords: ["foto", "fotograf", "shooting", "hochzeit", "portrait", "bilder"],
+    summary: "Es wird ein Fotograf gesucht.",
+    questions: ["Um welchen Anlass geht es?", "Wann soll der Termin stattfinden?"] }
+];
+
+const URGENT_WORDS = ["notfall", "dringend", "sofort", "läuft aus", "laeuft aus", "überschwemmt",
+  "wasserschaden", "kein strom", "ausgesperrt", "gasgeruch", "brennt", "friert"];
+const RELAXED_WORDS = ["irgendwann", "keine eile", "gelegentlich", "in den nächsten wochen"];
+
+function analyze(description, photoCount, answered) {
+  const hay = String(description).toLowerCase().replace(/\s+/g, " ");
+  let best = null;
+  for (const rule of RULES) {
+    const hits = rule.keywords.filter((k) => hay.includes(k)).length;
+    if (hits > 0 && (best === null || hits > best.hits)) best = { rule, hits };
+  }
+
+  const urgency = URGENT_WORDS.some((w) => hay.includes(w)) ? "HIGH"
+    : RELAXED_WORDS.some((w) => hay.includes(w)) ? "LOW" : "NORMAL";
+
+  if (best === null) {
+    // Keine Regel greift. Dann sagt die KI das ehrlich, statt zu raten.
+    const clean = String(description).trim().replace(/\s+/g, " ");
+    return {
+      categorySlug: null,
+      summary: clean.length < 10
+        ? "Die Beschreibung reicht noch nicht aus, um das Anliegen einzuordnen."
+        : (clean.length > 150 ? clean.slice(0, 149) + "…" : clean),
+      urgency,
+      questions: ["Um welche Art von Leistung geht es genau?", "Wo soll die Arbeit ausgeführt werden?"],
+      confidence: 0.2
+    };
+  }
+
+  const askedSet = new Set((answered || []).map((a) => a.question));
+  const open = best.rule.questions.filter((q) => !askedSet.has(q));
+  return {
+    categorySlug: best.rule.slug,
+    summary: best.rule.summary,
+    urgency,
+    // Ein Foto ersetzt oft eine Rückfrage.
+    questions: photoCount > 0 ? open.slice(0, 2) : open.slice(0, 3),
+    confidence: Math.min(0.9, 0.55 + best.hits * 0.1)
+  };
+}
+
+/* ==========================================================================
+   3. Die Matching-Engine
+   Übernommen aus services/api/src/modules/matching/engine.ts. Die Gewichte
+   sind ein Startmodell - was wirklich zu Aufträgen führt, zeigt der Betrieb.
+   ========================================================================== */
+
+const WEIGHTS = { service: 35, distance: 20, availability: 15, rating: 10, price: 10, experience: 5, responseTime: 5 };
+
+const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+const saturate = (v, half) => (v <= 0 ? 0 : v / (v + half));
+
+function scoreBusiness(biz, categorySlug, referencePrice) {
+  const parent = UNTERKATEGORIEN[categorySlug] ? UNTERKATEGORIEN[categorySlug].parent : null;
+  const exact = biz.categories.includes(categorySlug);
+  // Nur die Oberkategorie selbst zählt als teilweise Übereinstimmung, nicht
+  // eine Schwesterkategorie: ein Maler ist kein Treffer für eine Heizung.
+  const viaParent = !exact && parent !== null && biz.categories.includes(parent);
+
+  const f = {
+    service: exact ? 1 : viaParent ? 0.45 : 0,
+    // Außerhalb des Einsatzradius: 0. Ein Betrieb, der nicht hinfährt,
+    // ist kein Treffer, egal wie gut er sonst passt.
+    distance: biz.distanceKm > biz.radius ? 0 : clamp(1 - biz.distanceKm / biz.radius, 0, 1),
+    availability: biz.availability ? 1 : 0,
+    // Wenige Bestbewertungen werden gedämpft: 5,0 aus einer Bewertung soll
+    // 4,7 aus 200 nicht überholen.
+    rating: biz.reviews === 0 ? 0.5 : 0.5 + (clamp((biz.rating - 1) / 4, 0, 1) - 0.5) * saturate(biz.reviews, 20),
+    price: 0.5,
+    experience: saturate(biz.jobs, 25),
+    responseTime: biz.responseMin === null || biz.responseMin === undefined ? 0.5
+      : biz.responseMin <= 15 ? 1
+      : biz.responseMin >= 1440 ? 0
+      : clamp(1 - (biz.responseMin - 15) / 1425, 0, 1)
+  };
+
+  const eigenerPreis = preisMitte(biz);
+  if (referencePrice > 0 && eigenerPreis !== null) {
+    f.price = clamp(1 - (eigenerPreis / referencePrice - 0.5) / 1.5, 0, 1);
+  }
+
+  const reasons = [];
+  let total = 0;
+  for (const key of Object.keys(WEIGHTS)) {
+    const points = f[key] * WEIGHTS[key];
+    total += points;
+    const label = reasonLabel(key, biz, f[key]);
+    if (label) reasons.push({ factor: key, label, points: Math.round(points * 10) / 10 });
+  }
+
+  return {
+    business: biz,
+    score: Math.round(clamp(total, 0, 100)),
+    reasons: reasons.sort((a, b) => b.points - a.points)
+  };
+}
+
+/** Mittlerer Preis eines Betriebs, oder null wenn keine Spanne hinterlegt ist. */
+function preisMitte(biz) {
+  const von = biz.priceMin;
+  const bis = biz.priceMax;
+  if ((von === null || von === undefined) && (bis === null || bis === undefined)) return null;
+  if (von === null || von === undefined) return bis;
+  if (bis === null || bis === undefined) return von;
+  return (von + bis) / 2;
+}
+
+function reasonLabel(factor, biz, value) {
+  switch (factor) {
+    case "service": return value === 1 ? "Bietet genau diese Leistung an" : value > 0 ? "Arbeitet in diesem Bereich" : null;
+    case "distance":
+      return biz.distanceKm === null || biz.distanceKm === undefined ? null
+        : value > 0 ? fmtKm(biz.distanceKm) + " entfernt" : null;
+    case "availability": return biz.availability ? "Hat freie Zeiten hinterlegt" : null;
+    case "rating":
+      return biz.reviews === 0 || biz.rating === null || biz.rating === undefined ? null
+        : biz.rating.toFixed(1).replace(".", ",") + " aus " + biz.reviews + " Bewertungen";
+    case "price": return value > 0.5 && preisMitte(biz) !== null ? "Preislich günstig" : null;
+    case "experience": return biz.jobs === 0 ? null : biz.jobs + " abgeschlossene Aufträge";
+    case "responseTime":
+      return biz.responseMin === null || biz.responseMin === undefined ? null
+        : "Antwortet im Schnitt in " + fmtMin(biz.responseMin);
+    default: return null;
+  }
+}
+
+function runMatching(categorySlug) {
+  if (!categorySlug) return [];
+  const parent = UNTERKATEGORIEN[categorySlug] ? UNTERKATEGORIEN[categorySlug].parent : null;
+  const pool = alleBetriebeAlsKandidaten().filter((b) =>
+    b.categories.includes(categorySlug) || (parent !== null && b.categories.includes(parent))
+  );
+  if (pool.length === 0) return [];
+
+  // Bezugspreis ist der Median, nicht der Mittelwert: einzelne Ausreißer
+  // sollen ihn nicht verziehen.
+  const mids = pool.map(preisMitte).filter((w) => w !== null && w > 0).sort((a, b) => a - b);
+  const mid = Math.floor(mids.length / 2);
+  const reference = mids.length === 0 ? 0
+    : mids.length % 2 ? mids[mid] : (mids[mid - 1] + mids[mid]) / 2;
+
+  return pool
+    .map((b) => scoreBusiness(b, categorySlug, reference))
+    .filter((m) => m.score >= 25)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 6);
+}
+
+
+/* --- Anzeigeformate -------------------------------------------------------- */
+
+const fmtEuro = (cent) => (cent / 100).toFixed(2).replace(".", ",") + " €";
+const fmtEuroKurz = (cent) => Math.round(cent / 100) + " €";
+const fmtKm = (km) => (km < 10 ? km.toFixed(1).replace(".", ",") : Math.round(km)) + " km";
+const fmtMin = (m) => (m < 60 ? Math.round(m) + " Min." : Math.round(m / 60) + " Std.");
+const fmtDatum = (iso) => new Date(iso).toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric" });
+const fmtZeitpunkt = (iso) => new Date(iso).toLocaleString("de-DE",
+  { weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" });
+const fmtUhr = (iso) => new Date(iso).toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" });
+
+const DRINGLICHKEIT = { LOW: "Kann warten", NORMAL: "Normal", HIGH: "Dringend" };
+const ANFRAGE_STATUS = {
+  ENTWURF: "Entwurf", ANALYSE: "Wird analysiert", OFFEN: "Offen",
+  VERMITTELT: "Anbieter gefunden", ANGEBOTE: "Angebote erhalten",
+  ANGENOMMEN: "Angebot angenommen", ABGESCHLOSSEN: "Abgeschlossen", ZURUECKGEZOGEN: "Zurückgezogen"
+};
+const ANGEBOT_STATUS = {
+  OFFEN: "Offen", ANGENOMMEN: "Angenommen", ABGELEHNT: "Abgelehnt", ZURUECKGEZOGEN: "Zurückgezogen"
+};
+const AUFTRAG_STATUS = {
+  GEPLANT: "Geplant", IN_ARBEIT: "In Arbeit", ABGESCHLOSSEN: "Abgeschlossen", ABGEBROCHEN: "Abgebrochen"
+};
+
+const WOCHENTAGE = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"];
+
+function esc(wert) {
+  return String(wert).replace(/[&<>"']/g, (c) =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
+function neueId(praefix) {
+  return praefix + "-" + Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
+}
+
+/* ==========================================================================
+   4. Speicher
+
+   Alles liegt im lokalen Speicher des Browsers. Das ist bewusst so: ohne
+   Server gibt es keinen Ort, an dem Daten sonst liegen könnten. Jeder Zugriff
+   ist abgesichert - in einem privaten Fenster oder bei gesperrtem Speicher
+   läuft die App weiter, merkt sich dann aber nichts.
+   ========================================================================== */
+
+const SPEICHER = "jobflow.daten.v1";
+
+function leereDaten() {
+  return {
+    version: 1,
+    konten: [],
+    betriebe: [],
+    anfragen: [],
+    angebote: [],
+    termine: [],
+    auftraege: [],
+    bewertungen: [],
+    nachrichten: [],
+    sitzung: null
+  };
+}
+
+let db = leereDaten();
+
+function ladeDaten() {
+  try {
+    const roh = window.localStorage.getItem(SPEICHER);
+    if (roh === null) return leereDaten();
+    const gelesen = JSON.parse(roh);
+    // Fehlende Felder ergänzen, damit eine ältere Ablage nicht zu Abstürzen führt.
+    return Object.assign(leereDaten(), gelesen);
+  } catch {
+    return leereDaten();
+  }
+}
+
+function speichere() {
+  try {
+    window.localStorage.setItem(SPEICHER, JSON.stringify(db));
+  } catch {
+    // Kein Speicher verfügbar. Die App bleibt benutzbar, vergisst aber alles,
+    // sobald der Reiter geschlossen wird.
+  }
+}
+
+/* --- Passwörter -----------------------------------------------------------
+
+   Auch ohne Server wird das Passwort nicht im Klartext abgelegt: gespeichert
+   wird nur der SHA-256-Wert mit zufälligem Salz. Steht die Krypto-Schnittstelle
+   des Browsers nicht zur Verfügung, wird das offen vermerkt, statt so zu tun,
+   als sei etwas geschützt.                                                    */
+
+async function passwortHash(passwort, salz) {
+  if (!window.crypto || !window.crypto.subtle) return null;
+  const daten = new TextEncoder().encode(salz + ":" + passwort);
+  const puffer = await window.crypto.subtle.digest("SHA-256", daten);
+  return [...new Uint8Array(puffer)].map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+function neuesSalz() {
+  const bytes = new Uint8Array(16);
+  (window.crypto || {}).getRandomValues?.(bytes);
+  return [...bytes].map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+/* --- Zugriffe auf die Ablage ---------------------------------------------- */
+
+const kontoVon = (id) => db.konten.find((k) => k.id === id) ?? null;
+const angemeldet = () => (db.sitzung === null ? null : kontoVon(db.sitzung));
+
+function eigenerBetrieb() {
+  const konto = angemeldet();
+  if (konto === null) return null;
+  return db.betriebe.find((b) => b.kontoId === konto.id) ?? null;
+}
+
+function betriebVon(id) {
+  return db.betriebe.find((b) => b.id === id)
+    ?? BEISPIEL_BETRIEBE.find((b) => b.id === id)
+    ?? null;
+}
+
+/**
+ * Alle Betriebe in der Form, die die Matching-Engine erwartet.
+ *
+ * Ein selbst angelegter Betrieb hat keine Koordinaten - ohne Server lässt sich
+ * aus einer Postleitzahl keine Entfernung berechnen. Die Engine wertet eine
+ * fehlende Entfernung neutral, genau wie im Backend.
+ */
+function alleBetriebeAlsKandidaten() {
+  const eigene = db.betriebe
+    .filter((b) => b.leistungen.length > 0)
+    .map((b) => ({
+      id: b.id,
+      name: b.name,
+      categories: b.leistungen,
+      distanceKm: null,
+      radius: b.radiusKm,
+      availability: b.zeiten.some((z) => z.aktiv),
+      rating: b.bewertung,
+      reviews: b.anzahlBewertungen,
+      jobs: b.auftraege,
+      responseMin: b.antwortMin,
+      priceMin: b.preisVon,
+      priceMax: b.preisBis,
+      verified: b.geprueft,
+      eigen: true
+    }));
+
+  const fremde = BEISPIEL_BETRIEBE.map((b) => ({
+    id: b.id,
+    name: b.name,
+    categories: b.leistungen,
+    distanceKm: b.entfernungKm,
+    radius: b.radiusKm,
+    availability: b.hatZeiten,
+    rating: b.bewertung,
+    reviews: b.anzahlBewertungen,
+    jobs: b.auftraege,
+    responseMin: b.antwortMin,
+    priceMin: b.preisVon,
+    priceMax: b.preisBis,
+    verified: b.geprueft,
+    eigen: false
+  }));
+
+  return [...eigene, ...fremde];
+}
+
+const anfrageVon = (id) => db.anfragen.find((a) => a.id === id) ?? null;
+const angebotVon = (id) => db.angebote.find((a) => a.id === id) ?? null;
+const auftragVon = (id) => db.auftraege.find((a) => a.id === id) ?? null;
+const angeboteZu = (anfrageId) => db.angebote.filter((a) => a.anfrageId === anfrageId);
+const terminZu = (angebotId) => db.termine.find((t) => t.angebotId === angebotId && t.status !== "ABGESAGT") ?? null;
+const auftragZuAngebot = (angebotId) => db.auftraege.find((a) => a.angebotId === angebotId) ?? null;
+const gesamt = (angebot) => angebot.arbeitCent + angebot.materialCent + angebot.anfahrtCent;
+
+/* ==========================================================================
+   5. Abläufe
+
+   Was im Backend die Services tun, steht hier. Die Regeln sind dieselben:
+   nur der Kunde nimmt an, nur der ausführende Betrieb meldet den Fortschritt,
+   und bewertet wird erst ein abgeschlossener Auftrag.
+   ========================================================================== */
+
+function anfrageAnlegen(beschreibung, ort, dringlichkeit) {
+  const konto = angemeldet();
+  const anfrage = {
+    id: neueId("anf"),
+    kundeId: konto.id,
+    beschreibung,
+    ort,
+    dringlichkeit,
+    kategorie: null,
+    status: "ENTWURF",
+    analyse: null,
+    antworten: {},
+    vermittelt: [],
+    erstelltAm: new Date().toISOString()
+  };
+  db.anfragen.unshift(anfrage);
+  speichere();
+  return anfrage;
+}
+
+/** Die KI analysiert und das Ergebnis wird geprüft, bevor es gespeichert wird. */
+function analyseDurchfuehren(anfrage) {
+  const beantwortet = Object.entries(anfrage.antworten)
+    .map(([question, answer]) => ({ question, answer }));
+  const ergebnis = analyze(anfrage.beschreibung, 0, beantwortet);
+
+  // Eine Kategorie, die es nicht gibt, wird verworfen - nicht übernommen.
+  const kategorie = ergebnis.categorySlug !== null && UNTERKATEGORIEN[ergebnis.categorySlug]
+    ? ergebnis.categorySlug
+    : null;
+
+  anfrage.analyse = {
+    kategorie,
+    zusammenfassung: ergebnis.summary,
+    dringlichkeit: ergebnis.urgency,
+    fragen: ergebnis.questions,
+    sicherheit: ergebnis.confidence
+  };
+  // Die eigene Wahl des Kunden wiegt schwerer als der Vorschlag der KI.
+  if (anfrage.kategorie === null) anfrage.kategorie = kategorie;
+  anfrage.dringlichkeit = ergebnis.urgency;
+  if (anfrage.status === "ENTWURF") anfrage.status = "ANALYSE";
+  speichere();
+}
+
+function vermitteln(anfrage) {
+  const treffer = runMatching(anfrage.kategorie);
+  anfrage.vermittelt = treffer.map((t) => ({
+    betriebId: t.business.id,
+    punkte: t.score,
+    gruende: t.reasons.slice(0, 3).map((g) => g.label),
+    entfernungKm: t.business.distanceKm
+  }));
+  if (treffer.length > 0 && anfrage.status !== "ANGEBOTE" && anfrage.status !== "ANGENOMMEN") {
+    anfrage.status = "VERMITTELT";
+  }
+  speichere();
+  return treffer;
+}
+
+/**
+ * Die bereits registrierten Betriebe antworten auf die Anfrage.
+ *
+ * Ein selbst angelegter Betrieb ist ausdrücklich ausgenommen: der schreibt
+ * sein Angebot selbst, über den Unternehmensbereich der App.
+ */
+function angeboteEinholen(anfrage) {
+  const runde = (n) => Math.round(n / 500) * 500;
+  let neue = 0;
+
+  for (const eintrag of anfrage.vermittelt.slice(0, 3)) {
+    const betrieb = BEISPIEL_BETRIEBE.find((b) => b.id === eintrag.betriebId);
+    if (betrieb === undefined || !betrieb.antwortet) continue;
+    if (db.angebote.some((a) => a.anfrageId === anfrage.id && a.betriebId === betrieb.id)) continue;
+
+    db.angebote.push({
+      id: neueId("ang"),
+      anfrageId: anfrage.id,
+      betriebId: betrieb.id,
+      arbeitCent: runde(betrieb.preisVon * 0.9),
+      materialCent: runde(betrieb.preisVon * 0.28),
+      anfahrtCent: Math.min(3000, runde(betrieb.entfernungKm * 450)),
+      beschreibung:
+        "Anfahrt, Störungssuche und Reparatur an der Anlage. Sollte sich vor Ort ein " +
+        "größerer Aufwand zeigen, stimmen wir uns vorher mit Ihnen ab.",
+      kiUnterstuetzt: false,
+      status: "OFFEN",
+      gueltigBis: new Date(Date.now() + 7 * 864e5).toISOString(),
+      erstelltAm: new Date().toISOString()
+    });
+    neue += 1;
+  }
+
+  if (neue > 0 && anfrage.status !== "ANGENOMMEN" && anfrage.status !== "ABGESCHLOSSEN") {
+    anfrage.status = "ANGEBOTE";
+  }
+  speichere();
+  return neue;
+}
+
+/**
+ * Der Kunde nimmt ein Angebot an.
+ *
+ * Ein Zustandswechsel, der mehrere Dinge zugleich betrifft: Angebot annehmen,
+ * die übrigen ablehnen, Anfrage umstellen, Auftrag anlegen, Gespräch eröffnen.
+ * Im Backend läuft das in einer Transaktion - hier in einem Schritt.
+ */
+function angebotAnnehmen(angebot) {
+  const anfrage = anfrageVon(angebot.anfrageId);
+  angebot.status = "ANGENOMMEN";
+  for (const anderes of angeboteZu(anfrage.id)) {
+    if (anderes.id !== angebot.id && anderes.status === "OFFEN") anderes.status = "ABGELEHNT";
+  }
+  anfrage.status = "ANGENOMMEN";
+
+  const auftrag = {
+    id: neueId("auf"),
+    angebotId: angebot.id,
+    anfrageId: anfrage.id,
+    betriebId: angebot.betriebId,
+    kundeId: anfrage.kundeId,
+    status: "GEPLANT",
+    begonnenAm: null,
+    abgeschlossenAm: null,
+    erstelltAm: new Date().toISOString()
+  };
+  db.auftraege.unshift(auftrag);
+  speichere();
+  return auftrag;
+}
+
+function terminBuchen(angebotId, startIso, endeIso) {
+  const vorhanden = db.termine.find((t) => t.angebotId === angebotId && t.status !== "ABGESAGT");
+  if (vorhanden !== undefined) vorhanden.status = "ABGESAGT";
+  const termin = {
+    id: neueId("ter"),
+    angebotId,
+    start: startIso,
+    ende: endeIso,
+    status: "BESTAETIGT"
+  };
+  db.termine.push(termin);
+  speichere();
+  return termin;
+}
+
+/** Erlaubte Zustandswechsel eines Auftrags - wie im Backend. */
+const AUFTRAG_UEBERGAENGE = {
+  GEPLANT: ["IN_ARBEIT", "ABGEBROCHEN"],
+  IN_ARBEIT: ["ABGESCHLOSSEN", "ABGEBROCHEN"],
+  ABGESCHLOSSEN: [],
+  ABGEBROCHEN: []
+};
+
+function auftragStatusSetzen(auftrag, status) {
+  if (!AUFTRAG_UEBERGAENGE[auftrag.status].includes(status)) return false;
+  auftrag.status = status;
+  if (status === "IN_ARBEIT" && auftrag.begonnenAm === null) {
+    auftrag.begonnenAm = new Date().toISOString();
+  }
+  if (status === "ABGESCHLOSSEN") {
+    auftrag.abgeschlossenAm = new Date().toISOString();
+    const anfrage = anfrageVon(auftrag.anfrageId);
+    if (anfrage !== null) anfrage.status = "ABGESCHLOSSEN";
+    const betrieb = db.betriebe.find((b) => b.id === auftrag.betriebId);
+    if (betrieb !== undefined) betrieb.auftraege += 1;
+  }
+  speichere();
+  return true;
+}
+
+function bewerten(auftrag, sterne, text) {
+  const bewertung = {
+    id: neueId("bew"),
+    auftragId: auftrag.id,
+    betriebId: auftrag.betriebId,
+    kundeId: auftrag.kundeId,
+    sterne,
+    text: text.trim() === "" ? null : text.trim(),
+    erstelltAm: new Date().toISOString()
+  };
+  db.bewertungen.push(bewertung);
+
+  // Durchschnitt am Betrieb fortschreiben, damit das Matching ihn nicht bei
+  // jeder Anfrage neu ausrechnen muss.
+  const betrieb = db.betriebe.find((b) => b.id === auftrag.betriebId);
+  if (betrieb !== undefined) {
+    const eigene = db.bewertungen.filter((b) => b.betriebId === betrieb.id);
+    betrieb.anzahlBewertungen = eigene.length;
+    betrieb.bewertung = Math.round((eigene.reduce((s, b) => s + b.sterne, 0) / eigene.length) * 100) / 100;
+  }
+  speichere();
+  return bewertung;
+}
+
+function bewertungZu(auftragId) {
+  return db.bewertungen.find((b) => b.auftragId === auftragId) ?? null;
+}
+
+/* --- Nachrichten ----------------------------------------------------------- */
+
+function nachrichtenZu(anfrageId, betriebId) {
+  return db.nachrichten
+    .filter((n) => n.anfrageId === anfrageId && n.betriebId === betriebId)
+    .sort((a, b) => a.zeit.localeCompare(b.zeit));
+}
+
+function nachrichtSenden(anfrageId, betriebId, text, kiGeneriert) {
+  const konto = angemeldet();
+  db.nachrichten.push({
+    id: neueId("msg"),
+    anfrageId,
+    betriebId,
+    senderId: konto.id,
+    text,
+    kiGeneriert,
+    zeit: new Date().toISOString()
+  });
+  speichere();
+}
+
+/** Gespräche des angemeldeten Kontos - je Anfrage und Betrieb genau eines. */
+function gespraeche() {
+  const konto = angemeldet();
+  if (konto === null) return [];
+
+  if (konto.rolle === "KUNDE") {
+    const meine = db.anfragen.filter((a) => a.kundeId === konto.id);
+    const liste = [];
+    for (const anfrage of meine) {
+      for (const angebot of angeboteZu(anfrage.id)) {
+        if (!liste.some((g) => g.anfrageId === anfrage.id && g.betriebId === angebot.betriebId)) {
+          liste.push({ anfrageId: anfrage.id, betriebId: angebot.betriebId });
+        }
+      }
+    }
+    return liste;
+  }
+
+  const betrieb = eigenerBetrieb();
+  if (betrieb === null) return [];
+  return db.angebote
+    .filter((a) => a.betriebId === betrieb.id)
+    .map((a) => ({ anfrageId: a.anfrageId, betriebId: betrieb.id }));
+}
+
+/* --- Freie Zeitfenster -----------------------------------------------------
+
+   Aus dem Wochenplan des Betriebs, 21 Tage voraus - derselbe Horizont wie im
+   AppointmentService. Belegte Fenster fallen heraus.                          */
+
+function freieFenster(betriebId) {
+  const betrieb = betriebVon(betriebId);
+  if (betrieb === null) return [];
+
+  const plan = betrieb.zeiten !== undefined
+    ? betrieb.zeiten.filter((z) => z.aktiv).map((z) => ({ tag: z.tag, von: z.von, bis: z.bis }))
+    // Beispielbetriebe haben einen festen Wochenplan: Mo, Di, Do.
+    : (betrieb.hatZeiten ? [0, 1, 3].map((tag) => ({ tag, von: "09:00", bis: "17:00" })) : []);
+  if (plan.length === 0) return [];
+
+  const belegt = db.termine
+    .filter((t) => t.status !== "ABGESAGT")
+    .filter((t) => {
+      const angebot = angebotVon(t.angebotId);
+      return angebot !== null && angebot.betriebId === betriebId;
+    });
+
+  const heute = new Date();
+  heute.setHours(0, 0, 0, 0);
+  const fenster = [];
+
+  for (let versatz = 0; versatz <= 21; versatz += 1) {
+    const tag = new Date(heute.getTime() + versatz * 864e5);
+    // Montag = 0, damit der Wochenplan der Reihenfolge in WOCHENTAGE folgt.
+    const wochentag = (tag.getDay() + 6) % 7;
+    for (const zeile of plan.filter((z) => z.tag === wochentag)) {
+      const [vonStd, vonMin] = zeile.von.split(":").map(Number);
+      const [bisStd, bisMin] = zeile.bis.split(":").map(Number);
+      const beginn = new Date(tag); beginn.setHours(vonStd, vonMin, 0, 0);
+      const schluss = new Date(tag); schluss.setHours(bisStd, bisMin, 0, 0);
+
+      for (let t = beginn.getTime(); t + 36e5 <= schluss.getTime(); t += 36e5) {
+        if (t <= Date.now()) continue;
+        const ende = t + 36e5;
+        const kollidiert = belegt.some((b) =>
+          new Date(b.start).getTime() < ende && new Date(b.ende).getTime() > t);
+        if (!kollidiert) {
+          fenster.push({ start: new Date(t).toISOString(), ende: new Date(ende).toISOString() });
+        }
+      }
+    }
+  }
+  return fenster;
+}
+
+/* ==========================================================================
+   6. Oberfläche
+   ========================================================================== */
+
+/** Was gerade angezeigt wird. Rein flüchtig - nichts davon wird gespeichert. */
+let ansicht = { name: "willkommen", id: null, daten: {} };
+let meldung = null;
+let fehler = {};
+
+const viewport = document.getElementById("viewport");
+const navLeiste = document.getElementById("nav");
+
+function gehe(name, id = null, daten = {}) {
+  ansicht = { name, id, daten };
+  fehler = {};
+  zeichne();
+  viewport.scrollTop = 0;
+}
+
+let meldungTimer = 0;
+function hinweis(text) {
+  meldung = text;
+  window.clearTimeout(meldungTimer);
+  meldungTimer = window.setTimeout(() => { meldung = null; zeichne(); }, 3000);
+}
+
+const wert = (id) => {
+  const el = document.getElementById(id);
+  return el === null ? "" : el.value;
+};
+
+/* --- Wiederkehrende Bausteine ---------------------------------------------- */
+
+function appbar(titel, zurueck) {
+  return `
+    <div class="jf-appbar">
+      ${zurueck ? `<button class="jf-appbar__zurueck" data-zurueck="${esc(zurueck)}" aria-label="Zurück">&larr;</button>`
+                : '<span style="width:40px"></span>'}
+      <span class="jf-appbar__titel">${esc(titel)}</span>
+    </div>`;
+}
+
+function leer(icon, titel, text, knopf) {
+  return `
+    <div class="jf-empty">
+      <span class="jf-empty__icon">${icon}</span>
+      <p class="jf-h2">${esc(titel)}</p>
+      <p class="jf-muted" style="text-align:center">${esc(text)}</p>
+      ${knopf ?? ""}
+    </div>`;
+}
+
+function feld(id, beschriftung, art, platzhalter, vorgabe, hinweisText) {
+  const meldung = fehler[id];
+  return `
+    <div>
+      <label class="jf-label" for="${id}">${esc(beschriftung)}</label>
+      ${art === "mehrzeilig"
+        ? `<textarea class="jf-textarea" id="${id}" placeholder="${esc(platzhalter ?? "")}">${esc(vorgabe ?? "")}</textarea>`
+        : `<input class="jf-input" id="${id}" type="${art}" placeholder="${esc(platzhalter ?? "")}" value="${esc(vorgabe ?? "")}"
+             ${art === "email" ? 'autocomplete="email" autocapitalize="none"' : ""}
+             ${art === "password" ? 'autocomplete="current-password"' : ""}>`}
+      ${meldung ? `<p class="jf-error-text">${esc(meldung)}</p>`
+                : (hinweisText ? `<p class="jf-hint">${esc(hinweisText)}</p>` : "")}
+    </div>`;
+}
+
+const bildschirme = {};
+
+/* --- Öffentlich ------------------------------------------------------------ */
+
+bildschirme.willkommen = () => `
+  <div class="screen" style="justify-content:space-between;padding-top:44px;padding-bottom:38px">
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:16px">
+      <div class="jf-marke">JobFlow</div>
+      <p class="jf-h2" style="font-size:20px">Von der Anfrage zum Auftrag.</p>
+      <p class="jf-muted" style="font-size:15px">
+        Sag uns einfach, was los ist. Wir kümmern uns um den Rest &mdash; passende
+        Betriebe, Angebote und Termin.
+      </p>
+    </div>
+    <div class="jf-stack">
+      <button class="jf-btn jf-btn--primary" data-tu="zur-registrierung" data-wert="KUNDE">Konto erstellen</button>
+      <button class="jf-btn jf-btn--secondary" data-tu="gehe" data-wert="anmelden">Anmelden</button>
+      <div class="jf-trenner">oder</div>
+      <button class="jf-btn jf-btn--ghost" data-tu="zur-registrierung" data-wert="BETRIEB">
+        Als Unternehmen anmelden
+      </button>
+    </div>
+  </div>`;
+
+bildschirme.registrieren = () => {
+  const rolle = ansicht.daten.rolle ?? "KUNDE";
+  return `
+  ${appbar("Konto erstellen", "willkommen")}
+  <div class="screen" style="padding-top:6px">
+    <p class="jf-muted">Wofür möchtest du JobFlow nutzen?</p>
+    <div class="jf-stack jf-stack--tight">
+      <button class="jf-option" data-tu="rolle" data-wert="KUNDE" aria-pressed="${rolle === "KUNDE"}">
+        <span class="jf-option__title">Ich suche jemanden</span>
+        <span class="jf-option__desc">Problem beschreiben und passende Betriebe finden.</span>
+      </button>
+      <button class="jf-option" data-tu="rolle" data-wert="BETRIEB" aria-pressed="${rolle === "BETRIEB"}">
+        <span class="jf-option__title">Ich biete Leistungen an</span>
+        <span class="jf-option__desc">Passende Anfragen erhalten und Angebote schreiben.</span>
+      </button>
+    </div>
+    ${feld("reg-name", rolle === "BETRIEB" ? "Name des Unternehmens" : "Dein Name", "text",
+           rolle === "BETRIEB" ? "Muster Haustechnik" : "Max Mustermann", ansicht.daten.name)}
+    ${feld("reg-mail", "E-Mail", "email", "max@example.de", ansicht.daten.mail)}
+    ${feld("reg-pw", "Passwort", "password", "", "",
+           "Mindestens 10 Zeichen. Länge schützt mehr als Sonderzeichen.")}
+    <div class="jf-spacer"></div>
+    <button class="jf-btn jf-btn--primary" data-tu="registrieren">Konto erstellen</button>
+    <button class="jf-btn jf-btn--ghost" data-tu="gehe" data-wert="anmelden">Ich habe schon ein Konto</button>
+  </div>`;
+};
+
+bildschirme.anmelden = () => `
+  ${appbar("Anmelden", "willkommen")}
+  <div class="screen" style="padding-top:6px">
+    ${feld("an-mail", "E-Mail", "email", "max@example.de", ansicht.daten.mail)}
+    ${feld("an-pw", "Passwort", "password", "", "")}
+    <div class="jf-spacer"></div>
+    <button class="jf-btn jf-btn--primary" data-tu="anmelden">Anmelden</button>
+    <button class="jf-btn jf-btn--ghost" data-tu="zur-registrierung" data-wert="KUNDE">
+      Noch kein Konto? Jetzt erstellen
+    </button>
+    ${db.konten.length > 0 ? `
+      <p class="jf-caption" style="text-align:center">
+        Auf diesem Gerät angelegt: ${db.konten.map((k) => esc(k.name)).join(", ")}
+      </p>` : ""}
+  </div>`;
+
+/* --- Kundenbereich --------------------------------------------------------- */
+
+function anfrageKarte(anfrage) {
+  const unter = anfrage.kategorie ? UNTERKATEGORIEN[anfrage.kategorie] : null;
+  const ton = anfrage.status === "ABGESCHLOSSEN" ? "success"
+    : anfrage.status === "ZURUECKGEZOGEN" ? "error"
+    : anfrage.status === "ANALYSE" ? "ai"
+    : ["ANGEBOTE", "ANGENOMMEN"].includes(anfrage.status) ? "success" : "";
+  const anzahl = angeboteZu(anfrage.id).length;
+
+  return `
+    <button class="jf-card" data-tu="gehe" data-wert="anfrage" data-id="${anfrage.id}">
+      <div class="jf-row" style="flex-wrap:wrap">
+        <span class="jf-badge ${ton ? "jf-badge--" + ton : ""}">${ANFRAGE_STATUS[anfrage.status]}</span>
+        ${anfrage.dringlichkeit === "HIGH" ? '<span class="jf-badge jf-badge--warning">Dringend</span>' : ""}
+        ${unter ? `<span class="jf-badge jf-badge--primary">${unter.icon} ${esc(unter.name)}</span>` : ""}
+      </div>
+      <p class="jf-body" style="font-weight:600">${esc(anfrage.beschreibung)}</p>
+      <p class="jf-caption">
+        ${anfrage.ort ? "\u{1F4CD} " + esc(anfrage.ort) + " &nbsp;·&nbsp; " : ""}
+        \u{1F550} ${fmtDatum(anfrage.erstelltAm)}
+        ${anzahl > 0 ? " &nbsp;·&nbsp; \u{1F4B6} " + anzahl + (anzahl === 1 ? " Angebot" : " Angebote") : ""}
+      </p>
+    </button>`;
+}
+
+bildschirme.start = () => {
+  const konto = angemeldet();
+  const meine = db.anfragen.filter((a) => a.kundeId === konto.id).slice(0, 2);
+  const vorname = konto.name.split(" ")[0];
+
+  return `
+  <div class="screen">
+    <div>
+      <p class="jf-greeting">Hallo ${esc(vorname)} \u{1F44B}</p>
+      <h1 class="jf-h1">Was brauchst du?</h1>
+    </div>
+    <button class="jf-btn jf-btn--primary" data-tu="gehe" data-wert="anfrageNeu">
+      <span class="jf-btn__icon">✍️</span> Problem beschreiben
+    </button>
+
+    ${meine.length > 0 ? `
+      <div class="jf-stack">
+        <h2 class="jf-h2">Deine Anfragen</h2>
+        ${meine.map(anfrageKarte).join("")}
+      </div>` : ""}
+
+    <div class="jf-stack">
+      <h2 class="jf-h2">Kategorien</h2>
+      <div class="jf-grid-3">
+        ${KATEGORIEN.map((k) => `
+          <button class="jf-cat" data-tu="kategorie" data-wert="${k.slug}">
+            <span class="jf-cat__icon">${k.icon}</span>
+            <span class="jf-cat__name">${esc(k.name)}</span>
+          </button>`).join("")}
+      </div>
+    </div>
+  </div>`;
+};
+
+bildschirme.anfrageNeu = () => {
+  const dringlich = ansicht.daten.dringlichkeit ?? "NORMAL";
+  const vorgabe = ansicht.daten.kategorie
+    ? `Ich brauche jemanden für ${UNTERKATEGORIEN[ansicht.daten.kategorie]?.name ?? ""}: `
+    : "";
+  return `
+  ${appbar("Anfrage erstellen", "start")}
+  <div class="screen" style="padding-top:6px">
+    <h1 class="jf-h1">Was ist passiert?</h1>
+    ${feld("neu-text", "Beschreibung", "mehrzeilig", "Meine Heizung wird nicht mehr richtig warm.",
+           ansicht.daten.text ?? vorgabe, "Ein bis zwei Sätze reichen. Den Rest fragt die KI gezielt nach.")}
+    ${feld("neu-ort", "Wo?", "text", "45127 Essen", ansicht.daten.ort ?? "",
+           "Postleitzahl und Ort genügen. Die genaue Adresse bekommt nur der beauftragte Betrieb.")}
+    <div>
+      <label class="jf-label">Wie dringend ist es?</label>
+      <div class="jf-row">
+        ${["LOW", "NORMAL", "HIGH"].map((d) => `
+          <button class="jf-choice" data-tu="dringlichkeit" data-wert="${d}"
+            aria-pressed="${dringlich === d}">${DRINGLICHKEIT[d]}</button>`).join("")}
+      </div>
+    </div>
+    <div class="jf-spacer"></div>
+    <button class="jf-btn jf-btn--primary" data-tu="anfrageAbsenden">Anfrage starten</button>
+  </div>`;
+};
+
+bildschirme.analysiert = () => `
+  <div class="screen" style="justify-content:center">
+    <div class="jf-thinking">
+      <div class="jf-thinking__orb">\u{1F916}</div>
+      <p class="jf-h2" style="text-align:center">Ich schaue mir dein Problem an</p>
+      <div class="jf-thinking__steps">
+        <div class="jf-thinking__step" data-schritt="0"><span class="jf-thinking__tick">✓</span> Beschreibung gelesen</div>
+        <div class="jf-thinking__step" data-schritt="1"><span class="jf-thinking__tick">✓</span> Kategorie bestimmt</div>
+        <div class="jf-thinking__step" data-schritt="2"><span class="jf-thinking__tick">✓</span> Offene Punkte gesammelt</div>
+      </div>
+    </div>
+  </div>`;
+
+function kiBlock(analyse) {
+  const unter = analyse.kategorie ? UNTERKATEGORIEN[analyse.kategorie] : null;
+  return `
+    <div class="jf-ai">
+      <div class="jf-ai__head"><span style="font-size:19px">\u{1F916}</span><span class="jf-ai__title">Von der KI erkannt</span></div>
+      <dl style="margin:0;display:flex;flex-direction:column;gap:11px">
+        <div class="jf-ai__field">
+          <dt>Kategorie</dt>
+          <dd>${unter ? unter.icon + " " + esc(unter.name) : "Noch nicht eindeutig"}</dd>
+        </div>
+        <div class="jf-ai__field">
+          <dt>Problem</dt>
+          <dd style="font-weight:500;font-size:14px">${esc(analyse.zusammenfassung)}</dd>
+        </div>
+      </dl>
+      <p class="jf-ai__disclaimer">
+        ${analyse.sicherheit < 0.6
+          ? "Die KI ist sich hier unsicher (" + Math.round(analyse.sicherheit * 100) + " %). Bitte prüfe die Angaben."
+          : "Sicherheit " + Math.round(analyse.sicherheit * 100) + " % &mdash; automatisch erstellt, bitte kurz prüfen."}
+      </p>
+    </div>`;
+}
+
+bildschirme.rueckfragen = () => {
+  const anfrage = anfrageVon(ansicht.id);
+  if (anfrage === null || anfrage.analyse === null) return bildschirme.start();
+  const offen = anfrage.analyse.fragen.filter((f) => !anfrage.antworten[f]);
+
+  return `
+  ${appbar("KI-Analyse", null)}
+  <div class="screen" style="padding-top:6px">
+    ${kiBlock(anfrage.analyse)}
+    ${offen.length > 0 ? `
+      <div class="jf-stack">
+        <h2 class="jf-h2">Noch ${offen.length} ${offen.length === 1 ? "Frage" : "Fragen"}</h2>
+        <p class="jf-muted" style="margin-top:-4px">Nur das, was für ein gutes Angebot wirklich fehlt.</p>
+        ${offen.map((frage, i) => `
+          <div class="jf-card">
+            <label class="jf-label" for="frage${i}" style="margin:0">${esc(frage)}</label>
+            <input class="jf-input" id="frage${i}" data-frage="${esc(frage)}" placeholder="Deine Antwort">
+          </div>`).join("")}
+        <button class="jf-btn jf-btn--primary" data-tu="antwortenSenden" data-id="${anfrage.id}">Antworten senden</button>
+        <button class="jf-btn jf-btn--ghost" data-tu="gehe" data-wert="anfrage" data-id="${anfrage.id}">Später beantworten</button>
+      </div>`
+      : `
+      <div class="jf-card">
+        <p class="jf-body">Alle Rückfragen beantwortet. ✅</p>
+      </div>
+      <button class="jf-btn jf-btn--primary" data-tu="gehe" data-wert="anfrage" data-id="${anfrage.id}">Weiter</button>`}
+  </div>`;
+};
+
+bildschirme.anfragen = () => {
+  const konto = angemeldet();
+  const meine = db.anfragen.filter((a) => a.kundeId === konto.id);
+  return `
+  <div class="screen">
+    <h1 class="jf-h1">Meine Anfragen</h1>
+    ${meine.length === 0
+      ? leer("\u{1F4CB}", "Noch keine Anfragen",
+             "Beschreibe dein Anliegen — JobFlow findet die passenden Betriebe.",
+             '<button class="jf-btn jf-btn--primary jf-btn--sm" data-tu="gehe" data-wert="anfrageNeu" style="width:auto;margin-top:8px">Anfrage starten</button>')
+      : meine.map(anfrageKarte).join("")}
+  </div>`;
+};
+
+/** Zeitstrahl einer Anfrage - er beantwortet die Frage "wo steht mein Anliegen?". */
+function zeitstrahl(status) {
+  const schritte = [
+    { schluessel: "OFFEN", text: "Anfrage erstellt" },
+    { schluessel: "VERMITTELT", text: "Betriebe gefunden" },
+    { schluessel: "ANGEBOTE", text: "Angebot erhalten" },
+    { schluessel: "ANGENOMMEN", text: "Angebot angenommen" },
+    { schluessel: "ABGESCHLOSSEN", text: "Auftrag abgeschlossen" }
+  ];
+  const reihe = schritte.map((s) => s.schluessel);
+  const jetzt = reihe.indexOf(status);
+
+  return `
+    <div class="jf-timeline">
+      ${schritte.map((schritt, i) => {
+        const erledigt = jetzt > i;
+        const aktuell = jetzt === i;
+        const letzter = i === schritte.length - 1;
+        return `
+          <div class="jf-tl">
+            <div class="jf-tl__col">
+              <span class="jf-tl__dot ${erledigt ? "jf-tl__dot--done" : aktuell ? "jf-tl__dot--now" : ""}">${erledigt ? "✓" : aktuell ? "●" : "○"}</span>
+              ${letzter ? "" : `<span class="jf-tl__line ${erledigt ? "jf-tl__line--done" : ""}"></span>`}
+            </div>
+            <span class="jf-tl__label ${erledigt || aktuell ? "jf-tl__label--reached" : ""}">${schritt.text}</span>
+          </div>`;
+      }).join("")}
+      ${status === "ZURUECKGEZOGEN" ? '<p class="jf-caption" style="color:var(--jf-error)">Diese Anfrage wurde zurückgezogen.</p>' : ""}
+    </div>`;
+}
+
+bildschirme.anfrage = () => {
+  const anfrage = anfrageVon(ansicht.id);
+  if (anfrage === null) return bildschirme.anfragen();
+
+  const unter = anfrage.kategorie ? UNTERKATEGORIEN[anfrage.kategorie] : null;
+  const angebote = angeboteZu(anfrage.id).sort((a, b) => gesamt(a) - gesamt(b));
+  const angenommen = angebote.find((a) => a.status === "ANGENOMMEN") ?? null;
+  const auftrag = angenommen === null ? null : auftragZuAngebot(angenommen.id);
+  const offeneFragen = anfrage.analyse === null
+    ? [] : anfrage.analyse.fragen.filter((f) => !anfrage.antworten[f]);
+
+  /* Der Schritt, der jetzt dran ist - und Rückfragen als Angebot daneben.
+     Offene Fragen halten die Vermittlung ausdrücklich nicht auf: sie machen das
+     Angebot genauer, sind aber keine Pflicht. Ein Formular, das erst
+     vollständig sein muss, wäre genau die Bürokratie, die JobFlow vermeidet. */
+  let naechster = "";
+  if (anfrage.analyse === null) {
+    naechster = `<button class="jf-btn jf-btn--primary" data-tu="analyse" data-id="${anfrage.id}">
+      <span class="jf-btn__icon">\u{1F916}</span> Von der KI analysieren lassen</button>`;
+  } else if (anfrage.kategorie === null) {
+    naechster = `<p class="jf-muted">Die Kategorie steht noch nicht fest. Ergänze deine Beschreibung und lass die KI noch einmal darüberschauen.</p>
+      <button class="jf-btn jf-btn--secondary" data-tu="analyse" data-id="${anfrage.id}">Erneut analysieren</button>`;
+  } else if (anfrage.vermittelt.length === 0) {
+    naechster = `<button class="jf-btn jf-btn--primary" data-tu="vermitteln" data-id="${anfrage.id}">
+      <span class="jf-btn__icon">\u{1F50E}</span> Passende Betriebe suchen</button>`;
+  } else if (angebote.length === 0) {
+    naechster = `<button class="jf-btn jf-btn--primary" data-tu="angeboteEinholen" data-id="${anfrage.id}">
+      Angebote anfordern</button>`;
+  }
+
+  return `
+  ${appbar("Anfrage", "anfragen")}
+  <div class="screen" style="padding-top:6px">
+    <div>
+      <div class="jf-row" style="flex-wrap:wrap;margin-bottom:8px">
+        <span class="jf-badge ${["ANGEBOTE", "ANGENOMMEN", "ABGESCHLOSSEN"].includes(anfrage.status) ? "jf-badge--success" : ""}">${ANFRAGE_STATUS[anfrage.status]}</span>
+        ${unter ? `<span class="jf-badge jf-badge--primary">${unter.icon} ${esc(unter.name)}</span>` : ""}
+      </div>
+      <p class="jf-body">${esc(anfrage.beschreibung)}</p>
+      ${anfrage.ort ? `<p class="jf-caption" style="margin-top:6px">\u{1F4CD} ${esc(anfrage.ort)}</p>` : ""}
+    </div>
+
+    <div class="jf-card"><div>${zeitstrahl(anfrage.status)}</div></div>
+
+    ${anfrage.analyse !== null ? kiBlock(anfrage.analyse) : ""}
+    ${naechster}
+
+    ${offeneFragen.length > 0 && anfrage.status !== "ABGESCHLOSSEN" ? `
+      <div class="jf-stack jf-stack--tight">
+        <button class="jf-btn jf-btn--secondary" data-tu="gehe" data-wert="rueckfragen" data-id="${anfrage.id}">
+          ${offeneFragen.length} ${offeneFragen.length === 1 ? "offene Frage" : "offene Fragen"} beantworten
+        </button>
+        <p class="jf-caption" style="text-align:center">Freiwillig &mdash; macht die Angebote aber genauer.</p>
+      </div>` : ""}
+
+    ${anfrage.vermittelt.length > 0 && angebote.length === 0 ? `
+      <div class="jf-stack">
+        <h2 class="jf-h2">${anfrage.vermittelt.length} passende Betriebe</h2>
+        ${anfrage.vermittelt.map((t) => {
+          const betrieb = betriebVon(t.betriebId);
+          if (betrieb === null) return "";
+          return `
+            <div class="jf-card">
+              <div class="jf-row jf-row--between">
+                <div>
+                  <p class="jf-body" style="font-weight:600;font-size:15.5px">${esc(betrieb.name)}</p>
+                  <p class="jf-caption">${betrieb.anzahlBewertungen === 0 ? "Noch keine Bewertungen"
+                    : "⭐ " + betrieb.bewertung.toFixed(1).replace(".", ",") + " · " + betrieb.anzahlBewertungen + " Bewertungen"}</p>
+                </div>
+                <span class="jf-badge jf-badge--primary">${t.punkte}/100</span>
+              </div>
+              ${betrieb.geprueft ? '<span class="jf-badge jf-badge--success">✓ Geprüft</span>' : ""}
+              <div class="jf-stack jf-stack--tight" style="margin-top:2px">
+                ${t.gruende.map((g) => `<p class="jf-caption">• ${esc(g)}</p>`).join("")}
+              </div>
+            </div>`;
+        }).join("")}
+      </div>` : ""}
+
+    ${angebote.length > 0 ? `
+      <div class="jf-stack">
+        <h2 class="jf-h2">${angebote.length} ${angebote.length === 1 ? "Angebot" : "Angebote"}</h2>
+        ${angebote.map((angebot) => {
+          const betrieb = betriebVon(angebot.betriebId);
+          return `
+            <button class="jf-card" data-tu="gehe" data-wert="angebot" data-id="${angebot.id}"
+              ${angebot.status === "ABGELEHNT" ? 'style="opacity:.55"' : ""}>
+              <div class="jf-row jf-row--between">
+                <p class="jf-body" style="font-weight:600;font-size:15.5px">${esc(betrieb?.name ?? "Betrieb")}</p>
+                ${angebot.status === "ANGENOMMEN" ? '<span class="jf-badge jf-badge--success">Angenommen</span>'
+                  : angebot.status === "ABGELEHNT" ? '<span class="jf-badge">Abgelehnt</span>' : ""}
+              </div>
+              <div class="jf-row jf-row--between" style="align-items:baseline">
+                <span style="font-family:var(--font-display);font-size:26px;font-weight:700;color:var(--jf-text);font-variant-numeric:tabular-nums">${fmtEuroKurz(gesamt(angebot))}</span>
+                <span class="jf-caption">inkl. Material &amp; Anfahrt</span>
+              </div>
+            </button>`;
+        }).join("")}
+      </div>` : ""}
+
+    ${auftrag !== null ? `
+      <button class="jf-btn jf-btn--secondary" data-tu="gehe" data-wert="auftrag" data-id="${auftrag.id}">
+        Auftrag ansehen</button>` : ""}
+  </div>`;
+};
+
+bildschirme.angebot = () => {
+  const angebot = angebotVon(ansicht.id);
+  if (angebot === null) return bildschirme.anfragen();
+  const betrieb = betriebVon(angebot.betriebId);
+  const anfrage = anfrageVon(angebot.anfrageId);
+  const auftrag = auftragZuAngebot(angebot.id);
+  const abgelaufen = new Date(angebot.gueltigBis).getTime() < Date.now();
+
+  return `
+  ${appbar("Angebot", "anfrage")}
+  <div class="screen" style="padding-top:6px">
+    <div>
+      <h1 class="jf-h1">${esc(betrieb?.name ?? "Betrieb")}</h1>
+      <p class="jf-muted">
+        ${betrieb === null || betrieb.anzahlBewertungen === 0 ? "Noch keine Bewertungen"
+          : "⭐ " + betrieb.bewertung.toFixed(1).replace(".", ",") + " · " + betrieb.anzahlBewertungen + " Bewertungen"}
+        ${betrieb?.entfernungKm !== undefined ? " · " + fmtKm(betrieb.entfernungKm) : ""}
+      </p>
+    </div>
+    ${betrieb?.geprueft
+      ? '<span class="jf-badge jf-badge--success">✓ Unternehmen geprüft</span>'
+      : '<span class="jf-badge jf-badge--warning">Noch nicht geprüft</span>'}
+
+    <div class="jf-card">
+      <dl class="jf-price">
+        <div class="jf-price__row"><dt>Arbeitskosten</dt><dd>${fmtEuro(angebot.arbeitCent)}</dd></div>
+        <div class="jf-price__row"><dt>Material</dt><dd>${fmtEuro(angebot.materialCent)}</dd></div>
+        <div class="jf-price__row"><dt>Anfahrt</dt><dd>${fmtEuro(angebot.anfahrtCent)}</dd></div>
+        <div class="jf-price__total"><dt>Gesamt</dt><dd>${fmtEuroKurz(gesamt(angebot))}</dd></div>
+      </dl>
+    </div>
+
+    <div class="jf-card">
+      <p class="jf-label" style="margin:0">Beschreibung</p>
+      <p class="jf-body">${esc(angebot.beschreibung)}</p>
+      ${angebot.kiUnterstuetzt
+        ? '<p class="jf-caption" style="color:var(--jf-ai)">Text mit KI-Unterstützung verfasst und vom Betrieb freigegeben.</p>' : ""}
+    </div>
+
+    <p class="jf-caption">Gültig bis ${fmtDatum(angebot.gueltigBis)}</p>
+    <div class="jf-spacer"></div>
+
+    ${angebot.status === "ANGENOMMEN" ? `
+        <button class="jf-btn jf-btn--secondary" data-tu="gehe" data-wert="auftrag" data-id="${auftrag?.id ?? ""}">
+          Zum Auftrag</button>`
+      : angebot.status !== "OFFEN" ? `<p class="jf-muted">Dieses Angebot ist ${ANGEBOT_STATUS[angebot.status].toLowerCase()}.</p>`
+      : abgelaufen ? '<p class="jf-muted">Dieses Angebot ist abgelaufen.</p>'
+      : anfrage?.status === "ANGENOMMEN" ? '<p class="jf-muted">Zu dieser Anfrage wurde bereits ein anderes Angebot angenommen.</p>'
+      : `
+        <button class="jf-btn jf-btn--primary" data-tu="angebotAnnehmen" data-id="${angebot.id}">Angebot annehmen</button>
+        <button class="jf-btn jf-btn--ghost" data-tu="angebotAblehnen" data-id="${angebot.id}">Ablehnen</button>`}
+
+    <button class="jf-btn jf-btn--ghost" data-tu="gespraech" data-id="${angebot.anfrageId}" data-zusatz="${angebot.betriebId}">
+      <span class="jf-btn__icon">\u{1F4AC}</span> Nachricht schreiben
+    </button>
+  </div>`;
+};
+
+bildschirme.termin = () => {
+  const angebot = angebotVon(ansicht.id);
+  if (angebot === null) return bildschirme.anfragen();
+  const betrieb = betriebVon(angebot.betriebId);
+  const fenster = freieFenster(angebot.betriebId);
+
+  // Nach Tagen gruppieren - so wählt man einen Termin.
+  const tage = new Map();
+  for (const f of fenster) {
+    const schluessel = f.start.slice(0, 10);
+    if (!tage.has(schluessel)) tage.set(schluessel, []);
+    tage.get(schluessel).push(f);
+  }
+  const tagListe = [...tage.keys()].sort().slice(0, 14);
+  const gewaehlterTag = ansicht.daten.tag ?? null;
+  const gewaehltesFenster = ansicht.daten.fenster ?? null;
+
+  return `
+  ${appbar("Termin auswählen", "anfrage")}
+  <div class="screen" style="padding-top:6px">
+    <p class="jf-muted">Diese Zeiten hat ${esc(betrieb?.name ?? "der Betrieb")} freigegeben.</p>
+
+    ${tagListe.length === 0 ? leer("\u{1F4C5}", "Keine freien Zeiten",
+        "Der Betrieb hat für die nächsten drei Wochen nichts freigegeben. Schreib ihm eine Nachricht, um einen Termin abzustimmen.",
+        `<button class="jf-btn jf-btn--secondary jf-btn--sm" data-tu="gespraech" data-id="${angebot.anfrageId}" data-zusatz="${angebot.betriebId}" style="width:auto;margin-top:8px">Nachricht schreiben</button>`)
+    : `
+      <div>
+        <label class="jf-label">Tag</label>
+        <div class="jf-row" style="flex-wrap:wrap">
+          ${tagListe.map((tag) => {
+            const d = new Date(tag);
+            return `
+              <button class="jf-choice" style="flex:0 0 62px;padding:9px 4px"
+                data-tu="terminTag" data-wert="${tag}" aria-pressed="${gewaehlterTag === tag}">
+                <span style="display:block;font-size:11px">${d.toLocaleDateString("de-DE", { weekday: "short" })}</span>
+                <span style="display:block;font-size:17px;font-weight:600">${d.getDate()}</span>
+              </button>`;
+          }).join("")}
+        </div>
+      </div>
+
+      ${gewaehlterTag !== null ? `
+        <div>
+          <label class="jf-label">Verfügbare Zeiten</label>
+          <div class="jf-slots">
+            ${(tage.get(gewaehlterTag) ?? []).map((f) => `
+              <button class="jf-slot" data-tu="terminFenster" data-wert="${f.start}"
+                aria-pressed="${gewaehltesFenster === f.start}">${fmtUhr(f.start)}</button>`).join("")}
+          </div>
+        </div>`
+        : '<p class="jf-caption">Wähle zuerst einen Tag.</p>'}
+
+      <div class="jf-spacer"></div>
+      <button class="jf-btn jf-btn--primary" data-tu="terminBestaetigen" data-id="${angebot.id}"
+        ${gewaehltesFenster === null ? "disabled" : ""}>Termin bestätigen</button>`}
+  </div>`;
+};
+
+bildschirme.auftrag = () => {
+  const auftrag = auftragVon(ansicht.id);
+  if (auftrag === null) return bildschirme.anfragen();
+
+  const konto = angemeldet();
+  const istBetrieb = konto.rolle === "BETRIEB";
+  const angebot = angebotVon(auftrag.angebotId);
+  const anfrage = anfrageVon(auftrag.anfrageId);
+  const betrieb = betriebVon(auftrag.betriebId);
+  const termin = terminZu(auftrag.angebotId);
+  const bewertung = bewertungZu(auftrag.id);
+  const unter = anfrage?.kategorie ? UNTERKATEGORIEN[anfrage.kategorie] : null;
+
+  return `
+  ${appbar("Auftrag", istBetrieb ? "betriebAuftraege" : "anfrage")}
+  <div class="screen" style="padding-top:6px">
+    <div>
+      <h1 class="jf-h1">${unter ? esc(unter.name) : "Auftrag"}</h1>
+      <p class="jf-muted">
+        ${istBetrieb ? esc(anfrage?.ort ?? "") : esc(betrieb?.name ?? "")}
+        ${angebot === null ? "" : " · " + fmtEuroKurz(gesamt(angebot))}
+      </p>
+    </div>
+
+    <div class="jf-row"><span class="jf-badge ${auftrag.status === "ABGESCHLOSSEN" ? "jf-badge--success"
+      : auftrag.status === "IN_ARBEIT" ? "jf-badge--warning" : ""}">${AUFTRAG_STATUS[auftrag.status]}</span></div>
+
+    <div class="jf-card"><div>${zeitstrahl(anfrage?.status ?? "ANGENOMMEN")}</div></div>
+
+    <div class="jf-card">
+      <p class="jf-label" style="margin:0">Termin</p>
+      ${termin === null
+        ? `<p class="jf-body">Noch kein Termin vereinbart.</p>
+           ${istBetrieb ? "" : `<button class="jf-btn jf-btn--secondary jf-btn--sm" data-tu="gehe" data-wert="termin" data-id="${auftrag.angebotId}">Termin wählen</button>`}`
+        : `<p class="jf-body" style="font-weight:600">\u{1F4C5} ${fmtZeitpunkt(termin.start)}</p>`}
+    </div>
+
+    ${anfrage !== null ? `
+      <div class="jf-card">
+        <p class="jf-label" style="margin:0">Anliegen</p>
+        <p class="jf-body">${esc(anfrage.beschreibung)}</p>
+      </div>` : ""}
+
+    <button class="jf-btn jf-btn--secondary" data-tu="gespraech" data-id="${auftrag.anfrageId}" data-zusatz="${auftrag.betriebId}">
+      <span class="jf-btn__icon">\u{1F4AC}</span> Nachricht schreiben
+    </button>
+
+    ${istBetrieb && auftrag.status === "GEPLANT"
+      ? `<button class="jf-btn jf-btn--primary" data-tu="auftragStatus" data-id="${auftrag.id}" data-wert="IN_ARBEIT">Auftrag beginnen</button>` : ""}
+    ${istBetrieb && auftrag.status === "IN_ARBEIT"
+      ? `<button class="jf-btn jf-btn--primary" data-tu="auftragStatus" data-id="${auftrag.id}" data-wert="ABGESCHLOSSEN">Auftrag abschließen</button>` : ""}
+    ${!istBetrieb && auftrag.status !== "ABGESCHLOSSEN"
+      ? '<p class="jf-caption">Den Fortschritt meldet der ausführende Betrieb.</p>' : ""}
+
+    ${!istBetrieb && auftrag.status === "ABGESCHLOSSEN" && bewertung === null
+      ? `<button class="jf-btn jf-btn--primary" data-tu="gehe" data-wert="bewerten" data-id="${auftrag.id}">Auftrag bewerten</button>` : ""}
+
+    ${bewertung !== null ? `
+      <div class="jf-card">
+        <p class="jf-label" style="margin:0">Bewertung</p>
+        <p class="jf-body" style="font-size:20px">${"⭐".repeat(bewertung.sterne)}</p>
+        ${bewertung.text ? `<p class="jf-muted">${esc(bewertung.text)}</p>` : ""}
+      </div>` : ""}
+  </div>`;
+};
+
+bildschirme.bewerten = () => {
+  const auftrag = auftragVon(ansicht.id);
+  if (auftrag === null) return bildschirme.anfragen();
+  const betrieb = betriebVon(auftrag.betriebId);
+  const sterne = ansicht.daten.sterne ?? 0;
+
+  return `
+  ${appbar("Bewertung", "auftrag")}
+  <div class="screen" style="padding-top:6px">
+    <h1 class="jf-h1" style="text-align:center;margin-top:12px">Wie war dein Auftrag?</h1>
+    <p class="jf-muted" style="text-align:center;margin-top:-8px">${esc(betrieb?.name ?? "")}</p>
+    <div class="jf-stars">
+      ${[1, 2, 3, 4, 5].map((n) => `
+        <button class="jf-star ${n <= sterne ? "is-on" : ""}" data-tu="sterne" data-wert="${n}"
+          aria-label="${n} von 5 Sternen">⭐</button>`).join("")}
+    </div>
+    ${feld("bew-text", "Was möchtest du sagen?", "mehrzeilig",
+           "Sehr freundlicher und zuverlässiger Service.", "",
+           "Freiwillig. Deine Bewertung ist im Profil des Betriebs sichtbar.")}
+    <div class="jf-spacer"></div>
+    <button class="jf-btn jf-btn--primary" data-tu="bewertungSenden" data-id="${auftrag.id}"
+      ${sterne === 0 ? "disabled" : ""}>Bewertung senden</button>
+    <p class="jf-caption" style="text-align:center">
+      Bewerten lässt sich nur ein abgeschlossener Auftrag &mdash; das schützt vor erfundenen Bewertungen.
+    </p>
+  </div>`;
+};
+
+/* --- Nachrichten ----------------------------------------------------------- */
+
+bildschirme.gespraeche = () => {
+  const liste = gespraeche();
+  const konto = angemeldet();
+  return `
+  <div class="screen">
+    <h1 class="jf-h1">Nachrichten</h1>
+    ${liste.length === 0
+      ? leer("\u{1F4AC}", "Noch keine Gespräche",
+             konto.rolle === "KUNDE"
+               ? "Sobald ein Betrieb dir ein Angebot schickt, könnt ihr hier schreiben."
+               : "Sobald du auf eine Anfrage antwortest, entsteht hier ein Gespräch.")
+      : liste.map((g) => {
+          const betrieb = betriebVon(g.betriebId);
+          const anfrage = anfrageVon(g.anfrageId);
+          const verlauf = nachrichtenZu(g.anfrageId, g.betriebId);
+          const letzte = verlauf[verlauf.length - 1] ?? null;
+          const gegenueber = konto.rolle === "KUNDE"
+            ? (betrieb?.name ?? "Betrieb")
+            : (kontoVon(anfrage?.kundeId ?? "")?.name ?? "Kunde");
+          return `
+            <button class="jf-card" data-tu="gespraech" data-id="${g.anfrageId}" data-zusatz="${g.betriebId}">
+              <div class="jf-row jf-row--between">
+                <p class="jf-body" style="font-weight:600">${esc(gegenueber)}</p>
+                ${letzte ? `<span class="jf-caption">${fmtUhr(letzte.zeit)}</span>` : ""}
+              </div>
+              <p class="jf-caption">${letzte ? esc(letzte.text.slice(0, 70)) : "Noch keine Nachricht"}</p>
+            </button>`;
+        }).join("")}
+  </div>`;
+};
+
+bildschirme.gespraech = () => {
+  const { anfrageId, betriebId } = ansicht.daten;
+  const konto = angemeldet();
+  const anfrage = anfrageVon(anfrageId);
+  const betrieb = betriebVon(betriebId);
+  const verlauf = nachrichtenZu(anfrageId, betriebId);
+  const istBetrieb = konto.rolle === "BETRIEB";
+  const gegenueber = istBetrieb ? (kontoVon(anfrage?.kundeId ?? "")?.name ?? "Kunde") : (betrieb?.name ?? "Betrieb");
+
+  return `
+  ${appbar(gegenueber, "gespraeche")}
+  <div class="screen" style="padding-top:4px">
+    <div class="jf-chat">
+      ${verlauf.length === 0 ? '<p class="jf-caption" style="text-align:center">Noch keine Nachrichten.</p>' : ""}
+      ${verlauf.map((n) => {
+        const meine = n.senderId === konto.id;
+        return `
+          <div class="jf-bubble jf-bubble--${meine ? "me" : "them"} ${n.kiGeneriert ? "jf-bubble--ai-mark" : ""}">
+            ${esc(n.text)}
+            <span class="jf-bubble__time">${fmtUhr(n.zeit)}${n.kiGeneriert ? " · mit KI verfasst" : ""}</span>
+          </div>`;
+      }).join("")}
+    </div>
+    <div class="jf-spacer"></div>
+    ${istBetrieb ? `
+      <div class="jf-ai">
+        <div class="jf-ai__head"><span style="font-size:17px">\u{1F916}</span><span class="jf-ai__title">Antwort formulieren</span></div>
+        <p class="jf-caption">Die KI schreibt einen Vorschlag &mdash; du entscheidest, ob du ihn abschickst.</p>
+        <button class="jf-btn jf-btn--secondary jf-btn--sm" data-tu="antwortVorschlag">Vorschlag erzeugen</button>
+      </div>` : ""}
+    <div class="jf-composer">
+      <input class="jf-input" id="nachricht" placeholder="Nachricht schreiben" value="${esc(ansicht.daten.entwurf ?? "")}">
+      <button class="jf-btn jf-btn--primary jf-btn--sm" data-tu="nachrichtSenden" style="width:auto;padding:0 18px">Senden</button>
+    </div>
+  </div>`;
+};
+
+/* --- Profil ---------------------------------------------------------------- */
+
+bildschirme.profil = () => {
+  const konto = angemeldet();
+  return `
+  <div class="screen">
+    <h1 class="jf-h1">Profil</h1>
+    <div class="jf-card">
+      <p class="jf-h2">${esc(konto.name)}</p>
+      <p class="jf-caption">${esc(konto.email)}</p>
+      <p class="jf-caption">Kundenkonto</p>
+    </div>
+
+    <div class="jf-card">
+      <p class="jf-label" style="margin:0">Deine Daten</p>
+      <p class="jf-muted">
+        JobFlow speichert deine Anfragen, Angebote und Termine. Der Standort wird nur so
+        genau gespeichert, wie es für die Vermittlung nötig ist &mdash; die vollständige
+        Adresse erfährt erst der Betrieb, den du beauftragst.
+      </p>
+    </div>
+
+    <div class="jf-card">
+      <p class="jf-label" style="margin:0">Künstliche Intelligenz</p>
+      <p class="jf-muted">
+        Alles, was die KI erzeugt, ist violett markiert. Sie trifft keine verbindlichen
+        Entscheidungen über Preise oder Termine &mdash; darüber entscheiden immer
+        Menschen.
+      </p>
+    </div>
+
+    <div class="jf-spacer"></div>
+    <button class="jf-btn jf-btn--secondary" data-tu="abmelden">Abmelden</button>
+    ${ueberBlock()}
+  </div>`;
+};
+
+/**
+ * Der ehrliche Hinweis, was diese Fassung ist.
+ *
+ * Er steht am Fuß des Profils statt als Banner über der App: sichtbar für
+ * jeden, der nachsieht, ohne den Eindruck einer Demo zu erzeugen.
+ */
+function ueberBlock() {
+  return `
+    <p class="jf-fussnote">
+      Diese Fassung von JobFlow läuft ohne Server. Konten, Anfragen und Aufträge
+      bleiben auf diesem Gerät und werden nirgendwo hochgeladen. Die bereits
+      eingetragenen Betriebe sind Beispieldaten.
+      <button data-tu="alleDatenLoeschen"
+        style="background:none;border:none;padding:0;font:inherit;color:var(--jf-error);text-decoration:underline;cursor:pointer">
+        Alle Daten auf diesem Gerät löschen</button>
+    </p>`;
+}
+
+/* --- Unternehmensbereich ---------------------------------------------------
+
+   Dieselbe Codebasis, andere Oberfläche. Welche davon erscheint, entscheidet
+   die Rolle des angemeldeten Kontos - nicht ein Schalter.                     */
+
+/** Anfragen, die diesem Betrieb vermittelt wurden. */
+function anfragenFuerBetrieb(betrieb) {
+  if (betrieb === null) return [];
+  return db.anfragen.filter((a) =>
+    a.vermittelt.some((v) => v.betriebId === betrieb.id) &&
+    !["ZURUECKGEZOGEN"].includes(a.status));
+}
+
+function betriebKennzahlen(betrieb) {
+  if (betrieb === null) return { anfragen: 0, angebote: 0, auftraege: 0, quote: 0, gewinnquote: 0 };
+  const anfragen = anfragenFuerBetrieb(betrieb).length;
+  const angebote = db.angebote.filter((a) => a.betriebId === betrieb.id).length;
+  const auftraege = db.auftraege.filter((a) => a.betriebId === betrieb.id).length;
+  return {
+    anfragen, angebote, auftraege,
+    quote: anfragen === 0 ? 0 : Math.round((angebote / anfragen) * 100),
+    gewinnquote: angebote === 0 ? 0 : Math.round((auftraege / angebote) * 100)
+  };
+}
+
+bildschirme.dashboard = () => {
+  const betrieb = eigenerBetrieb();
+  const konto = angemeldet();
+  const zahlen = betriebKennzahlen(betrieb);
+  const offen = anfragenFuerBetrieb(betrieb).filter((a) =>
+    !db.angebote.some((ang) => ang.anfrageId === a.id && ang.betriebId === betrieb.id));
+  const laufende = db.auftraege.filter((a) => a.betriebId === betrieb?.id && a.status !== "ABGESCHLOSSEN");
+  const unvollstaendig = betrieb !== null && betrieb.leistungen.length === 0;
+
+  return `
+  <div class="screen">
+    <div>
+      <p class="jf-greeting">Guten Tag \u{1F44B}</p>
+      <h1 class="jf-h1">${esc(betrieb?.name ?? konto.name)}</h1>
+    </div>
+
+    ${unvollstaendig ? `
+      <div class="jf-card" style="background:var(--jf-warning-light)">
+        <p class="jf-body" style="font-weight:600;color:var(--jf-warning)">Profil vervollständigen</p>
+        <p class="jf-muted">
+          Ohne hinterlegte Leistung wirst du zu keiner Anfrage vorgeschlagen. Das dauert eine Minute.
+        </p>
+        <button class="jf-btn jf-btn--primary jf-btn--sm" data-tu="gehe" data-wert="betriebProfil">Jetzt einrichten</button>
+      </div>` : ""}
+
+    <div class="jf-tiles">
+      <div class="jf-tile"><span class="jf-tile__value">${offen.length}</span><span class="jf-tile__label">Neue Anfragen</span></div>
+      <div class="jf-tile"><span class="jf-tile__value">${zahlen.angebote}</span><span class="jf-tile__label">Angebote</span></div>
+      <div class="jf-tile"><span class="jf-tile__value">${laufende.length}</span><span class="jf-tile__label">Laufende Aufträge</span></div>
+      <div class="jf-tile"><span class="jf-tile__value">${zahlen.quote}&nbsp;%</span><span class="jf-tile__label">Angebotsquote</span></div>
+    </div>
+
+    <div class="jf-stack">
+      <h2 class="jf-h2">Neue Anfragen</h2>
+      ${offen.length === 0
+        ? `<div class="jf-card"><p class="jf-muted">${unvollstaendig
+            ? "Sobald deine Leistungen hinterlegt sind, erscheinen hier passende Anfragen."
+            : "Zurzeit keine offenen Anfragen. Sobald eine passende entsteht, erscheint sie hier."}</p></div>`
+        : offen.slice(0, 3).map(betriebAnfrageKarte).join("")}
+    </div>
+
+    ${laufende.length > 0 ? `
+      <div class="jf-stack">
+        <h2 class="jf-h2">Laufende Aufträge</h2>
+        ${laufende.slice(0, 3).map(auftragKarteBetrieb).join("")}
+      </div>` : ""}
+
+    <button class="jf-btn jf-btn--secondary" data-tu="gehe" data-wert="betriebStatistik">Statistik ansehen</button>
+  </div>`;
+};
+
+function betriebAnfrageKarte(anfrage) {
+  const unter = anfrage.kategorie ? UNTERKATEGORIEN[anfrage.kategorie] : null;
+  const betrieb = eigenerBetrieb();
+  const treffer = anfrage.vermittelt.find((v) => v.betriebId === betrieb?.id);
+  return `
+    <button class="jf-card" data-tu="gehe" data-wert="betriebAnfrage" data-id="${anfrage.id}">
+      <div class="jf-row jf-row--between">
+        ${unter ? `<span class="jf-badge jf-badge--primary">${unter.icon} ${esc(unter.name)}</span>` : '<span class="jf-badge">Ohne Kategorie</span>'}
+        ${treffer ? `<span class="jf-badge">Passung ${treffer.punkte}</span>` : ""}
+      </div>
+      <p class="jf-body" style="font-weight:600">${esc(anfrage.beschreibung)}</p>
+      <p class="jf-caption">
+        ${anfrage.ort ? "\u{1F4CD} " + esc(anfrage.ort) + " · " : ""}\u{1F550} ${fmtDatum(anfrage.erstelltAm)}
+        ${anfrage.dringlichkeit === "HIGH" ? " · ⚠️ dringend" : ""}
+      </p>
+    </button>`;
+}
+
+function auftragKarteBetrieb(auftrag) {
+  const anfrage = anfrageVon(auftrag.anfrageId);
+  const angebot = angebotVon(auftrag.angebotId);
+  const unter = anfrage?.kategorie ? UNTERKATEGORIEN[anfrage.kategorie] : null;
+  return `
+    <button class="jf-card" data-tu="gehe" data-wert="auftrag" data-id="${auftrag.id}">
+      <div class="jf-row jf-row--between">
+        <span class="jf-badge ${auftrag.status === "ABGESCHLOSSEN" ? "jf-badge--success"
+          : auftrag.status === "IN_ARBEIT" ? "jf-badge--warning" : ""}">${AUFTRAG_STATUS[auftrag.status]}</span>
+        ${angebot ? `<span class="jf-caption">${fmtEuroKurz(gesamt(angebot))}</span>` : ""}
+      </div>
+      <p class="jf-body" style="font-weight:600">${unter ? esc(unter.name) : "Auftrag"}</p>
+      <p class="jf-caption">${esc(anfrage?.beschreibung.slice(0, 60) ?? "")}</p>
+    </button>`;
+}
+
+bildschirme.betriebAnfragen = () => {
+  const betrieb = eigenerBetrieb();
+  const alle = anfragenFuerBetrieb(betrieb);
+  return `
+  <div class="screen">
+    <h1 class="jf-h1">Anfragen</h1>
+    ${alle.length === 0
+      ? leer("\u{1F4CB}", "Noch keine Anfragen",
+             betrieb !== null && betrieb.leistungen.length === 0
+               ? "Hinterlege zuerst deine Leistungen, damit das Matching dich findet."
+               : "Sobald eine passende Anfrage in deinem Einsatzgebiet entsteht, erscheint sie hier.",
+             betrieb !== null && betrieb.leistungen.length === 0
+               ? '<button class="jf-btn jf-btn--primary jf-btn--sm" data-tu="gehe" data-wert="betriebProfil" style="width:auto;margin-top:8px">Profil einrichten</button>'
+               : "")
+      : alle.map(betriebAnfrageKarte).join("")}
+  </div>`;
+};
+
+bildschirme.betriebAnfrage = () => {
+  const anfrage = anfrageVon(ansicht.id);
+  const betrieb = eigenerBetrieb();
+  if (anfrage === null || betrieb === null) return bildschirme.betriebAnfragen();
+
+  const unter = anfrage.kategorie ? UNTERKATEGORIEN[anfrage.kategorie] : null;
+  const kunde = kontoVon(anfrage.kundeId);
+  const eigenes = db.angebote.find((a) => a.anfrageId === anfrage.id && a.betriebId === betrieb.id) ?? null;
+  const antworten = Object.entries(anfrage.antworten);
+
+  return `
+  ${appbar("Anfrage", "betriebAnfragen")}
+  <div class="screen" style="padding-top:6px">
+    <div>
+      <h1 class="jf-h1">${unter ? unter.icon + " " + esc(unter.name) : "Anfrage"}</h1>
+      <p class="jf-muted">${esc(kunde?.name.split(" ")[0] ?? "Kunde")} · ${esc(anfrage.ort || "Ort offen")}</p>
+    </div>
+
+    ${anfrage.analyse !== null ? `
+      <div class="jf-ai">
+        <div class="jf-ai__head"><span style="font-size:19px">\u{1F916}</span><span class="jf-ai__title">KI-Zusammenfassung</span></div>
+        <p class="jf-body">${esc(anfrage.analyse.zusammenfassung)}</p>
+        <p class="jf-ai__disclaimer">Automatisch aus der Beschreibung erstellt. Der Wortlaut des Kunden steht darunter.</p>
+      </div>` : ""}
+
+    <div class="jf-card">
+      <p class="jf-label" style="margin:0">Der Kunde schreibt</p>
+      <p class="jf-body">„${esc(anfrage.beschreibung)}"</p>
+    </div>
+
+    ${antworten.length > 0 ? `
+      <div class="jf-card">
+        <p class="jf-label" style="margin:0">Rückfragen beantwortet</p>
+        ${antworten.map(([frage, antwort]) => `
+          <div><p class="jf-caption">${esc(frage)}</p><p class="jf-body" style="font-weight:500">${esc(antwort)}</p></div>`).join("")}
+      </div>` : ""}
+
+    <div class="jf-card">
+      <div class="jf-row" style="flex-wrap:wrap">
+        <span class="jf-badge">\u{1F4CD} ${esc(anfrage.ort || "Ort offen")}</span>
+        <span class="jf-badge ${anfrage.dringlichkeit === "HIGH" ? "jf-badge--warning" : ""}">${DRINGLICHKEIT[anfrage.dringlichkeit]}</span>
+        <span class="jf-badge">\u{1F550} ${fmtDatum(anfrage.erstelltAm)}</span>
+      </div>
+    </div>
+
+    <div class="jf-spacer"></div>
+    ${eigenes === null
+      ? `<button class="jf-btn jf-btn--primary" data-tu="gehe" data-wert="betriebAngebot" data-id="${anfrage.id}">Angebot erstellen</button>
+         <button class="jf-btn jf-btn--ghost" data-tu="anfrageAblehnen" data-id="${anfrage.id}">Ablehnen</button>`
+      : `<div class="jf-card">
+           <div class="jf-row jf-row--between">
+             <p class="jf-label" style="margin:0">Dein Angebot</p>
+             <span class="jf-badge ${eigenes.status === "ANGENOMMEN" ? "jf-badge--success" : ""}">${ANGEBOT_STATUS[eigenes.status]}</span>
+           </div>
+           <p class="jf-body" style="font-weight:600;font-size:20px">${fmtEuroKurz(gesamt(eigenes))}</p>
+         </div>
+         <button class="jf-btn jf-btn--secondary" data-tu="gespraech" data-id="${anfrage.id}" data-zusatz="${betrieb.id}">
+           <span class="jf-btn__icon">\u{1F4AC}</span> Nachricht an den Kunden</button>`}
+  </div>`;
+};
+
+bildschirme.betriebAngebot = () => {
+  const anfrage = anfrageVon(ansicht.id);
+  if (anfrage === null) return bildschirme.betriebAnfragen();
+  const d = ansicht.daten;
+  const arbeit = d.arbeit ?? "80";
+  const material = d.material ?? "25";
+  const anfahrt = d.anfahrt ?? "15";
+  const summe = zuCent(arbeit) + zuCent(material) + zuCent(anfahrt);
+  const text = d.text ?? "";
+
+  return `
+  ${appbar("Angebot erstellen", "betriebAnfrage")}
+  <div class="screen" style="padding-top:6px">
+    ${anfrage.analyse !== null ? `
+      <div class="jf-card" style="background:var(--jf-ai-light)">
+        <p class="jf-label" style="margin:0;color:var(--jf-ai)">\u{1F916} Das Anliegen laut KI</p>
+        <p class="jf-body">${esc(anfrage.analyse.zusammenfassung)}</p>
+      </div>` : ""}
+
+    ${feld("ang-arbeit", "Arbeitskosten in Euro", "text", "80", arbeit)}
+    ${feld("ang-material", "Material in Euro", "text", "25", material)}
+    ${feld("ang-anfahrt", "Anfahrt in Euro", "text", "15", anfahrt)}
+
+    <div class="jf-card" style="background:var(--jf-primary-light)">
+      <div class="jf-row jf-row--between" style="align-items:baseline">
+        <span style="font-size:13.5px;color:var(--jf-primary-dark)">Gesamt</span>
+        <span style="font-family:var(--font-display);font-size:26px;font-weight:700;color:var(--jf-primary-dark);font-variant-numeric:tabular-nums">${fmtEuroKurz(summe)}</span>
+      </div>
+      <p class="jf-caption" style="color:var(--jf-primary-dark)">Die Summe folgt aus den drei Positionen.</p>
+    </div>
+
+    ${feld("ang-text", "Beschreibung", "mehrzeilig", "Was ist im Angebot enthalten?", text,
+           d.kiUnterstuetzt ? "Vorschlag der KI – du kannst ihn frei ändern." : null)}
+
+    <div class="jf-ai">
+      <div class="jf-ai__head"><span style="font-size:17px">\u{1F916}</span><span class="jf-ai__title">Text vorschlagen</span></div>
+      <p class="jf-caption">Die KI formuliert einen Entwurf. Über Preis und Inhalt entscheidest du.</p>
+      <button class="jf-btn jf-btn--secondary jf-btn--sm" data-tu="angebotstextVorschlag" data-id="${anfrage.id}">
+        KI-Text vorschlagen</button>
+    </div>
+
+    <div class="jf-spacer"></div>
+    <button class="jf-btn jf-btn--primary" data-tu="angebotSenden" data-id="${anfrage.id}">Angebot senden</button>
+  </div>`;
+};
+
+function zuCent(text) {
+  const zahl = Number(String(text).replace(",", "."));
+  return Number.isFinite(zahl) && zahl >= 0 ? Math.round(zahl * 100) : 0;
+}
+
+bildschirme.betriebAuftraege = () => {
+  const betrieb = eigenerBetrieb();
+  const auftraege = db.auftraege.filter((a) => a.betriebId === betrieb?.id);
+  return `
+  <div class="screen">
+    <h1 class="jf-h1">Aufträge</h1>
+    ${auftraege.length === 0
+      ? leer("\u{1F9FE}", "Noch keine Aufträge",
+             "Sobald ein Kunde eines deiner Angebote annimmt, erscheint der Auftrag hier.")
+      : auftraege.map(auftragKarteBetrieb).join("")}
+  </div>`;
+};
+
+bildschirme.betriebStatistik = () => {
+  const betrieb = eigenerBetrieb();
+  const z = betriebKennzahlen(betrieb);
+  const hoechst = Math.max(z.anfragen, 1);
+  const balken = (name, wert) => `
+    <div class="jf-bar">
+      <div class="jf-bar__head"><span>${name}</span><span>${wert}</span></div>
+      <div class="jf-bar__track"><div class="jf-bar__fill" style="width:${Math.round((wert / hoechst) * 100)}%"></div></div>
+    </div>`;
+
+  return `
+  ${appbar("Statistik", "dashboard")}
+  <div class="screen" style="padding-top:6px">
+    <div class="jf-card">
+      ${balken("Anfragen", z.anfragen)}
+      ${balken("Angebote", z.angebote)}
+      ${balken("Aufträge", z.auftraege)}
+    </div>
+    <div class="jf-tiles">
+      <div class="jf-tile"><span class="jf-tile__value">${z.quote}&nbsp;%</span><span class="jf-tile__label">Angebotsquote</span></div>
+      <div class="jf-tile"><span class="jf-tile__value">${z.gewinnquote}&nbsp;%</span><span class="jf-tile__label">Aus Angebot wird Auftrag</span></div>
+      <div class="jf-tile">
+        <span class="jf-tile__value">${betrieb === null || betrieb.anzahlBewertungen === 0 ? "–" : betrieb.bewertung.toFixed(1).replace(".", ",")}</span>
+        <span class="jf-tile__label">${betrieb?.anzahlBewertungen === 1 ? "aus 1 Bewertung" : "aus " + (betrieb?.anzahlBewertungen ?? 0) + " Bewertungen"}</span>
+      </div>
+      <div class="jf-tile">
+        <span class="jf-tile__value">${betrieb?.antwortMin == null ? "–" : fmtMin(betrieb.antwortMin)}</span>
+        <span class="jf-tile__label">Antwortzeit im Schnitt</span>
+      </div>
+    </div>
+    <div class="jf-card">
+      <p class="jf-label" style="margin:0">Was das bedeutet</p>
+      <p class="jf-muted">
+        Antwortzeit, abgeschlossene Aufträge und Bewertungen fließen direkt ins Matching ein:
+        Wer schneller antwortet und zuverlässig arbeitet, wird häufiger vorgeschlagen.
+      </p>
+    </div>
+  </div>`;
+};
+
+bildschirme.betriebProfil = () => {
+  const betrieb = eigenerBetrieb();
+  const konto = angemeldet();
+  if (betrieb === null) return bildschirme.dashboard();
+
+  const alleLeistungen = Object.entries(UNTERKATEGORIEN);
+  return `
+  <div class="screen">
+    <h1 class="jf-h1">Unternehmen</h1>
+
+    <div class="jf-card">
+      <div class="jf-row jf-row--between">
+        <p class="jf-h2">${esc(betrieb.name)}</p>
+        ${betrieb.geprueft ? '<span class="jf-badge jf-badge--success">Geprüft</span>'
+                           : '<span class="jf-badge jf-badge--warning">Nicht geprüft</span>'}
+      </div>
+      <p class="jf-caption">${esc(konto.email)}</p>
+    </div>
+
+    ${feld("bp-beschreibung", "Beschreibung", "mehrzeilig", "Was macht euer Betrieb?", betrieb.beschreibung ?? "")}
+    ${feld("bp-ort", "Standort", "text", "45127 Essen", betrieb.ort ?? "")}
+    ${feld("bp-radius", "Einsatzradius in Kilometern", "text", "30", String(betrieb.radiusKm))}
+
+    <div class="jf-card">
+      <p class="jf-label" style="margin:0">Leistungen</p>
+      <p class="jf-caption">Ohne hinterlegte Leistung findet dich das Matching nicht.</p>
+      <div class="jf-auswahl">
+        ${alleLeistungen.map(([slug, k]) => `
+          <button class="jf-chip" data-tu="leistung" data-wert="${slug}"
+            aria-pressed="${betrieb.leistungen.includes(slug)}">${k.icon} ${esc(k.name)}</button>`).join("")}
+      </div>
+    </div>
+
+    <div class="jf-card">
+      <p class="jf-label" style="margin:0">Verfügbarkeit</p>
+      <p class="jf-caption">Der Kunde sieht ausschließlich freigegebene Zeiten.</p>
+      ${betrieb.zeiten.map((z, i) => `
+        <div class="jf-tag">
+          <span class="jf-tag__name">${WOCHENTAGE[z.tag]}</span>
+          <span class="jf-tag__zeit">${z.aktiv ? z.von + "–" + z.bis : "geschlossen"}</span>
+          <button class="jf-schalter" data-tu="wochentag" data-wert="${i}" aria-pressed="${z.aktiv}"
+            aria-label="${WOCHENTAGE[z.tag]} ${z.aktiv ? "geöffnet" : "geschlossen"}">
+            <span class="jf-schalter__knopf"></span>
+          </button>
+        </div>`).join("")}
+    </div>
+
+    <button class="jf-btn jf-btn--primary" data-tu="betriebSpeichern">Speichern</button>
+    <div class="jf-spacer"></div>
+    <button class="jf-btn jf-btn--secondary" data-tu="abmelden">Abmelden</button>
+    ${ueberBlock()}
+  </div>`;
+};
+
+/* ==========================================================================
+   7. Navigation
+   ========================================================================== */
+
+const REITER_KUNDE = [
+  { ansicht: "start", icon: "\u{1F3E0}", text: "Start" },
+  { ansicht: "anfragen", icon: "\u{1F4CB}", text: "Anfragen" },
+  { ansicht: "anfrageNeu", icon: "+", text: "Neu", knopf: true },
+  { ansicht: "gespraeche", icon: "\u{1F4AC}", text: "Chat" },
+  { ansicht: "profil", icon: "\u{1F464}", text: "Profil" }
+];
+
+const REITER_BETRIEB = [
+  { ansicht: "dashboard", icon: "\u{1F4CA}", text: "Übersicht" },
+  { ansicht: "betriebAnfragen", icon: "\u{1F4CB}", text: "Anfragen" },
+  { ansicht: "betriebAuftraege", icon: "\u{1F9FE}", text: "Aufträge" },
+  { ansicht: "gespraeche", icon: "\u{1F4AC}", text: "Chat" },
+  { ansicht: "betriebProfil", icon: "\u{1F3E2}", text: "Profil" }
+];
+
+/** Welcher Reiter zu einer Detailansicht gehört. */
+const REITER_VON = {
+  anfrage: "anfragen", angebot: "anfragen", termin: "anfragen",
+  auftrag: "anfragen", bewerten: "anfragen", rueckfragen: "anfragen",
+  gespraech: "gespraeche",
+  betriebAnfrage: "betriebAnfragen", betriebAngebot: "betriebAnfragen",
+  betriebStatistik: "dashboard"
+};
+
+/* Bildschirme ohne Reiterleiste - dort ist die Navigation Teil des Ablaufs. */
+const OHNE_LEISTE = new Set(["willkommen", "registrieren", "anmelden", "analysiert"]);
+
+/* ==========================================================================
+   8. Zeichnen
+   ========================================================================== */
+
+function zeichne() {
+  const konto = angemeldet();
+
+  // Ohne Anmeldung gibt es nur die öffentlichen Bildschirme.
+  if (konto === null && !["willkommen", "registrieren", "anmelden"].includes(ansicht.name)) {
+    ansicht = { name: "willkommen", id: null, daten: {} };
+  }
+
+  const bildschirm = bildschirme[ansicht.name] ?? bildschirme.willkommen;
+  viewport.innerHTML = bildschirm() +
+    (meldung !== null ? `<div class="jf-toast" role="status">${esc(meldung)}</div>` : "");
+
+  if (konto === null || OHNE_LEISTE.has(ansicht.name)) {
+    navLeiste.hidden = true;
+    return;
+  }
+
+  const reiter = konto.rolle === "KUNDE" ? REITER_KUNDE : REITER_BETRIEB;
+  const aktiv = REITER_VON[ansicht.name] ?? ansicht.name;
+  const offeneAnfragen = konto.rolle === "BETRIEB"
+    ? anfragenFuerBetrieb(eigenerBetrieb()).filter((a) =>
+        !db.angebote.some((ang) => ang.anfrageId === a.id && ang.betriebId === eigenerBetrieb()?.id)).length
+    : 0;
+
+  navLeiste.hidden = false;
+  navLeiste.innerHTML = reiter.map((r) => `
+    <button class="jf-nav__item ${r.knopf ? "jf-nav__item--fab" : ""} ${aktiv === r.ansicht ? "is-active" : ""}"
+      data-tu="gehe" data-wert="${r.ansicht}">
+      <span class="jf-nav__icon">${r.icon}</span>
+      <span>${r.text}</span>
+      ${r.ansicht === "betriebAnfragen" && offeneAnfragen > 0
+        ? `<span class="jf-nav__punkt">${offeneAnfragen}</span>` : ""}
+    </button>`).join("");
+}
+
+function startAnsicht() {
+  const konto = angemeldet();
+  if (konto === null) return { name: "willkommen", id: null, daten: {} };
+  return { name: konto.rolle === "KUNDE" ? "start" : "dashboard", id: null, daten: {} };
+}
+
+/* ==========================================================================
+   9. Aktionen
+   ========================================================================== */
+
+const aktionen = {
+  gehe(wert, id) {
+    // Detailansichten brauchen die Kennung des Objekts, Listen nicht.
+    if (wert === "anfrageNeu") { gehe("anfrageNeu", null, {}); return; }
+    gehe(wert, id, {});
+  },
+
+  "zur-registrierung"(wert) {
+    gehe("registrieren", null, { rolle: wert });
+  },
+
+  rolle(wert) {
+    ansicht.daten = { ...ansicht.daten, rolle: wert, name: wert("reg-name"), mail: wert("reg-mail") };
+    zeichne();
+  },
+
+  async registrieren() {
+    const name = wert("reg-name").trim();
+    const mail = wert("reg-mail").trim().toLowerCase();
+    const pw = wert("reg-pw");
+    const rolle = ansicht.daten.rolle ?? "KUNDE";
+
+    fehler = {};
+    if (name.length < 2) fehler["reg-name"] = "Bitte einen Namen mit mindestens 2 Zeichen angeben.";
+    if (!/^[^\s@]+@[^\s@.]+(\.[^\s@.]+)+$/.test(mail)) fehler["reg-mail"] = "Diese E-Mail-Adresse sieht nicht gültig aus.";
+    if (pw.length < 10) fehler["reg-pw"] = "Bitte mindestens 10 Zeichen angeben.";
+    if (db.konten.some((k) => k.email === mail)) fehler["reg-mail"] = "Zu dieser Adresse gibt es bereits ein Konto.";
+    if (Object.keys(fehler).length > 0) { ansicht.daten = { ...ansicht.daten, name, mail }; zeichne(); return; }
+
+    const salz = neuesSalz();
+    const konto = {
+      id: neueId("kto"), email: mail, name, rolle,
+      salz, hash: await passwortHash(pw, salz),
+      erstelltAm: new Date().toISOString()
+    };
+    db.konten.push(konto);
+
+    // Ein Unternehmenskonto bekommt sofort ein - noch leeres - Profil, genau
+    // wie im Backend. Sonst müsste jede Abfrage den Sonderfall behandeln.
+    if (rolle === "BETRIEB") {
+      db.betriebe.push({
+        id: neueId("btr"), kontoId: konto.id, name,
+        beschreibung: null, ort: "", radiusKm: 30,
+        leistungen: [], geprueft: false,
+        bewertung: null, anzahlBewertungen: 0, auftraege: 0, antwortMin: null,
+        preisVon: null, preisBis: null,
+        zeiten: WOCHENTAGE.map((_, i) => ({ tag: i, von: "08:00", bis: "17:00", aktiv: i < 5 }))
+      });
+    }
+
+    db.sitzung = konto.id;
+    speichere();
+    ansicht = startAnsicht();
+    zeichne();
+    hinweis(rolle === "BETRIEB" ? "Willkommen. Hinterlege als Nächstes deine Leistungen." : "Willkommen bei JobFlow.");
+  },
+
+  async anmelden() {
+    const mail = wert("an-mail").trim().toLowerCase();
+    const pw = wert("an-pw");
+    const konto = db.konten.find((k) => k.email === mail) ?? null;
+
+    // Bei falscher Adresse dieselbe Meldung wie bei falschem Passwort - sonst
+    // ließe sich herausfinden, welche Adressen registriert sind.
+    const stimmt = konto !== null &&
+      (konto.hash === null || konto.hash === await passwortHash(pw, konto.salz));
+    if (!stimmt) {
+      fehler = { "an-pw": "E-Mail-Adresse oder Passwort ist falsch." };
+      ansicht.daten = { ...ansicht.daten, mail };
+      zeichne();
+      return;
+    }
+
+    db.sitzung = konto.id;
+    speichere();
+    ansicht = startAnsicht();
+    zeichne();
+  },
+
+  abmelden() {
+    db.sitzung = null;
+    speichere();
+    gehe("willkommen");
+  },
+
+  alleDatenLoeschen() {
+    if (!window.confirm("Alle Konten, Anfragen und Aufträge auf diesem Gerät löschen? Das lässt sich nicht rückgängig machen.")) return;
+    db = leereDaten();
+    try { window.localStorage.removeItem(SPEICHER); } catch { /* nichts zu löschen */ }
+    gehe("willkommen");
+  },
+
+  kategorie(wert) {
+    gehe("anfrageNeu", null, { kategorie: wert });
+  },
+
+  dringlichkeit(w) {
+    ansicht.daten = {
+      ...ansicht.daten, dringlichkeit: w,
+      text: wert("neu-text"), ort: wert("neu-ort")
+    };
+    zeichne();
+  },
+
+  anfrageAbsenden() {
+    const text = wert("neu-text").trim();
+    const ort = wert("neu-ort").trim();
+    if (text.length < 10) {
+      fehler = { "neu-text": "Bitte beschreibe dein Anliegen in mindestens 10 Zeichen." };
+      ansicht.daten = { ...ansicht.daten, text, ort };
+      zeichne();
+      return;
+    }
+    const anfrage = anfrageAnlegen(text, ort, ansicht.daten.dringlichkeit ?? "NORMAL");
+    aktionen.analyse(null, anfrage.id);
+  },
+
+  analyse(_wert, id) {
+    const anfrage = anfrageVon(id);
+    if (anfrage === null) return;
+
+    gehe("analysiert", anfrage.id);
+    const schritte = viewport.querySelectorAll(".jf-thinking__step");
+    const sparsam = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const takt = sparsam ? 60 : 420;
+    schritte.forEach((s, i) => window.setTimeout(() => s.classList.add("is-on"), takt * (i + 1)));
+
+    window.setTimeout(() => {
+      analyseDurchfuehren(anfrage);
+      gehe("rueckfragen", anfrage.id);
+    }, takt * 3 + (sparsam ? 40 : 380));
+  },
+
+  antwortenSenden(_wert, id) {
+    const anfrage = anfrageVon(id);
+    if (anfrage === null) return;
+    let anzahl = 0;
+    viewport.querySelectorAll("[data-frage]").forEach((feldEl) => {
+      const antwort = feldEl.value.trim();
+      if (antwort !== "") {
+        anfrage.antworten[feldEl.getAttribute("data-frage")] = antwort;
+        anzahl += 1;
+      }
+    });
+    if (anzahl === 0) { hinweis("Beantworte mindestens eine Frage oder mach später weiter."); return; }
+    if (anfrage.status === "ANALYSE") anfrage.status = "OFFEN";
+    speichere();
+    gehe("anfrage", anfrage.id);
+  },
+
+  vermitteln(_wert, id) {
+    const anfrage = anfrageVon(id);
+    if (anfrage === null) return;
+    const treffer = vermitteln(anfrage);
+    gehe("anfrage", anfrage.id);
+    hinweis(treffer.length === 0
+      ? "In dieser Kategorie ist noch kein Betrieb registriert."
+      : treffer.length + (treffer.length === 1 ? " passender Betrieb gefunden." : " passende Betriebe gefunden."));
+  },
+
+  angeboteEinholen(_wert, id) {
+    const anfrage = anfrageVon(id);
+    if (anfrage === null) return;
+    const anzahl = angeboteEinholen(anfrage);
+    gehe("anfrage", anfrage.id);
+    hinweis(anzahl === 0
+      ? "Deine Anfrage ist unterwegs. Die Betriebe melden sich."
+      : anzahl + (anzahl === 1 ? " Angebot erhalten." : " Angebote erhalten."));
+  },
+
+  angebotAnnehmen(_wert, id) {
+    const angebot = angebotVon(id);
+    if (angebot === null || angebot.status !== "OFFEN") return;
+    angebotAnnehmen(angebot);
+    gehe("termin", angebot.id);
+    hinweis("Angebot angenommen. Jetzt fehlt nur noch der Termin.");
+  },
+
+  angebotAblehnen(_wert, id) {
+    const angebot = angebotVon(id);
+    if (angebot === null) return;
+    angebot.status = "ABGELEHNT";
+    speichere();
+    gehe("anfrage", angebot.anfrageId);
+  },
+
+  terminTag(w) { ansicht.daten = { ...ansicht.daten, tag: w, fenster: null }; zeichne(); },
+  terminFenster(w) { ansicht.daten = { ...ansicht.daten, fenster: w }; zeichne(); },
+
+  terminBestaetigen(_wert, id) {
+    const start = ansicht.daten.fenster;
+    if (start === undefined || start === null) return;
+    const ende = new Date(new Date(start).getTime() + 36e5).toISOString();
+    terminBuchen(id, start, ende);
+    const auftrag = auftragZuAngebot(id);
+    gehe("auftrag", auftrag?.id ?? null);
+    hinweis("Termin bestätigt.");
+  },
+
+  auftragStatus(w, id) {
+    const auftrag = auftragVon(id);
+    if (auftrag === null) return;
+    if (!auftragStatusSetzen(auftrag, w)) { hinweis("Dieser Wechsel ist nicht vorgesehen."); return; }
+    zeichne();
+    hinweis(w === "ABGESCHLOSSEN" ? "Auftrag abgeschlossen. Der Kunde kann jetzt bewerten." : "Auftrag begonnen.");
+  },
+
+  sterne(w) { ansicht.daten = { ...ansicht.daten, sterne: Number(w) }; zeichne(); },
+
+  bewertungSenden(_wert, id) {
+    const auftrag = auftragVon(id);
+    const sterne = ansicht.daten.sterne ?? 0;
+    if (auftrag === null || sterne === 0) return;
+    bewerten(auftrag, sterne, wert("bew-text"));
+    gehe("auftrag", auftrag.id);
+    hinweis("Danke für deine Bewertung.");
+  },
+
+  gespraech(_wert, id, zusatz) {
+    gehe("gespraech", null, { anfrageId: id, betriebId: zusatz });
+  },
+
+  nachrichtSenden() {
+    const text = wert("nachricht").trim();
+    if (text === "") return;
+    const { anfrageId, betriebId, kiEntwurf } = ansicht.daten;
+    nachrichtSenden(anfrageId, betriebId, text, kiEntwurf === text);
+    ansicht.daten = { anfrageId, betriebId, entwurf: "" };
+    zeichne();
+  },
+
+  antwortVorschlag() {
+    const text = "Guten Tag, vielen Dank für Ihre Nachricht. Wir könnten am Dienstag um 16 Uhr vorbeikommen.";
+    ansicht.daten = { ...ansicht.daten, entwurf: text, kiEntwurf: text };
+    zeichne();
+    hinweis("Vorschlag eingefügt. Du kannst ihn ändern, bevor du sendest.");
+  },
+
+  anfrageAblehnen(_wert, id) {
+    const anfrage = anfrageVon(id);
+    const betrieb = eigenerBetrieb();
+    if (anfrage === null || betrieb === null) return;
+    anfrage.vermittelt = anfrage.vermittelt.filter((v) => v.betriebId !== betrieb.id);
+    speichere();
+    gehe("betriebAnfragen");
+    hinweis("Anfrage abgelehnt. Sie wird dir nicht erneut vorgeschlagen.");
+  },
+
+  angebotstextVorschlag(_wert, id) {
+    const anfrage = anfrageVon(id);
+    const zusammenfassung = anfrage?.analyse?.zusammenfassung ?? "das beschriebene Anliegen";
+    ansicht.daten = {
+      ...ansicht.daten,
+      arbeit: wert("ang-arbeit"), material: wert("ang-material"), anfahrt: wert("ang-anfahrt"),
+      text: "Vielen Dank für Ihre Anfrage. Wir kümmern uns um folgendes Anliegen: " + zusammenfassung +
+        " Das Angebot umfasst Anfahrt, Arbeitszeit und das benötigte Material. Sollte sich vor Ort " +
+        "ein größerer Aufwand zeigen, stimmen wir uns vorher mit Ihnen ab.",
+      kiUnterstuetzt: true
+    };
+    zeichne();
+    hinweis("Vorschlag eingefügt. Preis und Inhalt bleiben deine Entscheidung.");
+  },
+
+  angebotSenden(_wert, id) {
+    const anfrage = anfrageVon(id);
+    const betrieb = eigenerBetrieb();
+    if (anfrage === null || betrieb === null) return;
+
+    const arbeit = zuCent(wert("ang-arbeit"));
+    const material = zuCent(wert("ang-material"));
+    const anfahrt = zuCent(wert("ang-anfahrt"));
+    const text = wert("ang-text").trim();
+
+    fehler = {};
+    if (arbeit + material + anfahrt <= 0) fehler["ang-arbeit"] = "Das Angebot braucht einen Betrag größer als 0.";
+    if (text.length < 10) fehler["ang-text"] = "Bitte beschreibe in einem Satz, was enthalten ist.";
+    if (Object.keys(fehler).length > 0) {
+      ansicht.daten = { ...ansicht.daten, arbeit: wert("ang-arbeit"), material: wert("ang-material"),
+        anfahrt: wert("ang-anfahrt"), text };
+      zeichne();
+      return;
+    }
+
+    db.angebote.push({
+      id: neueId("ang"), anfrageId: anfrage.id, betriebId: betrieb.id,
+      arbeitCent: arbeit, materialCent: material, anfahrtCent: anfahrt,
+      beschreibung: text,
+      kiUnterstuetzt: ansicht.daten.kiUnterstuetzt === true,
+      status: "OFFEN",
+      gueltigBis: new Date(Date.now() + 7 * 864e5).toISOString(),
+      erstelltAm: new Date().toISOString()
+    });
+    if (!["ANGENOMMEN", "ABGESCHLOSSEN"].includes(anfrage.status)) anfrage.status = "ANGEBOTE";
+    speichere();
+    gehe("dashboard");
+    hinweis("Angebot gesendet. Der Kunde sieht es sofort.");
+  },
+
+  leistung(w) {
+    const betrieb = eigenerBetrieb();
+    if (betrieb === null) return;
+    betrieb.leistungen = betrieb.leistungen.includes(w)
+      ? betrieb.leistungen.filter((l) => l !== w)
+      : [...betrieb.leistungen, w];
+    speichere();
+    zeichne();
+  },
+
+  wochentag(w) {
+    const betrieb = eigenerBetrieb();
+    if (betrieb === null) return;
+    const zeile = betrieb.zeiten[Number(w)];
+    if (zeile !== undefined) zeile.aktiv = !zeile.aktiv;
+    speichere();
+    zeichne();
+  },
+
+  betriebSpeichern() {
+    const betrieb = eigenerBetrieb();
+    if (betrieb === null) return;
+    const radius = Number(wert("bp-radius").replace(",", "."));
+    betrieb.beschreibung = wert("bp-beschreibung").trim() || null;
+    betrieb.ort = wert("bp-ort").trim();
+    betrieb.radiusKm = Number.isFinite(radius) && radius >= 1 ? Math.round(radius) : 30;
+    speichere();
+    zeichne();
+    hinweis("Profil gespeichert.");
+  }
+};
+
+/* ==========================================================================
+   10. Ereignisse
+   ========================================================================== */
+
+document.addEventListener("click", (ereignis) => {
+  const zurueck = ereignis.target.closest("[data-zurueck]");
+  if (zurueck !== null) {
+    const ziel = zurueck.getAttribute("data-zurueck");
+    // Bei Detailansichten die Kennung mitnehmen, damit man dort landet, wo
+    // man hergekommen ist.
+    gehe(ziel, ["anfrage", "betriebAnfrage", "auftrag"].includes(ziel) ? ansicht.id : null);
+    return;
+  }
+
+  const knopf = ereignis.target.closest("[data-tu]");
+  if (knopf === null) return;
+  const name = knopf.getAttribute("data-tu");
+  const behandlung = aktionen[name];
+  if (behandlung === undefined) return;
+
+  meldung = null;
+  window.clearTimeout(meldungTimer);
+  void behandlung(
+    knopf.getAttribute("data-wert"),
+    knopf.getAttribute("data-id"),
+    knopf.getAttribute("data-zusatz")
+  );
+});
+
+/* Eingaben zwischenspeichern, damit ein Neuzeichnen sie nicht verwirft. */
+document.addEventListener("input", (ereignis) => {
+  const el = ereignis.target;
+  if (el.id === "nachricht") ansicht.daten = { ...ansicht.daten, entwurf: el.value };
+});
+
+/* Mit der Eingabetaste absenden - in Formularen erwartet man das. */
+document.addEventListener("keydown", (ereignis) => {
+  if (ereignis.key !== "Enter" || ereignis.target.tagName !== "INPUT") return;
+  const id = ereignis.target.id;
+  const ziel = { "an-pw": "anmelden", "an-mail": "anmelden", "reg-pw": "registrieren", "nachricht": "nachrichtSenden" }[id];
+  if (ziel !== undefined) {
+    ereignis.preventDefault();
+    void aktionen[ziel]();
+  }
+});
+
+/* ==========================================================================
+   11. Start
+   ========================================================================== */
+
+db = ladeDaten();
+ansicht = startAnsicht();
+zeichne();
+</script>

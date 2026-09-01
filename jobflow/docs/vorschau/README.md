@@ -3,10 +3,28 @@
 Zwei Dateien, die beide ohne Server und ohne Installation funktionieren —
 einfach im Browser öffnen.
 
-| Datei | Was sie zeigt |
+| Datei | Was sie ist |
 |---|---|
-| `jobflow-vorschau.html` | Die App klickbar, Kunden- und Unternehmensseite |
-| `jobflow-quellcode.html` | Den gesamten Quellcode zum Durchblättern |
+| `jobflow-app.html` | **Die App selbst.** Ohne Demo-Beiwerk, mit gespeicherten Daten |
+| `jobflow-vorschau.html` | Die Vorschau mit Werkbank: Screen-Liste und API-Protokoll daneben |
+| `jobflow-quellcode.html` | Der gesamte Quellcode zum Durchblättern |
+
+## Der Unterschied zwischen App und Vorschau
+
+`jobflow-app.html` ist die Fassung zum Veröffentlichen: Vollbild, keine
+Steuerleiste, keine Rollen-Umschaltung, kein Zurücksetzen-Knopf. Man legt ein
+Konto an — als Kunde **oder** als Betrieb — und wechselt die Seite durch Ab- und
+Anmelden, genau wie im echten Produkt. Konten, Anfragen und Aufträge bleiben im
+Browser gespeichert.
+
+Legt man beide Konten auf demselben Gerät an, läuft der komplette Kreislauf
+durch: Der Kunde stellt eine Anfrage, der eigene Betrieb erscheint im Matching,
+schreibt ein Angebot, der Kunde nimmt an, der Betrieb meldet den Auftrag als
+erledigt, der Kunde bewertet.
+
+`jobflow-vorschau.html` bleibt daneben bestehen: sie zeigt zu jedem Schritt den
+API-Aufruf, den das Backend an dieser Stelle bekäme, und ist zum Erklären
+gedacht, nicht zum Benutzen.
 
 `jobflow-quellcode.html` ist eine **Momentaufnahme** des Codes zum Zeitpunkt
 des jeweiligen Commits: 150 Dateien, nach Architektur-Bereichen gruppiert, mit
