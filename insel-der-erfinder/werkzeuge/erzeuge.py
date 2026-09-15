@@ -150,10 +150,26 @@ def panel(x, y, w, h, titel, zeilen, kopffarbe="#3b3128"):
 
 PLAN_S = 84.0            # Hex-Radius in SVG-Einheiten
 PLAN_LUFT = 3.0          # Fuge zwischen den Feldern
-PLAN_W, PLAN_H = 1180, 858
-PLAN_BREITE_MM = 272.0   # so breit wird der Plan auf A4 quer gedruckt
-MM_JE_EINHEIT = PLAN_BREITE_MM / PLAN_W
-HEX_S_MM = (PLAN_S - PLAN_LUFT) * MM_JE_EINHEIT   # Radius der Insel-Plättchen
+PLAN_W, PLAN_H = 1180, 874
+
+# Der große Plan: zwei A4-Hochformatseiten, die zusammengeklebt A3 ergeben.
+GROSS_HOEHE_MM = 283.0
+GROSS_BREITE_MM = GROSS_HOEHE_MM * PLAN_W / PLAN_H
+HALB_MM = GROSS_BREITE_MM / 2.0
+# Der kleine Plan: eine einzelne A4-Querseite.
+KLEIN_BREITE_MM = 267.0
+KLEIN_ANTEIL = KLEIN_BREITE_MM / GROSS_BREITE_MM
+# Insel-Plättchen passen zum großen Plan.
+HEX_S_MM = (PLAN_S - PLAN_LUFT) * GROSS_BREITE_MM / PLAN_W
+
+# Erdtöne. Der Plan kommt mit fünf Farben aus, alles andere macht die Helligkeit.
+GRUND   = "#c9b998"      # Tischfläche rund um die Insel
+STRAND  = "#e6d9bc"
+INSEL   = "#f3ead7"
+TINTE   = "#4a3b2a"
+TINTE_2 = "#7a6a52"
+LINIE   = "#a8977a"
+PAPIER  = "#fdfaf2"
 
 
 def spielplan_svg():
@@ -161,38 +177,17 @@ def spielplan_svg():
     OX, OY = 590.0, 400.0
     W, H = PLAN_W, PLAN_H
     o = ['<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 %d %d" '
-         'width="100%%" font-family="Segoe UI, Helvetica Neue, Arial, sans-serif">' % (W, H)]
+         'font-family="Segoe UI, Helvetica Neue, Arial, sans-serif">' % (W, H)]
 
-    # --- Meer
-    o.append('<defs>'
-             '<radialGradient id="meer" cx="50%" cy="45%" r="75%">'
-             '<stop offset="0%" stop-color="#8fc6e0"/><stop offset="100%" stop-color="#4a92bb"/>'
-             '</radialGradient>'
-             '<radialGradient id="sand" cx="50%" cy="45%" r="70%">'
-             '<stop offset="0%" stop-color="#f3e6c8"/><stop offset="100%" stop-color="#e2cfa4"/>'
-             '</radialGradient>'
-             '<filter id="schatten" x="-20%" y="-20%" width="140%" height="140%">'
-             '<feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#000" flood-opacity="0.22"/>'
-             '</filter></defs>')
-    o.append('<rect x="0" y="0" width="%d" height="%d" rx="18" fill="url(#meer)"/>' % (W, H))
+    o.append('<rect x="0" y="0" width="%d" height="%d" fill="%s"/>' % (W, H, GRUND))
+    o.append('<rect x="6" y="6" width="%d" height="%d" rx="10" fill="none" stroke="%s" '
+             'stroke-width="3"/>' % (W - 12, H - 12, TINTE_2))
 
-    # Wellen
-    rnd = random.Random(7)
-    for _ in range(46):
-        wx, wy = rnd.uniform(20, W - 60), rnd.uniform(20, H - 20)
-        if (wx - OX) ** 2 / 430.0 ** 2 + (wy - OY) ** 2 / 400.0 ** 2 < 1.15:
-            continue
-        o.append('<path d="M %.0f %.0f q 9 -6 18 0 q 9 6 18 0" stroke="#ffffff" '
-                 'stroke-opacity="0.34" stroke-width="2.6" fill="none" stroke-linecap="round"/>' % (wx, wy))
+    # Insel: zwei ruhige Umrisse, kein Farbverlauf
+    o.append('<path d="%s" fill="%s"/>' % (blob_pfad(OX, OY, 420, 392, 15, 0.055, 11), STRAND))
+    o.append('<path d="%s" fill="%s" stroke="%s" stroke-width="2.5"/>'
+             % (blob_pfad(OX, OY, 400, 372, 15, 0.05, 11), INSEL, LINIE))
 
-    # --- Insel (Strand + Land)
-    o.append('<path d="%s" fill="#f7eed8" opacity="0.85"/>'
-             % blob_pfad(OX, OY, 420, 392, 15, 0.055, 11))
-    o.append('<path d="%s" fill="url(#sand)" stroke="#cbb789" stroke-width="3"/>'
-             % blob_pfad(OX, OY, 400, 372, 15, 0.05, 11))
-
-    # --- Felder
-    sp_nach_index = {s["key"]: s for s in D.SPIELERFARBEN}
     for f in D.FELDER:
         g = D.GELAENDE[f["typ"]]
         cx, cy = hex_mitte(f["q"], f["r"], S, OX, OY)
@@ -202,44 +197,35 @@ def spielplan_svg():
             fuell, rand = sp["hell"], sp["farbe"]
         else:
             fuell, rand = g["fuell"], g["rand"]
-        o.append('<polygon points="%s" fill="%s" stroke="%s" stroke-width="4" '
-                 'stroke-linejoin="round" filter="url(#schatten)"/>'
-                 % (hex_punkte(cx, cy, S - PLAN_LUFT), fuell, rand))
-        # Emoji
-        o.append('<text x="%.0f" y="%.0f" font-size="40" text-anchor="middle">%s</text>'
-                 % (cx, cy - 6, g["emoji"]))
-        # Name
+        o.append('<polygon points="%s" fill="%s" stroke="%s" stroke-width="%s" '
+                 'stroke-linejoin="round"/>' % (hex_punkte(cx, cy, S - PLAN_LUFT), fuell, rand,
+                                                "5" if ist_werkstatt else "3.5"))
+        o.append('<text x="%.0f" y="%.0f" font-size="42" text-anchor="middle">%s</text>'
+                 % (cx, cy - 4, g["emoji"]))
         name = (sp["name"].upper() if ist_werkstatt else g["name"].upper())
-        o.append('<text x="%.0f" y="%.0f" font-size="13" font-weight="800" text-anchor="middle" '
-                 'fill="%s" letter-spacing="0.8">%s</text>' % (cx, cy + 20, rand, html.escape(name)))
+        o.append('<text x="%.0f" y="%.0f" font-size="14" font-weight="800" text-anchor="middle" '
+                 'fill="%s" letter-spacing="1">%s</text>' % (cx, cy + 22, rand, html.escape(name)))
         if ist_werkstatt:
-            o.append('<text x="%.0f" y="%.0f" font-size="10.5" font-weight="700" text-anchor="middle" '
-                     'fill="#6f6556">WERKSTATT</text>' % (cx, cy + 36))
+            o.append('<text x="%.0f" y="%.0f" font-size="11" font-weight="700" text-anchor="middle" '
+                     'fill="%s" letter-spacing="0.6">WERKSTATT</text>' % (cx, cy + 38, TINTE_2))
         elif g["gibt"]:
-            res = D.RESSOURCEN[g["gibt"]]
-            o.append('<g><rect x="%.0f" y="%.0f" width="58" height="22" rx="11" fill="#ffffffcc" '
-                     'stroke="%s" stroke-width="1.6"/>' % (cx - 29, cy + 26, res["farbe"]))
-            o.append('<text x="%.0f" y="%.0f" font-size="13" text-anchor="middle" '
-                     'font-weight="700" fill="%s">%s +1</text></g>'
-                     % (cx, cy + 42, res["farbe"], res["emoji"]))
+            r = D.RESSOURCEN[g["gibt"]]
+            o.append('<text x="%.0f" y="%.0f" font-size="15" font-weight="700" text-anchor="middle" '
+                     'fill="%s">%s +1</text>' % (cx, cy + 41, TINTE_2, r["emoji"]))
         if f.get("fundkarten"):
-            n = f["fundkarten"]
-            o.append('<g><circle cx="%.0f" cy="%.0f" r="17" fill="#fff" stroke="%s" '
-                     'stroke-width="2.6" stroke-dasharray="4 3"/>' % (cx, cy + 40, g["rand"]))
+            o.append('<circle cx="%.0f" cy="%.0f" r="17" fill="%s" stroke="%s" '
+                     'stroke-width="2.4" stroke-dasharray="5 3.5"/>' % (cx, cy + 40, PAPIER, rand))
             o.append('<text x="%.0f" y="%.0f" font-size="17" font-weight="800" text-anchor="middle" '
-                     'fill="%s">%d</text></g>' % (cx, cy + 46, g["rand"], n))
+                     'fill="%s">%d</text>' % (cx, cy + 46, rand, f["fundkarten"]))
         if f["typ"] == "brachland":
-            o.append('<text x="%.0f" y="%.0f" font-size="10.5" font-weight="700" text-anchor="middle" '
-                     'fill="#a2957c">wartet auf</text>' % (cx, cy + 34))
-            o.append('<text x="%.0f" y="%.0f" font-size="10.5" font-weight="700" text-anchor="middle" '
-                     'fill="#a2957c">eine Inselkarte</text>' % (cx, cy + 46))
+            for i, t in enumerate(("wartet auf", "eine Inselkarte")):
+                o.append('<text x="%.0f" y="%.0f" font-size="11" font-weight="700" '
+                         'text-anchor="middle" fill="%s">%s</text>' % (cx, cy + 36 + i * 13, LINIE, t))
 
-    # --- Titel
-    o.append('<text x="%d" y="40" font-size="32" font-weight="800" text-anchor="middle" '
-             'fill="#ffffff" letter-spacing="3" opacity="0.95">🏝️ INSEL DER ERFINDER</text>' % (W / 2))
+    o.append('<text x="%d" y="42" font-size="34" font-weight="800" text-anchor="middle" '
+             'fill="%s" letter-spacing="4">INSEL DER ERFINDER</text>' % (W / 2, TINTE))
 
-    # --- Legende links
-    o.append(panel(14, 62, 206, 372, "GELÄNDE", [
+    o.append(panel(14, 66, 206, 366, "GELÄNDE", [
         ("🌲", "Wald", "gibt 🪵 Holz"),
         ("⛏️", "Mine", "gibt ⚙️ Metall"),
         ("🌊", "Küste", "gibt 💧 Wasser"),
@@ -248,59 +234,55 @@ def spielplan_svg():
         ("🏛️", "Ruine", "untersuchen: 💎 & mehr"),
         ("🏭", "Werkstatt", "hier baust du"),
         ("🏜️", "Brachland", "noch nichts"),
-    ], "#4a7a3c"))
+    ]))
 
-    # --- Aktionen rechts
-    o.append(panel(960, 62, 206, 372, "DEINE 3 AP", [
+    o.append(panel(960, 66, 206, 366, "DEINE 3 AP", [
         ("🚶", "Bewegen — 1 AP", "1 Feld weit"),
         ("🪵", "Sammeln — 1 AP", "1 Rohstoff des Feldes"),
         ("🔍", "Untersuchen — 1 AP", "nur Ruine mit Marke"),
         ("🔧", "Bauen — 2 AP", "nur eigene Werkstatt"),
         ("🤝", "Handeln — 1 AP", "Nachbar oder gleiches Feld"),
         ("⚖️", "Tauschbank — 1 AP", "3 gleiche → 1 beliebige"),
-    ], "#8a5a20"))
+    ]))
 
-    # --- Rundenleiste unten
     rx0, ry0 = 236, 768
-    o.append('<rect x="%d" y="%d" width="708" height="60" rx="30" fill="#fffdf6" '
-             'stroke="#b9ae99" stroke-width="2.5"/>' % (rx0, ry0))
-    o.append('<text x="%d" y="%d" font-size="12.5" font-weight="800" fill="#6f6556" '
-             'letter-spacing="1">RUNDE</text>' % (rx0 + 20, ry0 + 37))
+    o.append('<rect x="%d" y="%d" width="708" height="60" rx="30" fill="%s" stroke="%s" '
+             'stroke-width="2.5"/>' % (rx0, ry0, PAPIER, LINIE))
+    o.append('<text x="%d" y="%d" font-size="13" font-weight="800" fill="%s" '
+             'letter-spacing="1.5">RUNDE</text>' % (rx0 + 20, ry0 + 37, TINTE_2))
     for i in range(1, D.RUNDEN + 1):
         cx = rx0 + 96 + (i - 1) * 78
         insel = i in (2, 4, 6)
-        o.append('<circle cx="%d" cy="%d" r="23" fill="%s" stroke="%s" stroke-width="3"/>'
-                 % (cx, ry0 + 30, "#f0e4c4" if insel else "#ffffff", "#c79a1e" if insel else "#b9ae99"))
-        o.append('<text x="%d" y="%d" font-size="19" font-weight="800" text-anchor="middle" '
-                 'fill="#3b3128">%d</text>' % (cx, ry0 + 37, i))
+        o.append('<circle cx="%d" cy="%d" r="23" fill="%s" stroke="%s" stroke-width="%s"/>'
+                 % (cx, ry0 + 30, STRAND if insel else PAPIER, TINTE if insel else LINIE,
+                    "3.5" if insel else "2.5"))
+        o.append('<text x="%d" y="%d" font-size="20" font-weight="800" text-anchor="middle" '
+                 'fill="%s">%d</text>' % (cx, ry0 + 37, TINTE, i))
         if insel:
-            o.append('<text x="%d" y="%d" font-size="15" text-anchor="middle">⭐</text>' % (cx, ry0 + 4))
-    o.append('<text x="%d" y="%d" font-size="12" fill="#ffffff" fill-opacity="0.9" '
-             'text-anchor="middle">⭐ Nach dieser Runde wird eine Inselkarte aufgedeckt – '
-             'die Insel verändert sich für immer.</text>' % (W / 2, ry0 + 82))
+            o.append('<text x="%d" y="%d" font-size="15" text-anchor="middle">⭐</text>'
+                     % (cx, ry0 + 4))
+    o.append('<text x="%d" y="%d" font-size="13" fill="%s" text-anchor="middle">'
+             '⭐ Nach dieser Runde wird eine Inselkarte aufgedeckt – '
+             'die Insel verändert sich für immer.</text>' % (W / 2, ry0 + 82, TINTE))
 
-    # --- Fundkarten-Ablage (Ecke unten links)
-    o.append('<g><rect x="20" y="622" width="196" height="120" rx="14" fill="#fffdf6" '
-             'stroke="#7a5fae" stroke-width="2.5" stroke-dasharray="7 5"/>'
-             '<text x="118" y="654" font-size="14" font-weight="800" fill="#7a5fae" '
-             'text-anchor="middle" letter-spacing="1">FUNDKARTEN</text>'
-             '<text x="118" y="678" font-size="11.5" fill="#6f6556" text-anchor="middle">'
-             'Stapel hier daneben ablegen</text>'
-             '<text x="118" y="700" font-size="11.5" fill="#6f6556" text-anchor="middle">'
-             'Die Zahl im Kreis auf einer</text>'
-             '<text x="118" y="716" font-size="11.5" fill="#6f6556" text-anchor="middle">'
-             'Ruine sagt, wie viele</text>'
-             '<text x="118" y="732" font-size="11.5" fill="#6f6556" text-anchor="middle">'
-             'Fundmarken dort starten.</text></g>')
+    o.append('<g><rect x="20" y="622" width="196" height="120" rx="10" fill="%s" '
+             'stroke="%s" stroke-width="2.5" stroke-dasharray="7 5"/>' % (PAPIER, TINTE_2))
+    o.append('<text x="118" y="654" font-size="14" font-weight="800" fill="%s" '
+             'text-anchor="middle" letter-spacing="1.2">FUNDKARTEN</text>' % TINTE)
+    for i, t in enumerate(["Stapel hier daneben ablegen.", "Die Zahl im Kreis auf einer",
+                           "Ruine sagt, wie viele", "Fundmarken dort starten."]):
+        o.append('<text x="118" y="%d" font-size="11.5" fill="%s" text-anchor="middle">%s</text>'
+                 % (678 + i * 16, TINTE_2, t))
+    o.append('</g>')
 
-    # --- Wertung (Ecke unten rechts)
-    o.append('<g><rect x="964" y="622" width="202" height="120" rx="14" fill="#fffdf6" '
-             'stroke="#b9ae99" stroke-width="2.5"/>'
-             '<text x="1065" y="650" font-size="13.5" font-weight="800" fill="#3b3128" '
-             'text-anchor="middle" letter-spacing="1">WERTUNG</text>')
+    o.append('<g><rect x="964" y="622" width="202" height="120" rx="10" fill="%s" '
+             'stroke="%s" stroke-width="2.5"/>' % (PAPIER, LINIE))
+    o.append('<text x="1065" y="650" font-size="14" font-weight="800" fill="%s" '
+             'text-anchor="middle" letter-spacing="1.2">WERTUNG</text>' % TINTE)
     for i, t in enumerate(["🔧 Erfindungen = Kartenwert", "💎 Bauteil = 2 Punkte",
                            "🎯 Auftrag + ⭐ Bonusziel", "📦 3 Rohstoffe = 1 Punkt"]):
-        o.append('<text x="976" y="%d" font-size="11.5" fill="#4a4136">%s</text>' % (674 + i * 19, t))
+        o.append('<text x="976" y="%d" font-size="11.5" fill="%s">%s</text>'
+                 % (674 + i * 19, TINTE_2, t))
     o.append('</g>')
 
     o.append('</svg>')
@@ -308,20 +290,61 @@ def spielplan_svg():
 
 
 def bau_spielplan():
-    css = ("@page { size: A4 landscape; margin: 6mm; }\n"
-           ".plan { width: %.0fmm; margin: 0 auto; }\n"
-           ".plan svg { display: block; width: 100%%; height: auto; }\n"
-           "@media print { .plan { page-break-inside: avoid; } }\n" % PLAN_BREITE_MM)
+    plan = spielplan_svg()
+
+    # --- Große Fassung: zwei A4-Hochformatseiten zum Zusammenkleben
+    css = ("@page { size: A4 portrait; margin: 7mm; }\n"
+           ".halb { width: %.2fmm; height: %.2fmm; overflow: hidden; position: relative;\n"
+           "        margin: 0 auto; background: %s; }\n"
+           ".halb .inhalt { position: absolute; top: 0; width: %.2fmm; height: %.2fmm; }\n"
+           ".halb.links .inhalt { left: 0; }\n"
+           ".halb.rechts .inhalt { left: -%.2fmm; }\n"
+           ".halb svg { display: block; width: 100%%; height: 100%%; }\n"
+           ".marke { position: absolute; font: 700 7pt/1 Arial, sans-serif; color: %s;\n"
+           "         letter-spacing: 0.5pt; white-space: nowrap; }\n"
+           ".marke.oben { top: 1.5mm; }\n"
+           ".marke.unten { bottom: 1.5mm; }\n"
+           ".links .marke { right: 1.5mm; }\n"
+           ".rechts .marke { left: 1.5mm; }\n"
+           % (HALB_MM, GROSS_HOEHE_MM, GRUND, GROSS_BREITE_MM, GROSS_HOEHE_MM,
+              HALB_MM, TINTE))
+    haelften = []
+    for seite_name, klasse, pfeil in (("Linke Hälfte", "links", "▶"), ("Rechte Hälfte", "rechts", "◀")):
+        haelften.append(
+            '<div class="bogen halb %s"><div class="inhalt">%s</div>'
+            '<span class="marke oben">%s KLEBEKANTE</span>'
+            '<span class="marke unten">%s KLEBEKANTE</span></div>'
+            % (klasse, plan, pfeil, pfeil))
     hinweis = (DRUCK_HINWEIS +
-               "<p><strong>Tipp:</strong> Der Plan ist für <strong>A4 quer</strong> gemacht. "
-               "Noch schöner wird er auf <strong>A3</strong> – dann im Druckdialog auf "
-               "<strong>141&nbsp;%</strong> vergrößern. Wichtig: Die Datei "
-               "<em>insel-plaettchen.html</em> dann <strong>genauso</strong> vergrößern, "
-               "damit die Plättchen auf die Felder passen.</p>"
-               "<p>Am haltbarsten wird er, wenn du ihn auf feste Pappe klebst oder "
-               "im Copyshop laminieren lässt.</p>")
-    koerper = '<div class="plan">%s</div>' % spielplan_svg()
-    schreibe("spielplan.html", seite("Spielplan – Insel der Erfinder", css, koerper, hinweis))
+               "<p><strong>Dieser Plan besteht aus zwei A4-Seiten</strong>, die zusammen so groß "
+               "werden wie ein A3-Bogen – etwa <strong>39 × 28 cm</strong>. Jedes Feld misst dann "
+               "knapp <strong>4,8 cm</strong>, da haben Figur und Marker bequem Platz.</p>"
+               "<p><strong>Zusammenkleben:</strong> Beide Seiten drucken. Bei einer Seite den "
+               "weißen Rand an der Kante mit der Aufschrift „KLEBEKANTE\" abschneiden. Dann die "
+               "beiden Hälften bündig aneinanderlegen – der Rahmen und die Rundenleiste müssen "
+               "durchlaufen – und auf der <strong>Rückseite</strong> mit Klebeband verbinden.</p>"
+               "<p>Wenn du einen A3-Drucker oder einen Copyshop in der Nähe hast: "
+               "Dort passt der Plan auf ein einziges Blatt.</p>"
+               "<p><strong>Lieber kleiner?</strong> Dann nimm <em>spielplan-klein.html</em> – "
+               "der passt auf eine einzige A4-Seite quer.</p>")
+    schreibe("spielplan.html", seite("Spielplan – Insel der Erfinder", css,
+                                     "\n".join(haelften), hinweis))
+
+    # --- Kleine Fassung: eine A4-Querseite
+    css_klein = ("@page { size: A4 landscape; margin: 6mm; }\n"
+                 ".plan { width: %.0fmm; margin: 0 auto; }\n"
+                 ".plan svg { display: block; width: 100%%; height: auto; }\n"
+                 % KLEIN_BREITE_MM)
+    hinweis_klein = (DRUCK_HINWEIS +
+                     "<p>Die <strong>kleine Fassung</strong> auf einer A4-Querseite. "
+                     "Ein Feld misst hier gut <strong>3,2 cm</strong> – zum Ausprobieren gut, "
+                     "zum Spielen ist der große Plan angenehmer.</p>"
+                     "<p><strong>Achtung bei den Insel-Plättchen:</strong> Die sind für den "
+                     "<em>großen</em> Plan gemacht. Für diesen kleinen Plan musst du "
+                     "<em>insel-plaettchen.html</em> auf <strong>%d&nbsp;%%</strong> "
+                     "verkleinern.</p>" % round(KLEIN_ANTEIL * 100))
+    schreibe("spielplan-klein.html", seite("Spielplan klein – Insel der Erfinder", css_klein,
+                                           '<div class="plan">%s</div>' % plan, hinweis_klein))
 
 
 # ====================================================================== Karten

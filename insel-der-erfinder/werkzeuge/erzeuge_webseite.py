@@ -248,7 +248,7 @@ CHIPS = [("alle", "Alle"), ("stufe1", "Stufe I"), ("stufe2", "Stufe II"), ("stuf
          ("bonus", "Bonus"), ("fund", "Fund")]
 
 DATEIEN = [
-    ("spielplan.html", "Der Spielplan", "1 S. · A4 quer"),
+    ("spielplan.html", "Der Spielplan", "2 S. · zusammenkleben"),
     ("anleitung.html", "Anleitung mit Kartenanhang", "13 S."),
     ("erfindungskarten.html", "24 Erfindungen", "8 S."),
     ("fundkarten.html", "20 Fundkarten", "6 S."),
@@ -261,6 +261,7 @@ DATEIEN = [
     ("insel-plaettchen.html", "6 Insel-Plättchen", "1 S."),
     ("marker.html", "207 Marker", "2 S."),
     ("wertungsblock.html", "Wertungsblock", "2 S."),
+    ("spielplan-klein.html", "Kleiner Plan, eine Seite", "1 S. · optional"),
 ]
 
 AKTIONEN = [
@@ -360,8 +361,9 @@ def bau():
 <section>
   <span class="marke">Selber bauen</span>
   <h2>Was du ausdruckst</h2>
-  <p class="fuehrung">Alle Dateien liegen im Ordner <span class="mono">druckvorlagen/</span>.
-     Doppelklick öffnet sie im Browser, dann Strg&nbsp;+&nbsp;P (Mac: Cmd&nbsp;+&nbsp;P).</p>
+  <p class="fuehrung">Am einfachsten druckst du
+     <span class="mono">Insel-der-Erfinder-komplett.pdf</span> – da ist alles drin, 53 Seiten
+     mit Deckblatt und Bastelanleitung. Wer nur Einzelteile braucht, findet sie hier:</p>
   <table class="dateien">
     <thead><tr><th>Datei</th><th>Inhalt</th><th>Umfang</th></tr></thead>
     <tbody>__DATEIEN__</tbody>
@@ -370,6 +372,9 @@ def bau():
     <p><b>Zwei Einstellungen entscheiden alles:</b> Skalierung auf <b>100 %</b> stellen
        (nicht „An Seite anpassen") und <b>„Hintergrundgrafiken drucken"</b> anhaken.
        Sonst kommt der Plan zu klein und ohne Farbe aus dem Drucker.</p>
+    <p><b>Der Spielplan besteht aus zwei Seiten.</b> Bei einer Seite den weißen Rand an der
+       Kante mit der Aufschrift „KLEBEKANTE" abschneiden, beide Hälften bündig aneinanderlegen
+       und auf der Rückseite mit Klebeband verbinden. Zusammen sind sie etwa 38 × 28 cm groß.</p>
     <p><b>Für die erste Partie</b> reichen Spielplan, Anleitung, Erfindungskarten, Figuren
        und Tableaus. Als Rohstoffe nimmst du erst mal Bohnen, Perlen oder Lego-Steine.</p>
   </div>

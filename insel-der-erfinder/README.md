@@ -7,7 +7,23 @@ Spielfiguren, 86 Karten, Tableaus und Marker.
 
 ---
 
-## 🖨️ Schnellstart: Was drucke ich aus?
+## 📕 Der einfachste Weg: ein einziges PDF
+
+**[→ Insel-der-Erfinder-komplett.pdf](Insel-der-Erfinder-komplett.pdf)** –
+52 Seiten, alles drin, mit Deckblatt, Inhaltsverzeichnis und Bastelanleitung.
+Einmal ausdrucken und loslegen.
+
+Achte im Druckfenster nur auf zwei Dinge:
+
+> 1. Skalierung auf **100 %** bzw. „Tatsächliche Größe" – *nicht* „An Seite anpassen".
+> 2. **„Hintergrundgrafiken drucken"** anhaken, sonst fehlen alle Farben.
+
+Den Rest dieser Seite brauchst du nur, wenn du einzelne Teile nachdrucken
+oder selbst etwas am Spiel ändern willst.
+
+---
+
+## 🖨️ Einzeln drucken
 
 Alle Dateien liegen im Ordner **`druckvorlagen/`**. Du öffnest sie mit einem
 **Doppelklick** – sie gehen im Browser auf. Dann **Strg + P** (Mac: **Cmd + P**)
@@ -19,7 +35,7 @@ zum Drucken.
 
 | Reihenfolge | Datei | Seiten | Papier |
 |---|---|---|---|
-| 1 | `spielplan.html` | 1 (A4 **quer**) | so fest wie möglich |
+| 1 | `spielplan.html` | 2 (zusammenkleben) | so fest wie möglich |
 | 2 | `anleitung.html` | 13 | normal |
 | 3 | `erfindungskarten.html` | 8 | 200 g |
 | 4 | `fundkarten.html` | 6 | 200 g |
@@ -32,6 +48,7 @@ zum Drucken.
 | 11 | `insel-plaettchen.html` | 1 | 200 g |
 | 12 | `marker.html` | 2 | normal |
 | 13 | `wertungsblock.html` | 2 | normal |
+| – | `spielplan-klein.html` | 1 (A4 **quer**) | optional, kleine Fassung |
 
 **Es eilt?** Für eine erste Testpartie reichen `spielplan.html`,
 `anleitung.html`, `erfindungskarten.html`, `spielfiguren.html` und
@@ -46,11 +63,23 @@ es passt von allein, weil alle Rückseiten gleich aussehen. Kann er das nicht?
 Dann drucke einfach nur die ungeraden Seiten (1, 3, 5 …); auf festem Papier
 sieht man nichts durch.
 
-### Größer spielen (A3)
+### Der Spielplan besteht aus zwei Seiten
 
-Der Spielplan wird auf **A3** richtig schön. Dann im Druckfenster auf
-**141 %** stellen – und `insel-plaettchen.html` **genauso** auf 141 %,
-sonst passen die Plättchen nicht mehr auf die Felder.
+Zusammengeklebt wird er etwa **38 × 28 cm** groß – ein Feld misst dann gut
+**4,5 cm**, da haben Figur und Marker bequem Platz.
+
+1. Beide Seiten ausdrucken.
+2. Bei **einer** Seite den weißen Rand an der Kante mit der Aufschrift
+   „KLEBEKANTE" abschneiden.
+3. Die Hälften bündig aneinanderlegen – Rahmen und Rundenleiste müssen
+   durchlaufen – und auf der **Rückseite** mit Klebeband verbinden.
+
+Wer einen A3-Drucker oder einen Copyshop in der Nähe hat, bekommt den Plan
+dort auf ein einziges Blatt.
+
+**Lieber kleiner?** `spielplan-klein.html` passt auf eine einzige A4-Seite
+quer. Dann musst du aber `insel-plaettchen.html` auf **70 %** verkleinern,
+sonst passen die Plättchen nicht auf die Felder.
 
 ---
 
@@ -95,6 +124,9 @@ Fertig. Alle Druckvorlagen sind neu gebaut – die Karte, die Anleitung und die
 Kartenübersicht im Anhang stimmen automatisch wieder überein. Du musst nie
 etwas an zwei Stellen ändern.
 
+> Willst du danach auch das Gesamt-PDF und die Webseite neu haben, lass noch
+> `python3 werkzeuge/erzeuge_webseite.py` und `python3 werkzeuge/erzeuge_pdf.py` laufen.
+
 ### Neue Erfindung erfinden
 
 In `werkzeuge/daten.py` bei `ERFINDUNGEN` eine Zeile dazuschreiben, zum
@@ -126,14 +158,28 @@ niemand ist benachteiligt.
 
 ```
 insel-der-erfinder/
-├── README.md              ← diese Datei
-├── ANLEITUNG.md           ← die komplette Spielanleitung zum Lesen
-├── druckvorlagen/         ← alles zum Ausdrucken (wird erzeugt)
+├── README.md                          ← diese Datei
+├── ANLEITUNG.md                       ← die Spielanleitung zum Lesen
+├── Insel-der-Erfinder-komplett.pdf    ← alles in einem PDF
+├── webseite.html                      ← Online-Fassung zum Nachschlagen
+├── druckvorlagen/                     ← alles einzeln zum Ausdrucken
 └── werkzeuge/
     ├── daten.py           ← Karten, Felder, Zahlen
     ├── regeln.py          ← Regeltext
     ├── erzeuge.py         ← baut die Druckvorlagen
+    ├── erzeuge_webseite.py← baut die Online-Fassung
+    ├── erzeuge_pdf.py     ← fügt alles zu einem PDF zusammen (optional)
     └── pruefe_balance.py  ← prüft die Ausgewogenheit der Insel
 ```
 
-Gebraucht wird nur **Python 3** – sonst nichts, keine Installation.
+Für die Druckvorlagen brauchst du nur **Python 3** – sonst nichts.
+
+Das Gesamt-PDF neu bauen geht nur, wenn zusätzlich **Chrome** installiert ist
+und einmalig `pip install pypdf` gelaufen ist:
+
+```
+python3 werkzeuge/erzeuge_pdf.py
+```
+
+Das fertige PDF liegt aber schon dabei – du brauchst das nur, wenn du selbst
+etwas geändert hast.

@@ -21,21 +21,21 @@ RESSOURCEN = {
 # ------------------------------------------------------------ Geländetypen
 
 GELAENDE = {
-    "wald":     {"name": "Wald",          "emoji": "\U0001F332", "gibt": HOLZ,    "fuell": "#cfe3c4", "rand": "#5f8a4a"},
-    "mine":     {"name": "Mine",          "emoji": "⛏️", "gibt": METALL,  "fuell": "#d9dde2", "rand": "#6b7887"},
-    "kueste":   {"name": "Küste",        "emoji": "\U0001F30A", "gibt": WASSER,  "fuell": "#c9e2f2", "rand": "#3d87b5"},
-    "energie":  {"name": "Energiequelle", "emoji": "⚡",     "gibt": ENERGIE, "fuell": "#f8ebc0", "rand": "#c79a1e"},
-    "ruine":    {"name": "Ruine",         "emoji": "\U0001F3DB️", "gibt": None, "fuell": "#e3dcd0", "rand": "#9a8c76"},
-    "grruine":  {"name": "Große Ruine",  "emoji": "\U0001F3DB️", "gibt": None, "fuell": "#ded2ef", "rand": "#7a5fae"},
-    "brachland":{"name": "Brachland",     "emoji": "\U0001F3DC️", "gibt": None, "fuell": "#efe8da", "rand": "#bdb09a"},
-    "werkstatt":{"name": "Werkstatt",     "emoji": "\U0001F3ED", "gibt": None, "fuell": "#ffffff", "rand": "#333333"},
+    "wald":     {"name": "Wald",          "emoji": "\U0001F332", "gibt": HOLZ,    "fuell": "#dbd5b2", "rand": "#7b7a4f"},
+    "mine":     {"name": "Mine",          "emoji": "\u26CF\uFE0F", "gibt": METALL,  "fuell": "#dad3c5", "rand": "#7d7264"},
+    "kueste":   {"name": "Küste",         "emoji": "\U0001F30A", "gibt": WASSER,  "fuell": "#e9e1cd", "rand": "#8a8168"},
+    "energie":  {"name": "Energiequelle", "emoji": "\u26A1",     "gibt": ENERGIE, "fuell": "#ecdcab", "rand": "#987d38"},
+    "ruine":    {"name": "Ruine",         "emoji": "\U0001F3DB\uFE0F", "gibt": None, "fuell": "#d5c8b0", "rand": "#796950"},
+    "grruine":  {"name": "Große Ruine",   "emoji": "\U0001F3DB\uFE0F", "gibt": None, "fuell": "#c7b593", "rand": "#67563d"},
+    "brachland":{"name": "Brachland",     "emoji": "\U0001F3DC\uFE0F", "gibt": None, "fuell": "#f2ead9", "rand": "#b2a78e"},
+    "werkstatt":{"name": "Werkstatt",     "emoji": "\U0001F3ED", "gibt": None, "fuell": "#fffdf8", "rand": "#4a3b2a"},
 }
 
 SPIELERFARBEN = [
-    {"key": "rot",  "name": "Rot",  "farbe": "#c0392b", "hell": "#f6d5d0"},
-    {"key": "blau", "name": "Blau", "farbe": "#2471a3", "hell": "#cfe0ef"},
-    {"key": "gruen","name": "Grün","farbe": "#1e8449", "hell": "#cfe9d9"},
-    {"key": "gelb", "name": "Gelb", "farbe": "#b7950b", "hell": "#f6ecc0"},
+    {"key": "rot",  "name": "Rot",  "farbe": "#9c4a35", "hell": "#f8e6de"},
+    {"key": "blau", "name": "Blau", "farbe": "#3f6478", "hell": "#e4eef4"},
+    {"key": "gruen","name": "Grün", "farbe": "#5a7345", "hell": "#eaefe1"},
+    {"key": "gelb", "name": "Gelb", "farbe": "#a8842c", "hell": "#faf2dd"},
 ]
 
 # ------------------------------------------------------------- Der Spielplan
