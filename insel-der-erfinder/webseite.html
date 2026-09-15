@@ -1,0 +1,498 @@
+<title>Insel der Erfinder</title>
+<style>
+:root {
+  --papier:   #efe7d6;
+  --blatt:    #fbf7ee;
+  --blatt-2:  #f5eee0;
+  --tinte:    #1d2a2f;
+  --tinte-2:  #5c6b6b;
+  --tinte-3:  #8a9694;
+  --see:      #0f6e78;
+  --see-hell: #d8e9e9;
+  --messing:  #ab6f22;
+  --linie:    #d3c7ac;
+  --linie-2:  #e4dbc8;
+  --schatten: 0 1px 0 #ffffffb0, 0 10px 30px -18px #1d2a2f55;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --papier:   #0e1a1e;
+    --blatt:    #16262b;
+    --blatt-2:  #1b2e34;
+    --tinte:    #e9e1cf;
+    --tinte-2:  #9db0af;
+    --tinte-3:  #6d807f;
+    --see:      #49b8c0;
+    --see-hell: #123238;
+    --messing:  #dda256;
+    --linie:    #2b4248;
+    --linie-2:  #22383e;
+    --schatten: 0 1px 0 #ffffff0d, 0 10px 30px -18px #000000cc;
+  }
+}
+:root[data-theme="dark"] {
+  --papier:   #0e1a1e;
+  --blatt:    #16262b;
+  --blatt-2:  #1b2e34;
+  --tinte:    #e9e1cf;
+  --tinte-2:  #9db0af;
+  --tinte-3:  #6d807f;
+  --see:      #49b8c0;
+  --see-hell: #123238;
+  --messing:  #dda256;
+  --linie:    #2b4248;
+  --linie-2:  #22383e;
+  --schatten: 0 1px 0 #ffffff0d, 0 10px 30px -18px #000000cc;
+}
+
+body {
+  background: var(--papier);
+  color: var(--tinte);
+  font-family: "Source Serif 4", Georgia, "Times New Roman", serif;
+  font-size: 17px;
+  line-height: 1.6;
+}
+.seite { max-width: 980px; margin: 0 auto; padding-inline: 20px; padding-block: 0 72px; }
+
+h1, h2, h3, .anzeige {
+  font-family: "Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
+  font-weight: 800;
+  text-wrap: balance;
+}
+.mono, .marke, th, .kosten, .wert, .stelle {
+  font-family: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
+}
+.marke {
+  font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--tinte-3);
+}
+
+/* ---------------------------------------------------------- Kopf */
+.kopf { padding-block: 56px 36px; border-bottom: 1px solid var(--linie); }
+.kopf .oben { border-top: 3px solid var(--tinte); border-bottom: 1px solid var(--tinte);
+              height: 6px; margin-bottom: 26px; }
+.kopf h1 { margin: 0; font-size: clamp(38px, 9vw, 74px); line-height: 0.95;
+           letter-spacing: -0.025em; }
+.kopf h1 .klein { display: block; font-size: clamp(12px, 2.1vw, 15px); letter-spacing: 0.22em;
+                  text-transform: uppercase; color: var(--see); margin-bottom: 1.1em;
+                  font-weight: 600; }
+.kopf .unter { margin: 18px 0 0; max-width: 60ch; color: var(--tinte-2); font-size: 18px; }
+.daten { display: flex; flex-wrap: wrap; gap: 0; margin-top: 30px;
+         border: 1px solid var(--linie); border-radius: 2px; background: var(--blatt);
+         overflow: hidden; }
+.daten div { flex: 1 1 120px; padding: 12px 16px; border-right: 1px solid var(--linie-2); }
+.daten div:last-child { border-right: 0; }
+.daten b { display: block; font-size: 24px; font-family: "IBM Plex Mono", monospace;
+           font-weight: 600; font-variant-numeric: tabular-nums; color: var(--see); }
+
+/* ------------------------------------------------------ Abschnitt */
+section { padding-block: 44px; border-bottom: 1px solid var(--linie); }
+section:last-of-type { border-bottom: 0; }
+h2 { font-size: clamp(24px, 4.4vw, 34px); margin: 8px 0 14px; letter-spacing: -0.015em; }
+h3 { font-size: 19px; margin: 26px 0 8px; }
+p { margin: 0 0 14px; max-width: 66ch; }
+.fuehrung { font-size: 19px; color: var(--tinte-2); max-width: 62ch; }
+
+/* --------------------------------------------------------- Karte */
+.abb { margin: 0; }
+.abb .rahmen { background: var(--blatt); border: 1px solid var(--linie); border-radius: 3px;
+               padding: 12px; box-shadow: var(--schatten); }
+.abb svg { display: block; width: 100%; height: auto; border-radius: 2px; }
+.abb figcaption { margin-top: 10px; font-size: 12.5px; color: var(--tinte-3);
+                  font-family: "IBM Plex Mono", monospace; }
+.abb figcaption b { color: var(--tinte-2); font-weight: 600; }
+
+/* --------------------------------------------------------- Ablauf */
+.ablauf { list-style: none; margin: 18px 0 0; padding: 0; display: grid; gap: 1px;
+          background: var(--linie-2); border: 1px solid var(--linie); border-radius: 3px; }
+.ablauf li { background: var(--blatt); padding: 14px 18px; display: grid;
+             grid-template-columns: 34px 1fr; gap: 14px; align-items: start; }
+.ablauf .stelle { color: var(--see); font-weight: 600; font-size: 15px; padding-top: 2px; }
+.ablauf b { display: block; font-family: "Bricolage Grotesque", sans-serif; font-weight: 700; }
+.ablauf span { color: var(--tinte-2); font-size: 15.5px; }
+
+/* -------------------------------------------------------- Tabelle */
+.tabelle { width: 100%; border-collapse: collapse; margin-top: 18px; }
+.tabelle th { text-align: left; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+              color: var(--tinte-3); font-weight: 600; padding: 0 12px 8px 0;
+              border-bottom: 1px solid var(--tinte); }
+.tabelle td { padding: 11px 12px 11px 0; border-bottom: 1px solid var(--linie-2);
+              vertical-align: top; font-size: 16px; }
+.tabelle .ap { font-family: "IBM Plex Mono", monospace; font-weight: 600; color: var(--messing);
+               font-variant-numeric: tabular-nums; white-space: nowrap; }
+.tabelle .was { font-weight: 600; white-space: nowrap; }
+.tabelle .wo { color: var(--tinte-2); }
+
+/* ----------------------------------------------------- Verzeichnis */
+.werkzeuge { display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+             margin: 20px 0 6px; position: sticky; top: env(safe-area-inset-top, 0px);
+             background: var(--papier); padding-block: 10px; z-index: 5; }
+.suche { flex: 1 1 210px; min-width: 0; font: inherit; font-size: 16px; color: var(--tinte);
+         background: var(--blatt); border: 1px solid var(--linie); border-radius: 2px;
+         padding: 9px 12px; }
+.suche::placeholder { color: var(--tinte-3); }
+.suche:focus-visible, .chip:focus-visible { outline: 2px solid var(--see); outline-offset: 2px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font-family: "IBM Plex Mono", monospace; font-size: 12px; font-weight: 600;
+        letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer;
+        background: transparent; color: var(--tinte-2);
+        border: 1px solid var(--linie); border-radius: 2px; padding: 7px 10px; }
+.chip[aria-pressed="true"] { background: var(--see); border-color: var(--see); color: var(--papier); }
+
+.eintraege { border-top: 1px solid var(--tinte); }
+.eintrag { display: grid; grid-template-columns: 30px minmax(0, 1fr) auto;
+           gap: 6px 14px; padding: 15px 0; border-bottom: 1px solid var(--linie-2);
+           align-items: baseline; }
+.eintrag .sinn { font-size: 20px; line-height: 1; }
+.eintrag .name { font-family: "Bricolage Grotesque", sans-serif; font-weight: 700;
+                 font-size: 17.5px; }
+.eintrag .wert { font-size: 15px; font-weight: 600; color: var(--messing); text-align: right;
+                 font-variant-numeric: tabular-nums; white-space: nowrap; }
+.eintrag .leib { grid-column: 2 / -1; color: var(--tinte-2); font-size: 15.5px; margin: 0; }
+.eintrag .kosten { grid-column: 2 / -1; display: flex; flex-wrap: wrap; gap: 5px; margin-top: 2px; }
+.eintrag .kosten span { font-size: 12.5px; font-weight: 600; background: var(--see-hell);
+                        color: var(--tinte); border-radius: 2px; padding: 2px 7px; }
+.eintrag .herkunft { grid-column: 2 / -1; margin-top: 3px; }
+.leer { padding: 28px 0; color: var(--tinte-2); }
+
+/* ---------------------------------------------------------- Drucken */
+.dateien { width: 100%; border-collapse: collapse; margin-top: 18px; }
+.dateien th { text-align: left; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+              color: var(--tinte-3); font-weight: 600; padding: 0 10px 8px 0;
+              border-bottom: 1px solid var(--tinte); }
+.dateien td { padding: 9px 10px 9px 0; border-bottom: 1px solid var(--linie-2); font-size: 15.5px; }
+.dateien td:first-child { font-family: "IBM Plex Mono", monospace; font-size: 13.5px;
+                          white-space: nowrap; }
+.dateien td:last-child { text-align: right; font-family: "IBM Plex Mono", monospace;
+                         font-variant-numeric: tabular-nums; color: var(--tinte-2);
+                         white-space: nowrap; }
+.merk { background: var(--blatt); border-left: 3px solid var(--messing); border-radius: 0 3px 3px 0;
+        padding: 14px 18px; margin: 20px 0 0; }
+.merk p:last-child { margin-bottom: 0; }
+
+.fuss { padding-block: 34px 0; color: var(--tinte-3); font-size: 14px; }
+.fuss .oben { border-top: 1px solid var(--tinte); border-bottom: 3px solid var(--tinte);
+              height: 6px; margin-bottom: 20px; }
+
+@media (max-width: 560px) {
+  body { font-size: 16px; }
+  .eintrag { grid-template-columns: 26px minmax(0, 1fr) auto; }
+  .daten div { flex-basis: 50%; border-bottom: 1px solid var(--linie-2); }
+}
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=IBM+Plex+Mono:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+
+<div class="seite">
+
+<header class="kopf">
+  <div class="oben"></div>
+  <h1><span class="klein">Ein Brettspiel zum Ausdrucken</span>Insel der Erfinder</h1>
+  <p class="unter">Nach einem Sturm stranden mehrere Erfinder auf einer unbekannten Insel.
+     Jeder baut sich eine Werkstatt und versucht, die beeindruckendsten Maschinen zu bauen –
+     während die Insel sich unter ihnen verändert.</p>
+  <div class="daten"><div><span class="marke">Spieler</span><b>2–4</b></div><div><span class="marke">Alter</span><b>ab 10</b></div><div><span class="marke">Dauer</span><b>45–60 Min</b></div><div><span class="marke">Runden</span><b>8</b></div><div><span class="marke">Karten</span><b>86</b></div></div>
+</header>
+
+<section>
+  <span class="marke">Das Brett</span>
+  <h2>Neunzehn Felder, vier Werkstätten</h2>
+  <p class="fuehrung">In der Mitte liegt die Große Ruine – dort gibt es die wertvollen
+     seltenen Bauteile, aber von jeder Werkstatt sind es zwei Züge bis dorthin.
+     Die beiden Brachland-Felder sind absichtlich leer: Dort entsteht später Neues.</p>
+  <figure class="abb">
+    <div class="rahmen"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 858" width="100%" font-family="Segoe UI, Helvetica Neue, Arial, sans-serif">
+<defs><radialGradient id="meer" cx="50%" cy="45%" r="75%"><stop offset="0%" stop-color="#8fc6e0"/><stop offset="100%" stop-color="#4a92bb"/></radialGradient><radialGradient id="sand" cx="50%" cy="45%" r="70%"><stop offset="0%" stop-color="#f3e6c8"/><stop offset="100%" stop-color="#e2cfa4"/></radialGradient><filter id="schatten" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#000" flood-opacity="0.22"/></filter></defs>
+<rect x="0" y="0" width="1180" height="858" rx="18" fill="url(#meer)"/>
+<path d="M 84 435 q 9 -6 18 0 q 9 6 18 0" stroke="#ffffff" stroke-opacity="0.34" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+<path d="M 61 375 q 9 -6 18 0 q 9 6 18 0" stroke="#ffffff" stroke-opacity="0.34" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+<path d="M 97 94 q 9 -6 18 0 q 9 6 18 0" stroke="#ffffff" stroke-opacity="0.34" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+<path d="M 156 203 q 9 -6 18 0 q 9 6 18 0" stroke="#ffffff" stroke-opacity="0.34" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+<path d="M 1094 58 q 9 -6 18 0 q 9 6 18 0" stroke="#ffffff" stroke-opacity="0.34" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+<path d="M 179 116 q 9 -6 18 0 q 9 6 18 0" stroke="#ffffff" stroke-opacity="0.34" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+<path d="M 86 188 q 9 -6 18 0 q 9 6 18 0" stroke="#ffffff" stroke-opacity="0.34" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+<path d="M 1098 117 q 9 -6 18 0 q 9 6 18 0" stroke="#ffffff" stroke-opacity="0.34" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+<path d="M 63 567 q 9 -6 18 0 q 9 6 18 0" stroke="#ffffff" stroke-opacity="0.34" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+<path d="M 944 793 q 9 -6 18 0 q 9 6 18 0" stroke="#ffffff" stroke-opacity="0.34" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+<path d="M 87 594 q 9 -6 18 0 q 9 6 18 0" stroke="#ffffff" stroke-opacity="0.34" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+<path d="M 732 832 q 9 -6 18 0 q 9 6 18 0" stroke="#ffffff" stroke-opacity="0.34" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+<path d="M 45 398 q 9 -6 18 0 q 9 6 18 0" stroke="#ffffff" stroke-opacity="0.34" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+<path d="M 205 116 q 9 -6 18 0 q 9 6 18 0" stroke="#ffffff" stroke-opacity="0.34" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+<path d="M 85 648 q 9 -6 18 0 q 9 6 18 0" stroke="#ffffff" stroke-opacity="0.34" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+<path d="M 162 223 q 9 -6 18 0 q 9 6 18 0" stroke="#ffffff" stroke-opacity="0.34" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+<path d="M 109 387 q 9 -6 18 0 q 9 6 18 0" stroke="#ffffff" stroke-opacity="0.34" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+<path d="M 994.8 318.6 Q 1007.8 400.0 992.0 480.2 Q 976.2 560.5 930.2 632.7 Q 884.1 704.9 801.7 738.2 Q 719.3 771.4 632.7 780.8 Q 546.1 790.2 462.0 766.5 Q 378.0 742.7 320.0 682.6 Q 262.0 622.4 220.3 552.0 Q 178.6 481.6 176.0 399.5 Q 173.3 317.3 206.3 239.7 Q 239.3 162.2 314.3 118.9 Q 389.4 75.7 468.2 47.1 Q 547.0 18.6 630.5 31.3 Q 713.9 44.0 797.3 71.4 Q 880.6 98.8 931.2 168.0 Q 981.9 237.2 994.8 318.6 Z" fill="#f7eed8" opacity="0.85"/>
+<path d="M 975.3 322.9 Q 988.1 400.0 972.8 476.1 Q 957.6 552.2 913.3 620.2 Q 869.0 688.2 791.1 720.4 Q 713.2 752.6 630.7 761.4 Q 548.2 770.3 468.2 747.6 Q 388.3 725.0 332.4 668.4 Q 276.6 611.8 237.4 544.6 Q 198.3 477.4 196.0 399.5 Q 193.7 321.7 225.3 248.3 Q 256.9 174.9 327.5 132.9 Q 398.1 90.9 473.6 64.1 Q 549.0 37.3 628.8 49.0 Q 708.5 60.7 787.2 87.8 Q 865.9 115.0 914.2 180.4 Q 962.5 245.8 975.3 322.9 Z" fill="url(#sand)" stroke="#cbb789" stroke-width="3"/>
+<polygon points="660.15,440.50 590.00,481.00 519.85,440.50 519.85,359.50 590.00,319.00 660.15,359.50" fill="#ded2ef" stroke="#7a5fae" stroke-width="4" stroke-linejoin="round" filter="url(#schatten)"/>
+<text x="590" y="394" font-size="40" text-anchor="middle">🏛️</text>
+<text x="590" y="420" font-size="13" font-weight="800" text-anchor="middle" fill="#7a5fae" letter-spacing="0.8">GROSSE RUINE</text>
+<g><circle cx="590" cy="440" r="17" fill="#fff" stroke="#7a5fae" stroke-width="2.6" stroke-dasharray="4 3"/>
+<text x="590" y="446" font-size="17" font-weight="800" text-anchor="middle" fill="#7a5fae">8</text></g>
+<polygon points="732.89,314.50 662.75,355.00 592.60,314.50 592.60,233.50 662.75,193.00 732.89,233.50" fill="#f8ebc0" stroke="#c79a1e" stroke-width="4" stroke-linejoin="round" filter="url(#schatten)"/>
+<text x="663" y="268" font-size="40" text-anchor="middle">⚡</text>
+<text x="663" y="294" font-size="13" font-weight="800" text-anchor="middle" fill="#c79a1e" letter-spacing="0.8">ENERGIEQUELLE</text>
+<g><rect x="634" y="300" width="58" height="22" rx="11" fill="#ffffffcc" stroke="#b8860b" stroke-width="1.6"/>
+<text x="663" y="316" font-size="13" text-anchor="middle" font-weight="700" fill="#b8860b">⚡ +1</text></g>
+<polygon points="805.64,440.50 735.49,481.00 665.34,440.50 665.34,359.50 735.49,319.00 805.64,359.50" fill="#cfe3c4" stroke="#5f8a4a" stroke-width="4" stroke-linejoin="round" filter="url(#schatten)"/>
+<text x="735" y="394" font-size="40" text-anchor="middle">🌲</text>
+<text x="735" y="420" font-size="13" font-weight="800" text-anchor="middle" fill="#5f8a4a" letter-spacing="0.8">WALD</text>
+<g><rect x="706" y="426" width="58" height="22" rx="11" fill="#ffffffcc" stroke="#7a5230" stroke-width="1.6"/>
+<text x="735" y="442" font-size="13" text-anchor="middle" font-weight="700" fill="#7a5230">🪵 +1</text></g>
+<polygon points="732.89,566.50 662.75,607.00 592.60,566.50 592.60,485.50 662.75,445.00 732.89,485.50" fill="#d9dde2" stroke="#6b7887" stroke-width="4" stroke-linejoin="round" filter="url(#schatten)"/>
+<text x="663" y="520" font-size="40" text-anchor="middle">⛏️</text>
+<text x="663" y="546" font-size="13" font-weight="800" text-anchor="middle" fill="#6b7887" letter-spacing="0.8">MINE</text>
+<g><rect x="634" y="552" width="58" height="22" rx="11" fill="#ffffffcc" stroke="#5a6673" stroke-width="1.6"/>
+<text x="663" y="568" font-size="13" text-anchor="middle" font-weight="700" fill="#5a6673">⚙️ +1</text></g>
+<polygon points="587.40,566.50 517.25,607.00 447.11,566.50 447.11,485.50 517.25,445.00 587.40,485.50" fill="#e3dcd0" stroke="#9a8c76" stroke-width="4" stroke-linejoin="round" filter="url(#schatten)"/>
+<text x="517" y="520" font-size="40" text-anchor="middle">🏛️</text>
+<text x="517" y="546" font-size="13" font-weight="800" text-anchor="middle" fill="#9a8c76" letter-spacing="0.8">RUINE</text>
+<g><circle cx="517" cy="566" r="17" fill="#fff" stroke="#9a8c76" stroke-width="2.6" stroke-dasharray="4 3"/>
+<text x="517" y="572" font-size="17" font-weight="800" text-anchor="middle" fill="#9a8c76">4</text></g>
+<polygon points="514.66,440.50 444.51,481.00 374.36,440.50 374.36,359.50 444.51,319.00 514.66,359.50" fill="#cfe3c4" stroke="#5f8a4a" stroke-width="4" stroke-linejoin="round" filter="url(#schatten)"/>
+<text x="445" y="394" font-size="40" text-anchor="middle">🌲</text>
+<text x="445" y="420" font-size="13" font-weight="800" text-anchor="middle" fill="#5f8a4a" letter-spacing="0.8">WALD</text>
+<g><rect x="416" y="426" width="58" height="22" rx="11" fill="#ffffffcc" stroke="#7a5230" stroke-width="1.6"/>
+<text x="445" y="442" font-size="13" text-anchor="middle" font-weight="700" fill="#7a5230">🪵 +1</text></g>
+<polygon points="587.40,314.50 517.25,355.00 447.11,314.50 447.11,233.50 517.25,193.00 587.40,233.50" fill="#d9dde2" stroke="#6b7887" stroke-width="4" stroke-linejoin="round" filter="url(#schatten)"/>
+<text x="517" y="268" font-size="40" text-anchor="middle">⛏️</text>
+<text x="517" y="294" font-size="13" font-weight="800" text-anchor="middle" fill="#6b7887" letter-spacing="0.8">MINE</text>
+<g><rect x="488" y="300" width="58" height="22" rx="11" fill="#ffffffcc" stroke="#5a6673" stroke-width="1.6"/>
+<text x="517" y="316" font-size="13" text-anchor="middle" font-weight="700" fill="#5a6673">⚙️ +1</text></g>
+<polygon points="805.64,188.50 735.49,229.00 665.34,188.50 665.34,107.50 735.49,67.00 805.64,107.50" fill="#f6d5d0" stroke="#c0392b" stroke-width="4" stroke-linejoin="round" filter="url(#schatten)"/>
+<text x="735" y="142" font-size="40" text-anchor="middle">🏭</text>
+<text x="735" y="168" font-size="13" font-weight="800" text-anchor="middle" fill="#c0392b" letter-spacing="0.8">ROT</text>
+<text x="735" y="184" font-size="10.5" font-weight="700" text-anchor="middle" fill="#6f6556">WERKSTATT</text>
+<polygon points="878.39,314.50 808.24,355.00 738.09,314.50 738.09,233.50 808.24,193.00 878.39,233.50" fill="#c9e2f2" stroke="#3d87b5" stroke-width="4" stroke-linejoin="round" filter="url(#schatten)"/>
+<text x="808" y="268" font-size="40" text-anchor="middle">🌊</text>
+<text x="808" y="294" font-size="13" font-weight="800" text-anchor="middle" fill="#3d87b5" letter-spacing="0.8">KÜSTE</text>
+<g><rect x="779" y="300" width="58" height="22" rx="11" fill="#ffffffcc" stroke="#2a6f97" stroke-width="1.6"/>
+<text x="808" y="316" font-size="13" text-anchor="middle" font-weight="700" fill="#2a6f97">💧 +1</text></g>
+<polygon points="951.13,440.50 880.98,481.00 810.84,440.50 810.84,359.50 880.98,319.00 951.13,359.50" fill="#d9dde2" stroke="#6b7887" stroke-width="4" stroke-linejoin="round" filter="url(#schatten)"/>
+<text x="881" y="394" font-size="40" text-anchor="middle">⛏️</text>
+<text x="881" y="420" font-size="13" font-weight="800" text-anchor="middle" fill="#6b7887" letter-spacing="0.8">MINE</text>
+<g><rect x="852" y="426" width="58" height="22" rx="11" fill="#ffffffcc" stroke="#5a6673" stroke-width="1.6"/>
+<text x="881" y="442" font-size="13" text-anchor="middle" font-weight="700" fill="#5a6673">⚙️ +1</text></g>
+<polygon points="878.39,566.50 808.24,607.00 738.09,566.50 738.09,485.50 808.24,445.00 878.39,485.50" fill="#cfe0ef" stroke="#2471a3" stroke-width="4" stroke-linejoin="round" filter="url(#schatten)"/>
+<text x="808" y="520" font-size="40" text-anchor="middle">🏭</text>
+<text x="808" y="546" font-size="13" font-weight="800" text-anchor="middle" fill="#2471a3" letter-spacing="0.8">BLAU</text>
+<text x="808" y="562" font-size="10.5" font-weight="700" text-anchor="middle" fill="#6f6556">WERKSTATT</text>
+<polygon points="805.64,692.50 735.49,733.00 665.34,692.50 665.34,611.50 735.49,571.00 805.64,611.50" fill="#efe8da" stroke="#bdb09a" stroke-width="4" stroke-linejoin="round" filter="url(#schatten)"/>
+<text x="735" y="646" font-size="40" text-anchor="middle">🏜️</text>
+<text x="735" y="672" font-size="13" font-weight="800" text-anchor="middle" fill="#bdb09a" letter-spacing="0.8">BRACHLAND</text>
+<text x="735" y="686" font-size="10.5" font-weight="700" text-anchor="middle" fill="#a2957c">wartet auf</text>
+<text x="735" y="698" font-size="10.5" font-weight="700" text-anchor="middle" fill="#a2957c">eine Inselkarte</text>
+<polygon points="660.15,692.50 590.00,733.00 519.85,692.50 519.85,611.50 590.00,571.00 660.15,611.50" fill="#f8ebc0" stroke="#c79a1e" stroke-width="4" stroke-linejoin="round" filter="url(#schatten)"/>
+<text x="590" y="646" font-size="40" text-anchor="middle">⚡</text>
+<text x="590" y="672" font-size="13" font-weight="800" text-anchor="middle" fill="#c79a1e" letter-spacing="0.8">ENERGIEQUELLE</text>
+<g><rect x="561" y="678" width="58" height="22" rx="11" fill="#ffffffcc" stroke="#b8860b" stroke-width="1.6"/>
+<text x="590" y="694" font-size="13" text-anchor="middle" font-weight="700" fill="#b8860b">⚡ +1</text></g>
+<polygon points="514.66,692.50 444.51,733.00 374.36,692.50 374.36,611.50 444.51,571.00 514.66,611.50" fill="#cfe9d9" stroke="#1e8449" stroke-width="4" stroke-linejoin="round" filter="url(#schatten)"/>
+<text x="445" y="646" font-size="40" text-anchor="middle">🏭</text>
+<text x="445" y="672" font-size="13" font-weight="800" text-anchor="middle" fill="#1e8449" letter-spacing="0.8">GRÜN</text>
+<text x="445" y="688" font-size="10.5" font-weight="700" text-anchor="middle" fill="#6f6556">WERKSTATT</text>
+<polygon points="441.91,566.50 371.76,607.00 301.61,566.50 301.61,485.50 371.76,445.00 441.91,485.50" fill="#c9e2f2" stroke="#3d87b5" stroke-width="4" stroke-linejoin="round" filter="url(#schatten)"/>
+<text x="372" y="520" font-size="40" text-anchor="middle">🌊</text>
+<text x="372" y="546" font-size="13" font-weight="800" text-anchor="middle" fill="#3d87b5" letter-spacing="0.8">KÜSTE</text>
+<g><rect x="343" y="552" width="58" height="22" rx="11" fill="#ffffffcc" stroke="#2a6f97" stroke-width="1.6"/>
+<text x="372" y="568" font-size="13" text-anchor="middle" font-weight="700" fill="#2a6f97">💧 +1</text></g>
+<polygon points="369.16,440.50 299.02,481.00 228.87,440.50 228.87,359.50 299.02,319.00 369.16,359.50" fill="#efe8da" stroke="#bdb09a" stroke-width="4" stroke-linejoin="round" filter="url(#schatten)"/>
+<text x="299" y="394" font-size="40" text-anchor="middle">🏜️</text>
+<text x="299" y="420" font-size="13" font-weight="800" text-anchor="middle" fill="#bdb09a" letter-spacing="0.8">BRACHLAND</text>
+<text x="299" y="434" font-size="10.5" font-weight="700" text-anchor="middle" fill="#a2957c">wartet auf</text>
+<text x="299" y="446" font-size="10.5" font-weight="700" text-anchor="middle" fill="#a2957c">eine Inselkarte</text>
+<polygon points="441.91,314.50 371.76,355.00 301.61,314.50 301.61,233.50 371.76,193.00 441.91,233.50" fill="#f6ecc0" stroke="#b7950b" stroke-width="4" stroke-linejoin="round" filter="url(#schatten)"/>
+<text x="372" y="268" font-size="40" text-anchor="middle">🏭</text>
+<text x="372" y="294" font-size="13" font-weight="800" text-anchor="middle" fill="#b7950b" letter-spacing="0.8">GELB</text>
+<text x="372" y="310" font-size="10.5" font-weight="700" text-anchor="middle" fill="#6f6556">WERKSTATT</text>
+<polygon points="514.66,188.50 444.51,229.00 374.36,188.50 374.36,107.50 444.51,67.00 514.66,107.50" fill="#cfe3c4" stroke="#5f8a4a" stroke-width="4" stroke-linejoin="round" filter="url(#schatten)"/>
+<text x="445" y="142" font-size="40" text-anchor="middle">🌲</text>
+<text x="445" y="168" font-size="13" font-weight="800" text-anchor="middle" fill="#5f8a4a" letter-spacing="0.8">WALD</text>
+<g><rect x="416" y="174" width="58" height="22" rx="11" fill="#ffffffcc" stroke="#7a5230" stroke-width="1.6"/>
+<text x="445" y="190" font-size="13" text-anchor="middle" font-weight="700" fill="#7a5230">🪵 +1</text></g>
+<polygon points="660.15,188.50 590.00,229.00 519.85,188.50 519.85,107.50 590.00,67.00 660.15,107.50" fill="#e3dcd0" stroke="#9a8c76" stroke-width="4" stroke-linejoin="round" filter="url(#schatten)"/>
+<text x="590" y="142" font-size="40" text-anchor="middle">🏛️</text>
+<text x="590" y="168" font-size="13" font-weight="800" text-anchor="middle" fill="#9a8c76" letter-spacing="0.8">RUINE</text>
+<g><circle cx="590" cy="188" r="17" fill="#fff" stroke="#9a8c76" stroke-width="2.6" stroke-dasharray="4 3"/>
+<text x="590" y="194" font-size="17" font-weight="800" text-anchor="middle" fill="#9a8c76">4</text></g>
+<text x="590" y="40" font-size="32" font-weight="800" text-anchor="middle" fill="#ffffff" letter-spacing="3" opacity="0.95">🏝️ INSEL DER ERFINDER</text>
+<g><rect x="14" y="62" width="206" height="372" rx="14" fill="#fffdf6" stroke="#b9ae99" stroke-width="2.5"/>
+<rect x="14" y="62" width="206" height="30" rx="14" fill="#4a7a3c"/>
+<rect x="14" y="76" width="206" height="16" fill="#4a7a3c"/>
+<text x="117" y="83" font-size="16" font-weight="700" fill="#fff" text-anchor="middle" letter-spacing="1.2">GELÄNDE</text>
+<text x="27" y="115" font-size="19">🌲</text>
+<text x="54" y="111" font-size="13.5" font-weight="700" fill="#2b241c">Wald</text>
+<text x="54" y="125" font-size="11.5" fill="#6f6556">gibt 🪵 Holz</text>
+<text x="27" y="146" font-size="19">⛏️</text>
+<text x="54" y="142" font-size="13.5" font-weight="700" fill="#2b241c">Mine</text>
+<text x="54" y="156" font-size="11.5" fill="#6f6556">gibt ⚙️ Metall</text>
+<text x="27" y="177" font-size="19">🌊</text>
+<text x="54" y="173" font-size="13.5" font-weight="700" fill="#2b241c">Küste</text>
+<text x="54" y="187" font-size="11.5" fill="#6f6556">gibt 💧 Wasser</text>
+<text x="27" y="208" font-size="19">⚡</text>
+<text x="54" y="204" font-size="13.5" font-weight="700" fill="#2b241c">Energiequelle</text>
+<text x="54" y="218" font-size="11.5" fill="#6f6556">gibt ⚡ Energie</text>
+<line x1="26" y1="226" x2="208" y2="226" stroke="#ddd4c0" stroke-width="2"/>
+<text x="27" y="243" font-size="19">🏛️</text>
+<text x="54" y="239" font-size="13.5" font-weight="700" fill="#2b241c">Ruine</text>
+<text x="54" y="253" font-size="11.5" fill="#6f6556">untersuchen: 💎 &amp; mehr</text>
+<text x="27" y="274" font-size="19">🏭</text>
+<text x="54" y="270" font-size="13.5" font-weight="700" fill="#2b241c">Werkstatt</text>
+<text x="54" y="284" font-size="11.5" fill="#6f6556">hier baust du</text>
+<text x="27" y="305" font-size="19">🏜️</text>
+<text x="54" y="301" font-size="13.5" font-weight="700" fill="#2b241c">Brachland</text>
+<text x="54" y="315" font-size="11.5" fill="#6f6556">noch nichts</text>
+</g>
+<g><rect x="960" y="62" width="206" height="372" rx="14" fill="#fffdf6" stroke="#b9ae99" stroke-width="2.5"/>
+<rect x="960" y="62" width="206" height="30" rx="14" fill="#8a5a20"/>
+<rect x="960" y="76" width="206" height="16" fill="#8a5a20"/>
+<text x="1063" y="83" font-size="16" font-weight="700" fill="#fff" text-anchor="middle" letter-spacing="1.2">DEINE 3 AP</text>
+<text x="973" y="115" font-size="19">🚶</text>
+<text x="1000" y="111" font-size="13.5" font-weight="700" fill="#2b241c">Bewegen — 1 AP</text>
+<text x="1000" y="125" font-size="11.5" fill="#6f6556">1 Feld weit</text>
+<text x="973" y="146" font-size="19">🪵</text>
+<text x="1000" y="142" font-size="13.5" font-weight="700" fill="#2b241c">Sammeln — 1 AP</text>
+<text x="1000" y="156" font-size="11.5" fill="#6f6556">1 Rohstoff des Feldes</text>
+<text x="973" y="177" font-size="19">🔍</text>
+<text x="1000" y="173" font-size="13.5" font-weight="700" fill="#2b241c">Untersuchen — 1 AP</text>
+<text x="1000" y="187" font-size="11.5" fill="#6f6556">nur Ruine mit Marke</text>
+<text x="973" y="208" font-size="19">🔧</text>
+<text x="1000" y="204" font-size="13.5" font-weight="700" fill="#2b241c">Bauen — 2 AP</text>
+<text x="1000" y="218" font-size="11.5" fill="#6f6556">nur eigene Werkstatt</text>
+<text x="973" y="239" font-size="19">🤝</text>
+<text x="1000" y="235" font-size="13.5" font-weight="700" fill="#2b241c">Handeln — 1 AP</text>
+<text x="1000" y="249" font-size="11.5" fill="#6f6556">Nachbar oder gleiches Feld</text>
+<text x="973" y="270" font-size="19">⚖️</text>
+<text x="1000" y="266" font-size="13.5" font-weight="700" fill="#2b241c">Tauschbank — 1 AP</text>
+<text x="1000" y="280" font-size="11.5" fill="#6f6556">3 gleiche → 1 beliebige</text>
+</g>
+<rect x="236" y="768" width="708" height="60" rx="30" fill="#fffdf6" stroke="#b9ae99" stroke-width="2.5"/>
+<text x="256" y="805" font-size="12.5" font-weight="800" fill="#6f6556" letter-spacing="1">RUNDE</text>
+<circle cx="332" cy="798" r="23" fill="#ffffff" stroke="#b9ae99" stroke-width="3"/>
+<text x="332" y="805" font-size="19" font-weight="800" text-anchor="middle" fill="#3b3128">1</text>
+<circle cx="410" cy="798" r="23" fill="#f0e4c4" stroke="#c79a1e" stroke-width="3"/>
+<text x="410" y="805" font-size="19" font-weight="800" text-anchor="middle" fill="#3b3128">2</text>
+<text x="410" y="772" font-size="15" text-anchor="middle">⭐</text>
+<circle cx="488" cy="798" r="23" fill="#ffffff" stroke="#b9ae99" stroke-width="3"/>
+<text x="488" y="805" font-size="19" font-weight="800" text-anchor="middle" fill="#3b3128">3</text>
+<circle cx="566" cy="798" r="23" fill="#f0e4c4" stroke="#c79a1e" stroke-width="3"/>
+<text x="566" y="805" font-size="19" font-weight="800" text-anchor="middle" fill="#3b3128">4</text>
+<text x="566" y="772" font-size="15" text-anchor="middle">⭐</text>
+<circle cx="644" cy="798" r="23" fill="#ffffff" stroke="#b9ae99" stroke-width="3"/>
+<text x="644" y="805" font-size="19" font-weight="800" text-anchor="middle" fill="#3b3128">5</text>
+<circle cx="722" cy="798" r="23" fill="#f0e4c4" stroke="#c79a1e" stroke-width="3"/>
+<text x="722" y="805" font-size="19" font-weight="800" text-anchor="middle" fill="#3b3128">6</text>
+<text x="722" y="772" font-size="15" text-anchor="middle">⭐</text>
+<circle cx="800" cy="798" r="23" fill="#ffffff" stroke="#b9ae99" stroke-width="3"/>
+<text x="800" y="805" font-size="19" font-weight="800" text-anchor="middle" fill="#3b3128">7</text>
+<circle cx="878" cy="798" r="23" fill="#ffffff" stroke="#b9ae99" stroke-width="3"/>
+<text x="878" y="805" font-size="19" font-weight="800" text-anchor="middle" fill="#3b3128">8</text>
+<text x="590" y="850" font-size="12" fill="#ffffff" fill-opacity="0.9" text-anchor="middle">⭐ Nach dieser Runde wird eine Inselkarte aufgedeckt – die Insel verändert sich für immer.</text>
+<g><rect x="20" y="622" width="196" height="120" rx="14" fill="#fffdf6" stroke="#7a5fae" stroke-width="2.5" stroke-dasharray="7 5"/><text x="118" y="654" font-size="14" font-weight="800" fill="#7a5fae" text-anchor="middle" letter-spacing="1">FUNDKARTEN</text><text x="118" y="678" font-size="11.5" fill="#6f6556" text-anchor="middle">Stapel hier daneben ablegen</text><text x="118" y="700" font-size="11.5" fill="#6f6556" text-anchor="middle">Die Zahl im Kreis auf einer</text><text x="118" y="716" font-size="11.5" fill="#6f6556" text-anchor="middle">Ruine sagt, wie viele</text><text x="118" y="732" font-size="11.5" fill="#6f6556" text-anchor="middle">Fundmarken dort starten.</text></g>
+<g><rect x="964" y="622" width="202" height="120" rx="14" fill="#fffdf6" stroke="#b9ae99" stroke-width="2.5"/><text x="1065" y="650" font-size="13.5" font-weight="800" fill="#3b3128" text-anchor="middle" letter-spacing="1">WERTUNG</text>
+<text x="976" y="674" font-size="11.5" fill="#4a4136">🔧 Erfindungen = Kartenwert</text>
+<text x="976" y="693" font-size="11.5" fill="#4a4136">💎 Bauteil = 2 Punkte</text>
+<text x="976" y="712" font-size="11.5" fill="#4a4136">🎯 Auftrag + ⭐ Bonusziel</text>
+<text x="976" y="731" font-size="11.5" fill="#4a4136">📦 3 Rohstoffe = 1 Punkt</text>
+</g>
+</svg></div>
+    <figcaption><b>Abb. 1</b> — Die Insel zu Spielbeginn. Die Anordnung ist berechnet, nicht
+      geraten: Von jeder Werkstatt aus ist die Summe der Wege zu Holz, Metall, Wasser und
+      Energie genau 6. Rot und Grün starten spiegelgleich, Blau und Gelb ebenso.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <span class="marke">Dein Zug</span>
+  <h2>Drei Aktionspunkte, sechs Möglichkeiten</h2>
+  <p class="fuehrung">Du darfst sie beliebig verteilen und dieselbe Aktion auch mehrfach
+     machen. Nicht benutzte Punkte verfallen – und genau da fängt das Nachdenken an.</p>
+  <table class="tabelle">
+    <thead><tr><th>Kosten</th><th>Aktion</th><th>Was passiert</th></tr></thead>
+    <tbody><tr><td class="ap">1 AP</td><td class="was">🚶 Bewegen</td><td class="wo">Ein Feld weit, auf ein angrenzendes Feld.</td></tr><tr><td class="ap">1 AP</td><td class="was">🪵 Sammeln</td><td class="wo">1 Rohstoff des Feldes, auf dem du stehst.</td></tr><tr><td class="ap">1 AP</td><td class="was">🔍 Untersuchen</td><td class="wo">Nur auf einer Ruine mit Fundmarke: Marke ab, Fundkarte ziehen.</td></tr><tr><td class="ap">2 AP</td><td class="was">🔧 Bauen</td><td class="wo">Nur in deiner eigenen Werkstatt, aus der offenen Auslage.</td></tr><tr><td class="ap">1 AP</td><td class="was">🤝 Handeln</td><td class="wo">Mit einem Spieler auf deinem oder einem Nachbarfeld.</td></tr><tr><td class="ap">1 AP</td><td class="was">⚖️ Tauschbank</td><td class="wo">In deiner Werkstatt: 3 gleiche Rohstoffe → 1 beliebiger.</td></tr></tbody>
+  </table>
+</section>
+
+<section>
+  <span class="marke">Eine Runde</span>
+  <h2>Fünf Schritte, achtmal</h2>
+  <ol class="ablauf"><li><span class="stelle">A</span><div><b>Zugphase</b><span>Reihum hat jeder Spieler 3 Aktionspunkte.</span></div></li><li><span class="stelle">B</span><div><b>Lager prüfen</b><span>Wer mehr als 10 Rohstoffe hat, wirft ab. 💎 zählen nicht mit.</span></div></li><li><span class="stelle">C</span><div><b>Ereigniskarte</b><span>Eine Karte aufdecken und vorlesen.</span></div></li><li><span class="stelle">D</span><div><b>Inselentwicklung</b><span>Nach Runde 2, 4 und 6: eine Inselkarte. Die Insel ändert sich für immer.</span></div></li><li><span class="stelle">E</span><div><b>Weiter</b><span>Rundenmarker vor, Startspieler wechselt.</span></div></li></ol>
+</section>
+
+<section>
+  <span class="marke">Nachschlagen</span>
+  <h2>Alle 86 Karten</h2>
+  <p class="fuehrung">Wenn am Tisch jemand fragt „was macht der Magnetkran noch mal?" –
+     hier steht es. Tippe einen Namen ein oder filtere nach Kartenart.</p>
+  <div class="werkzeuge">
+    <input class="suche" id="suche" type="search" placeholder="Karte suchen …"
+           aria-label="Karte suchen" autocomplete="off">
+    <div class="chips" role="group" aria-label="Nach Kartenart filtern"><button class="chip" type="button" data-filter="alle" aria-pressed="true">Alle</button><button class="chip" type="button" data-filter="stufe1" aria-pressed="false">Stufe I</button><button class="chip" type="button" data-filter="stufe2" aria-pressed="false">Stufe II</button><button class="chip" type="button" data-filter="stufe3" aria-pressed="false">Stufe III</button><button class="chip" type="button" data-filter="ereignis" aria-pressed="false">Ereignis</button><button class="chip" type="button" data-filter="insel" aria-pressed="false">Insel</button><button class="chip" type="button" data-filter="auftrag" aria-pressed="false">Auftrag</button><button class="chip" type="button" data-filter="bonus" aria-pressed="false">Bonus</button><button class="chip" type="button" data-filter="fund" aria-pressed="false">Fund</button></div>
+  </div>
+  <div class="eintraege" id="liste"><article class="eintrag" data-gruppe="stufe1" data-text="taschenlampe wenn du eine ruine untersuchst, ziehe 2 fundkarten und behalte 1. die andere kommt zurück unter den stapel. erfindung · stufe i"><div class="sinn" aria-hidden="true">🔦</div><h3 class="name">Taschenlampe</h3><div class="wert">4 P</div><div class="kosten"><span>⚙️&nbsp;1</span><span>⚡&nbsp;1</span></div><p class="leib">Wenn du eine Ruine untersuchst, ziehe 2 Fundkarten und behalte 1. Die andere kommt zurück unter den Stapel.</p><div class="herkunft marke">Erfindung · Stufe I</div></article><article class="eintrag" data-gruppe="stufe1" data-text="spitzhacke wenn du in der ⛏️ mine sammelst, bekommst du 1 ⚙️ metall extra. erfindung · stufe i"><div class="sinn" aria-hidden="true">⛏️</div><h3 class="name">Spitzhacke</h3><div class="wert">4 P</div><div class="kosten"><span>🪵&nbsp;1</span><span>⚙️&nbsp;2</span></div><p class="leib">Wenn du in der ⛏️ Mine sammelst, bekommst du 1 ⚙️ Metall extra.</p><div class="herkunft marke">Erfindung · Stufe I</div></article><article class="eintrag" data-gruppe="stufe1" data-text="signalhorn handeln kostet dich keinen aktionspunkt mehr. erfindung · stufe i"><div class="sinn" aria-hidden="true">📯</div><h3 class="name">Signalhorn</h3><div class="wert">4 P</div><div class="kosten"><span>🪵&nbsp;1</span><span>⚙️&nbsp;1</span><span>💧&nbsp;1</span></div><p class="leib">Handeln kostet dich keinen Aktionspunkt mehr.</p><div class="herkunft marke">Erfindung · Stufe I</div></article><article class="eintrag" data-gruppe="stufe1" data-text="holzfäller-axt wenn du im 🌲 wald sammelst, bekommst du 1 🪵 holz extra. erfindung · stufe i"><div class="sinn" aria-hidden="true">🪓</div><h3 class="name">Holzfäller-Axt</h3><div class="wert">3 P</div><div class="kosten"><span>🪵&nbsp;2</span><span>⚙️&nbsp;1</span></div><p class="leib">Wenn du im 🌲 Wald sammelst, bekommst du 1 🪵 Holz extra.</p><div class="herkunft marke">Erfindung · Stufe I</div></article><article class="eintrag" data-gruppe="stufe1" data-text="regenfänger wenn du an der 🌊 küste sammelst, bekommst du 1 💧 wasser extra. erfindung · stufe i"><div class="sinn" aria-hidden="true">🪣</div><h3 class="name">Regenfänger</h3><div class="wert">3 P</div><div class="kosten"><span>🪵&nbsp;1</span><span>⚙️&nbsp;1</span><span>💧&nbsp;1</span></div><p class="leib">Wenn du an der 🌊 Küste sammelst, bekommst du 1 💧 Wasser extra.</p><div class="herkunft marke">Erfindung · Stufe I</div></article><article class="eintrag" data-gruppe="stufe1" data-text="schubkarre dein lager fasst 4 ressourcen mehr (also 14 statt 10). erfindung · stufe i"><div class="sinn" aria-hidden="true">🛒</div><h3 class="name">Schubkarre</h3><div class="wert">3 P</div><div class="kosten"><span>🪵&nbsp;2</span></div><p class="leib">Dein Lager fasst 4 Ressourcen mehr (also 14 statt 10).</p><div class="herkunft marke">Erfindung · Stufe I</div></article><article class="eintrag" data-gruppe="stufe1" data-text="strickleiter einmal pro runde: bewege dich 1 feld weit, ohne einen aktionspunkt zu bezahlen. erfindung · stufe i"><div class="sinn" aria-hidden="true">🪜</div><h3 class="name">Strickleiter</h3><div class="wert">3 P</div><div class="kosten"><span>🪵&nbsp;3</span></div><p class="leib">Einmal pro Runde: Bewege dich 1 Feld weit, ohne einen Aktionspunkt zu bezahlen.</p><div class="herkunft marke">Erfindung · Stufe I</div></article><article class="eintrag" data-gruppe="stufe1" data-text="lagerfeuer einmal pro runde: tausche 2 gleiche ressourcen gegen 1 beliebige. das kostet keine aktion. erfindung · stufe i"><div class="sinn" aria-hidden="true">🔥</div><h3 class="name">Lagerfeuer</h3><div class="wert">3 P</div><div class="kosten"><span>🪵&nbsp;2</span><span>💧&nbsp;1</span></div><p class="leib">Einmal pro Runde: Tausche 2 gleiche Ressourcen gegen 1 beliebige. Das kostet keine Aktion.</p><div class="herkunft marke">Erfindung · Stufe I</div></article><article class="eintrag" data-gruppe="stufe2" data-text="destillieranlage einmal pro runde für 1 aktionspunkt: tausche 3 💧 wasser gegen 1 💎 seltenes bauteil. erfindung · stufe ii"><div class="sinn" aria-hidden="true">⚗️</div><h3 class="name">Destillieranlage</h3><div class="wert">7 P</div><div class="kosten"><span>⚙️&nbsp;2</span><span>💧&nbsp;2</span><span>⚡&nbsp;1</span></div><p class="leib">Einmal pro Runde für 1 Aktionspunkt: Tausche 3 💧 Wasser gegen 1 💎 seltenes Bauteil.</p><div class="herkunft marke">Erfindung · Stufe II</div></article><article class="eintrag" data-gruppe="stufe2" data-text="mini-flugmaschine einmal pro runde: fliege für 1 aktionspunkt auf ein beliebiges feld der insel. erfindung · stufe ii"><div class="sinn" aria-hidden="true">🚁</div><h3 class="name">Mini-Flugmaschine</h3><div class="wert">6 P</div><div class="kosten"><span>🪵&nbsp;1</span><span>⚙️&nbsp;2</span><span>⚡&nbsp;1</span></div><p class="leib">Einmal pro Runde: Fliege für 1 Aktionspunkt auf ein beliebiges Feld der Insel.</p><div class="herkunft marke">Erfindung · Stufe II</div></article><article class="eintrag" data-gruppe="stufe2" data-text="magnetkran einmal pro runde: sammle, ohne einen aktionspunkt zu bezahlen. erfindung · stufe ii"><div class="sinn" aria-hidden="true">🧲</div><h3 class="name">Magnetkran</h3><div class="wert">6 P</div><div class="kosten"><span>🪵&nbsp;1</span><span>⚙️&nbsp;3</span></div><p class="leib">Einmal pro Runde: Sammle, ohne einen Aktionspunkt zu bezahlen.</p><div class="herkunft marke">Erfindung · Stufe II</div></article><article class="eintrag" data-gruppe="stufe2" data-text="feldlabor sofort: ziehe 1 forschungsauftrag. außerdem einmal pro runde: tausche 1 ressource gegen 1 andere, ohne aktion. erfindung · stufe ii"><div class="sinn" aria-hidden="true">🧪</div><h3 class="name">Feldlabor</h3><div class="wert">6 P</div><div class="kosten"><span>⚙️&nbsp;2</span><span>💧&nbsp;1</span><span>⚡&nbsp;1</span></div><p class="leib">Sofort: Ziehe 1 Forschungsauftrag. Außerdem einmal pro Runde: Tausche 1 Ressource gegen 1 andere, ohne Aktion.</p><div class="herkunft marke">Erfindung · Stufe II</div></article><article class="eintrag" data-gruppe="stufe2" data-text="roboter-helfer einmal pro runde: beim sammeln bekommst du 1 zusätzliche ressource des feldes. erfindung · stufe ii"><div class="sinn" aria-hidden="true">🤖</div><h3 class="name">Roboter-Helfer</h3><div class="wert">5 P</div><div class="kosten"><span>⚙️&nbsp;3</span><span>⚡&nbsp;1</span></div><p class="leib">Einmal pro Runde: Beim Sammeln bekommst du 1 zusätzliche Ressource des Feldes.</p><div class="herkunft marke">Erfindung · Stufe II</div></article><article class="eintrag" data-gruppe="stufe2" data-text="aussichtsturm wenn du sammelst, darfst du stattdessen von einem angrenzenden feld sammeln. erfindung · stufe ii"><div class="sinn" aria-hidden="true">🔭</div><h3 class="name">Aussichtsturm</h3><div class="wert">5 P</div><div class="kosten"><span>🪵&nbsp;3</span><span>⚙️&nbsp;1</span></div><p class="leib">Wenn du sammelst, darfst du stattdessen von einem angrenzenden Feld sammeln.</p><div class="herkunft marke">Erfindung · Stufe II</div></article><article class="eintrag" data-gruppe="stufe2" data-text="auslegerboot einmal pro runde: fahre für 1 aktionspunkt auf ein beliebiges 🌊 küstenfeld. erfindung · stufe ii"><div class="sinn" aria-hidden="true">🛶</div><h3 class="name">Auslegerboot</h3><div class="wert">5 P</div><div class="kosten"><span>🪵&nbsp;3</span><span>💧&nbsp;1</span></div><p class="leib">Einmal pro Runde: Fahre für 1 Aktionspunkt auf ein beliebiges 🌊 Küstenfeld.</p><div class="herkunft marke">Erfindung · Stufe II</div></article><article class="eintrag" data-gruppe="stufe2" data-text="energiespeicher am spielende: jede ⚡ energie in deinem lager ist 2 punkte wert. erfindung · stufe ii"><div class="sinn" aria-hidden="true">🔌</div><h3 class="name">Energiespeicher</h3><div class="wert">5 P</div><div class="kosten"><span>⚙️&nbsp;2</span><span>⚡&nbsp;1</span></div><p class="leib">Am Spielende: Jede ⚡ Energie in deinem Lager ist 2 Punkte wert.</p><div class="herkunft marke">Erfindung · Stufe II</div></article><article class="eintrag" data-gruppe="stufe2" data-text="hebekran erfindungen bauen kostet dich nur noch 1 aktionspunkt statt 2. erfindung · stufe ii"><div class="sinn" aria-hidden="true">🏗️</div><h3 class="name">Hebekran</h3><div class="wert">5 P</div><div class="kosten"><span>🪵&nbsp;2</span><span>⚙️&nbsp;2</span></div><p class="leib">Erfindungen bauen kostet dich nur noch 1 Aktionspunkt statt 2.</p><div class="herkunft marke">Erfindung · Stufe II</div></article><article class="eintrag" data-gruppe="stufe2" data-text="wasser-recyclingmaschine am spielende: jedes 💧 wasser in deinem lager ist 1 punkt wert. erfindung · stufe ii"><div class="sinn" aria-hidden="true">💧</div><h3 class="name">Wasser-Recyclingmaschine</h3><div class="wert">4 P</div><div class="kosten"><span>⚙️&nbsp;2</span><span>💧&nbsp;2</span></div><p class="leib">Am Spielende: Jedes 💧 Wasser in deinem Lager ist 1 Punkt wert.</p><div class="herkunft marke">Erfindung · Stufe II</div></article><article class="eintrag" data-gruppe="stufe3" data-text="leuchtturm der erfinder am spielende: jedes übrige 💎 seltene bauteil zählt 4 statt 2 punkte. erfindung · stufe iii"><div class="sinn" aria-hidden="true">🗼</div><h3 class="name">Leuchtturm der Erfinder</h3><div class="wert">12 P</div><div class="kosten"><span>🪵&nbsp;2</span><span>⚙️&nbsp;2</span><span>💧&nbsp;2</span><span>⚡&nbsp;1</span></div><p class="leib">Am Spielende: Jedes übrige 💎 seltene Bauteil zählt 4 statt 2 Punkte.</p><div class="herkunft marke">Erfindung · Stufe III</div></article><article class="eintrag" data-gruppe="stufe3" data-text="automatik-fabrik zu beginn jeder runde: nimm 1 beliebige ressource aus dem vorrat. erfindung · stufe iii"><div class="sinn" aria-hidden="true">🏭</div><h3 class="name">Automatik-Fabrik</h3><div class="wert">11 P</div><div class="kosten"><span>⚙️&nbsp;3</span><span>⚡&nbsp;2</span><span>💎&nbsp;1</span></div><p class="leib">Zu Beginn jeder Runde: Nimm 1 beliebige Ressource aus dem Vorrat.</p><div class="herkunft marke">Erfindung · Stufe III</div></article><article class="eintrag" data-gruppe="stufe3" data-text="supergenerator keine fähigkeit – dafür besonders viele punkte. erfindung · stufe iii"><div class="sinn" aria-hidden="true">⚡</div><h3 class="name">Supergenerator</h3><div class="wert">10 P</div><div class="kosten"><span>⚙️&nbsp;2</span><span>⚡&nbsp;2</span><span>💎&nbsp;1</span></div><p class="leib">Keine Fähigkeit – dafür besonders viele Punkte.</p><div class="herkunft marke">Erfindung · Stufe III</div></article><article class="eintrag" data-gruppe="stufe3" data-text="luftschiff bewegung kostet dich ab jetzt nie mehr einen aktionspunkt. erfindung · stufe iii"><div class="sinn" aria-hidden="true">🛸</div><h3 class="name">Luftschiff</h3><div class="wert">9 P</div><div class="kosten"><span>🪵&nbsp;3</span><span>⚙️&nbsp;2</span><span>⚡&nbsp;1</span></div><p class="leib">Bewegung kostet dich ab jetzt nie mehr einen Aktionspunkt.</p><div class="herkunft marke">Erfindung · Stufe III</div></article><article class="eintrag" data-gruppe="stufe3" data-text="ruinen-scanner einmal pro runde: untersuche eine ruine, ohne einen aktionspunkt zu bezahlen. erfindung · stufe iii"><div class="sinn" aria-hidden="true">📡</div><h3 class="name">Ruinen-Scanner</h3><div class="wert">9 P</div><div class="kosten"><span>⚙️&nbsp;2</span><span>⚡&nbsp;2</span><span>💎&nbsp;1</span></div><p class="leib">Einmal pro Runde: Untersuche eine Ruine, ohne einen Aktionspunkt zu bezahlen.</p><div class="herkunft marke">Erfindung · Stufe III</div></article><article class="eintrag" data-gruppe="stufe3" data-text="große brücke am spielende: +1 punkt für jede erfindung, die du gebaut hast (diese mitgezählt). erfindung · stufe iii"><div class="sinn" aria-hidden="true">🌉</div><h3 class="name">Große Brücke</h3><div class="wert">7 P</div><div class="kosten"><span>🪵&nbsp;4</span><span>⚙️&nbsp;2</span></div><p class="leib">Am Spielende: +1 Punkt für jede Erfindung, die du gebaut hast (diese mitgezählt).</p><div class="herkunft marke">Erfindung · Stufe III</div></article><article class="eintrag" data-gruppe="ereignis" data-text="tropensturm nächste runde: jede bewegung kostet 1 aktionspunkt mehr. ereigniskarte"><div class="sinn" aria-hidden="true">🌪️</div><h3 class="name">Tropensturm</h3><div class="wert"></div><p class="leib">Nächste Runde: Jede Bewegung kostet 1 Aktionspunkt mehr.</p><div class="herkunft marke">Ereigniskarte</div></article><article class="eintrag" data-gruppe="ereignis" data-text="geistesblitz nächste runde: jede erfindung kostet 1 ressource weniger (du suchst aus welche). ereigniskarte"><div class="sinn" aria-hidden="true">💡</div><h3 class="name">Geistesblitz</h3><div class="wert"></div><p class="leib">Nächste Runde: Jede Erfindung kostet 1 Ressource weniger (du suchst aus welche).</p><div class="herkunft marke">Ereigniskarte</div></article><article class="eintrag" data-gruppe="ereignis" data-text="neugierige affen jeder spieler verliert sofort 1 ressource seiner wahl. ereigniskarte"><div class="sinn" aria-hidden="true">🐒</div><h3 class="name">Neugierige Affen</h3><div class="wert"></div><p class="leib">Jeder Spieler verliert sofort 1 Ressource seiner Wahl.</p><div class="herkunft marke">Ereigniskarte</div></article><article class="eintrag" data-gruppe="ereignis" data-text="die insel bebt der startspieler wählt 1 feld (keine werkstatt). nächste runde darf niemand darauf ziehen. figuren, die dort stehen, dürfen bleiben. ereigniskarte"><div class="sinn" aria-hidden="true">🌋</div><h3 class="name">Die Insel bebt</h3><div class="wert"></div><p class="leib">Der Startspieler wählt 1 Feld (keine Werkstatt). Nächste Runde darf niemand darauf ziehen. Figuren, die dort stehen, dürfen bleiben.</p><div class="herkunft marke">Ereigniskarte</div></article><article class="eintrag" data-gruppe="ereignis" data-text="regenzeit jeder spieler nimmt 1 💧 wasser aus dem vorrat. ereigniskarte"><div class="sinn" aria-hidden="true">🌧️</div><h3 class="name">Regenzeit</h3><div class="wert"></div><p class="leib">Jeder Spieler nimmt 1 💧 Wasser aus dem Vorrat.</p><div class="herkunft marke">Ereigniskarte</div></article><article class="eintrag" data-gruppe="ereignis" data-text="sonnensturm jeder spieler auf einem ⚡ energiefeld nimmt 1 ⚡ energie. alle anderen verlieren 1 ⚡ energie, falls sie welche haben. ereigniskarte"><div class="sinn" aria-hidden="true">☀️</div><h3 class="name">Sonnensturm</h3><div class="wert"></div><p class="leib">Jeder Spieler auf einem ⚡ Energiefeld nimmt 1 ⚡ Energie. Alle anderen verlieren 1 ⚡ Energie, falls sie welche haben.</p><div class="herkunft marke">Ereigniskarte</div></article><article class="eintrag" data-gruppe="ereignis" data-text="bunte vögel nächste runde: jedes sammeln bringt für alle 1 ressource extra. ereigniskarte"><div class="sinn" aria-hidden="true">🦜</div><h3 class="name">Bunte Vögel</h3><div class="wert"></div><p class="leib">Nächste Runde: Jedes Sammeln bringt für alle 1 Ressource extra.</p><div class="herkunft marke">Ereigniskarte</div></article><article class="eintrag" data-gruppe="ereignis" data-text="flut nächste runde sind alle 🌊 küstenfelder gesperrt. figuren, die dort stehen, müssen als erste aktion wegziehen. ereigniskarte"><div class="sinn" aria-hidden="true">🌊</div><h3 class="name">Flut</h3><div class="wert"></div><p class="leib">Nächste Runde sind alle 🌊 Küstenfelder gesperrt. Figuren, die dort stehen, müssen als erste Aktion wegziehen.</p><div class="herkunft marke">Ereigniskarte</div></article><article class="eintrag" data-gruppe="ereignis" data-text="waldbrand nächste runde kann im 🌲 wald nicht gesammelt werden. ereigniskarte"><div class="sinn" aria-hidden="true">🔥</div><h3 class="name">Waldbrand</h3><div class="wert"></div><p class="leib">Nächste Runde kann im 🌲 Wald nicht gesammelt werden.</p><div class="herkunft marke">Ereigniskarte</div></article><article class="eintrag" data-gruppe="ereignis" data-text="strandgut jeder spieler, dessen figur an der 🌊 küste steht, nimmt 2 beliebige ressourcen. ereigniskarte"><div class="sinn" aria-hidden="true">🎁</div><h3 class="name">Strandgut</h3><div class="wert"></div><p class="leib">Jeder Spieler, dessen Figur an der 🌊 Küste steht, nimmt 2 beliebige Ressourcen.</p><div class="herkunft marke">Ereigniskarte</div></article><article class="eintrag" data-gruppe="ereignis" data-text="erfinderkongress nächste runde kostet handeln für alle keinen aktionspunkt. ereigniskarte"><div class="sinn" aria-hidden="true">🤝</div><h3 class="name">Erfinderkongress</h3><div class="wert"></div><p class="leib">Nächste Runde kostet Handeln für alle keinen Aktionspunkt.</p><div class="herkunft marke">Ereigniskarte</div></article><article class="eintrag" data-gruppe="ereignis" data-text="sternenklare nacht nächste runde hat jeder spieler 4 aktionspunkte statt 3. ereigniskarte"><div class="sinn" aria-hidden="true">🌙</div><h3 class="name">Sternenklare Nacht</h3><div class="wert"></div><p class="leib">Nächste Runde hat jeder Spieler 4 Aktionspunkte statt 3.</p><div class="herkunft marke">Ereigniskarte</div></article><article class="eintrag" data-gruppe="insel" data-text="neue energiequelle entdeckt! lege das ⚡ insel-plättchen auf ein 🏜️ brachland. dort kann ab jetzt energie gesammelt werden. inselkarte"><div class="sinn" aria-hidden="true">⚡</div><h3 class="name">Neue Energiequelle entdeckt!</h3><div class="wert"></div><p class="leib">Lege das ⚡ Insel-Plättchen auf ein 🏜️ Brachland. Dort kann ab jetzt Energie gesammelt werden.</p><div class="herkunft marke">Inselkarte</div></article><article class="eintrag" data-gruppe="insel" data-text="verschüttete ruine freigelegt! lege das 🏛️ insel-plättchen auf ein 🏜️ brachland und 3 fundmarken darauf. inselkarte"><div class="sinn" aria-hidden="true">🏛️</div><h3 class="name">Verschüttete Ruine freigelegt!</h3><div class="wert"></div><p class="leib">Lege das 🏛️ Insel-Plättchen auf ein 🏜️ Brachland und 3 Fundmarken darauf.</p><div class="herkunft marke">Inselkarte</div></article><article class="eintrag" data-gruppe="insel" data-text="die mine bricht ein! lege das ⚠️ plättchen auf ein ⛏️ minenfeld. dort kann nicht mehr gesammelt werden – dafür liegen jetzt 3 fundmarken darauf – die ruine kann untersucht werden. inselkarte"><div class="sinn" aria-hidden="true">⛏️</div><h3 class="name">Die Mine bricht ein!</h3><div class="wert"></div><p class="leib">Lege das ⚠️ Plättchen auf ein ⛏️ Minenfeld. Dort kann nicht mehr gesammelt werden – dafür liegen jetzt 3 Fundmarken darauf – die Ruine kann untersucht werden.</p><div class="herkunft marke">Inselkarte</div></article><article class="eintrag" data-gruppe="insel" data-text="der wald wächst lege das 🌲 insel-plättchen auf ein 🏜️ brachland. dort kann ab jetzt holz gesammelt werden. inselkarte"><div class="sinn" aria-hidden="true">🌲</div><h3 class="name">Der Wald wächst</h3><div class="wert"></div><p class="leib">Lege das 🌲 Insel-Plättchen auf ein 🏜️ Brachland. Dort kann ab jetzt Holz gesammelt werden.</p><div class="herkunft marke">Inselkarte</div></article><article class="eintrag" data-gruppe="insel" data-text="der wasserspiegel steigt lege das 🌊 insel-plättchen auf ein beliebiges randfeld (keine werkstatt). es ist ab jetzt küste. inselkarte"><div class="sinn" aria-hidden="true">🌊</div><h3 class="name">Der Wasserspiegel steigt</h3><div class="wert"></div><p class="leib">Lege das 🌊 Insel-Plättchen auf ein beliebiges Randfeld (keine Werkstatt). Es ist ab jetzt Küste.</p><div class="herkunft marke">Inselkarte</div></article><article class="eintrag" data-gruppe="insel" data-text="brücke über die schlucht lege das 🌉 plättchen zwischen die große ruine und ein beliebiges werkstattfeld. diese beiden felder sind ab jetzt für alle benachbart. inselkarte"><div class="sinn" aria-hidden="true">🌉</div><h3 class="name">Brücke über die Schlucht</h3><div class="wert"></div><p class="leib">Lege das 🌉 Plättchen zwischen die Große Ruine und ein beliebiges Werkstattfeld. Diese beiden Felder sind ab jetzt für alle benachbart.</p><div class="herkunft marke">Inselkarte</div></article><article class="eintrag" data-gruppe="insel" data-text="leuchtpilze lege auf jedes 🏛️ ruinenfeld (auch die große ruine) 2 zusätzliche fundkarten. inselkarte"><div class="sinn" aria-hidden="true">🍄</div><h3 class="name">Leuchtpilze</h3><div class="wert"></div><p class="leib">Lege auf jedes 🏛️ Ruinenfeld (auch die Große Ruine) 2 zusätzliche Fundkarten.</p><div class="herkunft marke">Inselkarte</div></article><article class="eintrag" data-gruppe="insel" data-text="fruchtbare erde ab jetzt bringt sammeln im 🌲 wald und an der 🌊 küste für alle spieler 1 ressource extra. inselkarte"><div class="sinn" aria-hidden="true">🌺</div><h3 class="name">Fruchtbare Erde</h3><div class="wert"></div><p class="leib">Ab jetzt bringt Sammeln im 🌲 Wald und an der 🌊 Küste für alle Spieler 1 Ressource extra.</p><div class="herkunft marke">Inselkarte</div></article><article class="eintrag" data-gruppe="auftrag" data-text="holzsammler du hast am spielende mindestens 4 🪵 holz im lager. forschungsauftrag · geheim"><div class="sinn" aria-hidden="true">🪵</div><h3 class="name">Holzsammler</h3><div class="wert">3 P</div><p class="leib">Du hast am Spielende mindestens 4 🪵 Holz im Lager.</p><div class="herkunft marke">Forschungsauftrag · geheim</div></article><article class="eintrag" data-gruppe="auftrag" data-text="metallhändler du hast am spielende mindestens 4 ⚙️ metall im lager. forschungsauftrag · geheim"><div class="sinn" aria-hidden="true">⚙️</div><h3 class="name">Metallhändler</h3><div class="wert">3 P</div><p class="leib">Du hast am Spielende mindestens 4 ⚙️ Metall im Lager.</p><div class="herkunft marke">Forschungsauftrag · geheim</div></article><article class="eintrag" data-gruppe="auftrag" data-text="wasserträger du hast am spielende mindestens 4 💧 wasser im lager. forschungsauftrag · geheim"><div class="sinn" aria-hidden="true">💧</div><h3 class="name">Wasserträger</h3><div class="wert">3 P</div><p class="leib">Du hast am Spielende mindestens 4 💧 Wasser im Lager.</p><div class="herkunft marke">Forschungsauftrag · geheim</div></article><article class="eintrag" data-gruppe="auftrag" data-text="energiebündel du hast am spielende mindestens 3 ⚡ energie im lager. forschungsauftrag · geheim"><div class="sinn" aria-hidden="true">⚡</div><h3 class="name">Energiebündel</h3><div class="wert">4 P</div><p class="leib">Du hast am Spielende mindestens 3 ⚡ Energie im Lager.</p><div class="herkunft marke">Forschungsauftrag · geheim</div></article><article class="eintrag" data-gruppe="auftrag" data-text="schatzsucher du hast am spielende mindestens 2 💎 seltene bauteile im lager. forschungsauftrag · geheim"><div class="sinn" aria-hidden="true">💎</div><h3 class="name">Schatzsucher</h3><div class="wert">4 P</div><p class="leib">Du hast am Spielende mindestens 2 💎 seltene Bauteile im Lager.</p><div class="herkunft marke">Forschungsauftrag · geheim</div></article><article class="eintrag" data-gruppe="auftrag" data-text="weltenbummler deine figur stand im lauf des spiels auf jeder geländeart: 🌲 ⛏️ 🌊 ⚡ 🏛️ (haken auf dem werkstatt-tableau machen!). forschungsauftrag · geheim"><div class="sinn" aria-hidden="true">🧭</div><h3 class="name">Weltenbummler</h3><div class="wert">4 P</div><p class="leib">Deine Figur stand im Lauf des Spiels auf jeder Geländeart: 🌲 ⛏️ 🌊 ⚡ 🏛️ (Haken auf dem Werkstatt-Tableau machen!).</p><div class="herkunft marke">Forschungsauftrag · geheim</div></article><article class="eintrag" data-gruppe="auftrag" data-text="baumeister du hast mindestens 3 erfindungen gebaut. forschungsauftrag · geheim"><div class="sinn" aria-hidden="true">🔨</div><h3 class="name">Baumeister</h3><div class="wert">4 P</div><p class="leib">Du hast mindestens 3 Erfindungen gebaut.</p><div class="herkunft marke">Forschungsauftrag · geheim</div></article><article class="eintrag" data-gruppe="auftrag" data-text="großmeister du hast mindestens 1 erfindung der stufe iii gebaut. forschungsauftrag · geheim"><div class="sinn" aria-hidden="true">🎓</div><h3 class="name">Großmeister</h3><div class="wert">5 P</div><p class="leib">Du hast mindestens 1 Erfindung der Stufe III gebaut.</p><div class="herkunft marke">Forschungsauftrag · geheim</div></article><article class="eintrag" data-gruppe="auftrag" data-text="ruinenforscher du hast mindestens 4-mal eine ruine untersucht. forschungsauftrag · geheim"><div class="sinn" aria-hidden="true">🏛️</div><h3 class="name">Ruinenforscher</h3><div class="wert">4 P</div><p class="leib">Du hast mindestens 4-mal eine Ruine untersucht.</p><div class="herkunft marke">Forschungsauftrag · geheim</div></article><article class="eintrag" data-gruppe="auftrag" data-text="händler du hast mindestens 3-mal mit anderen spielern gehandelt. forschungsauftrag · geheim"><div class="sinn" aria-hidden="true">🤝</div><h3 class="name">Händler</h3><div class="wert">3 P</div><p class="leib">Du hast mindestens 3-mal mit anderen Spielern gehandelt.</p><div class="herkunft marke">Forschungsauftrag · geheim</div></article><article class="eintrag" data-gruppe="auftrag" data-text="heimwerker du hast mindestens 2 erfindungen der stufe i gebaut. forschungsauftrag · geheim"><div class="sinn" aria-hidden="true">🛠️</div><h3 class="name">Heimwerker</h3><div class="wert">3 P</div><p class="leib">Du hast mindestens 2 Erfindungen der Stufe I gebaut.</p><div class="herkunft marke">Forschungsauftrag · geheim</div></article><article class="eintrag" data-gruppe="auftrag" data-text="sparfuchs du hast am spielende mindestens 8 ressourcen im lager. forschungsauftrag · geheim"><div class="sinn" aria-hidden="true">📦</div><h3 class="name">Sparfuchs</h3><div class="wert">4 P</div><p class="leib">Du hast am Spielende mindestens 8 Ressourcen im Lager.</p><div class="herkunft marke">Forschungsauftrag · geheim</div></article><article class="eintrag" data-gruppe="bonus" data-text="meister der maschinen du hast mindestens 3 verschiedene erfindungen gebaut. bonusziel · für alle"><div class="sinn" aria-hidden="true">⚙️</div><h3 class="name">Meister der Maschinen</h3><div class="wert">5 P</div><p class="leib">Du hast mindestens 3 verschiedene Erfindungen gebaut.</p><div class="herkunft marke">Bonusziel · für alle</div></article><article class="eintrag" data-gruppe="bonus" data-text="vielfalt du hast am spielende von jeder art mindestens 1: 🪵 ⚙️ 💧 ⚡ 💎 bonusziel · für alle"><div class="sinn" aria-hidden="true">🌈</div><h3 class="name">Vielfalt</h3><div class="wert">5 P</div><p class="leib">Du hast am Spielende von jeder Art mindestens 1: 🪵 ⚙️ 💧 ⚡ 💎</p><div class="herkunft marke">Bonusziel · für alle</div></article><article class="eintrag" data-gruppe="bonus" data-text="entdecker du hast die meisten 💎 seltenen bauteile gefunden (verbaute zählen mit). bei gleichstand bekommen alle die punkte. bonusziel · für alle"><div class="sinn" aria-hidden="true">🔍</div><h3 class="name">Entdecker</h3><div class="wert">4 P</div><p class="leib">Du hast die meisten 💎 seltenen Bauteile gefunden (verbaute zählen mit). Bei Gleichstand bekommen alle die Punkte.</p><div class="herkunft marke">Bonusziel · für alle</div></article><article class="eintrag" data-gruppe="bonus" data-text="schnellbauer du hast als erster eine erfindung der stufe iii gebaut. nur ein spieler bekommt das. bonusziel · für alle"><div class="sinn" aria-hidden="true">🏁</div><h3 class="name">Schnellbauer</h3><div class="wert">4 P</div><p class="leib">Du hast als Erster eine Erfindung der Stufe III gebaut. Nur ein Spieler bekommt das.</p><div class="herkunft marke">Bonusziel · für alle</div></article><article class="eintrag" data-gruppe="bonus" data-text="energiemeister du hast mindestens 2 erfindungen gebaut, die ⚡ energie gekostet haben. bonusziel · für alle"><div class="sinn" aria-hidden="true">⚡</div><h3 class="name">Energiemeister</h3><div class="wert">4 P</div><p class="leib">Du hast mindestens 2 Erfindungen gebaut, die ⚡ Energie gekostet haben.</p><div class="herkunft marke">Bonusziel · für alle</div></article><article class="eintrag" data-gruppe="bonus" data-text="guter nachbar du hast mindestens 3-mal mit anderen spielern gehandelt. bonusziel · für alle"><div class="sinn" aria-hidden="true">🤝</div><h3 class="name">Guter Nachbar</h3><div class="wert">4 P</div><p class="leib">Du hast mindestens 3-mal mit anderen Spielern gehandelt.</p><div class="herkunft marke">Bonusziel · für alle</div></article><article class="eintrag" data-gruppe="bonus" data-text="heimatverbunden deine figur steht am spielende auf deinem eigenen werkstattfeld. bonusziel · für alle"><div class="sinn" aria-hidden="true">🏠</div><h3 class="name">Heimatverbunden</h3><div class="wert">3 P</div><p class="leib">Deine Figur steht am Spielende auf deinem eigenen Werkstattfeld.</p><div class="herkunft marke">Bonusziel · für alle</div></article><article class="eintrag" data-gruppe="bonus" data-text="fleißig du hast mindestens 5 erfindungen gebaut. bonusziel · für alle"><div class="sinn" aria-hidden="true">🐝</div><h3 class="name">Fleißig</h3><div class="wert">6 P</div><p class="leib">Du hast mindestens 5 Erfindungen gebaut.</p><div class="herkunft marke">Bonusziel · für alle</div></article><article class="eintrag" data-gruppe="bonus" data-text="holzhütte du hast mindestens 3 erfindungen gebaut, die 🪵 holz gekostet haben. bonusziel · für alle"><div class="sinn" aria-hidden="true">🌲</div><h3 class="name">Holzhütte</h3><div class="wert">4 P</div><p class="leib">Du hast mindestens 3 Erfindungen gebaut, die 🪵 Holz gekostet haben.</p><div class="herkunft marke">Bonusziel · für alle</div></article><article class="eintrag" data-gruppe="bonus" data-text="küstenbewohner du hast am spielende mindestens 5 💧 wasser im lager. bonusziel · für alle"><div class="sinn" aria-hidden="true">🌊</div><h3 class="name">Küstenbewohner</h3><div class="wert">4 P</div><p class="leib">Du hast am Spielende mindestens 5 💧 Wasser im Lager.</p><div class="herkunft marke">Bonusziel · für alle</div></article><article class="eintrag" data-gruppe="fund" data-text="seltenes bauteil nimm 1 💎 seltenes bauteil. fundkarte"><div class="sinn" aria-hidden="true">💎</div><h3 class="name">Seltenes Bauteil</h3><div class="wert">8×</div><p class="leib">Nimm 1 💎 seltenes Bauteil.</p><div class="herkunft marke">Fundkarte</div></article><article class="eintrag" data-gruppe="fund" data-text="reicher fund nimm 2 💎 seltene bauteile. fundkarte"><div class="sinn" aria-hidden="true">💎💎</div><h3 class="name">Reicher Fund</h3><div class="wert">3×</div><p class="leib">Nimm 2 💎 seltene Bauteile.</p><div class="herkunft marke">Fundkarte</div></article><article class="eintrag" data-gruppe="fund" data-text="alte vorratskiste nimm 2 beliebige ressourcen (kein bauteil). fundkarte"><div class="sinn" aria-hidden="true">📦</div><h3 class="name">Alte Vorratskiste</h3><div class="wert">4×</div><p class="leib">Nimm 2 beliebige Ressourcen (kein Bauteil).</p><div class="herkunft marke">Fundkarte</div></article><article class="eintrag" data-gruppe="fund" data-text="verwitterte karte nimm 1 beliebige ressource und ziehe 1 forschungsauftrag. fundkarte"><div class="sinn" aria-hidden="true">🗺️</div><h3 class="name">Verwitterte Karte</h3><div class="wert">2×</div><p class="leib">Nimm 1 beliebige Ressource und ziehe 1 Forschungsauftrag.</p><div class="herkunft marke">Fundkarte</div></article><article class="eintrag" data-gruppe="fund" data-text="relikt: alter kompass behalte diese karte offen. deine erste bewegung in jeder runde kostet keinen aktionspunkt. fundkarte"><div class="sinn" aria-hidden="true">🧭</div><h3 class="name">Relikt: Alter Kompass</h3><div class="wert">1×</div><p class="leib">Behalte diese Karte offen. Deine erste Bewegung in jeder Runde kostet keinen Aktionspunkt.</p><div class="herkunft marke">Fundkarte</div></article><article class="eintrag" data-gruppe="fund" data-text="relikt: ewige batterie behalte diese karte offen. einmal pro runde bekommst du beim sammeln zusätzlich 1 ⚡ energie. fundkarte"><div class="sinn" aria-hidden="true">🔋</div><h3 class="name">Relikt: Ewige Batterie</h3><div class="wert">1×</div><p class="leib">Behalte diese Karte offen. Einmal pro Runde bekommst du beim Sammeln zusätzlich 1 ⚡ Energie.</p><div class="herkunft marke">Fundkarte</div></article><article class="eintrag" data-gruppe="fund" data-text="relikt: steinerner wächter behalte diese karte offen. am spielende bekommst du +4 punkte. fundkarte"><div class="sinn" aria-hidden="true">🗿</div><h3 class="name">Relikt: Steinerner Wächter</h3><div class="wert">1×</div><p class="leib">Behalte diese Karte offen. Am Spielende bekommst du +4 Punkte.</p><div class="herkunft marke">Fundkarte</div></article></div>
+  <p class="leer" id="leer" hidden>Dazu gibt es keine Karte. Versuch es mit einem anderen Wort.</p>
+</section>
+
+<section>
+  <span class="marke">Selber bauen</span>
+  <h2>Was du ausdruckst</h2>
+  <p class="fuehrung">Alle Dateien liegen im Ordner <span class="mono">druckvorlagen/</span>.
+     Doppelklick öffnet sie im Browser, dann Strg&nbsp;+&nbsp;P (Mac: Cmd&nbsp;+&nbsp;P).</p>
+  <table class="dateien">
+    <thead><tr><th>Datei</th><th>Inhalt</th><th>Umfang</th></tr></thead>
+    <tbody><tr><td>spielplan.html</td><td>Der Spielplan</td><td>1 S. · A4 quer</td></tr><tr><td>anleitung.html</td><td>Anleitung mit Kartenanhang</td><td>13 S.</td></tr><tr><td>erfindungskarten.html</td><td>24 Erfindungen</td><td>8 S.</td></tr><tr><td>fundkarten.html</td><td>20 Fundkarten</td><td>6 S.</td></tr><tr><td>ereigniskarten.html</td><td>12 Ereignisse</td><td>4 S.</td></tr><tr><td>forschungsauftraege.html</td><td>12 Forschungsaufträge</td><td>4 S.</td></tr><tr><td>inselkarten.html</td><td>8 Inselkarten</td><td>2 S.</td></tr><tr><td>bonusziele.html</td><td>10 Bonusziele</td><td>2 S.</td></tr><tr><td>spielfiguren.html</td><td>8 Figuren zum Falten</td><td>1 S.</td></tr><tr><td>werkstatt-tableaus.html</td><td>4 Werkstatt-Tableaus</td><td>2 S.</td></tr><tr><td>insel-plaettchen.html</td><td>6 Insel-Plättchen</td><td>1 S.</td></tr><tr><td>marker.html</td><td>207 Marker</td><td>2 S.</td></tr><tr><td>wertungsblock.html</td><td>Wertungsblock</td><td>2 S.</td></tr></tbody>
+  </table>
+  <div class="merk">
+    <p><b>Zwei Einstellungen entscheiden alles:</b> Skalierung auf <b>100 %</b> stellen
+       (nicht „An Seite anpassen") und <b>„Hintergrundgrafiken drucken"</b> anhaken.
+       Sonst kommt der Plan zu klein und ohne Farbe aus dem Drucker.</p>
+    <p><b>Für die erste Partie</b> reichen Spielplan, Anleitung, Erfindungskarten, Figuren
+       und Tableaus. Als Rohstoffe nimmst du erst mal Bohnen, Perlen oder Lego-Steine.</p>
+  </div>
+</section>
+
+<footer class="fuss">
+  <div class="oben"></div>
+  <p>Insel der Erfinder · 24 Erfindungen, 20 Fundkarten, 12 Ereignisse, 12 Aufträge,
+     10 Bonusziele, 8 Inselkarten · Spielplan, Figuren und Karten zum Selbstausdrucken.</p>
+</footer>
+
+</div>
+
+<script>
+(function () {
+  var suche = document.getElementById("suche");
+  var liste = document.getElementById("liste");
+  var leer  = document.getElementById("leer");
+  var chips = Array.prototype.slice.call(document.querySelectorAll(".chip"));
+  var eintraege = Array.prototype.slice.call(liste.querySelectorAll(".eintrag"));
+  var gruppe = "alle";
+
+  function zeigen() {
+    var wort = suche.value.trim().toLowerCase();
+    var sichtbar = 0;
+    eintraege.forEach(function (e) {
+      var passtGruppe = gruppe === "alle" || e.dataset.gruppe === gruppe;
+      var passtWort = !wort || e.dataset.text.indexOf(wort) !== -1;
+      var zeig = passtGruppe && passtWort;
+      e.hidden = !zeig;
+      if (zeig) { sichtbar++; }
+    });
+    leer.hidden = sichtbar > 0;
+  }
+
+  chips.forEach(function (c) {
+    c.addEventListener("click", function () {
+      gruppe = c.dataset.filter;
+      chips.forEach(function (x) {
+        x.setAttribute("aria-pressed", x === c ? "true" : "false");
+      });
+      zeigen();
+    });
+  });
+  suche.addEventListener("input", zeigen);
+  zeigen();
+})();
+</script>
