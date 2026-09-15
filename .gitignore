@@ -21,3 +21,7 @@ next-env.d.ts
 .DS_Store
 npm-debug.log*
 yarn-error.log*
+
+# Python-Zwischendateien
+__pycache__/
+*.pyc

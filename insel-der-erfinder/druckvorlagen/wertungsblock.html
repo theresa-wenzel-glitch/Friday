@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wertungsblock – Insel der Erfinder</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+body { margin: 0; font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+       color: #221c15; background: #f4f1ea; }
+.hinweis { max-width: 190mm; margin: 6mm auto; padding: 5mm 6mm; background: #fffdf7;
+           border: 1px solid #d8cfbc; border-radius: 3mm; font-size: 10pt; line-height: 1.5; }
+.hinweis h1 { margin: 0 0 2mm; font-size: 15pt; }
+.hinweis p { margin: 0 0 2mm; }
+.hinweis strong { color: #8a5a20; }
+.bogen { background: #fff; margin: 0 auto; page-break-after: always; break-after: page; }
+.bogen:last-child { page-break-after: auto; break-after: auto; }
+@media print { body { background: #fff; } .hinweis { display: none; } }
+
+@page { size: A4 portrait; margin: 12mm; }
+.bogen { width: 186mm; display: flex; flex-direction: column; gap: 10mm; }
+.block h2 { font-size: 14pt; margin: 0 0 3mm; }
+.wertung { width: 100%; border-collapse: collapse; font-size: 9.5pt; }
+.wertung th, .wertung td { border: 0.3mm solid #b9ae99; padding: 1.8mm 2mm; text-align: center; }
+.wertung th { background: #efe9dc; font-size: 10pt; }
+.w-emoji { width: 9mm; font-size: 12pt; }
+.w-was { text-align: left !important; width: 58mm; }
+.w-was span { display: block; font-size: 7.6pt; color: #7a6f5d; }
+.w-feld { height: 9mm; background: #fffdf8; }
+.w-summe td { background: #f6efdd; font-size: 12pt; height: 12mm; }
+.w-fuss { font-size: 8.5pt; color: #6f6556; margin: 2mm 0 0; }
+</style>
+</head>
+<body>
+<div class="hinweis"><h1>Wertungsblock – Insel der Erfinder</h1><p><strong>So druckst du das aus:</strong> Diese Datei im Browser öffnen (Doppelklick), dann <strong>Strg&nbsp;+&nbsp;P</strong> (Mac: <strong>Cmd&nbsp;+&nbsp;P</strong>). Wichtig: Bei „Skalierung" <strong>100&nbsp;%</strong> bzw. „Tatsächliche Größe" einstellen – nicht „An Seite anpassen". Und <strong>„Hintergrundgrafiken drucken"</strong> anhaken, sonst bleiben die Farben weg.</p><p>Dieser graue Kasten wird nicht mitgedruckt.</p><p>Zwei Wertungen pro Blatt – reicht für zwei Partien. Oder einmal drucken, laminieren und mit abwischbarem Stift benutzen.</p></div>
+<div class="bogen"><div class="block"><h2>🏆 Wertung – Insel der Erfinder</h2><table class="wertung">
+  <tr><th></th><th class="w-was">Wofür?</th><th style="color:#c0392b">Rot</th><th style="color:#2471a3">Blau</th><th style="color:#1e8449">Grün</th><th style="color:#b7950b">Gelb</th></tr>
+  <tr><td class="w-emoji">🔧</td><td class="w-was"><b>Erfindungen</b><span>Punkte auf den Karten zusammenzählen</span></td><td class="w-feld"></td><td class="w-feld"></td><td class="w-feld"></td><td class="w-feld"></td></tr><tr><td class="w-emoji">💎</td><td class="w-was"><b>Seltene Bauteile</b><span>Anzahl × 2</span></td><td class="w-feld"></td><td class="w-feld"></td><td class="w-feld"></td><td class="w-feld"></td></tr><tr><td class="w-emoji">🎯</td><td class="w-was"><b>Forschungsauftrag 1</b><span>nur wenn erfüllt</span></td><td class="w-feld"></td><td class="w-feld"></td><td class="w-feld"></td><td class="w-feld"></td></tr><tr><td class="w-emoji">🎯</td><td class="w-was"><b>Forschungsauftrag 2</b><span>nur wenn erfüllt</span></td><td class="w-feld"></td><td class="w-feld"></td><td class="w-feld"></td><td class="w-feld"></td></tr><tr><td class="w-emoji">🎯</td><td class="w-was"><b>Weitere Aufträge</b><span>aus Fundkarten</span></td><td class="w-feld"></td><td class="w-feld"></td><td class="w-feld"></td><td class="w-feld"></td></tr><tr><td class="w-emoji">⭐</td><td class="w-was"><b>Bonusziel 1</b></td><td class="w-feld"></td><td class="w-feld"></td><td class="w-feld"></td><td class="w-feld"></td></tr><tr><td class="w-emoji">⭐</td><td class="w-was"><b>Bonusziel 2</b></td><td class="w-feld"></td><td class="w-feld"></td><td class="w-feld"></td><td class="w-feld"></td></tr><tr><td class="w-emoji">⭐</td><td class="w-was"><b>Bonusziel 3</b></td><td class="w-feld"></td><td class="w-feld"></td><td class="w-feld"></td><td class="w-feld"></td></tr><tr><td class="w-emoji">🗿</td><td class="w-was"><b>Relikte</b><span>wie auf der Karte</span></td><td class="w-feld"></td><td class="w-feld"></td><td class="w-feld"></td><td class="w-feld"></td></tr><tr><td class="w-emoji">📦</td><td class="w-was"><b>Restliche Rohstoffe</b><span>Anzahl ÷ 3, abrunden</span></td><td class="w-feld"></td><td class="w-feld"></td><td class="w-feld"></td><td class="w-feld"></td></tr>
+  <tr class="w-summe"><td class="w-emoji">🏆</td><td class="w-was"><b>SUMME</b></td><td class="w-feld"></td><td class="w-feld"></td><td class="w-feld"></td><td class="w-feld"></td></tr>
+</table><p class="w-fuss"><b>Gleichstand?</b> Es gewinnt, wer mehr Erfindungen gebaut hat. Dann: wer mehr 💎 hat. Dann: gemeinsamer Sieg.</p></div><div class="block"><h2>🏆 Wertung – Insel der Erfinder</h2><table class="wertung">
+  <tr><th></th><th class="w-was">Wofür?</th><th style="color:#c0392b">Rot</th><th style="color:#2471a3">Blau</th><th style="color:#1e8449">Grün</th><th style="color:#b7950b">Gelb</th></tr>
+  <tr><td class="w-emoji">🔧</td><td class="w-was"><b>Erfindungen</b><span>Punkte auf den Karten zusammenzählen</span></td><td class="w-feld"></td><td class="w-feld"></td><td class="w-feld"></td><td class="w-feld"></td></tr><tr><td class="w-emoji">💎</td><td class="w-was"><b>Seltene Bauteile</b><span>Anzahl × 2</span></td><td class="w-feld"></td><td class="w-feld"></td><td class="w-feld"></td><td class="w-feld"></td></tr><tr><td class="w-emoji">🎯</td><td class="w-was"><b>Forschungsauftrag 1</b><span>nur wenn erfüllt</span></td><td class="w-feld"></td><td class="w-feld"></td><td class="w-feld"></td><td class="w-feld"></td></tr><tr><td class="w-emoji">🎯</td><td class="w-was"><b>Forschungsauftrag 2</b><span>nur wenn erfüllt</span></td><td class="w-feld"></td><td class="w-feld"></td><td class="w-feld"></td><td class="w-feld"></td></tr><tr><td class="w-emoji">🎯</td><td class="w-was"><b>Weitere Aufträge</b><span>aus Fundkarten</span></td><td class="w-feld"></td><td class="w-feld"></td><td class="w-feld"></td><td class="w-feld"></td></tr><tr><td class="w-emoji">⭐</td><td class="w-was"><b>Bonusziel 1</b></td><td class="w-feld"></td><td class="w-feld"></td><td class="w-feld"></td><td class="w-feld"></td></tr><tr><td class="w-emoji">⭐</td><td class="w-was"><b>Bonusziel 2</b></td><td class="w-feld"></td><td class="w-feld"></td><td class="w-feld"></td><td class="w-feld"></td></tr><tr><td class="w-emoji">⭐</td><td class="w-was"><b>Bonusziel 3</b></td><td class="w-feld"></td><td class="w-feld"></td><td class="w-feld"></td><td class="w-feld"></td></tr><tr><td class="w-emoji">🗿</td><td class="w-was"><b>Relikte</b><span>wie auf der Karte</span></td><td class="w-feld"></td><td class="w-feld"></td><td class="w-feld"></td><td class="w-feld"></td></tr><tr><td class="w-emoji">📦</td><td class="w-was"><b>Restliche Rohstoffe</b><span>Anzahl ÷ 3, abrunden</span></td><td class="w-feld"></td><td class="w-feld"></td><td class="w-feld"></td><td class="w-feld"></td></tr>
+  <tr class="w-summe"><td class="w-emoji">🏆</td><td class="w-was"><b>SUMME</b></td><td class="w-feld"></td><td class="w-feld"></td><td class="w-feld"></td><td class="w-feld"></td></tr>
+</table><p class="w-fuss"><b>Gleichstand?</b> Es gewinnt, wer mehr Erfindungen gebaut hat. Dann: wer mehr 💎 hat. Dann: gemeinsamer Sieg.</p></div></div>
+</body>
+</html>

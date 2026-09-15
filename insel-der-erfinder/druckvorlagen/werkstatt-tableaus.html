@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Werkstatt-Tableaus – Insel der Erfinder</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+body { margin: 0; font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+       color: #221c15; background: #f4f1ea; }
+.hinweis { max-width: 190mm; margin: 6mm auto; padding: 5mm 6mm; background: #fffdf7;
+           border: 1px solid #d8cfbc; border-radius: 3mm; font-size: 10pt; line-height: 1.5; }
+.hinweis h1 { margin: 0 0 2mm; font-size: 15pt; }
+.hinweis p { margin: 0 0 2mm; }
+.hinweis strong { color: #8a5a20; }
+.bogen { background: #fff; margin: 0 auto; page-break-after: always; break-after: page; }
+.bogen:last-child { page-break-after: auto; break-after: auto; }
+@media print { body { background: #fff; } .hinweis { display: none; } }
+
+@page { size: A4 portrait; margin: 8mm; }
+.bogen { width: 194mm; display: flex; flex-direction: column; gap: 4mm; }
+.tableau { border: 0.8mm solid var(--farbe); border-radius: 3mm; overflow: hidden;
+           background: #fffdf8; height: 133mm; display: flex; flex-direction: column; }
+.t-kopf { background: var(--farbe); color: #fff; padding: 2.5mm 4mm; display: flex;
+          align-items: baseline; justify-content: space-between; }
+.t-titel { font-size: 13pt; font-weight: 800; letter-spacing: 1pt; }
+.t-limit { font-size: 8.5pt; opacity: 0.95; }
+.t-raster { display: grid; grid-template-columns: 1.05fr 1fr; gap: 4mm; padding: 3mm 4mm 4mm; flex: 1; }
+.t-links, .t-rechts { display: flex; flex-direction: column; min-height: 0; }
+.rundenbox { margin-top: auto; font-size: 7.6pt; line-height: 1.45; background: var(--hell);
+             border-radius: 1.5mm; padding: 2mm 2.5mm; color: #4a4136; }
+.t-label { font-size: 7.5pt; font-weight: 800; letter-spacing: 0.6pt; text-transform: uppercase;
+           color: #7a6f5d; margin: 0 0 1.5mm; }
+.lagerreihe { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1.2mm; margin-bottom: 3mm; }
+.lagerfach { border: 0.4mm solid; border-radius: 1.5mm; overflow: hidden; }
+.lf-kopf { font-size: 6.6pt; font-weight: 700; text-align: center; padding: 0.8mm 0.3mm;
+           line-height: 1.2; }
+.lf-flaeche { height: 26mm; }
+.bauplatz { border: 0.5mm dashed var(--farbe); border-radius: 2mm; flex: 1; min-height: 46mm;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24pt; opacity: 0.25; }
+.aktionen { list-style: none; margin: 0 0 3mm; padding: 0; }
+.aktionen li { display: flex; justify-content: space-between; gap: 2mm; font-size: 8.4pt;
+               padding: 0.9mm 0; border-bottom: 0.2mm dotted #d5cbb6; }
+.aktionen li span { color: #7a6f5d; font-size: 7.8pt; text-align: right; }
+.merk { font-size: 8.2pt; margin-bottom: 2mm; display: flex; align-items: center;
+        gap: 1.5mm; flex-wrap: wrap; }
+.merk b { min-width: 25mm; }
+.kaestchen { display: inline-block; width: 4.2mm; height: 4.2mm; border: 0.35mm solid #9c907a;
+             border-radius: 0.8mm; background: #fff; }
+.gel { display: inline-flex; align-items: center; gap: 0.6mm; margin-right: 0.9mm; font-size: 8.4pt; }
+.merk .kaestchen { flex: none; }
+</style>
+</head>
+<body>
+<div class="hinweis"><h1>Werkstatt-Tableaus – Insel der Erfinder</h1><p><strong>So druckst du das aus:</strong> Diese Datei im Browser öffnen (Doppelklick), dann <strong>Strg&nbsp;+&nbsp;P</strong> (Mac: <strong>Cmd&nbsp;+&nbsp;P</strong>). Wichtig: Bei „Skalierung" <strong>100&nbsp;%</strong> bzw. „Tatsächliche Größe" einstellen – nicht „An Seite anpassen". Und <strong>„Hintergrundgrafiken drucken"</strong> anhaken, sonst bleiben die Farben weg.</p><p>Dieser graue Kasten wird nicht mitgedruckt.</p><p>Jeder Spieler bekommt ein Tableau in seiner Farbe. Auf zwei A4-Seiten sind alle vier drauf. Die Merkliste ist zum Ankreuzen – am besten laminieren und mit abwischbarem Stift benutzen.</p></div>
+<div class="bogen"><div class="tableau" style="--farbe:#c0392b;--hell:#f6d5d0">
+  <div class="t-kopf"><span class="t-titel">🏭 WERKSTATT ROT</span>
+    <span class="t-limit">Lager: max. <b>10</b> Rohstoffe · 💎 zählen nicht mit</span></div>
+  <div class="t-raster">
+    <div class="t-links">
+      <div class="t-label">Dein Lager</div>
+      <div class="lagerreihe"><div class="lagerfach" style="border-color:#7a5230"><div class="lf-kopf" style="background:#e8d9c5">🪵 Holz</div><div class="lf-flaeche"></div></div><div class="lagerfach" style="border-color:#5a6673"><div class="lf-kopf" style="background:#d8dee5">⚙️ Metall</div><div class="lf-flaeche"></div></div><div class="lagerfach" style="border-color:#2a6f97"><div class="lf-kopf" style="background:#cfe4f2">💧 Wasser</div><div class="lf-flaeche"></div></div><div class="lagerfach" style="border-color:#b8860b"><div class="lf-kopf" style="background:#f7e9bf">⚡ Energie</div><div class="lf-flaeche"></div></div><div class="lagerfach" style="border-color:#6b4a9e"><div class="lf-kopf" style="background:#e4dbf5">💎 Bauteil</div><div class="lf-flaeche"></div></div></div>
+      <div class="t-label">Deine Erfindungen hierhin legen</div>
+      <div class="bauplatz">🔧</div>
+    </div>
+    <div class="t-rechts">
+      <div class="t-label">Deine 3 Aktionspunkte</div>
+      <ul class="aktionen"><li><b>🚶 Bewegen — 1</b> <span>1 Feld weit</span></li><li><b>🪵 Sammeln — 1</b> <span>1 Rohstoff des Feldes</span></li><li><b>🔍 Untersuchen — 1</b> <span>Ruine mit Fundmarke</span></li><li><b>🔧 Bauen — 2</b> <span>nur hier, in deiner Werkstatt</span></li><li><b>🤝 Handeln — 1</b> <span>Nachbar oder gleiches Feld</span></li><li><b>⚖️ Tauschbank — 1</b> <span>3 gleiche → 1 beliebige</span></li></ul>
+      <div class="t-label">Merkliste (für Aufträge &amp; Bonusziele)</div>
+      <div class="merk"><b>Gehandelt</b><span class="kaestchen"></span><span class="kaestchen"></span><span class="kaestchen"></span><span class="kaestchen"></span><span class="kaestchen"></span><span class="kaestchen"></span></div>
+      <div class="merk"><b>Ruine untersucht</b><span class="kaestchen"></span><span class="kaestchen"></span><span class="kaestchen"></span><span class="kaestchen"></span><span class="kaestchen"></span><span class="kaestchen"></span></div>
+      <div class="merk"><b>Gelände besucht</b><span class="gel">🌲<span class="kaestchen"></span></span><span class="gel">⛏️<span class="kaestchen"></span></span><span class="gel">🌊<span class="kaestchen"></span></span><span class="gel">⚡<span class="kaestchen"></span></span><span class="gel">🏛️<span class="kaestchen"></span></span></div>
+      <div class="rundenbox">
+        <b>Jede Runde:</b> alle sind dran &rarr; Lager auf 10 pr&uuml;fen &rarr;
+        Ereigniskarte &rarr; nach Runde 2/4/6 eine Inselkarte
+      </div>
+    </div>
+  </div>
+</div><div class="tableau" style="--farbe:#2471a3;--hell:#cfe0ef">
+  <div class="t-kopf"><span class="t-titel">🏭 WERKSTATT BLAU</span>
+    <span class="t-limit">Lager: max. <b>10</b> Rohstoffe · 💎 zählen nicht mit</span></div>
+  <div class="t-raster">
+    <div class="t-links">
+      <div class="t-label">Dein Lager</div>
+      <div class="lagerreihe"><div class="lagerfach" style="border-color:#7a5230"><div class="lf-kopf" style="background:#e8d9c5">🪵 Holz</div><div class="lf-flaeche"></div></div><div class="lagerfach" style="border-color:#5a6673"><div class="lf-kopf" style="background:#d8dee5">⚙️ Metall</div><div class="lf-flaeche"></div></div><div class="lagerfach" style="border-color:#2a6f97"><div class="lf-kopf" style="background:#cfe4f2">💧 Wasser</div><div class="lf-flaeche"></div></div><div class="lagerfach" style="border-color:#b8860b"><div class="lf-kopf" style="background:#f7e9bf">⚡ Energie</div><div class="lf-flaeche"></div></div><div class="lagerfach" style="border-color:#6b4a9e"><div class="lf-kopf" style="background:#e4dbf5">💎 Bauteil</div><div class="lf-flaeche"></div></div></div>
+      <div class="t-label">Deine Erfindungen hierhin legen</div>
+      <div class="bauplatz">🔧</div>
+    </div>
+    <div class="t-rechts">
+      <div class="t-label">Deine 3 Aktionspunkte</div>
+      <ul class="aktionen"><li><b>🚶 Bewegen — 1</b> <span>1 Feld weit</span></li><li><b>🪵 Sammeln — 1</b> <span>1 Rohstoff des Feldes</span></li><li><b>🔍 Untersuchen — 1</b> <span>Ruine mit Fundmarke</span></li><li><b>🔧 Bauen — 2</b> <span>nur hier, in deiner Werkstatt</span></li><li><b>🤝 Handeln — 1</b> <span>Nachbar oder gleiches Feld</span></li><li><b>⚖️ Tauschbank — 1</b> <span>3 gleiche → 1 beliebige</span></li></ul>
+      <div class="t-label">Merkliste (für Aufträge &amp; Bonusziele)</div>
+      <div class="merk"><b>Gehandelt</b><span class="kaestchen"></span><span class="kaestchen"></span><span class="kaestchen"></span><span class="kaestchen"></span><span class="kaestchen"></span><span class="kaestchen"></span></div>
+      <div class="merk"><b>Ruine untersucht</b><span class="kaestchen"></span><span class="kaestchen"></span><span class="kaestchen"></span><span class="kaestchen"></span><span class="kaestchen"></span><span class="kaestchen"></span></div>
+      <div class="merk"><b>Gelände besucht</b><span class="gel">🌲<span class="kaestchen"></span></span><span class="gel">⛏️<span class="kaestchen"></span></span><span class="gel">🌊<span class="kaestchen"></span></span><span class="gel">⚡<span class="kaestchen"></span></span><span class="gel">🏛️<span class="kaestchen"></span></span></div>
+      <div class="rundenbox">
+        <b>Jede Runde:</b> alle sind dran &rarr; Lager auf 10 pr&uuml;fen &rarr;
+        Ereigniskarte &rarr; nach Runde 2/4/6 eine Inselkarte
+      </div>
+    </div>
+  </div>
+</div></div>
+<div class="bogen"><div class="tableau" style="--farbe:#1e8449;--hell:#cfe9d9">
+  <div class="t-kopf"><span class="t-titel">🏭 WERKSTATT GRÜN</span>
+    <span class="t-limit">Lager: max. <b>10</b> Rohstoffe · 💎 zählen nicht mit</span></div>
+  <div class="t-raster">
+    <div class="t-links">
+      <div class="t-label">Dein Lager</div>
+      <div class="lagerreihe"><div class="lagerfach" style="border-color:#7a5230"><div class="lf-kopf" style="background:#e8d9c5">🪵 Holz</div><div class="lf-flaeche"></div></div><div class="lagerfach" style="border-color:#5a6673"><div class="lf-kopf" style="background:#d8dee5">⚙️ Metall</div><div class="lf-flaeche"></div></div><div class="lagerfach" style="border-color:#2a6f97"><div class="lf-kopf" style="background:#cfe4f2">💧 Wasser</div><div class="lf-flaeche"></div></div><div class="lagerfach" style="border-color:#b8860b"><div class="lf-kopf" style="background:#f7e9bf">⚡ Energie</div><div class="lf-flaeche"></div></div><div class="lagerfach" style="border-color:#6b4a9e"><div class="lf-kopf" style="background:#e4dbf5">💎 Bauteil</div><div class="lf-flaeche"></div></div></div>
+      <div class="t-label">Deine Erfindungen hierhin legen</div>
+      <div class="bauplatz">🔧</div>
+    </div>
+    <div class="t-rechts">
+      <div class="t-label">Deine 3 Aktionspunkte</div>
+      <ul class="aktionen"><li><b>🚶 Bewegen — 1</b> <span>1 Feld weit</span></li><li><b>🪵 Sammeln — 1</b> <span>1 Rohstoff des Feldes</span></li><li><b>🔍 Untersuchen — 1</b> <span>Ruine mit Fundmarke</span></li><li><b>🔧 Bauen — 2</b> <span>nur hier, in deiner Werkstatt</span></li><li><b>🤝 Handeln — 1</b> <span>Nachbar oder gleiches Feld</span></li><li><b>⚖️ Tauschbank — 1</b> <span>3 gleiche → 1 beliebige</span></li></ul>
+      <div class="t-label">Merkliste (für Aufträge &amp; Bonusziele)</div>
+      <div class="merk"><b>Gehandelt</b><span class="kaestchen"></span><span class="kaestchen"></span><span class="kaestchen"></span><span class="kaestchen"></span><span class="kaestchen"></span><span class="kaestchen"></span></div>
+      <div class="merk"><b>Ruine untersucht</b><span class="kaestchen"></span><span class="kaestchen"></span><span class="kaestchen"></span><span class="kaestchen"></span><span class="kaestchen"></span><span class="kaestchen"></span></div>
+      <div class="merk"><b>Gelände besucht</b><span class="gel">🌲<span class="kaestchen"></span></span><span class="gel">⛏️<span class="kaestchen"></span></span><span class="gel">🌊<span class="kaestchen"></span></span><span class="gel">⚡<span class="kaestchen"></span></span><span class="gel">🏛️<span class="kaestchen"></span></span></div>
+      <div class="rundenbox">
+        <b>Jede Runde:</b> alle sind dran &rarr; Lager auf 10 pr&uuml;fen &rarr;
+        Ereigniskarte &rarr; nach Runde 2/4/6 eine Inselkarte
+      </div>
+    </div>
+  </div>
+</div><div class="tableau" style="--farbe:#b7950b;--hell:#f6ecc0">
+  <div class="t-kopf"><span class="t-titel">🏭 WERKSTATT GELB</span>
+    <span class="t-limit">Lager: max. <b>10</b> Rohstoffe · 💎 zählen nicht mit</span></div>
+  <div class="t-raster">
+    <div class="t-links">
+      <div class="t-label">Dein Lager</div>
+      <div class="lagerreihe"><div class="lagerfach" style="border-color:#7a5230"><div class="lf-kopf" style="background:#e8d9c5">🪵 Holz</div><div class="lf-flaeche"></div></div><div class="lagerfach" style="border-color:#5a6673"><div class="lf-kopf" style="background:#d8dee5">⚙️ Metall</div><div class="lf-flaeche"></div></div><div class="lagerfach" style="border-color:#2a6f97"><div class="lf-kopf" style="background:#cfe4f2">💧 Wasser</div><div class="lf-flaeche"></div></div><div class="lagerfach" style="border-color:#b8860b"><div class="lf-kopf" style="background:#f7e9bf">⚡ Energie</div><div class="lf-flaeche"></div></div><div class="lagerfach" style="border-color:#6b4a9e"><div class="lf-kopf" style="background:#e4dbf5">💎 Bauteil</div><div class="lf-flaeche"></div></div></div>
+      <div class="t-label">Deine Erfindungen hierhin legen</div>
+      <div class="bauplatz">🔧</div>
+    </div>
+    <div class="t-rechts">
+      <div class="t-label">Deine 3 Aktionspunkte</div>
+      <ul class="aktionen"><li><b>🚶 Bewegen — 1</b> <span>1 Feld weit</span></li><li><b>🪵 Sammeln — 1</b> <span>1 Rohstoff des Feldes</span></li><li><b>🔍 Untersuchen — 1</b> <span>Ruine mit Fundmarke</span></li><li><b>🔧 Bauen — 2</b> <span>nur hier, in deiner Werkstatt</span></li><li><b>🤝 Handeln — 1</b> <span>Nachbar oder gleiches Feld</span></li><li><b>⚖️ Tauschbank — 1</b> <span>3 gleiche → 1 beliebige</span></li></ul>
+      <div class="t-label">Merkliste (für Aufträge &amp; Bonusziele)</div>
+      <div class="merk"><b>Gehandelt</b><span class="kaestchen"></span><span class="kaestchen"></span><span class="kaestchen"></span><span class="kaestchen"></span><span class="kaestchen"></span><span class="kaestchen"></span></div>
+      <div class="merk"><b>Ruine untersucht</b><span class="kaestchen"></span><span class="kaestchen"></span><span class="kaestchen"></span><span class="kaestchen"></span><span class="kaestchen"></span><span class="kaestchen"></span></div>
+      <div class="merk"><b>Gelände besucht</b><span class="gel">🌲<span class="kaestchen"></span></span><span class="gel">⛏️<span class="kaestchen"></span></span><span class="gel">🌊<span class="kaestchen"></span></span><span class="gel">⚡<span class="kaestchen"></span></span><span class="gel">🏛️<span class="kaestchen"></span></span></div>
+      <div class="rundenbox">
+        <b>Jede Runde:</b> alle sind dran &rarr; Lager auf 10 pr&uuml;fen &rarr;
+        Ereigniskarte &rarr; nach Runde 2/4/6 eine Inselkarte
+      </div>
+    </div>
+  </div>
+</div></div>
+</body>
+</html>
