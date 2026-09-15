@@ -1,0 +1,2653 @@
+<title>Insel der Erfinder</title>
+<style>/* Insel der Erfinder — Online-Spiel. Eigenständiges CSS, wird von
+   erzeuge_spielseite.py in die fertige Seite eingebettet. */
+
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Mono:wght@400;600;700&display=swap');
+
+:root {
+  --papier: #f4efe3; --blatt: #fffdf7; --blatt2: #f8f2e4;
+  --tinte: #241c12; --tinte2: #5c5140; --tinte3: #8a7d64;
+  --linie: #ddd0b3; --linie2: #ecdfc0;
+  --akzent: #a8642c; --akzent-hell: #f3e2c9; --akzent-dunkel: #7a4a1f;
+  --gut: #4a7a3c; --schlecht: #9c4a35; --info: #3f6478;
+  --schatten: 0 2px 0 #ffffffa0, 0 10px 26px -16px #24140055;
+  --holz: #7a5230; --holz-hell: #e8d9c5;
+  --metall: #5a6673; --metall-hell: #d8dee5;
+  --wasser: #2a6f97; --wasser-hell: #cfe4f2;
+  --energie: #b8860b; --energie-hell: #f7e9bf;
+  --bauteil: #6b4a9e; --bauteil-hell: #e4dbf5;
+  --rot: #9c4a35; --rot-hell: #f8e6de;
+  --blau: #3f6478; --blau-hell: #e4eef4;
+  --gruen: #5a7345; --gruen-hell: #eaefe1;
+  --gelb: #a8842c; --gelb-hell: #faf2dd;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --papier: #1b1611; --blatt: #241d16; --blatt2: #2b2319;
+    --tinte: #efe6d4; --tinte2: #c2b494; --tinte3: #8c7f64;
+    --linie: #4a3e2c; --linie2: #362c1e;
+    --akzent: #d38a45; --akzent-hell: #3a2c18; --akzent-dunkel: #f0ac6a;
+    --gut: #7bb367; --schlecht: #d5765c; --info: #6fa2c0;
+    --schatten: 0 1px 0 #ffffff10, 0 10px 26px -16px #00000090;
+    --holz-hell: #3a2f1e; --metall-hell: #2b3138; --wasser-hell: #1c2f3a;
+    --energie-hell: #3a2f11; --bauteil-hell: #2b2038;
+    --rot-hell: #3a2018; --blau-hell: #1c2830; --gruen-hell: #212a1c; --gelb-hell: #332c15;
+  }
+}
+:root[data-theme="dark"] {
+  --papier: #1b1611; --blatt: #241d16; --blatt2: #2b2319;
+  --tinte: #efe6d4; --tinte2: #c2b494; --tinte3: #8c7f64;
+  --linie: #4a3e2c; --linie2: #362c1e;
+  --akzent: #d38a45; --akzent-hell: #3a2c18; --akzent-dunkel: #f0ac6a;
+  --gut: #7bb367; --schlecht: #d5765c; --info: #6fa2c0;
+  --schatten: 0 1px 0 #ffffff10, 0 10px 26px -16px #00000090;
+  --holz-hell: #3a2f1e; --metall-hell: #2b3138; --wasser-hell: #1c2f3a;
+  --energie-hell: #3a2f11; --bauteil-hell: #2b2038;
+  --rot-hell: #3a2018; --blau-hell: #1c2830; --gruen-hell: #212a1c; --gelb-hell: #332c15;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--papier); color: var(--tinte);
+  font-family: "Source Serif 4", Georgia, serif; font-size: 15px; line-height: 1.5;
+  height: 100%; overflow: hidden;
+}
+html { height: 100%; }
+h1, h2, h3, button, .titel, .zahl { font-family: "Bricolage Grotesque", "Trebuchet MS", sans-serif; }
+.mono { font-family: "IBM Plex Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+button { font: inherit; cursor: pointer; }
+button:disabled { cursor: not-allowed; opacity: 0.45; }
+button:focus-visible, input:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--akzent); outline-offset: 2px; }
+[hidden] { display: none !important; }
+img { max-width: 100%; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; } }
+
+#app { height: 100%; display: flex; flex-direction: column; }
+
+/* ------------------------------------------------------------- Startseite */
+.start { max-width: 640px; margin: 0 auto; padding: max(24px, env(safe-area-inset-top)) 20px 32px;
+         overflow-y: auto; height: 100%; }
+.start-kopf { text-align: center; margin-bottom: 28px; }
+.start-kopf .emoji { font-size: 44px; line-height: 1; }
+.start-kopf h1 { font-size: 30px; margin: 8px 0 4px; letter-spacing: -0.02em; }
+.start-kopf p { color: var(--tinte2); margin: 0; font-size: 15px; }
+.wahlkarten { display: grid; gap: 12px; margin-top: 20px; }
+.wahlkarte { display: flex; align-items: center; gap: 14px; text-align: left; background: var(--blatt);
+             border: 1.5px solid var(--linie); border-radius: 14px; padding: 16px 18px; box-shadow: var(--schatten); }
+.wahlkarte .we { font-size: 26px; }
+.wahlkarte .wt { flex: 1; }
+.wahlkarte .wt b { display: block; font-size: 16px; }
+.wahlkarte .wt span { color: var(--tinte2); font-size: 13.5px; }
+.wahlkarte:hover { border-color: var(--akzent); }
+
+.feld-gruppe { margin: 18px 0; }
+.feld-gruppe label { display: block; font-size: 12.5px; font-weight: 700; letter-spacing: 0.03em;
+                     color: var(--tinte2); margin-bottom: 6px; text-transform: uppercase; }
+.textfeld { width: 100%; font: inherit; font-size: 16px; padding: 11px 14px; border-radius: 10px;
+            border: 1.5px solid var(--linie); background: var(--blatt); color: var(--tinte); }
+.textfeld:focus { border-color: var(--akzent); }
+.code-feld { text-align: center; font-family: "IBM Plex Mono", monospace; font-size: 26px; font-weight: 700;
+             letter-spacing: 0.18em; text-transform: uppercase; }
+
+.spielerliste { display: flex; flex-direction: column; gap: 8px; margin: 10px 0; }
+.spielerzeile { display: flex; align-items: center; gap: 10px; background: var(--blatt); border: 1.5px solid var(--linie);
+                border-radius: 10px; padding: 8px 10px; }
+.farbpunkt { width: 20px; height: 20px; border-radius: 50%; flex: none; border: 2px solid #0002; }
+.spielerzeile input { flex: 1; border: none; background: transparent; font: inherit; font-size: 15px; color: var(--tinte); }
+.spielerzeile input:focus { outline: none; }
+.sitz-frei { opacity: 0.55; font-style: italic; }
+
+.knopf { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: none; border-radius: 11px;
+         padding: 13px 20px; font-size: 15.5px; font-weight: 700; }
+.knopf.primaer { background: var(--akzent); color: #fff; box-shadow: var(--schatten); }
+.knopf.primaer:hover:not(:disabled) { background: var(--akzent-dunkel); }
+.knopf.zweitrangig { background: var(--blatt2); color: var(--tinte); border: 1.5px solid var(--linie); }
+.knopf.zweitrangig:hover:not(:disabled) { border-color: var(--akzent); }
+.knopf.gefahr { background: var(--schlecht); color: #fff; }
+.knopf.breit { width: 100%; }
+.knopf.klein { padding: 8px 13px; font-size: 13.5px; border-radius: 9px; }
+
+.raumcode-anzeige { text-align: center; margin: 14px 0; }
+.raumcode-anzeige .code { font-family: "IBM Plex Mono", monospace; font-size: 40px; font-weight: 700;
+                          letter-spacing: 0.2em; color: var(--akzent); }
+.raumcode-anzeige p { color: var(--tinte2); font-size: 13px; margin: 4px 0 0; }
+
+.zurueck-link { display: inline-flex; align-items: center; gap: 4px; color: var(--tinte2); font-size: 13.5px;
+                background: none; border: none; padding: 6px 0; margin-bottom: 4px; }
+.zurueck-link:hover { color: var(--akzent); }
+
+.fehlermeldung { background: var(--rot-hell); color: var(--schlecht); border-radius: 10px; padding: 10px 13px;
+                 font-size: 13.5px; margin: 10px 0; font-weight: 600; }
+
+/* ------------------------------------------------------------- Spielkopf */
+.spielkopf { flex: none; display: flex; align-items: center; gap: 12px; padding: max(10px, env(safe-area-inset-top)) 14px 10px;
+             background: var(--blatt); border-bottom: 1.5px solid var(--linie); }
+.spielkopf .runde-chip { font-family: "IBM Plex Mono", monospace; font-weight: 700; font-size: 13px; background: var(--akzent-hell);
+                         color: var(--akzent-dunkel); border-radius: 8px; padding: 5px 10px; white-space: nowrap; }
+.spielkopf .amzug { flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px; font-size: 14px; overflow: hidden; }
+.spielkopf .amzug b { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.spielkopf .ap-punkte { display: flex; gap: 4px; flex: none; }
+.spielkopf .ap-punkt { width: 13px; height: 13px; border-radius: 50%; background: var(--linie2); border: 1.5px solid var(--linie); }
+.spielkopf .ap-punkt.voll { background: var(--akzent); border-color: var(--akzent-dunkel); }
+.spielkopf button.icon { background: none; border: none; font-size: 18px; padding: 4px; color: var(--tinte2); flex: none; }
+
+.buehne { flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr; grid-template-rows: minmax(0, 1fr);
+          overflow: hidden; position: relative; }
+@media (min-width: 860px) { .buehne { grid-template-columns: 1fr 300px; } }
+
+.brett-bereich { position: relative; overflow: hidden; min-height: 0; min-width: 0;
+                background: radial-gradient(ellipse at 50% 40%, var(--blatt2), var(--papier)); }
+.brett-bereich svg { width: 100%; height: 100%; display: block; touch-action: manipulation; }
+.hexfeld { cursor: default; transition: filter 0.15s; }
+.hexfeld.anklickbar { cursor: pointer; }
+.hexfeld.anklickbar:hover { filter: brightness(1.06); }
+.hexfeld.anklickbar .hexumriss { stroke-width: 5; }
+
+.seitenleiste { border-left: 1.5px solid var(--linie); background: var(--blatt); overflow-y: auto;
+                display: flex; flex-direction: column; }
+@media (max-width: 859px) {
+  .seitenleiste { position: absolute; inset: 0; z-index: 20; transform: translateX(100%);
+                  transition: transform 0.22s ease; border-left: none; }
+  .seitenleiste.offen { transform: translateX(0); }
+}
+.leiste-kopf { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px;
+               border-bottom: 1.5px solid var(--linie); flex: none; }
+.leiste-kopf h2 { margin: 0; font-size: 15px; }
+.leiste-kopf button { background: none; border: none; font-size: 18px; color: var(--tinte2); }
+.leiste-tabs { display: flex; gap: 2px; padding: 8px 10px 0; flex: none; }
+.leiste-tab { flex: 1; text-align: center; padding: 8px 4px; font-size: 12px; font-weight: 700; background: none;
+              border: none; border-bottom: 2.5px solid transparent; color: var(--tinte2); }
+.leiste-tab.aktiv { color: var(--akzent); border-color: var(--akzent); }
+.leiste-inhalt { padding: 12px 14px; flex: 1; overflow-y: auto; }
+
+.marktkarte { display: flex; gap: 10px; padding: 10px; border: 1.5px solid var(--linie); border-radius: 12px;
+              background: var(--blatt2); margin-bottom: 8px; }
+.marktkarte .me { font-size: 22px; }
+.marktkarte .mt { flex: 1; min-width: 0; }
+.marktkarte .mt b { display: block; font-size: 13.5px; }
+.marktkarte .mkosten { display: flex; gap: 4px; flex-wrap: wrap; margin: 3px 0; }
+.marktkarte .mkosten span { font-size: 10.5px; font-weight: 700; border-radius: 5px; padding: 1px 5px; }
+.marktkarte .mtext { font-size: 11.5px; color: var(--tinte2); line-height: 1.35; }
+.marktkarte .mpunkte { align-self: center; font-family: "IBM Plex Mono", monospace; font-weight: 700; font-size: 15px;
+                       color: var(--akzent-dunkel); flex: none; }
+.marktkarte.bauen-moeglich { border-color: var(--gut); }
+
+.log-zeile { font-size: 12.5px; padding: 5px 0; border-bottom: 1px solid var(--linie2); color: var(--tinte2); }
+.log-zeile .lr { font-family: "IBM Plex Mono", monospace; font-weight: 700; color: var(--tinte3); margin-right: 5px; }
+
+/* ------------------------------------------------------------- Aktionsriegel */
+.aktionsriegel { flex: none; display: flex; gap: 6px; padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
+                 background: var(--blatt); border-top: 1.5px solid var(--linie); overflow-x: auto; }
+.aktionsknopf { flex: none; display: flex; flex-direction: column; align-items: center; gap: 3px; background: var(--blatt2);
+                border: 1.5px solid var(--linie); border-radius: 12px; padding: 8px 12px; min-width: 64px; color: var(--tinte); }
+.aktionsknopf .ae { font-size: 19px; }
+.aktionsknopf .at { font-size: 10.5px; font-weight: 700; white-space: nowrap; }
+.aktionsknopf.aktiv { background: var(--akzent); border-color: var(--akzent-dunkel); color: #fff; }
+.aktionsknopf.beenden { background: var(--tinte); color: var(--papier); border-color: var(--tinte); }
+
+/* ------------------------------------------------------------- Modale */
+.schleier { position: fixed; inset: 0; background: #24140077; display: flex; align-items: center; justify-content: center;
+            padding: 20px; z-index: 50; }
+.modal { background: var(--blatt); border-radius: 16px; padding: 22px; max-width: 420px; width: 100%;
+         max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 50px -20px #00000066; }
+.modal h2 { margin: 0 0 4px; font-size: 18px; }
+.modal .modal-unter { color: var(--tinte2); font-size: 13.5px; margin: 0 0 14px; }
+.modal-aktionen { display: flex; gap: 8px; margin-top: 16px; }
+.modal-aktionen .knopf { flex: 1; }
+
+.ressourcenraster { display: grid; grid-template-columns: repeat(auto-fit, minmax(64px, 1fr)); gap: 8px; margin: 10px 0; }
+.ressourcenwahl { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 6px;
+                  border: 1.5px solid var(--linie); border-radius: 10px; background: var(--blatt2); }
+.ressourcenwahl .re { font-size: 20px; }
+.ressourcenwahl .rz { display: flex; align-items: center; gap: 8px; }
+.ressourcenwahl button { width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid var(--linie); background: var(--blatt);
+                         font-size: 14px; line-height: 1; padding: 0; display: flex; align-items: center; justify-content: center; }
+.ressourcenwahl .rn { font-family: "IBM Plex Mono", monospace; font-weight: 700; min-width: 16px; text-align: center; }
+
+.karte-vorschau { display: flex; gap: 12px; align-items: center; padding: 12px; border: 1.5px solid var(--linie);
+                  border-radius: 12px; background: var(--blatt2); margin-bottom: 8px; cursor: pointer; }
+.karte-vorschau.gewaehlt { border-color: var(--akzent); background: var(--akzent-hell); }
+.karte-vorschau .ke { font-size: 26px; }
+.karte-vorschau .kt b { display: block; font-size: 14px; }
+.karte-vorschau .kt span { font-size: 12px; color: var(--tinte2); }
+
+/* --------------------------------------------------------- Eigenes Tableau */
+.tableau-schleier { position: fixed; inset: 0; background: #24140055; z-index: 40; }
+.tableau { position: fixed; left: 0; right: 0; bottom: 0; background: var(--blatt); border-radius: 20px 20px 0 0;
+           max-height: 82vh; overflow-y: auto; z-index: 41; padding: 8px 18px calc(20px + env(safe-area-inset-bottom));
+           box-shadow: 0 -10px 40px -10px #00000055; }
+.tableau-griff { width: 40px; height: 5px; background: var(--linie); border-radius: 3px; margin: 6px auto 12px; }
+.tableau-kopf { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.tableau-kopf .farbpunkt { width: 26px; height: 26px; }
+.tableau-kopf h2 { margin: 0; font-size: 18px; flex: 1; }
+.tableau-abschnitt { margin-bottom: 18px; }
+.tableau-abschnitt h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--tinte3);
+                        margin: 0 0 8px; font-weight: 700; }
+.lagerraster { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.lagerfach { text-align: center; padding: 10px 4px; border-radius: 10px; }
+.lagerfach .le { font-size: 17px; }
+.lagerfach .ln { font-family: "IBM Plex Mono", monospace; font-weight: 700; font-size: 16px; display: block; margin-top: 2px; }
+.chip-liste { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { display: inline-flex; align-items: center; gap: 5px; background: var(--blatt2); border: 1.5px solid var(--linie);
+        border-radius: 20px; padding: 5px 11px; font-size: 12.5px; }
+.missionskarte { display: flex; gap: 10px; align-items: flex-start; padding: 11px; border-radius: 11px;
+                background: var(--blatt2); border: 1.5px solid var(--linie); margin-bottom: 8px; }
+.missionskarte.erfuellt { border-color: var(--gut); background: color-mix(in srgb, var(--gut) 10%, var(--blatt2)); }
+.missionskarte .mie { font-size: 20px; }
+.missionskarte .mit b { font-size: 13.5px; }
+.missionskarte .mit p { margin: 2px 0 0; font-size: 12px; color: var(--tinte2); }
+.missionskarte .mip { margin-left: auto; font-family: "IBM Plex Mono", monospace; font-weight: 700; color: var(--akzent-dunkel); }
+.verdeckt-hinweis { text-align: center; padding: 24px 10px; color: var(--tinte2); }
+.verdeckt-hinweis button { margin-top: 10px; }
+
+/* ------------------------------------------------------------ Endergebnis */
+.endbuehne { padding: max(28px, env(safe-area-inset-top)) 18px 32px; overflow-y: auto; height: 100%; max-width: 600px; margin: 0 auto; }
+.endbuehne h1 { text-align: center; font-size: 26px; margin-bottom: 4px; }
+.endbuehne .unter { text-align: center; color: var(--tinte2); margin-bottom: 20px; }
+.platzkarte { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: 14px; margin-bottom: 10px;
+              border: 1.5px solid var(--linie); background: var(--blatt); }
+.platzkarte.sieger { border-color: var(--akzent); background: var(--akzent-hell); }
+.platzkarte .platz { font-family: "IBM Plex Mono", monospace; font-weight: 700; font-size: 20px; color: var(--tinte3); width: 26px; }
+.platzkarte .pname { flex: 1; font-weight: 700; }
+.platzkarte .ppunkte { font-family: "IBM Plex Mono", monospace; font-weight: 800; font-size: 20px; }
+.wertungsdetail { margin-top: 6px; font-size: 12px; color: var(--tinte2); }
+.wertungsdetail summary { cursor: pointer; color: var(--akzent-dunkel); font-weight: 600; }
+.wertungszeile { display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px dotted var(--linie2); }
+
+/* ------------------------------------------------------------ Ereignis-Banner */
+.karten-toast { position: fixed; top: max(14px, env(safe-area-inset-top)); left: 50%; transform: translateX(-50%);
+                background: var(--tinte); color: var(--papier); border-radius: 12px; padding: 10px 18px;
+                font-size: 13.5px; display: flex; align-items: center; gap: 8px; z-index: 60; box-shadow: 0 10px 30px -12px #000000aa;
+                max-width: 90vw; }
+.karten-toast .te { font-size: 18px; }
+
+.wartehinweis { position: fixed; bottom: calc(70px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%);
+               background: var(--info); color: #fff; border-radius: 20px; padding: 8px 16px; font-size: 12.5px;
+               font-weight: 700; z-index: 45; }
+</style>
+<div id="app"><noscript>Dieses Spiel braucht JavaScript.</noscript></div>
+<script type="application/json" id="spieldaten-json">{"version": 1, "regeln": {"runden": 8, "aktionspunkte": 3, "lagerlimit": 10, "inselkartenRunden": [2, 4, 6]}, "ressourcen": {"holz": {"name": "Holz", "emoji": "🪵", "farbe": "#7a5230", "hell": "#e8d9c5"}, "metall": {"name": "Metall", "emoji": "⚙️", "farbe": "#5a6673", "hell": "#d8dee5"}, "wasser": {"name": "Wasser", "emoji": "💧", "farbe": "#2a6f97", "hell": "#cfe4f2"}, "energie": {"name": "Energie", "emoji": "⚡", "farbe": "#b8860b", "hell": "#f7e9bf"}, "bauteil": {"name": "Seltenes Bauteil", "emoji": "💎", "farbe": "#6b4a9e", "hell": "#e4dbf5"}}, "gelaende": {"wald": {"name": "Wald", "emoji": "🌲", "gibt": "holz", "fuell": "#dbd5b2", "rand": "#7b7a4f"}, "mine": {"name": "Mine", "emoji": "⛏️", "gibt": "metall", "fuell": "#dad3c5", "rand": "#7d7264"}, "kueste": {"name": "Küste", "emoji": "🌊", "gibt": "wasser", "fuell": "#e9e1cd", "rand": "#8a8168"}, "energie": {"name": "Energiequelle", "emoji": "⚡", "gibt": "energie", "fuell": "#ecdcab", "rand": "#987d38"}, "ruine": {"name": "Ruine", "emoji": "🏛️", "gibt": null, "fuell": "#d5c8b0", "rand": "#796950"}, "grruine": {"name": "Große Ruine", "emoji": "🏛️", "gibt": null, "fuell": "#c7b593", "rand": "#67563d"}, "brachland": {"name": "Brachland", "emoji": "🏜️", "gibt": null, "fuell": "#f2ead9", "rand": "#b2a78e"}, "werkstatt": {"name": "Werkstatt", "emoji": "🏭", "gibt": null, "fuell": "#fffdf8", "rand": "#4a3b2a"}}, "spielerfarben": [{"key": "rot", "name": "Rot", "farbe": "#9c4a35", "hell": "#f8e6de"}, {"key": "blau", "name": "Blau", "farbe": "#3f6478", "hell": "#e4eef4"}, {"key": "gruen", "name": "Grün", "farbe": "#5a7345", "hell": "#eaefe1"}, {"key": "gelb", "name": "Gelb", "farbe": "#a8842c", "hell": "#faf2dd"}], "felder": [{"id": "0_0", "q": 0, "r": 0, "typ": "grruine", "fundmarken": 8}, {"id": "1_-1", "q": 1, "r": -1, "typ": "energie", "fundmarken": 0}, {"id": "1_0", "q": 1, "r": 0, "typ": "wald", "fundmarken": 0}, {"id": "0_1", "q": 0, "r": 1, "typ": "mine", "fundmarken": 0}, {"id": "-1_1", "q": -1, "r": 1, "typ": "ruine", "fundmarken": 4}, {"id": "-1_0", "q": -1, "r": 0, "typ": "wald", "fundmarken": 0}, {"id": "0_-1", "q": 0, "r": -1, "typ": "mine", "fundmarken": 0}, {"id": "2_-2", "q": 2, "r": -2, "typ": "werkstatt", "fundmarken": 0, "spieler": "rot"}, {"id": "2_-1", "q": 2, "r": -1, "typ": "kueste", "fundmarken": 0}, {"id": "2_0", "q": 2, "r": 0, "typ": "mine", "fundmarken": 0}, {"id": "1_1", "q": 1, "r": 1, "typ": "werkstatt", "fundmarken": 0, "spieler": "blau"}, {"id": "0_2", "q": 0, "r": 2, "typ": "brachland", "fundmarken": 0}, {"id": "-1_2", "q": -1, "r": 2, "typ": "energie", "fundmarken": 0}, {"id": "-2_2", "q": -2, "r": 2, "typ": "werkstatt", "fundmarken": 0, "spieler": "gruen"}, {"id": "-2_1", "q": -2, "r": 1, "typ": "kueste", "fundmarken": 0}, {"id": "-2_0", "q": -2, "r": 0, "typ": "brachland", "fundmarken": 0}, {"id": "-1_-1", "q": -1, "r": -1, "typ": "werkstatt", "fundmarken": 0, "spieler": "gelb"}, {"id": "0_-2", "q": 0, "r": -2, "typ": "wald", "fundmarken": 0}, {"id": "1_-2", "q": 1, "r": -2, "typ": "ruine", "fundmarken": 4}], "nachbarn": {"0_0": ["1_0", "-1_0", "0_1", "0_-1", "1_-1", "-1_1"], "1_-1": ["2_-1", "0_-1", "1_0", "1_-2", "2_-2", "0_0"], "1_0": ["2_0", "0_0", "1_1", "1_-1", "2_-1", "0_1"], "0_1": ["1_1", "-1_1", "0_2", "0_0", "1_0", "-1_2"], "-1_1": ["0_1", "-2_1", "-1_2", "-1_0", "0_0", "-2_2"], "-1_0": ["0_0", "-2_0", "-1_1", "-1_-1", "0_-1", "-2_1"], "0_-1": ["1_-1", "-1_-1", "0_0", "0_-2", "1_-2", "-1_0"], "2_-2": ["1_-2", "2_-1", "1_-1"], "2_-1": ["1_-1", "2_0", "2_-2", "1_0"], "2_0": ["1_0", "2_-1", "1_1"], "1_1": ["0_1", "1_0", "2_0", "0_2"], "0_2": ["-1_2", "0_1", "1_1"], "-1_2": ["0_2", "-2_2", "-1_1", "0_1"], "-2_2": ["-1_2", "-2_1", "-1_1"], "-2_1": ["-1_1", "-2_2", "-2_0", "-1_0"], "-2_0": ["-1_0", "-2_1", "-1_-1"], "-1_-1": ["0_-1", "-1_0", "0_-2", "-2_0"], "0_-2": ["1_-2", "0_-1", "-1_-1"], "1_-2": ["2_-2", "0_-2", "1_-1", "0_-1"]}, "startWerkstatt": {"rot": "2_-2", "blau": "1_1", "gruen": "-2_2", "gelb": "-1_-1"}, "grosseRuine": "0_0", "erfindungen": [{"id": "holzfaelleraxt", "stufe": 1, "emoji": "🪓", "name": "Holzfäller-Axt", "kosten": {"holz": 2, "metall": 1}, "punkte": 3, "text": "Wenn du im 🌲 Wald sammelst, bekommst du 1 🪵 Holz extra."}, {"id": "regenfaenger", "stufe": 1, "emoji": "🪣", "name": "Regenfänger", "kosten": {"holz": 1, "metall": 1, "wasser": 1}, "punkte": 3, "text": "Wenn du an der 🌊 Küste sammelst, bekommst du 1 💧 Wasser extra."}, {"id": "schubkarre", "stufe": 1, "emoji": "🛒", "name": "Schubkarre", "kosten": {"holz": 2}, "punkte": 3, "text": "Dein Lager fasst 4 Ressourcen mehr (also 14 statt 10)."}, {"id": "taschenlampe", "stufe": 1, "emoji": "🔦", "name": "Taschenlampe", "kosten": {"metall": 1, "energie": 1}, "punkte": 4, "text": "Wenn du eine Ruine untersuchst, ziehe 2 Fundkarten und behalte 1. Die andere kommt zurück unter den Stapel."}, {"id": "strickleiter", "stufe": 1, "emoji": "🪜", "name": "Strickleiter", "kosten": {"holz": 3}, "punkte": 3, "text": "Einmal pro Runde: Bewege dich 1 Feld weit, ohne einen Aktionspunkt zu bezahlen."}, {"id": "spitzhacke", "stufe": 1, "emoji": "⛏️", "name": "Spitzhacke", "kosten": {"holz": 1, "metall": 2}, "punkte": 4, "text": "Wenn du in der ⛏️ Mine sammelst, bekommst du 1 ⚙️ Metall extra."}, {"id": "lagerfeuer", "stufe": 1, "emoji": "🔥", "name": "Lagerfeuer", "kosten": {"holz": 2, "wasser": 1}, "punkte": 3, "text": "Einmal pro Runde: Tausche 2 gleiche Ressourcen gegen 1 beliebige. Das kostet keine Aktion."}, {"id": "signalhorn", "stufe": 1, "emoji": "📯", "name": "Signalhorn", "kosten": {"holz": 1, "metall": 1, "wasser": 1}, "punkte": 4, "text": "Handeln kostet dich keinen Aktionspunkt mehr."}, {"id": "miniflugmaschine", "stufe": 2, "emoji": "🚁", "name": "Mini-Flugmaschine", "kosten": {"metall": 2, "energie": 1, "holz": 1}, "punkte": 6, "text": "Einmal pro Runde: Fliege für 1 Aktionspunkt auf ein beliebiges Feld der Insel."}, {"id": "roboterhelfer", "stufe": 2, "emoji": "🤖", "name": "Roboter-Helfer", "kosten": {"metall": 3, "energie": 1}, "punkte": 5, "text": "Einmal pro Runde: Beim Sammeln bekommst du 1 zusätzliche Ressource des Feldes."}, {"id": "wasserrecycling", "stufe": 2, "emoji": "💧", "name": "Wasser-Recyclingmaschine", "kosten": {"metall": 2, "wasser": 2}, "punkte": 4, "text": "Am Spielende: Jedes 💧 Wasser in deinem Lager ist 1 Punkt wert."}, {"id": "aussichtsturm", "stufe": 2, "emoji": "🔭", "name": "Aussichtsturm", "kosten": {"holz": 3, "metall": 1}, "punkte": 5, "text": "Wenn du sammelst, darfst du stattdessen von einem angrenzenden Feld sammeln."}, {"id": "auslegerboot", "stufe": 2, "emoji": "🛶", "name": "Auslegerboot", "kosten": {"holz": 3, "wasser": 1}, "punkte": 5, "text": "Einmal pro Runde: Fahre für 1 Aktionspunkt auf ein beliebiges 🌊 Küstenfeld."}, {"id": "energiespeicher", "stufe": 2, "emoji": "🔌", "name": "Energiespeicher", "kosten": {"metall": 2, "energie": 1}, "punkte": 5, "text": "Am Spielende: Jede ⚡ Energie in deinem Lager ist 2 Punkte wert."}, {"id": "magnetkran", "stufe": 2, "emoji": "🧲", "name": "Magnetkran", "kosten": {"metall": 3, "holz": 1}, "punkte": 6, "text": "Einmal pro Runde: Sammle, ohne einen Aktionspunkt zu bezahlen."}, {"id": "feldlabor", "stufe": 2, "emoji": "🧪", "name": "Feldlabor", "kosten": {"metall": 2, "wasser": 1, "energie": 1}, "punkte": 6, "text": "Sofort: Ziehe 1 Forschungsauftrag. Außerdem einmal pro Runde: Tausche 1 Ressource gegen 1 andere, ohne Aktion."}, {"id": "destillieranlage", "stufe": 2, "emoji": "⚗️", "name": "Destillieranlage", "kosten": {"metall": 2, "wasser": 2, "energie": 1}, "punkte": 7, "text": "Einmal pro Runde für 1 Aktionspunkt: Tausche 3 💧 Wasser gegen 1 💎 seltenes Bauteil."}, {"id": "hebekran", "stufe": 2, "emoji": "🏗️", "name": "Hebekran", "kosten": {"holz": 2, "metall": 2}, "punkte": 5, "text": "Erfindungen bauen kostet dich nur noch 1 Aktionspunkt statt 2."}, {"id": "supergenerator", "stufe": 3, "emoji": "⚡", "name": "Supergenerator", "kosten": {"metall": 2, "energie": 2, "bauteil": 1}, "punkte": 10, "text": "Keine Fähigkeit – dafür besonders viele Punkte."}, {"id": "luftschiff", "stufe": 3, "emoji": "🛸", "name": "Luftschiff", "kosten": {"holz": 3, "metall": 2, "energie": 1}, "punkte": 9, "text": "Bewegung kostet dich ab jetzt nie mehr einen Aktionspunkt."}, {"id": "ruinenscanner", "stufe": 3, "emoji": "📡", "name": "Ruinen-Scanner", "kosten": {"metall": 2, "energie": 2, "bauteil": 1}, "punkte": 9, "text": "Einmal pro Runde: Untersuche eine Ruine, ohne einen Aktionspunkt zu bezahlen."}, {"id": "grossebruecke", "stufe": 3, "emoji": "🌉", "name": "Große Brücke", "kosten": {"holz": 4, "metall": 2}, "punkte": 7, "text": "Am Spielende: +1 Punkt für jede Erfindung, die du gebaut hast (diese mitgezählt)."}, {"id": "automatikfabrik", "stufe": 3, "emoji": "🏭", "name": "Automatik-Fabrik", "kosten": {"metall": 3, "energie": 2, "bauteil": 1}, "punkte": 11, "text": "Zu Beginn jeder Runde: Nimm 1 beliebige Ressource aus dem Vorrat."}, {"id": "leuchtturm", "stufe": 3, "emoji": "🗼", "name": "Leuchtturm der Erfinder", "kosten": {"holz": 2, "metall": 2, "wasser": 2, "energie": 1}, "punkte": 12, "text": "Am Spielende: Jedes übrige 💎 seltene Bauteil zählt 4 statt 2 Punkte."}], "ereignisse": [{"id": "tropensturm", "emoji": "🌪️", "name": "Tropensturm", "text": "Nächste Runde: Jede Bewegung kostet 1 Aktionspunkt mehr.", "art": "schlecht"}, {"id": "geistesblitz", "emoji": "💡", "name": "Geistesblitz", "text": "Nächste Runde: Jede Erfindung kostet 1 Ressource weniger (du suchst aus welche).", "art": "gut"}, {"id": "neugierigeaffen", "emoji": "🐒", "name": "Neugierige Affen", "text": "Jeder Spieler verliert sofort 1 Ressource seiner Wahl.", "art": "schlecht"}, {"id": "inselbebt", "emoji": "🌋", "name": "Die Insel bebt", "text": "Der Startspieler wählt 1 Feld (keine Werkstatt). Nächste Runde darf niemand darauf ziehen. Figuren, die dort stehen, dürfen bleiben.", "art": "schlecht"}, {"id": "regenzeit", "emoji": "🌧️", "name": "Regenzeit", "text": "Jeder Spieler nimmt 1 💧 Wasser aus dem Vorrat.", "art": "gut"}, {"id": "sonnensturm", "emoji": "☀️", "name": "Sonnensturm", "text": "Jeder Spieler auf einem ⚡ Energiefeld nimmt 1 ⚡ Energie. Alle anderen verlieren 1 ⚡ Energie, falls sie welche haben.", "art": "gemischt"}, {"id": "buntevoegel", "emoji": "🦜", "name": "Bunte Vögel", "text": "Nächste Runde: Jedes Sammeln bringt für alle 1 Ressource extra.", "art": "gut"}, {"id": "flut", "emoji": "🌊", "name": "Flut", "text": "Nächste Runde sind alle 🌊 Küstenfelder gesperrt. Figuren, die dort stehen, müssen als erste Aktion wegziehen.", "art": "schlecht"}, {"id": "waldbrand", "emoji": "🔥", "name": "Waldbrand", "text": "Nächste Runde kann im 🌲 Wald nicht gesammelt werden.", "art": "schlecht"}, {"id": "strandgut", "emoji": "🎁", "name": "Strandgut", "text": "Jeder Spieler, dessen Figur an der 🌊 Küste steht, nimmt 2 beliebige Ressourcen.", "art": "gut"}, {"id": "erfinderkongress", "emoji": "🤝", "name": "Erfinderkongress", "text": "Nächste Runde kostet Handeln für alle keinen Aktionspunkt.", "art": "gut"}, {"id": "sternenklarenacht", "emoji": "🌙", "name": "Sternenklare Nacht", "text": "Nächste Runde hat jeder Spieler 4 Aktionspunkte statt 3.", "art": "gut"}], "inselkarten": [{"id": "neueenergiequelle", "emoji": "⚡", "name": "Neue Energiequelle entdeckt!", "text": "Lege das ⚡ Insel-Plättchen auf ein 🏜️ Brachland. Dort kann ab jetzt Energie gesammelt werden."}, {"id": "verschuetteteruine", "emoji": "🏛️", "name": "Verschüttete Ruine freigelegt!", "text": "Lege das 🏛️ Insel-Plättchen auf ein 🏜️ Brachland und 3 Fundmarken darauf."}, {"id": "minebrichtein", "emoji": "⛏️", "name": "Die Mine bricht ein!", "text": "Lege das ⚠️ Plättchen auf ein ⛏️ Minenfeld. Dort kann nicht mehr gesammelt werden – dafür liegen jetzt 3 Fundmarken darauf – die Ruine kann untersucht werden."}, {"id": "waldwaechst", "emoji": "🌲", "name": "Der Wald wächst", "text": "Lege das 🌲 Insel-Plättchen auf ein 🏜️ Brachland. Dort kann ab jetzt Holz gesammelt werden."}, {"id": "wasserspiegelsteigt", "emoji": "🌊", "name": "Der Wasserspiegel steigt", "text": "Lege das 🌊 Insel-Plättchen auf ein beliebiges Randfeld (keine Werkstatt). Es ist ab jetzt Küste."}, {"id": "bruecke", "emoji": "🌉", "name": "Brücke über die Schlucht", "text": "Lege das 🌉 Plättchen zwischen die Große Ruine und ein beliebiges Werkstattfeld. Diese beiden Felder sind ab jetzt für alle benachbart."}, {"id": "leuchtpilze", "emoji": "🍄", "name": "Leuchtpilze", "text": "Lege auf jedes 🏛️ Ruinenfeld (auch die Große Ruine) 2 zusätzliche Fundkarten."}, {"id": "fruchtbareerde", "emoji": "🌺", "name": "Fruchtbare Erde", "text": "Ab jetzt bringt Sammeln im 🌲 Wald und an der 🌊 Küste für alle Spieler 1 Ressource extra."}], "fundkarten": [{"id": "fundbauteil", "emoji": "💎", "name": "Seltenes Bauteil", "anzahl": 8, "text": "Nimm 1 💎 seltenes Bauteil.", "relikt": false}, {"id": "reicherfund", "emoji": "💎💎", "name": "Reicher Fund", "anzahl": 3, "text": "Nimm 2 💎 seltene Bauteile.", "relikt": false}, {"id": "vorratskiste", "emoji": "📦", "name": "Alte Vorratskiste", "anzahl": 4, "text": "Nimm 2 beliebige Ressourcen (kein Bauteil).", "relikt": false}, {"id": "verwitterte", "emoji": "🗺️", "name": "Verwitterte Karte", "anzahl": 2, "text": "Nimm 1 beliebige Ressource und ziehe 1 Forschungsauftrag.", "relikt": false}, {"id": "reliktkompass", "emoji": "🧭", "name": "Relikt: Alter Kompass", "anzahl": 1, "text": "Behalte diese Karte offen. Deine erste Bewegung in jeder Runde kostet keinen Aktionspunkt.", "relikt": true}, {"id": "reliktbatterie", "emoji": "🔋", "name": "Relikt: Ewige Batterie", "anzahl": 1, "text": "Behalte diese Karte offen. Einmal pro Runde bekommst du beim Sammeln zusätzlich 1 ⚡ Energie.", "relikt": true}, {"id": "reliktwaechter", "emoji": "🗿", "name": "Relikt: Steinerner Wächter", "anzahl": 1, "text": "Behalte diese Karte offen. Am Spielende bekommst du +4 Punkte.", "relikt": true}], "auftraege": [{"id": "holzsammler", "emoji": "🪵", "name": "Holzsammler", "punkte": 3, "text": "Du hast am Spielende mindestens 4 🪵 Holz im Lager."}, {"id": "metallhaendler", "emoji": "⚙️", "name": "Metallhändler", "punkte": 3, "text": "Du hast am Spielende mindestens 4 ⚙️ Metall im Lager."}, {"id": "wassertraeger", "emoji": "💧", "name": "Wasserträger", "punkte": 3, "text": "Du hast am Spielende mindestens 4 💧 Wasser im Lager."}, {"id": "energiebuendel", "emoji": "⚡", "name": "Energiebündel", "punkte": 4, "text": "Du hast am Spielende mindestens 3 ⚡ Energie im Lager."}, {"id": "schatzsucher", "emoji": "💎", "name": "Schatzsucher", "punkte": 4, "text": "Du hast am Spielende mindestens 2 💎 seltene Bauteile im Lager."}, {"id": "weltenbummler", "emoji": "🧭", "name": "Weltenbummler", "punkte": 4, "text": "Deine Figur stand im Lauf des Spiels auf jeder Geländeart: 🌲 ⛏️ 🌊 ⚡ 🏛️ (Haken auf dem Werkstatt-Tableau machen!)."}, {"id": "baumeister", "emoji": "🔨", "name": "Baumeister", "punkte": 4, "text": "Du hast mindestens 3 Erfindungen gebaut."}, {"id": "grossmeister", "emoji": "🎓", "name": "Großmeister", "punkte": 5, "text": "Du hast mindestens 1 Erfindung der Stufe III gebaut."}, {"id": "ruinenforscher", "emoji": "🏛️", "name": "Ruinenforscher", "punkte": 4, "text": "Du hast mindestens 4-mal eine Ruine untersucht."}, {"id": "haendler", "emoji": "🤝", "name": "Händler", "punkte": 3, "text": "Du hast mindestens 3-mal mit anderen Spielern gehandelt."}, {"id": "heimwerker", "emoji": "🛠️", "name": "Heimwerker", "punkte": 3, "text": "Du hast mindestens 2 Erfindungen der Stufe I gebaut."}, {"id": "sparfuchs", "emoji": "📦", "name": "Sparfuchs", "punkte": 4, "text": "Du hast am Spielende mindestens 8 Ressourcen im Lager."}], "bonusziele": [{"id": "meistermaschinen", "emoji": "⚙️", "name": "Meister der Maschinen", "punkte": 5, "text": "Du hast mindestens 3 verschiedene Erfindungen gebaut."}, {"id": "vielfalt", "emoji": "🌈", "name": "Vielfalt", "punkte": 5, "text": "Du hast am Spielende von jeder Art mindestens 1: 🪵 ⚙️ 💧 ⚡ 💎"}, {"id": "entdecker", "emoji": "🔍", "name": "Entdecker", "punkte": 4, "text": "Du hast die meisten 💎 seltenen Bauteile gefunden (verbaute zählen mit). Bei Gleichstand bekommen alle die Punkte."}, {"id": "schnellbauer", "emoji": "🏁", "name": "Schnellbauer", "punkte": 4, "text": "Du hast als Erster eine Erfindung der Stufe III gebaut. Nur ein Spieler bekommt das."}, {"id": "energiemeister", "emoji": "⚡", "name": "Energiemeister", "punkte": 4, "text": "Du hast mindestens 2 Erfindungen gebaut, die ⚡ Energie gekostet haben."}, {"id": "guternachbar", "emoji": "🤝", "name": "Guter Nachbar", "punkte": 4, "text": "Du hast mindestens 3-mal mit anderen Spielern gehandelt."}, {"id": "heimatverbunden", "emoji": "🏠", "name": "Heimatverbunden", "punkte": 3, "text": "Deine Figur steht am Spielende auf deinem eigenen Werkstattfeld."}, {"id": "fleissig", "emoji": "🐝", "name": "Fleißig", "punkte": 6, "text": "Du hast mindestens 5 Erfindungen gebaut."}, {"id": "holzhuette", "emoji": "🌲", "name": "Holzhütte", "punkte": 4, "text": "Du hast mindestens 3 Erfindungen gebaut, die 🪵 Holz gekostet haben."}, {"id": "kuestenbewohner", "emoji": "🌊", "name": "Küstenbewohner", "punkte": 4, "text": "Du hast am Spielende mindestens 5 💧 Wasser im Lager."}]}</script>
+<script>
+window.SPIELDATEN = JSON.parse(document.getElementById("spieldaten-json").textContent);
+</script>
+<script>
+// -*- coding: utf-8 -*-
+//
+// motor.js — die Spiel-Engine von "Insel der Erfinder".
+//
+// Reiner Reducer: wende(zustand, aktion) -> {zustand, ereignisse, fehler}.
+// Nichts hier greift auf DOM, Netzwerk oder Zeit zu (außer Math.random beim
+// Erzeugen einer neuen Partie) — das macht die Engine leicht zu testen und
+// in Node genauso lauffähig wie im Browser, egal ob lokal oder online
+// gespielt wird. Erwartet eine globale Variable SPIELDATEN (siehe daten.json)
+// bevor diese Datei geladen wird.
+//
+// Namensraum: window.Motor im Browser, module.exports.Motor in Node.
+
+(function (global) {
+  "use strict";
+
+  const D = global.SPIELDATEN;
+  if (!D) throw new Error("SPIELDATEN fehlt — motor.js braucht die Spieldaten zuerst.");
+
+  const GRUNDROHSTOFFE = ["holz", "metall", "wasser", "energie"];
+  const ALLE_ROHSTOFFE = ["holz", "metall", "wasser", "energie", "bauteil"];
+  const EINMAL_PRO_RUNDE_SCHLUESSEL = [
+    "strickleiter", "lagerfeuer", "miniflugmaschine", "roboterhelfer", "auslegerboot",
+    "magnetkran", "feldlabor", "destillieranlage", "ruinenscanner",
+    "reliktkompass", "reliktbatterie",
+  ];
+
+  function klon(x) { return x === undefined ? x : JSON.parse(JSON.stringify(x)); }
+
+  function mische(liste, zzz) {
+    const rng = zzz || Math.random;
+    const a = liste.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(rng() * (i + 1));
+      const t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+
+  // ------------------------------------------------------------ Nachschlagen
+
+  const nach = { erfindung: {}, ereignis: {}, insel: {}, fund: {}, auftrag: {}, bonus: {}, feld: {} };
+  D.erfindungen.forEach(function (e) { nach.erfindung[e.id] = e; });
+  D.ereignisse.forEach(function (e) { nach.ereignis[e.id] = e; });
+  D.inselkarten.forEach(function (e) { nach.insel[e.id] = e; });
+  D.fundkarten.forEach(function (e) { nach.fund[e.id] = e; });
+  D.auftraege.forEach(function (e) { nach.auftrag[e.id] = e; });
+  D.bonusziele.forEach(function (e) { nach.bonus[e.id] = e; });
+  D.felder.forEach(function (f) { nach.feld[f.id] = f; });
+
+  function neueId(praefix) {
+    return praefix + "_" + Math.random().toString(36).slice(2, 10);
+  }
+
+  // -------------------------------------------------------------- Spielplan
+
+  /** Der aktuelle Feld-Typ, nachdem Inselkarten das Gelände verändert haben. */
+  function feldTyp(zustand, feldId) {
+    const ueb = zustand.brett.ueberschreibungen[feldId];
+    if (ueb && ueb.typ) return ueb.typ;
+    return nach.feld[feldId].typ;
+  }
+
+  function feldSpielerFarbe(feldId) {
+    const f = nach.feld[feldId];
+    return f && f.spieler ? f.spieler : null;
+  }
+
+  function feldGibt(zustand, feldId) {
+    const t = feldTyp(zustand, feldId);
+    const g = D.gelaende[t];
+    return g ? g.gibt : null;
+  }
+
+  function fundmarkenRest(zustand, feldId) {
+    const v = zustand.brett.fundmarkenRest[feldId];
+    return v === undefined ? 0 : v;
+  }
+
+  function istUntersuchbar(zustand, feldId) {
+    const t = feldTyp(zustand, feldId);
+    return (t === "ruine" || t === "grruine") && fundmarkenRest(zustand, feldId) > 0;
+  }
+
+  /** Nachbarn eines Feldes inklusive per Inselkarte gebauter Brücken. */
+  function nachbarnVon(zustand, feldId) {
+    const basis = D.nachbarn[feldId] || [];
+    const zusatz = [];
+    zustand.brett.zusatzKanten.forEach(function (paar) {
+      if (paar[0] === feldId) zusatz.push(paar[1]);
+      if (paar[1] === feldId) zusatz.push(paar[0]);
+    });
+    return basis.concat(zusatz);
+  }
+
+  function istGesperrtZumBetreten(zustand, feldId) {
+    if (zustand.rundenSperren.felder.indexOf(feldId) !== -1) return true;
+    const t = feldTyp(zustand, feldId);
+    return zustand.rundenSperren.gelaendeBewegen.indexOf(t) !== -1;
+  }
+
+  function istGesperrtZumSammeln(zustand, feldId) {
+    const t = feldTyp(zustand, feldId);
+    return zustand.rundenSperren.gelaendeSammeln.indexOf(t) !== -1;
+  }
+
+  // -------------------------------------------------------------- Spieler-Helfer
+
+  function hatErfindung(spieler, id) { return spieler.gebaut.indexOf(id) !== -1; }
+  function hatRelikt(spieler, id) { return spieler.relikte.indexOf(id) !== -1; }
+
+  function gesamtRessourcen(spieler, nurGrund) {
+    const liste = nurGrund ? GRUNDROHSTOFFE : ALLE_ROHSTOFFE;
+    return liste.reduce(function (s, k) { return s + (spieler.ressourcen[k] || 0); }, 0);
+  }
+
+  function lagerlimit(spieler) {
+    return D.regeln.lagerlimit + (hatErfindung(spieler, "schubkarre") ? 4 : 0);
+  }
+
+  function gibRessourcen(spieler, gaben) {
+    Object.keys(gaben).forEach(function (k) {
+      spieler.ressourcen[k] = (spieler.ressourcen[k] || 0) + gaben[k];
+    });
+  }
+
+  function kannBezahlen(spieler, kosten) {
+    return Object.keys(kosten).every(function (k) { return (spieler.ressourcen[k] || 0) >= kosten[k]; });
+  }
+
+  function bezahle(spieler, kosten) {
+    Object.keys(kosten).forEach(function (k) { spieler.ressourcen[k] -= kosten[k]; });
+  }
+
+  function merkeGelaendeBesuch(spieler, gelaendeTyp) {
+    if (spieler.zaehler.besuchteGelaende.indexOf(gelaendeTyp) === -1) {
+      spieler.zaehler.besuchteGelaende.push(gelaendeTyp);
+    }
+  }
+
+  // ------------------------------------------------------------- Protokoll
+
+  function log(zustand, text) {
+    zustand.protokoll.push({ runde: zustand.runde, text: text });
+    if (zustand.protokoll.length > 60) zustand.protokoll.shift();
+  }
+
+  // ============================================================ Spiel anlegen
+
+  function erstelleSpiel(sitzplaetze, namen) {
+    const zustand = {
+      version: 1,
+      erstellt: new Date().toISOString(),
+      phase: "spiel",
+      runde: 1,
+      sitzplaetze: sitzplaetze.slice(),
+      zugSitzIndex: 0,
+      zuegeDieseRunde: 0,
+      startspielerIndex: 0,
+      ap: D.regeln.aktionspunkte,
+      brett: { ueberschreibungen: {}, zusatzKanten: [], fundmarkenRest: {} },
+      rundenSperren: { felder: [], gelaendeBewegen: [], gelaendeSammeln: [] },
+      aktivEffekte: { diese: leereEffekte(), naechste: leereEffekte(), dauerhaft: { fruchtbareErde: false } },
+      spieler: {},
+      markt: { 1: [], 2: [], 3: [] },
+      stapel: { erfindungen: { 1: [], 2: [], 3: [] }, fund: [], fundAblage: [], ereignisse: [], insel: [] },
+      ausstehend: {},
+      handelsAngebot: null,
+      wartetAuf: null,
+      bonusziele: [],
+      ersterStufe3: null,
+      protokoll: [],
+      ergebnis: null,
+    };
+
+    D.felder.forEach(function (f) {
+      if (f.fundmarken) zustand.brett.fundmarkenRest[f.id] = f.fundmarken;
+    });
+
+    // Erfindungsstapel je Stufe mischen, Auslage füllen (2/2/1).
+    [1, 2, 3].forEach(function (stufe) {
+      const ids = D.erfindungen.filter(function (e) { return e.stufe === stufe; }).map(function (e) { return e.id; });
+      zustand.stapel.erfindungen[stufe] = mische(ids);
+    });
+    zustand.markt[1] = [zustand.stapel.erfindungen[1].pop(), zustand.stapel.erfindungen[1].pop()];
+    zustand.markt[2] = [zustand.stapel.erfindungen[2].pop(), zustand.stapel.erfindungen[2].pop()];
+    zustand.markt[3] = [zustand.stapel.erfindungen[3].pop()];
+
+    // Fundkartenstapel: jede Karte so oft, wie "anzahl" angibt.
+    let fund = [];
+    D.fundkarten.forEach(function (f) { for (let i = 0; i < f.anzahl; i++) fund.push(f.id); });
+    zustand.stapel.fund = mische(fund);
+
+    zustand.stapel.ereignisse = mische(D.ereignisse.map(function (e) { return e.id; }));
+    zustand.stapel.insel = mische(D.inselkarten.map(function (e) { return e.id; }));
+    zustand.bonusziele = mische(D.bonusziele.map(function (b) { return b.id; })).slice(0, 3);
+
+    const auftraegeStapel = mische(D.auftraege.map(function (a) { return a.id; }));
+
+    sitzplaetze.forEach(function (sitz, i) {
+      zustand.spieler[sitz] = {
+        name: (namen && namen[sitz]) || D.spielerfarben.find(function (s) { return s.key === sitz; }).name,
+        position: D.startWerkstatt[sitz],
+        ressourcen: { holz: 1, metall: 1, wasser: 1, energie: 0, bauteil: 0 },
+        gebaut: [],
+        relikte: [],
+        einmalProRunde: {},
+        zaehler: { getauscht: 0, untersucht: 0, besuchteGelaende: [], bauteileGefundenGesamt: 0 },
+        auftraege: [auftraegeStapel.pop(), auftraegeStapel.pop()],
+      };
+      merkeGelaendeBesuch(zustand.spieler[sitz], feldTyp(zustand, D.startWerkstatt[sitz]));
+      zustand.ausstehend[sitz] = [];
+    });
+
+    startZug(zustand, zustand.sitzplaetze[0]);
+    log(zustand, "Das Spiel beginnt. " + zustand.spieler[zustand.sitzplaetze[0]].name + " ist zuerst dran.");
+    return zustand;
+  }
+
+  function leereEffekte() {
+    return {
+      bewegenExtraKosten: 0, sammelnExtra: 0, handelnKostenlos: false, apBonus: 0,
+      geistesblitz: false, sperrFelder: [], sperrGelaendeBewegen: [], sperrGelaendeSammeln: [],
+    };
+  }
+
+  function startZug(zustand, sitz) {
+    zustand.zugSitzIndex = zustand.sitzplaetze.indexOf(sitz);
+    zustand.ap = D.regeln.aktionspunkte + zustand.aktivEffekte.diese.apBonus + (zustand.aktivEffekte.diese.bewegenExtraKosten ? 0 : 0);
+    EINMAL_PRO_RUNDE_SCHLUESSEL.forEach(function (k) { zustand.spieler[sitz].einmalProRunde[k] = false; });
+  }
+
+  // =============================================================== Aktionen
+
+  /** wende(zustand, aktion) -> { zustand, ereignisse, fehler } — nie mutiert das Original. */
+  function wende(zustandAlt, aktion) {
+    const zustand = klon(zustandAlt);
+    const ereignisse = [];
+    try {
+      const ergebnis = AKTIONEN[aktion.typ];
+      if (!ergebnis) return { zustand: zustandAlt, ereignisse: [], fehler: "Unbekannte Aktion: " + aktion.typ };
+      ergebnis(zustand, aktion, ereignisse);
+      return { zustand: zustand, ereignisse: ereignisse, fehler: null };
+    } catch (e) {
+      if (e instanceof Regelfehler) return { zustand: zustandAlt, ereignisse: [], fehler: e.message };
+      throw e;
+    }
+  }
+
+  function Regelfehler(msg) { this.message = msg; }
+  Regelfehler.prototype = Object.create(Error.prototype);
+
+  function pruefe(bedingung, meldung) {
+    if (!bedingung) throw new Regelfehler(meldung);
+  }
+
+  function istAmZug(zustand, sitz) {
+    return zustand.phase === "spiel" && !zustand.wartetAuf && zustand.sitzplaetze[zustand.zugSitzIndex] === sitz;
+  }
+
+  function verlangeEigenerZug(zustand, sitz) {
+    pruefe(zustand.phase === "spiel", "Das Spiel läuft nicht (mehr).");
+    pruefe(!zustand.wartetAuf, "Es wartet noch jemand auf eine Antwort.");
+    pruefe(zustand.sitzplaetze[zustand.zugSitzIndex] === sitz, "Du bist nicht am Zug.");
+  }
+
+  function verlangeAp(zustand, n) {
+    pruefe(zustand.ap >= n, "Nicht genug Aktionspunkte.");
+  }
+
+  const AKTIONEN = {};
+
+  // ------------------------------------------------------------------ Bewegen
+
+  AKTIONEN.bewegen = function (zustand, aktion, ereignisse) {
+    verlangeEigenerZug(zustand, aktion.sitz);
+    const spieler = zustand.spieler[aktion.sitz];
+    const ziel = aktion.ziel;
+    pruefe(nach.feld[ziel], "Unbekanntes Feld.");
+    pruefe(!istGesperrtZumBetreten(zustand, ziel), "Dieses Feld ist diese Runde gesperrt.");
+
+    const luftschiff = hatErfindung(spieler, "luftschiff");
+    let kostenlos = luftschiff;
+    let weiteFlugreise = false;
+
+    if (aktion.spezial === "fliegen") {
+      pruefe(hatErfindung(spieler, "miniflugmaschine"), "Du hast keine Mini-Flugmaschine.");
+      pruefe(!spieler.einmalProRunde.miniflugmaschine, "Die Mini-Flugmaschine ist diese Runde schon benutzt.");
+      spieler.einmalProRunde.miniflugmaschine = true;
+      weiteFlugreise = true;
+    } else if (aktion.spezial === "segeln") {
+      pruefe(hatErfindung(spieler, "auslegerboot"), "Du hast kein Auslegerboot.");
+      pruefe(!spieler.einmalProRunde.auslegerboot, "Das Auslegerboot ist diese Runde schon benutzt.");
+      pruefe(feldTyp(zustand, ziel) === "kueste", "Das Auslegerboot fährt nur zu Küstenfeldern.");
+      spieler.einmalProRunde.auslegerboot = true;
+      weiteFlugreise = true;
+    } else {
+      const nachbarn = nachbarnVon(zustand, spieler.position);
+      pruefe(nachbarn.indexOf(ziel) !== -1, "Das Feld grenzt nicht an deine Position an.");
+      if (!kostenlos && !spieler.einmalProRunde.strickleiter && hatErfindung(spieler, "strickleiter")) {
+        spieler.einmalProRunde.strickleiter = true;
+        kostenlos = true;
+      }
+      if (!kostenlos && !spieler.einmalProRunde.reliktkompass && hatRelikt(spieler, "reliktkompass")) {
+        spieler.einmalProRunde.reliktkompass = true;
+        kostenlos = true;
+      }
+    }
+
+    const kosten = weiteFlugreise ? 1 : (kostenlos ? 0 : 1 + zustand.aktivEffekte.diese.bewegenExtraKosten);
+    verlangeAp(zustand, kosten);
+    zustand.ap -= kosten;
+    spieler.position = ziel;
+    merkeGelaendeBesuch(spieler, feldTyp(zustand, ziel));
+    ereignisse.push({ typ: "bewegt", sitz: aktion.sitz, ziel: ziel });
+  };
+
+  // ------------------------------------------------------------------ Sammeln
+
+  AKTIONEN.sammeln = function (zustand, aktion, ereignisse) {
+    verlangeEigenerZug(zustand, aktion.sitz);
+    const spieler = zustand.spieler[aktion.sitz];
+
+    let quelle = spieler.position;
+    if (aktion.quelleFeld && aktion.quelleFeld !== spieler.position) {
+      pruefe(hatErfindung(spieler, "aussichtsturm"), "Nur der Aussichtsturm erlaubt Sammeln von einem Nachbarfeld.");
+      pruefe(nachbarnVon(zustand, spieler.position).indexOf(aktion.quelleFeld) !== -1, "Das ist kein Nachbarfeld.");
+      quelle = aktion.quelleFeld;
+    }
+
+    const rohstoff = feldGibt(zustand, quelle);
+    pruefe(rohstoff, "Auf diesem Feld gibt es nichts zu sammeln.");
+    pruefe(!istGesperrtZumSammeln(zustand, quelle), "Hier ist Sammeln diese Runde gesperrt.");
+
+    let kostenlos = false;
+    if (!spieler.einmalProRunde.magnetkran && hatErfindung(spieler, "magnetkran")) {
+      spieler.einmalProRunde.magnetkran = true;
+      kostenlos = true;
+    }
+    verlangeAp(zustand, kostenlos ? 0 : 1);
+
+    let menge = 1;
+    menge += zustand.aktivEffekte.diese.sammelnExtra;
+    if (zustand.aktivEffekte.dauerhaft.fruchtbareErde && (feldTyp(zustand, quelle) === "wald" || feldTyp(zustand, quelle) === "kueste")) menge += 1;
+    if (rohstoff === "holz" && hatErfindung(spieler, "holzfaelleraxt")) menge += 1;
+    if (rohstoff === "wasser" && hatErfindung(spieler, "regenfaenger")) menge += 1;
+    if (rohstoff === "metall" && hatErfindung(spieler, "spitzhacke")) menge += 1;
+    if (!spieler.einmalProRunde.roboterhelfer && hatErfindung(spieler, "roboterhelfer")) {
+      spieler.einmalProRunde.roboterhelfer = true;
+      menge += 1;
+    }
+
+    if (!kostenlos) zustand.ap -= 1;
+    const gaben = {}; gaben[rohstoff] = menge;
+    if (rohstoff === "energie") {
+      // nichts weiter
+    }
+    if (!spieler.einmalProRunde.reliktbatterie && hatRelikt(spieler, "reliktbatterie")) {
+      spieler.einmalProRunde.reliktbatterie = true;
+      gaben.energie = (gaben.energie || 0) + 1;
+    }
+    gibRessourcen(spieler, gaben);
+    merkeGelaendeBesuch(spieler, feldTyp(zustand, quelle));
+    ereignisse.push({ typ: "gesammelt", sitz: aktion.sitz, gaben: gaben });
+  };
+
+  // -------------------------------------------------------------- Untersuchen
+
+  AKTIONEN.untersuchen = function (zustand, aktion, ereignisse) {
+    verlangeEigenerZug(zustand, aktion.sitz);
+    const spieler = zustand.spieler[aktion.sitz];
+    pruefe(istUntersuchbar(zustand, spieler.position), "Hier gibt es keine Fundmarke mehr.");
+
+    let kostenlos = false;
+    if (!spieler.einmalProRunde.ruinenscanner && hatErfindung(spieler, "ruinenscanner")) {
+      spieler.einmalProRunde.ruinenscanner = true;
+      kostenlos = true;
+    }
+    verlangeAp(zustand, kostenlos ? 0 : 1);
+    if (!kostenlos) zustand.ap -= 1;
+
+    zustand.brett.fundmarkenRest[spieler.position] -= 1;
+    spieler.zaehler.untersucht += 1;
+
+    if (hatErfindung(spieler, "taschenlampe")) {
+      const a = ziehFundkarte(zustand);
+      const b = ziehFundkarte(zustand);
+      warteAuf(zustand, aktion.sitz, { art: "taschenlampe_wahl", karten: [a, b] });
+      ereignisse.push({ typ: "ruine_taschenlampe", sitz: aktion.sitz, karten: [a, b] });
+    } else {
+      const karte = ziehFundkarte(zustand);
+      wendeFundkarteAn(zustand, aktion.sitz, karte, ereignisse);
+    }
+  };
+
+  function ziehFundkarte(zustand) {
+    if (zustand.stapel.fund.length === 0) {
+      pruefe(zustand.stapel.fundAblage.length > 0, "Keine Fundkarten mehr übrig.");
+      zustand.stapel.fund = mische(zustand.stapel.fundAblage);
+      zustand.stapel.fundAblage = [];
+    }
+    return zustand.stapel.fund.pop();
+  }
+
+  function wendeFundkarteAn(zustand, sitz, kartenId, ereignisse) {
+    const karte = nach.fund[kartenId];
+    const spieler = zustand.spieler[sitz];
+    ereignisse.push({ typ: "fund_gezogen", sitz: sitz, karte: kartenId });
+
+    if (karte.relikt) {
+      spieler.relikte.push(kartenId);
+      log(zustand, spieler.name + " findet ein Relikt: " + karte.name + ".");
+      return;
+    }
+    zustand.stapel.fundAblage.push(kartenId);
+
+    switch (kartenId) {
+      case "fundbauteil":
+        gibRessourcen(spieler, { bauteil: 1 });
+        spieler.zaehler.bauteileGefundenGesamt += 1;
+        break;
+      case "reicherfund":
+        gibRessourcen(spieler, { bauteil: 2 });
+        spieler.zaehler.bauteileGefundenGesamt += 2;
+        break;
+      case "vorratskiste":
+        warteAuf(zustand, sitz, { art: "ressourcenwahl", anzahl: 2, ausschluss: ["bauteil"], grund: "vorratskiste" });
+        break;
+      case "verwitterte":
+        warteAuf(zustand, sitz, { art: "ressourcenwahl", anzahl: 1, ausschluss: ["bauteil"], grund: "verwitterte" });
+        ziehAuftrag(zustand, sitz);
+        break;
+    }
+    log(zustand, spieler.name + " findet: " + karte.name + ".");
+  }
+
+  function ziehAuftrag(zustand, sitz) {
+    // Alle noch nicht vergebenen Aufträge ermitteln und einen ziehen.
+    const vergeben = {};
+    Object.keys(zustand.spieler).forEach(function (s) {
+      zustand.spieler[s].auftraege.forEach(function (a) { vergeben[a] = true; });
+    });
+    const uebrig = D.auftraege.map(function (a) { return a.id; }).filter(function (id) { return !vergeben[id]; });
+    if (uebrig.length === 0) return;
+    zustand.spieler[sitz].auftraege.push(mische(uebrig)[0]);
+  }
+
+  // ------------------------------------------------------------------- Bauen
+
+  AKTIONEN.bauen = function (zustand, aktion, ereignisse) {
+    verlangeEigenerZug(zustand, aktion.sitz);
+    const spieler = zustand.spieler[aktion.sitz];
+    pruefe(spieler.position === D.startWerkstatt[aktion.sitz], "Du musst in deiner eigenen Werkstatt sein.");
+
+    const stufe = [1, 2, 3].filter(function (s) { return zustand.markt[s].indexOf(aktion.erfindungId) !== -1; })[0];
+    pruefe(stufe, "Diese Erfindung liegt nicht in der Auslage.");
+
+    const kartenkosten = klon(nach.erfindung[aktion.erfindungId].kosten);
+    if (zustand.aktivEffekte.diese.geistesblitz) {
+      const r = aktion.geistesblitzRessource;
+      pruefe(r && kartenkosten[r], "Wähle eine Ressource, die diese Erfindung kostet, für den Rabatt.");
+      kartenkosten[r] = Math.max(0, kartenkosten[r] - 1);
+    }
+    pruefe(kannBezahlen(spieler, kartenkosten), "Du hast nicht genug Rohstoffe.");
+
+    const apKosten = hatErfindung(spieler, "hebekran") ? 1 : 2;
+    verlangeAp(zustand, apKosten);
+    zustand.ap -= apKosten;
+    bezahle(spieler, kartenkosten);
+
+    zustand.markt[stufe] = zustand.markt[stufe].filter(function (id) { return id !== aktion.erfindungId; });
+    if (zustand.stapel.erfindungen[stufe].length > 0) {
+      zustand.markt[stufe].push(zustand.stapel.erfindungen[stufe].pop());
+    }
+    spieler.gebaut.push(aktion.erfindungId);
+
+    if (stufe === 3 && !zustand.ersterStufe3) zustand.ersterStufe3 = aktion.sitz;
+    if (aktion.erfindungId === "feldlabor") ziehAuftrag(zustand, aktion.sitz);
+
+    log(zustand, spieler.name + " baut: " + nach.erfindung[aktion.erfindungId].name + ".");
+    ereignisse.push({ typ: "gebaut", sitz: aktion.sitz, erfindungId: aktion.erfindungId });
+  };
+
+  // ---------------------------------------------------------------- Handeln
+
+  AKTIONEN.handeln_vorschlagen = function (zustand, aktion, ereignisse) {
+    verlangeEigenerZug(zustand, aktion.sitz);
+    pruefe(!zustand.handelsAngebot, "Es gibt schon ein offenes Handelsangebot.");
+    pruefe(zustand.spieler[aktion.anSitz], "Unbekannter Mitspieler.");
+    pruefe(aktion.anSitz !== aktion.sitz, "Du kannst nicht mit dir selbst handeln.");
+
+    const eigene = zustand.spieler[aktion.sitz];
+    const andere = zustand.spieler[aktion.anSitz];
+    const nachbarn = nachbarnVon(zustand, eigene.position).concat([eigene.position]);
+    pruefe(nachbarn.indexOf(andere.position) !== -1, "Dieser Spieler steht nicht auf oder neben deinem Feld.");
+    pruefe(kannBezahlen(eigene, aktion.gibt || {}), "Du hast diese Rohstoffe nicht.");
+    pruefe(kannBezahlen(andere, aktion.nimmt || {}), "Der andere Spieler hat diese Rohstoffe nicht.");
+
+    const kostenlos = zustand.aktivEffekte.diese.handelnKostenlos || hatErfindung(eigene, "signalhorn");
+    verlangeAp(zustand, kostenlos ? 0 : 1);
+
+    zustand.handelsAngebot = {
+      id: neueId("handel"), von: aktion.sitz, an: aktion.anSitz,
+      gibt: aktion.gibt || {}, nimmt: aktion.nimmt || {}, apKosten: kostenlos ? 0 : 1,
+    };
+    zustand.wartetAuf = aktion.anSitz;
+    log(zustand, eigene.name + " bietet " + andere.name + " einen Tausch an.");
+    ereignisse.push({ typ: "handel_angeboten", angebot: zustand.handelsAngebot });
+  };
+
+  AKTIONEN.handeln_antwort = function (zustand, aktion, ereignisse) {
+    pruefe(zustand.handelsAngebot, "Es liegt kein Angebot vor.");
+    pruefe(zustand.handelsAngebot.an === aktion.sitz, "Dieses Angebot richtet sich nicht an dich.");
+    const angebot = zustand.handelsAngebot;
+    const von = zustand.spieler[angebot.von];
+    const an = zustand.spieler[angebot.an];
+
+    if (aktion.annehmen) {
+      bezahle(von, angebot.gibt); gibRessourcen(an, angebot.gibt);
+      bezahle(an, angebot.nimmt); gibRessourcen(von, angebot.nimmt);
+      von.zaehler.getauscht += 1; an.zaehler.getauscht += 1;
+      zustand.ap -= angebot.apKosten;
+      log(zustand, an.name + " nimmt den Tausch an.");
+      ereignisse.push({ typ: "handel_angenommen", angebot: angebot });
+    } else {
+      log(zustand, an.name + " lehnt den Tausch ab.");
+      ereignisse.push({ typ: "handel_abgelehnt", angebot: angebot });
+    }
+    zustand.handelsAngebot = null;
+    zustand.wartetAuf = null;
+  };
+
+  // -------------------------------------------------------------- Tauschbank
+
+  AKTIONEN.tauschbank = function (zustand, aktion, ereignisse) {
+    verlangeEigenerZug(zustand, aktion.sitz);
+    const spieler = zustand.spieler[aktion.sitz];
+    pruefe(spieler.position === D.startWerkstatt[aktion.sitz], "Die Tauschbank gibt es nur in deiner eigenen Werkstatt.");
+    pruefe((spieler.ressourcen[aktion.gibtRessource] || 0) >= 3, "Du brauchst 3 gleiche Rohstoffe.");
+    verlangeAp(zustand, 1);
+    zustand.ap -= 1;
+    spieler.ressourcen[aktion.gibtRessource] -= 3;
+    gibRessourcen(spieler, (function () { const o = {}; o[aktion.nimmtRessource] = 1; return o; })());
+    ereignisse.push({ typ: "getauscht_bank", sitz: aktion.sitz });
+  };
+
+  // -------------------------------------------------------- Sonderfähigkeiten
+
+  AKTIONEN.sonderfaehigkeit = function (zustand, aktion, ereignisse) {
+    verlangeEigenerZug(zustand, aktion.sitz);
+    const spieler = zustand.spieler[aktion.sitz];
+    const schluessel = aktion.schluessel;
+
+    if (schluessel === "lagerfeuer" || schluessel === "feldlabor") {
+      pruefe(hatErfindung(spieler, schluessel), "Du hast diese Erfindung nicht.");
+      pruefe(!spieler.einmalProRunde[schluessel], "Schon diese Runde benutzt.");
+      const menge = schluessel === "lagerfeuer" ? 2 : 1;
+      pruefe((spieler.ressourcen[aktion.gibtRessource] || 0) >= menge, "Nicht genug Rohstoffe dafür.");
+      spieler.einmalProRunde[schluessel] = true;
+      spieler.ressourcen[aktion.gibtRessource] -= menge;
+      gibRessourcen(spieler, (function () { const o = {}; o[aktion.nimmtRessource] = 1; return o; })());
+      ereignisse.push({ typ: "sonderfaehigkeit", schluessel: schluessel, sitz: aktion.sitz });
+      return;
+    }
+
+    if (schluessel === "destillieranlage") {
+      pruefe(hatErfindung(spieler, schluessel), "Du hast die Destillieranlage nicht.");
+      pruefe(!spieler.einmalProRunde[schluessel], "Schon diese Runde benutzt.");
+      pruefe((spieler.ressourcen.wasser || 0) >= 3, "Du brauchst 3 Wasser.");
+      verlangeAp(zustand, 1);
+      spieler.einmalProRunde[schluessel] = true;
+      zustand.ap -= 1;
+      spieler.ressourcen.wasser -= 3;
+      gibRessourcen(spieler, { bauteil: 1 });
+      spieler.zaehler.bauteileGefundenGesamt += 1;
+      ereignisse.push({ typ: "sonderfaehigkeit", schluessel: schluessel, sitz: aktion.sitz });
+      return;
+    }
+
+    throw new Regelfehler("Unbekannte Sonderfähigkeit.");
+  };
+
+  // ----------------------------------------------------------- Zug beenden
+
+  AKTIONEN.zug_beenden = function (zustand, aktion, ereignisse) {
+    verlangeEigenerZug(zustand, aktion.sitz);
+    pruefe(zustand.ausstehend[aktion.sitz].length === 0, "Du musst erst noch etwas entscheiden.");
+
+    // Der Startspieler rotiert jede Runde (siehe rundeAbschliessen), darum
+    // reicht "Index bis ans Arrayende" nicht als Rundenende-Erkennung — wir
+    // zählen stattdessen, wie viele der sitzplaetze.length Spieler diese
+    // Runde schon dran waren, und laufen dabei rund um das Array herum.
+    zustand.zuegeDieseRunde += 1;
+    if (zustand.zuegeDieseRunde < zustand.sitzplaetze.length) {
+      const naechsterIndex = (zustand.zugSitzIndex + 1) % zustand.sitzplaetze.length;
+      const naechsterSitz = zustand.sitzplaetze[naechsterIndex];
+      startZug(zustand, naechsterSitz);
+      log(zustand, zustand.spieler[naechsterSitz].name + " ist am Zug.");
+      ereignisse.push({ typ: "naechster_zug", sitz: naechsterSitz });
+    } else {
+      rundeAbschliessen(zustand, ereignisse);
+    }
+  };
+
+  function rundeAbschliessen(zustand, ereignisse) {
+    // B) Lager prüfen — wer über dem Limit ist, muss abwerfen.
+    zustand.sitzplaetze.forEach(function (sitz) {
+      const spieler = zustand.spieler[sitz];
+      const ueberschuss = gesamtRessourcen(spieler, true) - lagerlimit(spieler);
+      if (ueberschuss > 0) warteAuf(zustand, sitz, { art: "abwerfen", anzahl: ueberschuss });
+    });
+
+    // C) Ereigniskarte aufdecken.
+    if (zustand.stapel.ereignisse.length === 0) zustand.stapel.ereignisse = mische(D.ereignisse.map(function (e) { return e.id; }));
+    const ereignisId = zustand.stapel.ereignisse.pop();
+    wendeEreignisAn(zustand, ereignisId, ereignisse);
+
+    // D) Inselentwicklung nach Runde 2, 4, 6.
+    if (D.regeln.inselkartenRunden.indexOf(zustand.runde) !== -1 && zustand.stapel.insel.length > 0) {
+      const inselId = zustand.stapel.insel.pop();
+      wendeInselkarteAn(zustand, inselId, ereignisse);
+    }
+
+    // Effekte für die neue Runde übernehmen ("nächste Runde" -> "diese Runde").
+    zustand.aktivEffekte.diese = zustand.aktivEffekte.naechste;
+    zustand.aktivEffekte.naechste = leereEffekte();
+    zustand.rundenSperren = {
+      felder: zustand.aktivEffekte.diese.sperrFelder,
+      gelaendeBewegen: zustand.aktivEffekte.diese.sperrGelaendeBewegen,
+      gelaendeSammeln: zustand.aktivEffekte.diese.sperrGelaendeSammeln,
+    };
+
+    // E) Rundenende.
+    zustand.runde += 1;
+    if (zustand.runde > D.regeln.runden) {
+      beendeSpiel(zustand, ereignisse);
+      return;
+    }
+    zustand.startspielerIndex = (zustand.startspielerIndex + 1) % zustand.sitzplaetze.length;
+
+    // Automatik-Fabrik: zu Beginn jeder Runde 1 beliebige Ressource.
+    zustand.sitzplaetze.forEach(function (sitz) {
+      if (hatErfindung(zustand.spieler[sitz], "automatikfabrik")) {
+        warteAuf(zustand, sitz, { art: "ressourcenwahl", anzahl: 1, ausschluss: [], grund: "automatikfabrik" });
+      }
+    });
+
+    zustand.zuegeDieseRunde = 0;
+    const ersterSitz = zustand.sitzplaetze[zustand.startspielerIndex];
+    startZug(zustand, ersterSitz);
+    log(zustand, "— Runde " + zustand.runde + " beginnt. " + zustand.spieler[ersterSitz].name + " ist Startspieler. —");
+    ereignisse.push({ typ: "neue_runde", runde: zustand.runde });
+  }
+
+  // ----------------------------------------------------------- Ereigniskarten
+
+  function wendeEreignisAn(zustand, id, ereignisse) {
+    const karte = nach.ereignis[id];
+    log(zustand, "Ereignis: " + karte.name + " — " + karte.text);
+    ereignisse.push({ typ: "ereignis", karte: id });
+    const naechste = zustand.aktivEffekte.naechste;
+
+    switch (id) {
+      case "tropensturm": naechste.bewegenExtraKosten = 1; break;
+      case "geistesblitz": naechste.geistesblitz = true; break;
+      case "neugierigeaffen":
+        zustand.sitzplaetze.forEach(function (sitz) {
+          if (gesamtRessourcen(zustand.spieler[sitz], false) > 0) {
+            warteAuf(zustand, sitz, { art: "verlustwahl", anzahl: 1, grund: "neugierigeaffen" });
+          }
+        });
+        break;
+      case "inselbebt": {
+        const optionen = D.felder.map(function (f) { return f.id; }).filter(function (fid) { return feldSpielerFarbe(fid) === null; });
+        warteAuf(zustand, zustand.sitzplaetze[zustand.startspielerIndex], { art: "feldwahl_sperren", optionen: optionen });
+        break;
+      }
+      case "regenzeit":
+        zustand.sitzplaetze.forEach(function (sitz) { gibRessourcen(zustand.spieler[sitz], { wasser: 1 }); });
+        break;
+      case "sonnensturm":
+        zustand.sitzplaetze.forEach(function (sitz) {
+          const spieler = zustand.spieler[sitz];
+          if (feldTyp(zustand, spieler.position) === "energie") gibRessourcen(spieler, { energie: 1 });
+          else if (spieler.ressourcen.energie > 0) spieler.ressourcen.energie -= 1;
+        });
+        break;
+      case "buntevoegel": naechste.sammelnExtra = 1; break;
+      case "flut":
+        naechste.sperrGelaendeBewegen.push("kueste");
+        naechste.sperrGelaendeSammeln.push("kueste");
+        break;
+      case "waldbrand": naechste.sperrGelaendeSammeln.push("wald"); break;
+      case "strandgut":
+        zustand.sitzplaetze.forEach(function (sitz) {
+          if (feldTyp(zustand, zustand.spieler[sitz].position) === "kueste") {
+            warteAuf(zustand, sitz, { art: "ressourcenwahl", anzahl: 2, ausschluss: ["bauteil"], grund: "strandgut" });
+          }
+        });
+        break;
+      case "erfinderkongress": naechste.handelnKostenlos = true; break;
+      case "sternenklarenacht": naechste.apBonus = 1; break;
+    }
+  }
+
+  // ------------------------------------------------------------ Inselkarten
+
+  function freieBrachlandFelder(zustand) {
+    return D.felder.filter(function (f) { return feldTyp(zustand, f.id) === "brachland"; }).map(function (f) { return f.id; });
+  }
+
+  function beliebigesErsatzfeld(zustand) {
+    return D.felder
+      .filter(function (f) { return f.typ !== "werkstatt" && f.id !== D.grosseRuine; })
+      .map(function (f) { return f.id; });
+  }
+
+  function setzeFeldTyp(zustand, feldId, typ, fundmarken) {
+    zustand.brett.ueberschreibungen[feldId] = zustand.brett.ueberschreibungen[feldId] || {};
+    zustand.brett.ueberschreibungen[feldId].typ = typ;
+    if (fundmarken) zustand.brett.fundmarkenRest[feldId] = fundmarken;
+  }
+
+  function wendeInselkarteAn(zustand, id, ereignisse) {
+    const karte = nach.insel[id];
+    log(zustand, "Inselentwicklung: " + karte.name);
+    ereignisse.push({ typ: "inselkarte", karte: id });
+    const startSitz = zustand.sitzplaetze[zustand.startspielerIndex];
+
+    function zielFeld(bevorzugterTyp) {
+      const brachland = freieBrachlandFelder(zustand);
+      if (brachland.length === 1) return { feld: brachland[0], mehrereOptionen: null };
+      if (brachland.length > 1) return { feld: null, mehrereOptionen: brachland };
+      const ersatz = beliebigesErsatzfeld(zustand).filter(function (f) { return feldTyp(zustand, f) !== bevorzugterTyp; });
+      if (ersatz.length === 1) return { feld: ersatz[0], mehrereOptionen: null };
+      return { feld: null, mehrereOptionen: ersatz };
+    }
+
+    switch (id) {
+      case "neueenergiequelle": case "waldwaechst": {
+        const typ = id === "neueenergiequelle" ? "energie" : "wald";
+        const z = zielFeld(typ);
+        if (z.feld) setzeFeldTyp(zustand, z.feld, typ);
+        else warteAuf(zustand, startSitz, { art: "feldwahl_insel", optionen: z.mehrereOptionen, insel: id });
+        break;
+      }
+      case "verschuetteteruine": case "minebrichtein": {
+        const bevorzugt = id === "minebrichtein" ? "mine" : "brachland";
+        let ziel;
+        if (id === "minebrichtein") {
+          const minen = D.felder.filter(function (f) { return feldTyp(zustand, f.id) === "mine"; }).map(function (f) { return f.id; });
+          ziel = minen.length === 1 ? minen[0] : null;
+          if (!ziel && minen.length > 1) { warteAuf(zustand, startSitz, { art: "feldwahl_insel", optionen: minen, insel: id }); break; }
+        } else {
+          const z = zielFeld(bevorzugt);
+          if (z.feld) ziel = z.feld;
+          else { warteAuf(zustand, startSitz, { art: "feldwahl_insel", optionen: z.mehrereOptionen, insel: id }); break; }
+        }
+        setzeFeldTyp(zustand, ziel, "ruine", 3);
+        break;
+      }
+      case "wasserspiegelsteigt": {
+        const kandidaten = D.felder
+          .filter(function (f) { return f.typ !== "werkstatt" && f.id !== D.grosseRuine && feldTyp(zustand, f.id) !== "kueste"; })
+          .map(function (f) { return f.id; });
+        if (kandidaten.length === 1) setzeFeldTyp(zustand, kandidaten[0], "kueste");
+        else warteAuf(zustand, startSitz, { art: "feldwahl_insel", optionen: kandidaten, insel: id });
+        break;
+      }
+      case "bruecke": {
+        const schonVerbunden = {};
+        zustand.brett.zusatzKanten.forEach(function (p) { schonVerbunden[p[0]] = true; schonVerbunden[p[1]] = true; });
+        const werkstaetten = Object.keys(D.startWerkstatt).map(function (s) { return D.startWerkstatt[s]; })
+          .filter(function (f) { return !schonVerbunden[f]; });
+        if (werkstaetten.length === 1) zustand.brett.zusatzKanten.push([D.grosseRuine, werkstaetten[0]]);
+        else if (werkstaetten.length > 1) warteAuf(zustand, startSitz, { art: "feldwahl_insel", optionen: werkstaetten, insel: id });
+        break;
+      }
+      case "leuchtpilze":
+        D.felder.forEach(function (f) {
+          if (feldTyp(zustand, f.id) === "ruine" || feldTyp(zustand, f.id) === "grruine") {
+            zustand.brett.fundmarkenRest[f.id] = fundmarkenRest(zustand, f.id) + 2;
+          }
+        });
+        break;
+      case "fruchtbareerde": zustand.aktivEffekte.dauerhaft.fruchtbareErde = true; break;
+    }
+  }
+
+  // -------------------------------------------------------------- Ausstehend
+
+  function warteAuf(zustand, sitz, eintrag) {
+    eintrag.id = neueId("aus");
+    zustand.ausstehend[sitz] = zustand.ausstehend[sitz] || [];
+    zustand.ausstehend[sitz].push(eintrag);
+  }
+
+  AKTIONEN.ausstehend_loesen = function (zustand, aktion, ereignisse) {
+    const liste = zustand.ausstehend[aktion.sitz] || [];
+    const index = liste.findIndex(function (e) { return e.id === aktion.eintragId; });
+    pruefe(index !== -1, "Dieser Punkt steht bei dir nicht mehr aus.");
+    const eintrag = liste[index];
+    const spieler = zustand.spieler[aktion.sitz];
+
+    switch (eintrag.art) {
+      case "abwerfen": {
+        const gaben = aktion.wahl || {};
+        const summe = Object.keys(gaben).reduce(function (s, k) { return s + gaben[k]; }, 0);
+        pruefe(summe === eintrag.anzahl, "Du musst genau " + eintrag.anzahl + " abwerfen.");
+        Object.keys(gaben).forEach(function (k) {
+          pruefe((spieler.ressourcen[k] || 0) >= gaben[k], "Du hast davon nicht so viele.");
+          spieler.ressourcen[k] -= gaben[k];
+        });
+        break;
+      }
+      case "verlustwahl": {
+        const r = aktion.wahl && aktion.wahl.ressource;
+        pruefe(r && (spieler.ressourcen[r] || 0) > 0, "Wähle eine Ressource, die du besitzt.");
+        spieler.ressourcen[r] -= 1;
+        break;
+      }
+      case "ressourcenwahl": {
+        const gaben = aktion.wahl || {};
+        const summe = Object.keys(gaben).reduce(function (s, k) { return s + gaben[k]; }, 0);
+        pruefe(summe === eintrag.anzahl, "Wähle genau " + eintrag.anzahl + " Rohstoff(e).");
+        (eintrag.ausschluss || []).forEach(function (k) { pruefe(!gaben[k], "Das darf hier nicht gewählt werden."); });
+        gibRessourcen(spieler, gaben);
+        break;
+      }
+      case "feldwahl_sperren": {
+        pruefe(eintrag.optionen.indexOf(aktion.wahl) !== -1, "Ungültiges Feld.");
+        zustand.aktivEffekte.naechste.sperrFelder.push(aktion.wahl);
+        break;
+      }
+      case "feldwahl_insel": {
+        pruefe(eintrag.optionen.indexOf(aktion.wahl) !== -1, "Ungültiges Feld.");
+        if (eintrag.insel === "bruecke") zustand.brett.zusatzKanten.push([D.grosseRuine, aktion.wahl]);
+        else if (eintrag.insel === "minebrichtein" || eintrag.insel === "verschuetteteruine") setzeFeldTyp(zustand, aktion.wahl, "ruine", 3);
+        else if (eintrag.insel === "neueenergiequelle") setzeFeldTyp(zustand, aktion.wahl, "energie");
+        else if (eintrag.insel === "waldwaechst") setzeFeldTyp(zustand, aktion.wahl, "wald");
+        else if (eintrag.insel === "wasserspiegelsteigt") setzeFeldTyp(zustand, aktion.wahl, "kueste");
+        break;
+      }
+      case "taschenlampe_wahl": {
+        pruefe(eintrag.karten.indexOf(aktion.wahl) !== -1, "Das war keine der beiden Karten.");
+        const andere = eintrag.karten.filter(function (k) { return k !== aktion.wahl; })[0];
+        zustand.stapel.fund.unshift(andere);
+        liste.splice(index, 1);
+        wendeFundkarteAn(zustand, aktion.sitz, aktion.wahl, ereignisse);
+        return;
+      }
+      default:
+        throw new Regelfehler("Unbekannter ausstehender Punkt.");
+    }
+    liste.splice(index, 1);
+    ereignisse.push({ typ: "ausstehend_geloest", sitz: aktion.sitz, art: eintrag.art });
+  };
+
+  // =============================================================== Wertung
+
+  function beendeSpiel(zustand, ereignisse) {
+    zustand.phase = "ende";
+    const platzierung = zustand.sitzplaetze.map(function (sitz) { return berechneWertung(zustand, sitz); });
+    platzierung.sort(function (a, b) {
+      if (b.punkte !== a.punkte) return b.punkte - a.punkte;
+      if (b.erfindungen !== a.erfindungen) return b.erfindungen - a.erfindungen;
+      return b.bauteile - a.bauteile;
+    });
+    zustand.ergebnis = { platzierung: platzierung };
+    log(zustand, "Das Spiel ist zu Ende. " + zustand.spieler[platzierung[0].sitz].name + " gewinnt!");
+    ereignisse.push({ typ: "spiel_ende", ergebnis: zustand.ergebnis });
+  }
+
+  function bonuszielErfuellt(zustand, sitz, bonusId) {
+    const spieler = zustand.spieler[sitz];
+    const alle = zustand.sitzplaetze.map(function (s) { return zustand.spieler[s]; });
+    switch (bonusId) {
+      case "meistermaschinen": return new Set(spieler.gebaut).size >= 3;
+      case "vielfalt": return ALLE_ROHSTOFFE.every(function (r) { return (spieler.ressourcen[r] || 0) >= 1; });
+      case "entdecker": {
+        const werte = alle.map(function (s) { return s.zaehler.bauteileGefundenGesamt; });
+        const max = Math.max.apply(null, werte);
+        return max > 0 && spieler.zaehler.bauteileGefundenGesamt === max;
+      }
+      case "schnellbauer": return zustand.ersterStufe3 === sitz;
+      case "energiemeister": return spieler.gebaut.filter(function (id) { return (nach.erfindung[id].kosten.energie || 0) > 0; }).length >= 2;
+      case "guternachbar": return spieler.zaehler.getauscht >= 3;
+      case "heimatverbunden": return spieler.position === D.startWerkstatt[sitz];
+      case "fleissig": return spieler.gebaut.length >= 5;
+      case "holzhuette": return spieler.gebaut.filter(function (id) { return (nach.erfindung[id].kosten.holz || 0) > 0; }).length >= 3;
+      case "kuestenbewohner": return (spieler.ressourcen.wasser || 0) >= 5;
+      default: return false;
+    }
+  }
+
+  function auftragErfuellt(zustand, sitz, auftragId) {
+    const spieler = zustand.spieler[sitz];
+    switch (auftragId) {
+      case "holzsammler": return (spieler.ressourcen.holz || 0) >= 4;
+      case "metallhaendler": return (spieler.ressourcen.metall || 0) >= 4;
+      case "wassertraeger": return (spieler.ressourcen.wasser || 0) >= 4;
+      case "energiebuendel": return (spieler.ressourcen.energie || 0) >= 3;
+      case "schatzsucher": return (spieler.ressourcen.bauteil || 0) >= 2;
+      case "weltenbummler": return ["wald", "mine", "kueste", "energie", "ruine"].every(function (t) {
+        return spieler.zaehler.besuchteGelaende.indexOf(t) !== -1 || (t === "ruine" && spieler.zaehler.besuchteGelaende.indexOf("grruine") !== -1);
+      });
+      case "baumeister": return spieler.gebaut.length >= 3;
+      case "grossmeister": return spieler.gebaut.some(function (id) { return nach.erfindung[id].stufe === 3; });
+      case "ruinenforscher": return spieler.zaehler.untersucht >= 4;
+      case "haendler": return spieler.zaehler.getauscht >= 3;
+      case "heimwerker": return spieler.gebaut.filter(function (id) { return nach.erfindung[id].stufe === 1; }).length >= 2;
+      case "sparfuchs": return gesamtRessourcen(spieler, true) >= 8;
+      default: return false;
+    }
+  }
+
+  function berechneWertung(zustand, sitz) {
+    const spieler = zustand.spieler[sitz];
+    const details = { erfindungen: [], bauteile: 0, auftraege: [], bonusziele: [], relikte: [], restRohstoffe: 0 };
+    let punkte = 0;
+
+    spieler.gebaut.forEach(function (id) {
+      const e = nach.erfindung[id];
+      details.erfindungen.push({ id: id, name: e.name, punkte: e.punkte });
+      punkte += e.punkte;
+    });
+    if (hatErfindung(spieler, "grossebruecke")) punkte += spieler.gebaut.length;
+
+    const bauteilWert = hatErfindung(spieler, "leuchtturm") ? 4 : 2;
+    details.bauteile = spieler.ressourcen.bauteil || 0;
+    punkte += details.bauteile * bauteilWert;
+
+    spieler.auftraege.forEach(function (id) {
+      const erfuellt = auftragErfuellt(zustand, sitz, id);
+      details.auftraege.push({ id: id, name: nach.auftrag[id].name, punkte: nach.auftrag[id].punkte, erfuellt: erfuellt });
+      if (erfuellt) punkte += nach.auftrag[id].punkte;
+    });
+
+    zustand.bonusziele.forEach(function (id) {
+      const erfuellt = bonuszielErfuellt(zustand, sitz, id);
+      details.bonusziele.push({ id: id, name: nach.bonus[id].name, punkte: nach.bonus[id].punkte, erfuellt: erfuellt });
+      if (erfuellt) punkte += nach.bonus[id].punkte;
+    });
+
+    if (hatRelikt(spieler, "reliktwaechter")) { details.relikte.push({ id: "reliktwaechter", punkte: 4 }); punkte += 4; }
+
+    // Restliche Rohstoffe: Wasser/Energie ggf. per Erfindung einzeln, Rest 3:1.
+    const pool = { holz: spieler.ressourcen.holz || 0, metall: spieler.ressourcen.metall || 0 };
+    if (hatErfindung(spieler, "wasserrecycling")) { punkte += (spieler.ressourcen.wasser || 0); }
+    else pool.wasser = spieler.ressourcen.wasser || 0;
+    if (hatErfindung(spieler, "energiespeicher")) { punkte += (spieler.ressourcen.energie || 0) * 2; }
+    else pool.energie = spieler.ressourcen.energie || 0;
+    const restSumme = Object.keys(pool).reduce(function (s, k) { return s + pool[k]; }, 0);
+    details.restRohstoffe = Math.floor(restSumme / 3);
+    punkte += details.restRohstoffe;
+
+    return { sitz: sitz, name: spieler.name, punkte: punkte, erfindungen: spieler.gebaut.length, bauteile: details.bauteile, details: details };
+  }
+
+  // ======================================================= Mögliche Aktionen
+  //
+  // Für die UI (welche Knöpfe sind anklickbar?) und für automatisierte Tests.
+  // Gibt niemals AP-Kosten>vorhanden zurück; prüft aber nicht jede einzelne
+  // Regel — wende() bleibt die einzige Wahrheit. Bei einer abgelehnten
+  // Aktion einfach ignorieren und neu anzeigen (der Zustand ändert sich ja
+  // nicht).
+
+  function gueltigeAktionen(zustand, sitz) {
+    const liste = [];
+    if (zustand.phase !== "spiel") return liste;
+
+    (zustand.ausstehend[sitz] || []).forEach(function (eintrag) {
+      liste.push({ typ: "ausstehend_loesen", sitz: sitz, eintragId: eintrag.id, eintrag: eintrag });
+    });
+    if (liste.length > 0) return liste; // erst entscheiden, dann weiter
+
+    if (zustand.wartetAuf === sitz && zustand.handelsAngebot) {
+      liste.push({ typ: "handeln_antwort", sitz: sitz, annehmen: true });
+      liste.push({ typ: "handeln_antwort", sitz: sitz, annehmen: false });
+      return liste;
+    }
+    if (zustand.wartetAuf) return liste; // jemand anders muss erst antworten
+
+    if (!istAmZug(zustand, sitz)) return liste;
+    const spieler = zustand.spieler[sitz];
+
+    const bewegenKostenlos = hatErfindung(spieler, "luftschiff")
+      || (!spieler.einmalProRunde.strickleiter && hatErfindung(spieler, "strickleiter"))
+      || (!spieler.einmalProRunde.reliktkompass && hatRelikt(spieler, "reliktkompass"));
+    const bewegenKosten = bewegenKostenlos ? 0 : 1 + zustand.aktivEffekte.diese.bewegenExtraKosten;
+
+    if (zustand.ap >= bewegenKosten) {
+      nachbarnVon(zustand, spieler.position).forEach(function (ziel) {
+        if (!istGesperrtZumBetreten(zustand, ziel)) liste.push({ typ: "bewegen", sitz: sitz, ziel: ziel });
+      });
+    }
+    if (zustand.ap >= 1) {
+      if (hatErfindung(spieler, "miniflugmaschine") && !spieler.einmalProRunde.miniflugmaschine) {
+        D.felder.forEach(function (f) {
+          if (f.id !== spieler.position && !istGesperrtZumBetreten(zustand, f.id)) {
+            liste.push({ typ: "bewegen", sitz: sitz, ziel: f.id, spezial: "fliegen" });
+          }
+        });
+      }
+      if (hatErfindung(spieler, "auslegerboot") && !spieler.einmalProRunde.auslegerboot) {
+        D.felder.forEach(function (f) {
+          if (feldTyp(zustand, f.id) === "kueste" && !istGesperrtZumBetreten(zustand, f.id)) {
+            liste.push({ typ: "bewegen", sitz: sitz, ziel: f.id, spezial: "segeln" });
+          }
+        });
+      }
+    }
+
+    const sammelnKostenlos = !spieler.einmalProRunde.magnetkran && hatErfindung(spieler, "magnetkran");
+    if (zustand.ap >= (sammelnKostenlos ? 0 : 1)) {
+      if (feldGibt(zustand, spieler.position) && !istGesperrtZumSammeln(zustand, spieler.position)) {
+        liste.push({ typ: "sammeln", sitz: sitz });
+      }
+      if (hatErfindung(spieler, "aussichtsturm")) {
+        nachbarnVon(zustand, spieler.position).forEach(function (n) {
+          if (feldGibt(zustand, n) && !istGesperrtZumSammeln(zustand, n)) {
+            liste.push({ typ: "sammeln", sitz: sitz, quelleFeld: n });
+          }
+        });
+      }
+    }
+
+    const untersuchenKostenlos = !spieler.einmalProRunde.ruinenscanner && hatErfindung(spieler, "ruinenscanner");
+    if (zustand.ap >= (untersuchenKostenlos ? 0 : 1) && istUntersuchbar(zustand, spieler.position)) {
+      liste.push({ typ: "untersuchen", sitz: sitz });
+    }
+
+    if (spieler.position === D.startWerkstatt[sitz]) {
+      [1, 2, 3].forEach(function (stufe) {
+        zustand.markt[stufe].forEach(function (id) {
+          const apKosten = hatErfindung(spieler, "hebekran") ? 1 : 2;
+          if (zustand.ap < apKosten) return;
+          const kosten = nach.erfindung[id].kosten;
+          if (zustand.aktivEffekte.diese.geistesblitz) {
+            Object.keys(kosten).forEach(function (r) {
+              const probe = klon(kosten); probe[r] = Math.max(0, probe[r] - 1);
+              if (kannBezahlen(spieler, probe)) liste.push({ typ: "bauen", sitz: sitz, erfindungId: id, geistesblitzRessource: r });
+            });
+          } else if (kannBezahlen(spieler, kosten)) {
+            liste.push({ typ: "bauen", sitz: sitz, erfindungId: id });
+          }
+        });
+      });
+      ALLE_ROHSTOFFE.forEach(function (g) {
+        if ((spieler.ressourcen[g] || 0) >= 3 && zustand.ap >= 1) {
+          ALLE_ROHSTOFFE.forEach(function (n) { if (n !== g) liste.push({ typ: "tauschbank", sitz: sitz, gibtRessource: g, nimmtRessource: n }); });
+        }
+      });
+    }
+
+    if (zustand.ap >= 1 || zustand.aktivEffekte.diese.handelnKostenlos || hatErfindung(spieler, "signalhorn")) {
+      const hierUndDaneben = nachbarnVon(zustand, spieler.position).concat([spieler.position]);
+      zustand.sitzplaetze.forEach(function (anderer) {
+        if (anderer === sitz) return;
+        if (hierUndDaneben.indexOf(zustand.spieler[anderer].position) !== -1) {
+          liste.push({ typ: "handeln_vorschlagen", sitz: sitz, anSitz: anderer, gibt: {}, nimmt: {} });
+        }
+      });
+    }
+
+    if (hatErfindung(spieler, "lagerfeuer") && !spieler.einmalProRunde.lagerfeuer) {
+      ALLE_ROHSTOFFE.forEach(function (g) {
+        if ((spieler.ressourcen[g] || 0) >= 2) liste.push({ typ: "sonderfaehigkeit", sitz: sitz, schluessel: "lagerfeuer", gibtRessource: g });
+      });
+    }
+    if (hatErfindung(spieler, "feldlabor") && !spieler.einmalProRunde.feldlabor) {
+      ALLE_ROHSTOFFE.forEach(function (g) {
+        if ((spieler.ressourcen[g] || 0) >= 1) liste.push({ typ: "sonderfaehigkeit", sitz: sitz, schluessel: "feldlabor", gibtRessource: g });
+      });
+    }
+    if (hatErfindung(spieler, "destillieranlage") && !spieler.einmalProRunde.destillieranlage && zustand.ap >= 1 && (spieler.ressourcen.wasser || 0) >= 3) {
+      liste.push({ typ: "sonderfaehigkeit", sitz: sitz, schluessel: "destillieranlage" });
+    }
+
+    liste.push({ typ: "zug_beenden", sitz: sitz });
+    return liste;
+  }
+
+  // =================================================================== Export
+
+  const Motor = {
+    erstelleSpiel: erstelleSpiel,
+    wende: wende,
+    gueltigeAktionen: gueltigeAktionen,
+    hilfen: {
+      feldTyp: feldTyp, feldGibt: feldGibt, fundmarkenRest: fundmarkenRest,
+      istUntersuchbar: istUntersuchbar, nachbarnVon: nachbarnVon,
+      istGesperrtZumBetreten: istGesperrtZumBetreten, istGesperrtZumSammeln: istGesperrtZumSammeln,
+      hatErfindung: hatErfindung, hatRelikt: hatRelikt, gesamtRessourcen: gesamtRessourcen,
+      lagerlimit: lagerlimit, istAmZug: istAmZug, berechneWertung: berechneWertung,
+      auftragErfuellt: auftragErfuellt, bonuszielErfuellt: bonuszielErfuellt,
+    },
+    nach: nach,
+  };
+
+  if (typeof module !== "undefined" && module.exports) module.exports = { Motor: Motor };
+  else global.Motor = Motor;
+})(typeof window !== "undefined" ? window : global);
+
+</script>
+<script>
+// -*- coding: utf-8 -*-
+//
+// app.js — die Oberfläche von "Insel der Erfinder" (Online-Spiel).
+// Setzt auf motor.js auf (reiner Reducer) und kennt zwei Speicher:
+//   - Lokal: alles in einer JS-Variable, für Pass-and-Play auf einem Gerät.
+//   - Online: ein gemeinsames Dokument über die "db"-Fähigkeit, für Partien
+//     über mehrere Geräte hinweg (setzt voraus, dass der Betrachter das
+//     Spiel im selben Kontext / derselben Organisation öffnet).
+//
+// Diese Datei erwartet SPIELDATEN (window) und Motor (window), beide von
+// vorherigen <script>-Blöcken gesetzt.
+
+(function () {
+  "use strict";
+
+  const D = window.SPIELDATEN;
+  const M = window.Motor;
+  const APP_EL = document.getElementById("app");
+
+  // ----------------------------------------------------------------- Hilfen
+
+  function h(html) {
+    const t = document.createElement("template");
+    t.innerHTML = html.trim();
+    return t.content.firstElementChild;
+  }
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+  function neueId(n) { return Math.random().toString(36).slice(2, 2 + n); }
+  function jetzt() { return Date.now(); }
+
+  const RESSOURCE_LISTE = ["holz", "metall", "wasser", "energie", "bauteil"];
+  function ressourceZeichen(k) { return D.ressourcen[k].emoji; }
+  function ressourceFarbe(k) { return "var(--" + k + ")"; }
+  function ressourceFarbeHell(k) { return "var(--" + k + "-hell)"; }
+  function farbeVon(sitz) { return D.spielerfarben.find(function (s) { return s.key === sitz; }); }
+
+  function kostenChips(kosten) {
+    return RESSOURCE_LISTE.filter(function (k) { return kosten[k]; }).map(function (k) {
+      return '<span style="background:' + ressourceFarbeHell(k) + ";color:" + ressourceFarbe(k) + '">' +
+        ressourceZeichen(k) + "&nbsp;" + kosten[k] + "</span>";
+    }).join("");
+  }
+
+  // --------------------------------------------------------- Client-Identität
+
+  function holeClientId() {
+    let id = localStorage.getItem("insel-client-id");
+    if (!id) { id = neueId(16); localStorage.setItem("insel-client-id", id); }
+    return id;
+  }
+
+  // ======================================================================
+  // App-Zustand (nicht zu verwechseln mit dem Spielzustand aus motor.js)
+  // ======================================================================
+
+  const App = {
+    bildschirm: "start",     // start | lobbyLokal | lobbyOnlineErstellen | lobbyOnlineBeitreten | spiel | ende
+    modus: null,             // "lokal" | "online"
+    zustand: null,           // der Spielzustand (aus motor.js)
+    meinSitzOnline: null,    // fest belegter Sitz im Online-Modus
+    raumcode: null,
+    sitze: {},               // nur online: { farbe: {clientId, name} }
+    dbVerfuegbar: null,      // null = noch unbekannt, true/false danach
+    clientId: holeClientId(),
+    fehler: null,
+    brettModus: "ruhe",      // ruhe | zielWaehlen | flugZielWaehlen | segelZielWaehlen
+    seitenleisteOffen: false,
+    seitenleisteTab: "markt",
+    offenesTableau: null,    // Sitz, dessen Tableau gerade offen ist
+    missionenSichtbar: false,
+    toast: null,
+    localLobby: { anzahl: 2, namen: {} },
+  };
+
+  let dbNamespace = null;
+  let raumAbmelden = null;
+
+  // ------------------------------------------------------------- Lokale Sicherung
+
+  function sichereLokal() {
+    if (App.modus !== "lokal" || !App.zustand) return;
+    try { localStorage.setItem("insel-lokal-spiel", JSON.stringify(App.zustand)); } catch (e) { /* egal */ }
+  }
+  function ladeLokal() {
+    try {
+      const s = localStorage.getItem("insel-lokal-spiel");
+      return s ? JSON.parse(s) : null;
+    } catch (e) { return null; }
+  }
+  function loescheLokal() { try { localStorage.removeItem("insel-lokal-spiel"); } catch (e) { /* egal */ } }
+
+  // ======================================================================
+  // Wer muss gerade handeln? (vereinheitlicht Lokal- und Online-Modus)
+  // ======================================================================
+
+  function ermittleHandelndenSitz(zustand) {
+    if (!zustand) return null;
+    for (let i = 0; i < zustand.sitzplaetze.length; i++) {
+      const s = zustand.sitzplaetze[i];
+      if ((zustand.ausstehend[s] || []).length > 0) return s;
+    }
+    if (zustand.wartetAuf) return zustand.wartetAuf;
+    return zustand.sitzplaetze[zustand.zugSitzIndex];
+  }
+
+  /** Der Sitz, aus dessen Sicht DIESES Gerät gerade die Oberfläche zeigt. */
+  function wirksamerSitz() {
+    if (!App.zustand) return null;
+    if (App.modus === "lokal") return ermittleHandelndenSitz(App.zustand);
+    return App.meinSitzOnline;
+  }
+
+  // ======================================================================
+  // Aktionen senden
+  // ======================================================================
+
+  function melde(text, art) {
+    App.toast = { text: text, art: art || "info", id: neueId(6) };
+    render();
+    setTimeout(function () {
+      if (App.toast && App.toast.text === text) { App.toast = null; render(); }
+    }, 3200);
+  }
+
+  async function sende(aktion) {
+    App.fehler = null;
+    if (App.modus === "lokal") {
+      const r = M.wende(App.zustand, aktion);
+      if (r.fehler) { melde(r.fehler, "fehler"); return; }
+      App.zustand = r.zustand;
+      App.brettModus = "ruhe";
+      zeigeKartenToast(r.ereignisse);
+      sichereLokal();
+      render();
+      return;
+    }
+    // Online: immer erst frisch lesen, dann anwenden, dann minimal schreiben.
+    try {
+      const ref = raumDok();
+      const snap = await ref.get();
+      if (!snap.exists) { melde("Der Raum wurde geschlossen.", "fehler"); return; }
+      const dok = snap.data();
+      const r = M.wende(dok, aktion);
+      if (r.fehler) { melde(r.fehler, "fehler"); return; }
+      App.brettModus = "ruhe";
+      const patch = berechneMinimalesUpdate(dok, r.zustand);
+      if (Object.keys(patch).length > 0) await ref.update(patch);
+      zeigeKartenToast(r.ereignisse);
+      // App.zustand wird gleich über onSnapshot aktualisiert.
+    } catch (e) {
+      melde("Verbindung hat nicht geklappt: " + (e && e.message ? e.message : e), "fehler");
+    }
+  }
+
+  function zeigeKartenToast(ereignisse) {
+    ereignisse.forEach(function (e) {
+      if (e.typ === "ereignis") melde((M.nach.ereignis[e.karte].emoji) + " " + M.nach.ereignis[e.karte].name, "karte");
+      if (e.typ === "inselkarte") melde((M.nach.insel[e.karte].emoji) + " " + M.nach.insel[e.karte].name, "karte");
+      if (e.typ === "spiel_ende") { App.bildschirm = "ende"; loescheLokal(); }
+    });
+  }
+
+  function berechneMinimalesUpdate(alt, neu) {
+    const patch = {};
+    Object.keys(neu).forEach(function (schluessel) {
+      if (schluessel === "spieler" || schluessel === "ausstehend") {
+        const teil = {};
+        Object.keys(neu[schluessel]).forEach(function (sitz) {
+          if (JSON.stringify((alt[schluessel] || {})[sitz]) !== JSON.stringify(neu[schluessel][sitz])) {
+            teil[sitz] = neu[schluessel][sitz];
+          }
+        });
+        if (Object.keys(teil).length > 0) patch[schluessel] = teil;
+      } else if (JSON.stringify(alt[schluessel]) !== JSON.stringify(neu[schluessel])) {
+        patch[schluessel] = neu[schluessel];
+      }
+    });
+    return patch;
+  }
+
+  // ======================================================================
+  // Online: Raum anlegen / beitreten / abonnieren
+  // ======================================================================
+
+  function raumDok() { return dbNamespace.collection("rooms").doc(App.raumcode); }
+
+  async function pruefeDbVerfuegbarkeit() {
+    try {
+      dbNamespace = await window.claude.use("db");
+    } catch (e) { dbNamespace = null; }
+    App.dbVerfuegbar = !!dbNamespace;
+    render();
+  }
+
+  async function raumErstellen(name) {
+    if (!dbNamespace) return;
+    const code = neueId(4).toUpperCase();
+    App.raumcode = code;
+    const farbe = D.spielerfarben[0].key;
+    App.meinSitzOnline = farbe;
+    const sitze = {};
+    sitze[farbe] = { clientId: App.clientId, name: name };
+    await raumDok().set({ phase: "lobby", sitze: sitze, gastgeberClientId: App.clientId, erstelltAm: new Date().toISOString() });
+    location.hash = "raum=" + code;
+    abonniereRaum();
+  }
+
+  async function raumBeitreten(code, name, farbe) {
+    if (!dbNamespace) return;
+    App.raumcode = code.toUpperCase().trim();
+    const ref = raumDok();
+    const snap = await ref.get();
+    if (!snap.exists) { melde("Diesen Raumcode gibt es nicht.", "fehler"); App.raumcode = null; render(); return; }
+    const dok = snap.data();
+    if (dok.phase && dok.phase !== "lobby") { melde("Diese Partie läuft schon.", "fehler"); App.raumcode = null; render(); return; }
+    const sitze = Object.assign({}, dok.sitze || {});
+    const belegt = sitze[farbe];
+    if (belegt && belegt.clientId !== App.clientId) { melde("Diese Farbe ist schon vergeben.", "fehler"); return; }
+    sitze[farbe] = { clientId: App.clientId, name: name };
+    await ref.update({ sitze: sitze });
+    App.meinSitzOnline = farbe;
+    location.hash = "raum=" + App.raumcode;
+    abonniereRaum();
+  }
+
+  function abonniereRaum() {
+    App.modus = "online";
+    if (raumAbmelden) raumAbmelden();
+    App.fehler = null;
+    raumAbmelden = raumDok().onSnapshot(function (snap) {
+      if (!snap.exists) { melde("Der Raum wurde geschlossen.", "fehler"); return; }
+      const dok = snap.data();
+      App.sitze = dok.sitze || {};
+      if (dok.phase === "lobby") {
+        App.bildschirm = "lobbyOnlineWarten";
+        App.zustand = null;
+      } else {
+        App.zustand = dok;
+        App.bildschirm = dok.phase === "ende" ? "ende" : "spiel";
+      }
+      render();
+    }, function (err) {
+      melde("Verbindung verloren: " + err.message, "fehler");
+    });
+    App.bildschirm = "lobbyOnlineWarten";
+    render();
+  }
+
+  async function raumSpielStarten() {
+    const snap = await raumDok().get();
+    const dok = snap.data();
+    const sitze = dok.sitze || {};
+    const reihenfolge = D.spielerfarben.map(function (s) { return s.key; }).filter(function (k) { return sitze[k]; });
+    if (reihenfolge.length < 2) { melde("Mindestens 2 Spieler nötig.", "fehler"); return; }
+    const namen = {};
+    reihenfolge.forEach(function (k) { namen[k] = sitze[k].name; });
+    const zustand = M.erstelleSpiel(reihenfolge, namen);
+    await raumDok().set(Object.assign({ sitze: sitze, gastgeberClientId: dok.gastgeberClientId }, zustand));
+  }
+
+  function raumVerlassen() {
+    if (raumAbmelden) { raumAbmelden(); raumAbmelden = null; }
+    App.modus = null; App.raumcode = null; App.meinSitzOnline = null; App.zustand = null; App.sitze = {};
+    location.hash = "";
+    App.bildschirm = "start";
+    render();
+  }
+
+  // ======================================================================
+  // Lokale Partie anlegen
+  // ======================================================================
+
+  function lokaleParieStarten() {
+    const anzahl = App.localLobby.anzahl;
+    const sitzplaetze = D.spielerfarben.slice(0, anzahl).map(function (s) { return s.key; });
+    const namen = {};
+    sitzplaetze.forEach(function (s) { namen[s] = (App.localLobby.namen[s] || "").trim() || farbeVon(s).name; });
+    App.modus = "lokal";
+    App.zustand = M.erstelleSpiel(sitzplaetze, namen);
+    App.bildschirm = "spiel";
+    sichereLokal();
+    render();
+  }
+
+  // ======================================================================
+  // Rendern
+  // ======================================================================
+
+  function render() {
+    APP_EL.innerHTML = "";
+    let inhalt;
+    switch (App.bildschirm) {
+      case "start": inhalt = renderStart(); break;
+      case "lobbyLokal": inhalt = renderLobbyLokal(); break;
+      case "lobbyOnlineErstellen": inhalt = renderLobbyOnlineErstellen(); break;
+      case "lobbyOnlineBeitreten": inhalt = renderLobbyOnlineBeitreten(); break;
+      case "lobbyOnlineWarten": inhalt = renderLobbyOnlineWarten(); break;
+      case "spiel": inhalt = renderSpiel(); break;
+      case "ende": inhalt = renderEnde(); break;
+      default: inhalt = h('<div>?</div>');
+    }
+    APP_EL.appendChild(inhalt);
+    if (App.toast) APP_EL.appendChild(renderToast());
+    if (App.bildschirm === "spiel") {
+      const eingehend = eingehendesAngebot();
+      if (eingehend) APP_EL.appendChild(renderHandelEingehendModal(eingehend));
+      else if (aktivesAusstehend()) APP_EL.appendChild(renderAusstehendModal(aktivesAusstehend()));
+      else if (App.modalAktion) APP_EL.appendChild(renderAktionsModal(App.modalAktion));
+      if (App.offenesTableau) APP_EL.appendChild(renderTableau(App.offenesTableau));
+    }
+  }
+
+  function renderToast() {
+    const t = App.toast;
+    return h('<div class="karten-toast"><span class="te">' + (t.art === "fehler" ? "⚠️" : t.art === "karte" ? "🃏" : "ℹ️") +
+      '</span><span>' + esc(t.text) + '</span></div>');
+  }
+
+  // ------------------------------------------------------------------ Start
+
+  function renderStart() {
+    const el = h('<div class="start"></div>');
+    el.appendChild(h(
+      '<div class="start-kopf"><div class="emoji">🏝️</div><h1>Insel der Erfinder</h1>' +
+      '<p>Das digitale Brett zum Spiel — spielbereit, mit allen Erfindungen, Ereignissen und Missionen.</p></div>'
+    ));
+    const gespeichert = ladeLokal();
+    const gruppe = h('<div class="wahlkarten"></div>');
+    if (gespeichert && gespeichert.phase === "spiel") {
+      const weiter = h(
+        '<button class="wahlkarte" id="weiterspielen"><span class="we">↩️</span>' +
+        '<span class="wt"><b>Gespeicherte Partie fortsetzen</b><span>Runde ' + gespeichert.runde + ' von ' + D.regeln.runden + '</span></span></button>'
+      );
+      weiter.onclick = function () {
+        App.modus = "lokal"; App.zustand = gespeichert; App.bildschirm = "spiel"; render();
+      };
+      gruppe.appendChild(weiter);
+    }
+    const lokal = h(
+      '<button class="wahlkarte" id="waehle-lokal"><span class="we">🪑</span>' +
+      '<span class="wt"><b>Lokal auf diesem Gerät</b><span>2–4 Spieler reichen sich ein Gerät weiter — funktioniert überall, sofort.</span></span></button>'
+    );
+    lokal.onclick = function () { App.bildschirm = "lobbyLokal"; render(); };
+    gruppe.appendChild(lokal);
+
+    const erstellen = h(
+      '<button class="wahlkarte" id="waehle-online-erstellen"><span class="we">🌐</span>' +
+      '<span class="wt"><b>Online-Raum erstellen</b><span>Ein Spielstand, live geteilt über mehrere Geräte.</span></span></button>'
+    );
+    erstellen.onclick = function () { App.bildschirm = "lobbyOnlineErstellen"; render(); if (App.dbVerfuegbar === null) pruefeDbVerfuegbarkeit(); };
+    gruppe.appendChild(erstellen);
+
+    const beitreten = h(
+      '<button class="wahlkarte" id="waehle-online-beitreten"><span class="we">🔑</span>' +
+      '<span class="wt"><b>Einem Raum beitreten</b><span>Du hast schon einen Raumcode bekommen.</span></span></button>'
+    );
+    beitreten.onclick = function () { App.bildschirm = "lobbyOnlineBeitreten"; render(); if (App.dbVerfuegbar === null) pruefeDbVerfuegbarkeit(); };
+    gruppe.appendChild(beitreten);
+
+    el.appendChild(gruppe);
+    return el;
+  }
+
+  function zurueckKnopf(ziel) {
+    const b = h('<button class="zurueck-link">← Zurück</button>');
+    b.onclick = function () { App.bildschirm = ziel; render(); };
+    return b;
+  }
+
+  // ------------------------------------------------------------- Lokale Lobby
+
+  function renderLobbyLokal() {
+    const el = h('<div class="start"></div>');
+    el.appendChild(zurueckKnopf("start"));
+    el.appendChild(h('<div class="start-kopf"><div class="emoji">🪑</div><h1>Lokal spielen</h1>' +
+      '<p>Wie viele Erfinder sitzen am Tisch?</p></div>'));
+
+    const anzahlGruppe = h('<div class="feld-gruppe"><label>Anzahl Spieler</label></div>');
+    const anzahlReihe = h('<div style="display:flex;gap:8px"></div>');
+    [2, 3, 4].forEach(function (n) {
+      const b = h('<button class="knopf ' + (App.localLobby.anzahl === n ? "primaer" : "zweitrangig") + '" style="flex:1">' + n + '</button>');
+      b.onclick = function () { App.localLobby.anzahl = n; render(); };
+      anzahlReihe.appendChild(b);
+    });
+    anzahlGruppe.appendChild(anzahlReihe);
+    el.appendChild(anzahlGruppe);
+
+    const namenGruppe = h('<div class="feld-gruppe"><label>Namen (optional)</label></div>');
+    const liste = h('<div class="spielerliste"></div>');
+    D.spielerfarben.slice(0, App.localLobby.anzahl).forEach(function (s) {
+      const zeile = h('<div class="spielerzeile"><span class="farbpunkt" style="background:' + s.farbe + '"></span></div>');
+      const input = document.createElement("input");
+      input.placeholder = s.name; input.value = App.localLobby.namen[s.key] || "";
+      input.oninput = function () { App.localLobby.namen[s.key] = input.value; };
+      zeile.appendChild(input);
+      liste.appendChild(zeile);
+    });
+    namenGruppe.appendChild(liste);
+    el.appendChild(namenGruppe);
+
+    const start = h('<button class="knopf primaer breit">🏝️ Spiel beginnen</button>');
+    start.onclick = lokaleParieStarten;
+    el.appendChild(start);
+    return el;
+  }
+
+  // -------------------------------------------------------- Online: erstellen
+
+  function renderLobbyOnlineErstellen() {
+    const el = h('<div class="start"></div>');
+    el.appendChild(zurueckKnopf("start"));
+    el.appendChild(h('<div class="start-kopf"><div class="emoji">🌐</div><h1>Online-Raum erstellen</h1>' +
+      '<p>Andere öffnen diese Seite und geben deinen Code ein.</p></div>'));
+    if (App.dbVerfuegbar === false) {
+      el.appendChild(h('<div class="fehlermeldung">Online-Räume sind hier gerade nicht verfügbar. ' +
+        'Das kann daran liegen, dass diese Seite nicht als geteilter Raum geöffnet ist. Nimm stattdessen den lokalen Modus.</div>'));
+      return el;
+    }
+    const gruppe = h('<div class="feld-gruppe"><label>Dein Name</label></div>');
+    const input = document.createElement("input");
+    input.className = "textfeld"; input.placeholder = "z. B. Theresa"; input.id = "online-name";
+    gruppe.appendChild(input);
+    el.appendChild(gruppe);
+    const knopf = h('<button class="knopf primaer breit">Raum erstellen</button>');
+    knopf.disabled = App.dbVerfuegbar !== true;
+    knopf.onclick = function () { raumErstellen(input.value.trim() || "Erfinder 1"); };
+    el.appendChild(knopf);
+    if (App.dbVerfuegbar === null) el.appendChild(h('<p style="text-align:center;color:var(--tinte2);font-size:13px;margin-top:10px">Prüfe Verfügbarkeit …</p>'));
+    return el;
+  }
+
+  function renderLobbyOnlineBeitreten() {
+    const el = h('<div class="start"></div>');
+    el.appendChild(zurueckKnopf("start"));
+    el.appendChild(h('<div class="start-kopf"><div class="emoji">🔑</div><h1>Raum beitreten</h1>' +
+      '<p>Gib den Code ein, den du bekommen hast.</p></div>'));
+    if (App.dbVerfuegbar === false) {
+      el.appendChild(h('<div class="fehlermeldung">Online-Räume sind hier gerade nicht verfügbar.</div>'));
+      return el;
+    }
+    const codeGruppe = h('<div class="feld-gruppe"><label>Raumcode</label></div>');
+    const codeInput = document.createElement("input");
+    codeInput.className = "textfeld code-feld"; codeInput.maxLength = 4; codeInput.placeholder = "ABCD";
+    codeGruppe.appendChild(codeInput);
+    el.appendChild(codeGruppe);
+
+    const nameGruppe = h('<div class="feld-gruppe"><label>Dein Name</label></div>');
+    const nameInput = document.createElement("input");
+    nameInput.className = "textfeld"; nameInput.placeholder = "z. B. Theresa";
+    nameGruppe.appendChild(nameInput);
+    el.appendChild(nameGruppe);
+
+    const farbGruppe = h('<div class="feld-gruppe"><label>Farbe</label></div>');
+    const farbReihe = h('<div style="display:flex;gap:8px"></div>');
+    let gewaehlteFarbe = D.spielerfarben[0].key;
+    D.spielerfarben.forEach(function (s, i) {
+      const b = h('<button class="knopf ' + (i === 0 ? "primaer" : "zweitrangig") + '" style="flex:1;background:' +
+        (i === 0 ? s.farbe : "") + '">' + s.name + '</button>');
+      b.onclick = function () {
+        gewaehlteFarbe = s.key;
+        Array.prototype.forEach.call(farbReihe.children, function (c, j) {
+          c.className = "knopf " + (j === i ? "primaer" : "zweitrangig");
+          c.style.background = j === i ? s.farbe : "";
+        });
+      };
+      farbReihe.appendChild(b);
+    });
+    farbGruppe.appendChild(farbReihe);
+    el.appendChild(farbGruppe);
+
+    const knopf = h('<button class="knopf primaer breit">Beitreten</button>');
+    knopf.onclick = function () {
+      if (codeInput.value.trim().length !== 4) { melde("Der Code hat 4 Zeichen.", "fehler"); return; }
+      raumBeitreten(codeInput.value, nameInput.value.trim() || "Erfinder", gewaehlteFarbe);
+    };
+    el.appendChild(knopf);
+    return el;
+  }
+
+  function renderLobbyOnlineWarten() {
+    const el = h('<div class="start"></div>');
+    const zurueck = h('<button class="zurueck-link">← Raum verlassen</button>');
+    zurueck.onclick = raumVerlassen;
+    el.appendChild(zurueck);
+    el.appendChild(h('<div class="raumcode-anzeige"><div class="code">' + esc(App.raumcode) + '</div>' +
+      '<p>Diesen Code an die anderen weitergeben</p></div>'));
+
+    const liste = h('<div class="spielerliste"></div>');
+    D.spielerfarben.forEach(function (s) {
+      const belegt = App.sitze[s.key];
+      const zeile = h('<div class="spielerzeile"><span class="farbpunkt" style="background:' + s.farbe + '"></span>' +
+        '<span' + (belegt ? "" : ' class="sitz-frei"') + '>' + (belegt ? esc(belegt.name) : "noch frei") +
+        (belegt && belegt.clientId === App.clientId ? " (du)" : "") + '</span></div>');
+      liste.appendChild(zeile);
+    });
+    el.appendChild(liste);
+
+    const anzahl = Object.keys(App.sitze).length;
+    const start = h('<button class="knopf primaer breit">🏝️ Spiel beginnen (' + anzahl + ' Spieler)</button>');
+    start.disabled = anzahl < 2;
+    start.onclick = raumSpielStarten;
+    el.appendChild(start);
+    el.appendChild(h('<p style="text-align:center;color:var(--tinte2);font-size:12.5px;margin-top:10px">' +
+      'Jeder öffnet diese Seite und tritt mit demselben Code bei.</p>'));
+    return el;
+  }
+
+  // ======================================================================
+  // Spielbildschirm
+  // ======================================================================
+
+  function renderSpiel() {
+    const el = h('<div id="app-spiel" style="height:100%;display:flex;flex-direction:column"></div>');
+    const zustand = App.zustand;
+    const sitz = wirksamerSitz();
+    el.appendChild(renderSpielkopf(zustand, sitz));
+
+    const buehne = h('<div class="buehne"></div>');
+    buehne.appendChild(renderBrettBereich(zustand, sitz));
+    buehne.appendChild(renderSeitenleiste(zustand, sitz));
+    el.appendChild(buehne);
+
+    el.appendChild(renderAktionsriegel(zustand, sitz));
+    return el;
+  }
+
+  function renderSpielkopf(zustand, sitz) {
+    const handelnder = ermittleHandelndenSitz(zustand);
+    const spielerHandelnd = zustand.spieler[handelnder];
+    // Online zeigen wir "Du", wenn es der eigene Sitz ist, sonst den Namen.
+    // Lokal (ein gemeinsames Gerät) gibt es kein "du" — hier muss immer der
+    // Name stehen, sonst weiß am Tisch niemand, wer das Gerät bekommt.
+    const zeigeDu = App.modus === "online" && handelnder === sitz;
+    const kopf = h('<div class="spielkopf"></div>');
+    kopf.appendChild(h('<span class="runde-chip">Runde ' + zustand.runde + '/' + D.regeln.runden + '</span>'));
+    const amzug = h('<div class="amzug"></div>');
+    const punkt = '<span class="farbpunkt" style="width:12px;height:12px;background:' + farbeVon(handelnder).farbe + '"></span>';
+    amzug.innerHTML = punkt + '<b>' + (zeigeDu ? "Du bist" : esc(spielerHandelnd.name) + " ist") +
+      (zustand.wartetAuf ? " gefragt" : " am Zug") + '</b>';
+    kopf.appendChild(amzug);
+    const apAnzeige = h('<div class="ap-punkte"></div>');
+    for (let i = 0; i < Math.max(3, zustand.ap); i++) {
+      apAnzeige.appendChild(h('<span class="ap-punkt' + (i < zustand.ap ? " voll" : "") + '"></span>'));
+    }
+    kopf.appendChild(apAnzeige);
+    const menuKnopf = h('<button class="icon" title="Protokoll & Markt">📜</button>');
+    menuKnopf.onclick = function () { App.seitenleisteOffen = !App.seitenleisteOffen; render(); };
+    kopf.appendChild(menuKnopf);
+    return kopf;
+  }
+
+  // -------------------------------------------------------------- Brett/SVG
+
+  // Die Leinwand wird aus dem tatsächlichen Feldkranz berechnet (nicht aus
+  // einer festen Größe) — sonst bleibt bei schmalen Bildschirmen viel
+  // ungenutzter Rand übrig, wo eigentlich nur die 19 Felder hingehören.
+  const HEX_S = 78;
+  const TOKEN_RAND = 55; // Platz für Spielfiguren unterhalb jedes Feldes
+
+  function hexMitteRoh(q, r) {
+    return [HEX_S * Math.sqrt(3) * (q + r / 2), HEX_S * 1.5 * r];
+  }
+  function hexPunkte(cx, cy, s) {
+    const pts = [];
+    for (let i = 0; i < 6; i++) {
+      const a = (Math.PI / 180) * (60 * i + 30);
+      pts.push((cx + s * Math.cos(a)).toFixed(1) + "," + (cy + s * Math.sin(a)).toFixed(1));
+    }
+    return pts.join(" ");
+  }
+
+  const RAHMEN = (function () {
+    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    D.felder.forEach(function (f) {
+      const [cx, cy] = hexMitteRoh(f.q, f.r);
+      for (let i = 0; i < 6; i++) {
+        const a = (Math.PI / 180) * (60 * i + 30);
+        const x = cx + HEX_S * Math.cos(a), y = cy + HEX_S * Math.sin(a);
+        minX = Math.min(minX, x); maxX = Math.max(maxX, x);
+        minY = Math.min(minY, y); maxY = Math.max(maxY, y);
+      }
+    });
+    const pad = 26;
+    return { ox: -minX + pad, oy: -minY + pad, breite: maxX - minX + pad * 2, hoehe: maxY - minY + pad * 2 + TOKEN_RAND };
+  })();
+  const OX = RAHMEN.ox, OY = RAHMEN.oy, BREITE = RAHMEN.breite, HOEHE = RAHMEN.hoehe;
+
+  function hexMitte(q, r) {
+    return [OX + HEX_S * Math.sqrt(3) * (q + r / 2), OY + HEX_S * 1.5 * r];
+  }
+
+  function renderBrettBereich(zustand, sitz) {
+    const bereich = h('<div class="brett-bereich"></div>');
+    const optionen = sitz ? M.gueltigeAktionen(zustand, sitz) : [];
+    const zielFelder = {};
+    if (App.brettModus === "zielWaehlen") {
+      optionen.filter(function (o) { return o.typ === "bewegen" && !o.spezial; }).forEach(function (o) { zielFelder[o.ziel] = o; });
+    } else if (App.brettModus === "flugZielWaehlen") {
+      optionen.filter(function (o) { return o.typ === "bewegen" && o.spezial === "fliegen"; }).forEach(function (o) { zielFelder[o.ziel] = o; });
+    } else if (App.brettModus === "segelZielWaehlen") {
+      optionen.filter(function (o) { return o.typ === "bewegen" && o.spezial === "segeln"; }).forEach(function (o) { zielFelder[o.ziel] = o; });
+    }
+
+    let svg = '<svg viewBox="0 0 ' + BREITE + ' ' + HOEHE + '">';
+    svg += '<defs><radialGradient id="meer" cx="50%" cy="45%" r="75%">' +
+      '<stop offset="0%" stop-color="var(--blatt2)"/><stop offset="100%" stop-color="var(--papier)"/></radialGradient></defs>';
+
+    D.felder.forEach(function (f) {
+      const [cx, cy] = hexMitte(f.q, f.r);
+      const typ = M.hilfen.feldTyp(zustand, f.id);
+      const istWerkstatt = typ === "werkstatt" || f.spieler;
+      let fuell, rand;
+      if (f.spieler) { const sp = farbeVon(f.spieler); fuell = sp.hell; rand = sp.farbe; }
+      else { const g = D.gelaende[typ]; fuell = g.fuell; rand = g.rand; }
+      const anklickbar = !!zielFelder[f.id];
+      svg += '<g class="hexfeld' + (anklickbar ? " anklickbar" : "") + '" data-feld="' + f.id + '">';
+      svg += '<polygon class="hexumriss" points="' + hexPunkte(cx, cy, HEX_S - 3) + '" fill="' + fuell + '" stroke="' +
+        (anklickbar ? "var(--gut)" : rand) + '" stroke-width="' + (anklickbar ? 5 : 3.5) + '"/>';
+      const g = D.gelaende[typ];
+      svg += '<text x="' + cx + '" y="' + (cy - 14) + '" font-size="30" text-anchor="middle">' + g.emoji + '</text>';
+      const name = f.spieler ? farbeVon(f.spieler).name.toUpperCase() : g.name.toUpperCase();
+      svg += '<text x="' + cx + '" y="' + (cy + 8) + '" font-size="10.5" font-weight="800" text-anchor="middle" fill="' +
+        (anklickbar ? "var(--gut)" : rand) + '" letter-spacing="0.5">' + esc(name) + '</text>';
+      if (M.hilfen.istUntersuchbar(zustand, f.id)) {
+        svg += '<circle cx="' + (cx + 24) + '" cy="' + (cy - 24) + '" r="13" fill="var(--blatt)" stroke="' + rand + '" stroke-width="2"/>';
+        svg += '<text x="' + (cx + 24) + '" y="' + (cy - 20) + '" font-size="12" font-weight="800" text-anchor="middle" fill="' + rand + '">' +
+          M.hilfen.fundmarkenRest(zustand, f.id) + '</text>';
+      }
+      svg += "</g>";
+    });
+
+    // Spielfiguren
+    zustand.sitzplaetze.forEach(function (s, idx) {
+      const feld = nach_feld(zustand.spieler[s].position);
+      const [cx, cy] = hexMitte(feld.q, feld.r);
+      const versatz = versatzFuerToken(zustand, s);
+      const farbe = farbeVon(s);
+      const istEigener = s === sitz;
+      svg += '<g class="spielfigur" data-figur="' + s + '" style="cursor:pointer" transform="translate(' +
+        (cx + versatz[0]) + "," + (cy + 28 + versatz[1]) + ')">';
+      svg += '<circle r="15" fill="' + farbe.farbe + '" stroke="var(--blatt)" stroke-width="2.5"/>';
+      svg += '<text x="0" y="5" font-size="14" text-anchor="middle">🙂</text>';
+      if (istEigener) svg += '<circle r="19" fill="none" stroke="' + farbe.farbe + '" stroke-width="1.5" stroke-dasharray="2 2"/>';
+      svg += "</g>";
+    });
+
+    svg += "</svg>";
+    bereich.innerHTML = svg;
+
+    bereich.querySelectorAll(".hexfeld.anklickbar").forEach(function (g) {
+      g.addEventListener("click", function () {
+        const feldId = g.getAttribute("data-feld");
+        const option = zielFelder[feldId];
+        if (option) sende(option);
+      });
+    });
+    bereich.querySelectorAll(".spielfigur").forEach(function (g) {
+      g.addEventListener("click", function (ev) {
+        ev.stopPropagation();
+        App.offenesTableau = g.getAttribute("data-figur");
+        render();
+      });
+    });
+
+    if (App.brettModus !== "ruhe") {
+      const hinweis = h('<div class="wartehinweis">Feld auf der Karte wählen …</div>');
+      const abbrechen = document.createElement("span");
+      abbrechen.textContent = "  ✕ Abbrechen";
+      abbrechen.style.cursor = "pointer";
+      abbrechen.onclick = function () { App.brettModus = "ruhe"; render(); };
+      hinweis.appendChild(abbrechen);
+      bereich.appendChild(hinweis);
+    }
+    return bereich;
+  }
+
+  function nach_feld(id) { return D.felder.find(function (f) { return f.id === id; }); }
+
+  function versatzFuerToken(zustand, sitz) {
+    const feldId = zustand.spieler[sitz].position;
+    const geschwister = zustand.sitzplaetze.filter(function (s) { return zustand.spieler[s].position === feldId; });
+    const i = geschwister.indexOf(sitz);
+    if (geschwister.length === 1) return [0, 0];
+    const winkel = (Math.PI * 2 * i) / geschwister.length;
+    return [Math.cos(winkel) * 16, Math.sin(winkel) * 16];
+  }
+
+  // ------------------------------------------------------------- Seitenleiste
+
+  function renderSeitenleiste(zustand, sitz) {
+    const el = h('<div class="seitenleiste' + (App.seitenleisteOffen ? " offen" : "") + '"></div>');
+    const kopf = h('<div class="leiste-kopf"><h2>Insel-Übersicht</h2></div>');
+    const schliessen = h('<button>✕</button>');
+    schliessen.onclick = function () { App.seitenleisteOffen = false; render(); };
+    kopf.appendChild(schliessen);
+    el.appendChild(kopf);
+
+    const tabs = h('<div class="leiste-tabs"></div>');
+    [["markt", "🔧 Markt"], ["ziele", "⭐ Ziele"], ["protokoll", "📜 Verlauf"]].forEach(function (t) {
+      const b = h('<button class="leiste-tab' + (App.seitenleisteTab === t[0] ? " aktiv" : "") + '">' + t[1] + '</button>');
+      b.onclick = function () { App.seitenleisteTab = t[0]; render(); };
+      tabs.appendChild(b);
+    });
+    el.appendChild(tabs);
+
+    const inhalt = h('<div class="leiste-inhalt"></div>');
+    if (App.seitenleisteTab === "markt") inhalt.appendChild(renderMarkt(zustand, sitz));
+    else if (App.seitenleisteTab === "ziele") inhalt.appendChild(renderBonusziele(zustand));
+    else inhalt.appendChild(renderProtokoll(zustand));
+    el.appendChild(inhalt);
+    return el;
+  }
+
+  function renderMarkt(zustand, sitz) {
+    const el = h('<div></div>');
+    const optionen = sitz ? M.gueltigeAktionen(zustand, sitz) : [];
+    [1, 2, 3].forEach(function (stufe) {
+      el.appendChild(h('<h3 style="font-size:11px;color:var(--tinte3);margin:10px 0 6px;text-transform:uppercase">Stufe ' +
+        "I".repeat(stufe) + '</h3>'));
+      zustand.markt[stufe].forEach(function (id) {
+        const karte = M.nach.erfindung[id];
+        const bauOptionen = optionen.filter(function (o) { return o.typ === "bauen" && o.erfindungId === id; });
+        const karteEl = h('<div class="marktkarte' + (bauOptionen.length ? " bauen-moeglich" : "") + '">' +
+          '<span class="me">' + karte.emoji + '</span><div class="mt"><b>' + esc(karte.name) + '</b>' +
+          '<div class="mkosten">' + kostenChips(karte.kosten) + '</div>' +
+          '<div class="mtext">' + esc(karte.text) + '</div></div>' +
+          '<div class="mpunkte">' + karte.punkte + '</div></div>');
+        if (bauOptionen.length) {
+          karteEl.style.cursor = "pointer";
+          karteEl.onclick = function () {
+            if (bauOptionen.length === 1) sende(bauOptionen[0]);
+            else { App.modalAktion = { art: "geistesblitz_wahl", optionen: bauOptionen, karte: karte }; render(); }
+          };
+        }
+        el.appendChild(karteEl);
+      });
+    });
+    return el;
+  }
+
+  function renderBonusziele(zustand) {
+    const el = h('<div></div>');
+    el.appendChild(h('<p style="font-size:12.5px;color:var(--tinte2);margin-top:0">Diese 3 Bonusziele gelten für alle Spieler.</p>'));
+    zustand.bonusziele.forEach(function (id) {
+      const b = M.nach.bonus[id];
+      el.appendChild(h('<div class="missionskarte"><span class="mie">' + b.emoji + '</span>' +
+        '<div class="mit"><b>' + esc(b.name) + '</b><p>' + esc(b.text) + '</p></div>' +
+        '<span class="mip">' + b.punkte + '</span></div>'));
+    });
+    return el;
+  }
+
+  function renderProtokoll(zustand) {
+    const el = h('<div></div>');
+    zustand.protokoll.slice().reverse().forEach(function (z) {
+      el.appendChild(h('<div class="log-zeile"><span class="lr">R' + z.runde + '</span>' + esc(z.text) + '</div>'));
+    });
+    return el;
+  }
+
+  // ----------------------------------------------------------- Aktionsriegel
+
+  function eingehendesAngebot() {
+    const z = App.zustand;
+    const sitz = wirksamerSitz();
+    if (z && z.handelsAngebot && z.wartetAuf === sitz) return z.handelsAngebot;
+    return null;
+  }
+  function aktivesAusstehend() {
+    const z = App.zustand; const sitz = wirksamerSitz();
+    if (!z || !sitz) return null;
+    const liste = z.ausstehend[sitz] || [];
+    return liste.length ? liste[0] : null;
+  }
+
+  function renderAktionsriegel(zustand, sitz) {
+    const riegel = h('<div class="aktionsriegel"></div>');
+    if (!sitz || aktivesAusstehend() || eingehendesAngebot()) return riegel;
+    const optionen = M.gueltigeAktionen(zustand, sitz);
+    const istDran = App.modus === "lokal" || ermittleHandelndenSitz(zustand) === sitz;
+    if (!istDran) {
+      riegel.appendChild(h('<div style="padding:10px 4px;color:var(--tinte2);font-size:13px">Warte, bis du an der Reihe bist …</div>'));
+      return riegel;
+    }
+
+    function knopf(emoji, text, onClick, aktiv) {
+      const b = h('<button class="aktionsknopf' + (aktiv ? " aktiv" : "") + '"><span class="ae">' + emoji +
+        '</span><span class="at">' + text + '</span></button>');
+      b.onclick = onClick;
+      return b;
+    }
+
+    const bewegenMoeglich = optionen.some(function (o) { return o.typ === "bewegen" && !o.spezial; });
+    const bewegenKnopf = knopf("🚶", "Bewegen", function () {
+      App.brettModus = App.brettModus === "zielWaehlen" ? "ruhe" : "zielWaehlen"; render();
+    }, App.brettModus === "zielWaehlen");
+    bewegenKnopf.disabled = !bewegenMoeglich;
+    riegel.appendChild(bewegenKnopf);
+
+    const flugOptionen = optionen.filter(function (o) { return o.spezial === "fliegen"; });
+    if (flugOptionen.length) {
+      riegel.appendChild(knopf("🚁", "Fliegen", function () {
+        App.brettModus = App.brettModus === "flugZielWaehlen" ? "ruhe" : "flugZielWaehlen"; render();
+      }, App.brettModus === "flugZielWaehlen"));
+    }
+    const segelOptionen = optionen.filter(function (o) { return o.spezial === "segeln"; });
+    if (segelOptionen.length) {
+      riegel.appendChild(knopf("⛵", "Segeln", function () {
+        App.brettModus = App.brettModus === "segelZielWaehlen" ? "ruhe" : "segelZielWaehlen"; render();
+      }, App.brettModus === "segelZielWaehlen"));
+    }
+
+    const sammelnOptionen = optionen.filter(function (o) { return o.typ === "sammeln"; });
+    if (sammelnOptionen.length === 1) {
+      const b = knopf("🪵", "Sammeln", function () { sende(sammelnOptionen[0]); });
+      riegel.appendChild(b);
+    } else if (sammelnOptionen.length > 1) {
+      const b = knopf("🪵", "Sammeln", function () { App.modalAktion = { art: "sammeln_wahl", optionen: sammelnOptionen }; render(); });
+      riegel.appendChild(b);
+    }
+
+    const untersuchenOptionen = optionen.filter(function (o) { return o.typ === "untersuchen"; });
+    if (untersuchenOptionen.length) riegel.appendChild(knopf("🔍", "Untersuchen", function () { sende(untersuchenOptionen[0]); }));
+
+    const handelnZiele = optionen.filter(function (o) { return o.typ === "handeln_vorschlagen"; });
+    if (handelnZiele.length) {
+      riegel.appendChild(knopf("🤝", "Handeln", function () {
+        App.modalAktion = { art: "handel_bauen", ziele: handelnZiele, sitz: sitz };
+        render();
+      }));
+    }
+
+    const tauschbankOptionen = optionen.filter(function (o) { return o.typ === "tauschbank"; });
+    if (tauschbankOptionen.length) {
+      riegel.appendChild(knopf("⚖️", "Tauschbank", function () {
+        App.modalAktion = { art: "tauschbank_wahl", optionen: tauschbankOptionen };
+        render();
+      }));
+    }
+
+    ["lagerfeuer", "feldlabor"].forEach(function (schluessel) {
+      const opts = optionen.filter(function (o) { return o.typ === "sonderfaehigkeit" && o.schluessel === schluessel; });
+      if (opts.length) {
+        const bezeichnung = schluessel === "lagerfeuer" ? ["🔥", "Lagerfeuer"] : ["🧪", "Feldlabor"];
+        riegel.appendChild(knopf(bezeichnung[0], bezeichnung[1], function () {
+          App.modalAktion = { art: "sonderfaehigkeit_wahl", optionen: opts, schluessel: schluessel };
+          render();
+        }));
+      }
+    });
+    const destillier = optionen.filter(function (o) { return o.typ === "sonderfaehigkeit" && o.schluessel === "destillieranlage"; });
+    if (destillier.length) riegel.appendChild(knopf("⚗️", "Destillieren", function () { sende(destillier[0]); }));
+
+    const beenden = knopf("✅", "Zug beenden", function () { sende({ typ: "zug_beenden", sitz: sitz }); });
+    beenden.classList.add("beenden");
+    riegel.appendChild(beenden);
+    return riegel;
+  }
+
+  // ======================================================================
+  // Modale
+  // ======================================================================
+
+  function schleierMitModal(inhaltEl) {
+    const schleier = h('<div class="schleier"></div>');
+    const modal = h('<div class="modal"></div>');
+    modal.appendChild(inhaltEl);
+    schleier.appendChild(modal);
+    schleier.addEventListener("click", function (ev) { if (ev.target === schleier) { App.modalAktion = null; render(); } });
+    return schleier;
+  }
+
+  function ressourcenStepper(titel, erlaubteRessourcen, max, aufBestaetigt, grenzen) {
+    const werte = {};
+    erlaubteRessourcen.forEach(function (k) { werte[k] = 0; });
+    const wrap = h('<div></div>');
+    wrap.innerHTML = "<h2>" + esc(titel) + "</h2>";
+    const raster = h('<div class="ressourcenraster"></div>');
+    const summeAnzeige = h('<p class="modal-unter"></p>');
+    function aktualisiere() {
+      const summe = Object.values(werte).reduce(function (a, b) { return a + b; }, 0);
+      summeAnzeige.textContent = max ? "Gewählt: " + summe + " von " + max : "Gewählt: " + summe;
+      bestaetigenKnopf.disabled = max ? summe !== max : summe === 0;
+    }
+    erlaubteRessourcen.forEach(function (k) {
+      const feld = h('<div class="ressourcenwahl"><span class="re">' + ressourceZeichen(k) + '</span>' +
+        '<div class="rz"><button data-op="-">−</button><span class="rn">0</span><button data-op="+">+</button></div></div>');
+      const anzeige = feld.querySelector(".rn");
+      feld.querySelectorAll("button").forEach(function (btn) {
+        btn.onclick = function () {
+          const delta = btn.getAttribute("data-op") === "+" ? 1 : -1;
+          const grenze = grenzen && grenzen[k] !== undefined ? grenzen[k] : Infinity;
+          const neu = Math.max(0, Math.min(grenze, werte[k] + delta));
+          werte[k] = neu; anzeige.textContent = neu; aktualisiere();
+        };
+      });
+      raster.appendChild(feld);
+    });
+    wrap.appendChild(raster);
+    wrap.appendChild(summeAnzeige);
+    const aktionen = h('<div class="modal-aktionen"></div>');
+    const abbrechen = h('<button class="knopf zweitrangig">Abbrechen</button>');
+    abbrechen.onclick = function () { App.modalAktion = null; render(); };
+    var bestaetigenKnopf = h('<button class="knopf primaer">Bestätigen</button>');
+    bestaetigenKnopf.onclick = function () {
+      const gewaehlt = {};
+      Object.keys(werte).forEach(function (k) { if (werte[k] > 0) gewaehlt[k] = werte[k]; });
+      aufBestaetigt(gewaehlt);
+    };
+    aktionen.appendChild(abbrechen); aktionen.appendChild(bestaetigenKnopf);
+    wrap.appendChild(aktionen);
+    aktualisiere();
+    return wrap;
+  }
+
+  function renderAusstehendModal(eintrag) {
+    const sitz = wirksamerSitz();
+    let inhalt;
+    if (eintrag.art === "abwerfen") {
+      const spieler = App.zustand.spieler[sitz];
+      const grenzen = {}; RESSOURCE_LISTE.forEach(function (k) { if (k !== "bauteil") grenzen[k] = spieler.ressourcen[k] || 0; });
+      inhalt = ressourcenStepper("Lager voll — " + eintrag.anzahl + " abwerfen", ["holz", "metall", "wasser", "energie"], eintrag.anzahl,
+        function (wahl) { sende({ typ: "ausstehend_loesen", sitz: sitz, eintragId: eintrag.id, wahl: wahl }); }, grenzen);
+    } else if (eintrag.art === "verlustwahl") {
+      const spieler = App.zustand.spieler[sitz];
+      inhalt = h('<div><h2>🐒 Neugierige Affen</h2><p class="modal-unter">Wähle 1 Ressource, die du verlierst.</p></div>');
+      const raster = h('<div class="ressourcenraster"></div>');
+      RESSOURCE_LISTE.forEach(function (k) {
+        if ((spieler.ressourcen[k] || 0) <= 0) return;
+        const b = h('<button class="ressourcenwahl" style="cursor:pointer"><span class="re">' + ressourceZeichen(k) + '</span></button>');
+        b.onclick = function () { sende({ typ: "ausstehend_loesen", sitz: sitz, eintragId: eintrag.id, wahl: { ressource: k } }); };
+        raster.appendChild(b);
+      });
+      inhalt.appendChild(raster);
+    } else if (eintrag.art === "ressourcenwahl") {
+      const titel = { vorratskiste: "📦 Alte Vorratskiste", verwitterte: "🗺️ Verwitterte Karte",
+        strandgut: "🎁 Strandgut", automatikfabrik: "🏭 Automatik-Fabrik" }[eintrag.grund] || "Ressource wählen";
+      const erlaubt = RESSOURCE_LISTE.filter(function (k) { return (eintrag.ausschluss || []).indexOf(k) === -1; });
+      inhalt = ressourcenStepper(titel + " — " + eintrag.anzahl + " wählen", erlaubt, eintrag.anzahl,
+        function (wahl) { sende({ typ: "ausstehend_loesen", sitz: sitz, eintragId: eintrag.id, wahl: wahl }); });
+    } else if (eintrag.art === "feldwahl_sperren" || eintrag.art === "feldwahl_insel") {
+      const titel = eintrag.art === "feldwahl_sperren" ? "🌋 Welches Feld wird gesperrt?" : "🏝️ Wohin mit der Inselkarte?";
+      inhalt = h('<div><h2>' + titel + '</h2></div>');
+      const liste = h('<div style="display:flex;flex-direction:column;gap:6px;margin-top:10px"></div>');
+      eintrag.optionen.forEach(function (fid) {
+        const f = nach_feld(fid);
+        const name = f.spieler ? "Werkstatt " + farbeVon(f.spieler).name : D.gelaende[M.hilfen.feldTyp(App.zustand, fid)].name;
+        const b = h('<button class="knopf zweitrangig breit">' + esc(name) + '</button>');
+        b.onclick = function () { sende({ typ: "ausstehend_loesen", sitz: sitz, eintragId: eintrag.id, wahl: fid }); };
+        liste.appendChild(b);
+      });
+      inhalt.appendChild(liste);
+    } else if (eintrag.art === "taschenlampe_wahl") {
+      inhalt = h('<div><h2>🔦 Taschenlampe</h2><p class="modal-unter">Zwei Karten gezogen — welche behältst du?</p></div>');
+      eintrag.karten.forEach(function (kid) {
+        const k = M.nach.fund[kid];
+        const b = h('<div class="karte-vorschau"><span class="ke">' + k.emoji + '</span>' +
+          '<div class="kt"><b>' + esc(k.name) + '</b><span>' + esc(k.text) + '</span></div></div>');
+        b.onclick = function () { sende({ typ: "ausstehend_loesen", sitz: sitz, eintragId: eintrag.id, wahl: kid }); };
+        inhalt.appendChild(b);
+      });
+    } else {
+      inhalt = h('<div><h2>Entscheidung nötig</h2></div>');
+    }
+    return schleierMitModal(inhalt);
+  }
+
+  function renderHandelEingehendModal(angebot) {
+    const sitz = wirksamerSitz();
+    const von = App.zustand.spieler[angebot.von];
+    const inhalt = h('<div><h2>🤝 Handelsangebot von ' + esc(von.name) + '</h2></div>');
+    const zeile = h('<div style="display:flex;justify-content:space-between;gap:14px;margin:14px 0"></div>');
+    zeile.appendChild(seiteDesAngebots("Du bekommst", angebot.gibt));
+    zeile.appendChild(seiteDesAngebots("Du gibst", angebot.nimmt));
+    inhalt.appendChild(zeile);
+    const aktionen = h('<div class="modal-aktionen"></div>');
+    const ablehnen = h('<button class="knopf gefahr">Ablehnen</button>');
+    ablehnen.onclick = function () { sende({ typ: "handeln_antwort", sitz: sitz, annehmen: false }); };
+    const annehmen = h('<button class="knopf primaer">Annehmen</button>');
+    annehmen.onclick = function () { sende({ typ: "handeln_antwort", sitz: sitz, annehmen: true }); };
+    aktionen.appendChild(ablehnen); aktionen.appendChild(annehmen);
+    inhalt.appendChild(aktionen);
+    return schleierMitModal(inhalt);
+  }
+  function seiteDesAngebots(titel, gaben) {
+    const el = h('<div style="flex:1"><b style="font-size:12.5px;color:var(--tinte2)">' + titel + '</b></div>');
+    const chips = h('<div class="chip-liste" style="margin-top:6px"></div>');
+    const schluessel = Object.keys(gaben);
+    if (!schluessel.length) chips.appendChild(h('<span class="chip">nichts</span>'));
+    schluessel.forEach(function (k) { chips.appendChild(h('<span class="chip">' + ressourceZeichen(k) + " " + gaben[k] + '</span>')); });
+    el.appendChild(chips);
+    return el;
+  }
+
+  function renderAktionsModal(modalAktion) {
+    const sitz = wirksamerSitz();
+    let inhalt;
+    if (modalAktion.art === "sammeln_wahl") {
+      inhalt = h('<div><h2>🪵 Woher sammeln?</h2></div>');
+      modalAktion.optionen.forEach(function (o) {
+        const feldId = o.quelleFeld || App.zustand.spieler[sitz].position;
+        const f = nach_feld(feldId);
+        const g = D.gelaende[M.hilfen.feldTyp(App.zustand, feldId)];
+        const b = h('<button class="knopf zweitrangig breit" style="margin-bottom:6px">' + g.emoji + " " +
+          (o.quelleFeld ? "Nachbarfeld: " : "hier: ") + esc(g.name) + '</button>');
+        b.onclick = function () { sende(o); };
+        inhalt.appendChild(b);
+      });
+    } else if (modalAktion.art === "tauschbank_wahl") {
+      inhalt = h('<div><h2>⚖️ Tauschbank</h2><p class="modal-unter">3 gleiche gegen 1 beliebige.</p></div>');
+      const gruppiert = {};
+      modalAktion.optionen.forEach(function (o) { (gruppiert[o.gibtRessource] = gruppiert[o.gibtRessource] || []).push(o); });
+      Object.keys(gruppiert).forEach(function (gibt) {
+        inhalt.appendChild(h('<p style="margin:10px 0 4px;font-size:12.5px;color:var(--tinte2)">3× ' + ressourceZeichen(gibt) + ' gegen:</p>'));
+        const reihe = h('<div style="display:flex;gap:6px;flex-wrap:wrap"></div>');
+        gruppiert[gibt].forEach(function (o) {
+          const b = h('<button class="knopf zweitrangig klein">' + ressourceZeichen(o.nimmtRessource) + '</button>');
+          b.onclick = function () { sende(o); };
+          reihe.appendChild(b);
+        });
+        inhalt.appendChild(reihe);
+      });
+    } else if (modalAktion.art === "sonderfaehigkeit_wahl") {
+      const titel = modalAktion.schluessel === "lagerfeuer" ? "🔥 Lagerfeuer (2 gegen 1)" : "🧪 Feldlabor (1 gegen 1)";
+      inhalt = h('<div><h2>' + titel + '</h2></div>');
+      const gruppiert = {};
+      modalAktion.optionen.forEach(function (o) { (gruppiert[o.gibtRessource] = gruppiert[o.gibtRessource] || []).push(o); });
+      Object.keys(gruppiert).forEach(function (gibt) {
+        const menge = modalAktion.schluessel === "lagerfeuer" ? 2 : 1;
+        inhalt.appendChild(h('<p style="margin:10px 0 4px;font-size:12.5px;color:var(--tinte2)">' + menge + '× ' +
+          ressourceZeichen(gibt) + ' gegen:</p>'));
+        const reihe = h('<div style="display:flex;gap:6px;flex-wrap:wrap"></div>');
+        gruppiert[gibt].forEach(function (o) {
+          const b = h('<button class="knopf zweitrangig klein">' + ressourceZeichen(o.nimmtRessource) + '</button>');
+          b.onclick = function () { sende(o); };
+          reihe.appendChild(b);
+        });
+        inhalt.appendChild(reihe);
+      });
+    } else if (modalAktion.art === "geistesblitz_wahl") {
+      inhalt = h('<div><h2>' + modalAktion.karte.emoji + " " + esc(modalAktion.karte.name) + '</h2>' +
+        '<p class="modal-unter">💡 Geistesblitz: bei welcher Ressource gibt es 1 Rabatt?</p></div>');
+      modalAktion.optionen.forEach(function (o) {
+        const b = h('<button class="knopf zweitrangig breit" style="margin-bottom:6px">Rabatt auf ' +
+          ressourceZeichen(o.geistesblitzRessource) + '</button>');
+        b.onclick = function () { sende(o); };
+        inhalt.appendChild(b);
+      });
+    } else if (modalAktion.art === "handel_bauen") {
+      inhalt = renderHandelBauenModal(modalAktion);
+    } else {
+      inhalt = h('<div></div>');
+    }
+    const wrap = schleierMitModal(inhalt);
+    return wrap;
+  }
+
+  function renderHandelBauenModal(modalAktion) {
+    const sitz = modalAktion.sitz;
+    const zustand = App.zustand;
+    const wrap = h('<div></div>');
+    wrap.innerHTML = "<h2>🤝 Handel anbieten</h2>";
+    const zielAuswahl = h('<div class="feld-gruppe"><label>Mit wem?</label></div>');
+    const zielReihe = h('<div style="display:flex;gap:6px;flex-wrap:wrap"></div>');
+    let zielSitz = modalAktion.ziele[0].anSitz;
+    modalAktion.ziele.forEach(function (o, i) {
+      const b = h('<button class="knopf ' + (i === 0 ? "primaer" : "zweitrangig") + ' klein">' +
+        esc(zustand.spieler[o.anSitz].name) + '</button>');
+      b.onclick = function () {
+        zielSitz = o.anSitz;
+        Array.prototype.forEach.call(zielReihe.children, function (c, j) { c.className = "knopf klein " + (j === i ? "primaer" : "zweitrangig"); });
+      };
+      zielReihe.appendChild(b);
+    });
+    zielAuswahl.appendChild(zielReihe);
+    wrap.appendChild(zielAuswahl);
+
+    const eigene = zustand.spieler[sitz].ressourcen;
+    const werteGibt = {}, werteNimmt = {};
+    RESSOURCE_LISTE.forEach(function (k) { werteGibt[k] = 0; werteNimmt[k] = 0; });
+
+    function bauStepperZeile(titel, werte, grenzeFn) {
+      const box = h('<div class="feld-gruppe"><label>' + titel + '</label></div>');
+      const raster = h('<div class="ressourcenraster"></div>');
+      RESSOURCE_LISTE.forEach(function (k) {
+        const feld = h('<div class="ressourcenwahl"><span class="re">' + ressourceZeichen(k) + '</span>' +
+          '<div class="rz"><button data-op="-">−</button><span class="rn">0</span><button data-op="+">+</button></div></div>');
+        const anzeige = feld.querySelector(".rn");
+        feld.querySelectorAll("button").forEach(function (btn) {
+          btn.onclick = function () {
+            const delta = btn.getAttribute("data-op") === "+" ? 1 : -1;
+            const grenze = grenzeFn(k);
+            werte[k] = Math.max(0, Math.min(grenze, werte[k] + delta));
+            anzeige.textContent = werte[k];
+          };
+        });
+        raster.appendChild(feld);
+      });
+      box.appendChild(raster);
+      return box;
+    }
+    wrap.appendChild(bauStepperZeile("Du gibst", werteGibt, function (k) { return eigene[k] || 0; }));
+    wrap.appendChild(bauStepperZeile("Du bekommst", werteNimmt, function () { return 99; }));
+
+    const aktionen = h('<div class="modal-aktionen"></div>');
+    const abbrechen = h('<button class="knopf zweitrangig">Abbrechen</button>');
+    abbrechen.onclick = function () { App.modalAktion = null; render(); };
+    const anbieten = h('<button class="knopf primaer">Anbieten</button>');
+    anbieten.onclick = function () {
+      const gibt = {}, nimmt = {};
+      RESSOURCE_LISTE.forEach(function (k) { if (werteGibt[k]) gibt[k] = werteGibt[k]; if (werteNimmt[k]) nimmt[k] = werteNimmt[k]; });
+      sende({ typ: "handeln_vorschlagen", sitz: sitz, anSitz: zielSitz, gibt: gibt, nimmt: nimmt });
+    };
+    aktionen.appendChild(abbrechen); aktionen.appendChild(anbieten);
+    wrap.appendChild(aktionen);
+    return wrap;
+  }
+
+  // ======================================================================
+  // Eigenes Tableau (Tap auf die Spielfigur)
+  // ======================================================================
+
+  function renderTableau(sitz) {
+    const zustand = App.zustand;
+    const spieler = zustand.spieler[sitz];
+    const farbe = farbeVon(sitz);
+    const wirksam = wirksamerSitz();
+    const istEigenes = sitz === wirksam;
+
+    const schleier = h('<div class="tableau-schleier"></div>');
+    schleier.onclick = function () { App.offenesTableau = null; App.missionenSichtbar = false; render(); };
+
+    const t = h('<div class="tableau"></div>');
+    t.appendChild(h('<div class="tableau-griff"></div>'));
+    const kopf = h('<div class="tableau-kopf"><span class="farbpunkt" style="background:' + farbe.farbe + '"></span>' +
+      '<h2>' + esc(spieler.name) + '</h2></div>');
+    const schliessen = h('<button style="background:none;border:none;font-size:20px;color:var(--tinte2)">✕</button>');
+    schliessen.onclick = function () { App.offenesTableau = null; App.missionenSichtbar = false; render(); };
+    kopf.appendChild(schliessen);
+    t.appendChild(kopf);
+
+    const lager = h('<div class="tableau-abschnitt"><h3>Lager (max. ' + M.hilfen.lagerlimit(spieler) + ')</h3></div>');
+    const raster = h('<div class="lagerraster"></div>');
+    RESSOURCE_LISTE.forEach(function (k) {
+      raster.appendChild(h('<div class="lagerfach" style="background:' + ressourceFarbeHell(k) + ';color:' + ressourceFarbe(k) + '">' +
+        '<span class="le">' + ressourceZeichen(k) + '</span><span class="ln">' + (spieler.ressourcen[k] || 0) + '</span></div>'));
+    });
+    lager.appendChild(raster);
+    t.appendChild(lager);
+
+    const erf = h('<div class="tableau-abschnitt"><h3>Erfindungen (' + spieler.gebaut.length + ')</h3></div>');
+    const chips = h('<div class="chip-liste"></div>');
+    if (spieler.gebaut.length === 0) chips.appendChild(h('<span class="chip">noch keine</span>'));
+    spieler.gebaut.forEach(function (id) {
+      const k = M.nach.erfindung[id];
+      chips.appendChild(h('<span class="chip" title="' + esc(k.text) + '">' + k.emoji + " " + esc(k.name) + '</span>'));
+    });
+    erf.appendChild(chips);
+    t.appendChild(erf);
+
+    if (spieler.relikte.length) {
+      const rel = h('<div class="tableau-abschnitt"><h3>Relikte</h3></div>');
+      const relChips = h('<div class="chip-liste"></div>');
+      spieler.relikte.forEach(function (id) {
+        const k = M.nach.fund[id];
+        relChips.appendChild(h('<span class="chip" title="' + esc(k.text) + '">' + k.emoji + " " + esc(k.name) + '</span>'));
+      });
+      rel.appendChild(relChips);
+      t.appendChild(rel);
+    }
+
+    const missionen = h('<div class="tableau-abschnitt"><h3>Missionen</h3></div>');
+    if (istEigenes && App.missionenSichtbar) {
+      spieler.auftraege.forEach(function (id) {
+        const a = M.nach.auftrag[id];
+        const erfuellt = M.hilfen.auftragErfuellt(zustand, sitz, id);
+        missionen.appendChild(h('<div class="missionskarte' + (erfuellt ? " erfuellt" : "") + '"><span class="mie">' + a.emoji + '</span>' +
+          '<div class="mit"><b>' + esc(a.name) + (erfuellt ? " ✓" : "") + '</b><p>' + esc(a.text) + '</p></div>' +
+          '<span class="mip">' + a.punkte + '</span></div>'));
+      });
+      const verstecken = h('<button class="knopf zweitrangig klein" style="margin-top:6px">🔒 Wieder verdecken</button>');
+      verstecken.onclick = function () { App.missionenSichtbar = false; render(); };
+      missionen.appendChild(verstecken);
+    } else if (istEigenes) {
+      const hinweis = h('<div class="verdeckt-hinweis"><div style="font-size:26px">🔒</div>' +
+        '<p style="margin:6px 0 0;font-size:13px">Deine ' + spieler.auftraege.length + ' Missionen sind verdeckt.<br>Nur du solltest jetzt hinschauen.</p></div>');
+      const zeigen = h('<button class="knopf primaer">Meine Missionen zeigen</button>');
+      zeigen.onclick = function () { App.missionenSichtbar = true; render(); };
+      hinweis.appendChild(zeigen);
+      missionen.appendChild(hinweis);
+    } else {
+      missionen.appendChild(h('<p style="color:var(--tinte2);font-size:13px">🔒 ' + spieler.auftraege.length +
+        ' geheime Missionen — die zeigt ' + esc(spieler.name) + ' nur sich selbst.</p>'));
+    }
+    t.appendChild(missionen);
+
+    const wrapper = document.createElement("div");
+    wrapper.appendChild(schleier);
+    wrapper.appendChild(t);
+    return wrapper;
+  }
+
+  // ======================================================================
+  // Endergebnis
+  // ======================================================================
+
+  function renderEnde() {
+    const zustand = App.zustand;
+    const el = h('<div class="endbuehne"></div>');
+    el.appendChild(h('<h1>🏆 Die Insel ist erfunden</h1><p class="unter">Nach ' + D.regeln.runden + ' Runden steht das Ergebnis.</p>'));
+    zustand.ergebnis.platzierung.forEach(function (p, i) {
+      const farbe = farbeVon(p.sitz);
+      const karte = h('<div class="platzkarte' + (i === 0 ? " sieger" : "") + '">' +
+        '<span class="platz">' + (i + 1) + '</span>' +
+        '<span class="farbpunkt" style="background:' + farbe.farbe + '"></span>' +
+        '<span class="pname">' + esc(p.name) + '</span><span class="ppunkte">' + p.punkte + '</span></div>');
+      const details = h('<details class="wertungsdetail"><summary>Punkte im Einzelnen</summary></details>');
+      p.details.erfindungen.forEach(function (e) {
+        details.appendChild(h('<div class="wertungszeile"><span>🔧 ' + esc(e.name) + '</span><span>' + e.punkte + '</span></div>'));
+      });
+      if (p.details.bauteile) details.appendChild(h('<div class="wertungszeile"><span>💎 Bauteile (' + p.details.bauteile + ')</span></div>'));
+      p.details.auftraege.filter(function (a) { return a.erfuellt; }).forEach(function (a) {
+        details.appendChild(h('<div class="wertungszeile"><span>🎯 ' + esc(a.name) + '</span><span>' + a.punkte + '</span></div>'));
+      });
+      p.details.bonusziele.filter(function (b) { return b.erfuellt; }).forEach(function (b) {
+        details.appendChild(h('<div class="wertungszeile"><span>⭐ ' + esc(b.name) + '</span><span>' + b.punkte + '</span></div>'));
+      });
+      if (p.details.restRohstoffe) details.appendChild(h('<div class="wertungszeile"><span>📦 Restliche Rohstoffe</span><span>' + p.details.restRohstoffe + '</span></div>'));
+      karte.appendChild(details);
+      el.appendChild(karte);
+    });
+    const neu = h('<button class="knopf primaer breit" style="margin-top:18px">Neue Partie</button>');
+    neu.onclick = function () {
+      loescheLokal();
+      if (App.modus === "online") raumVerlassen();
+      else { App.bildschirm = "start"; App.zustand = null; render(); }
+    };
+    el.appendChild(neu);
+    return el;
+  }
+
+  // ======================================================================
+  // Los geht's
+  // ======================================================================
+
+  window.__insel_debug = function () { return { App: App, zustand: App.zustand }; };
+
+  function pruefeUrlAufRaum() {
+    const m = /raum=([A-Za-z0-9]{4})/.exec(location.hash);
+    return m ? m[1].toUpperCase() : null;
+  }
+
+  function main() {
+    const raumAusUrl = pruefeUrlAufRaum();
+    if (raumAusUrl) {
+      App.bildschirm = "lobbyOnlineBeitreten";
+    }
+    render();
+    if (window.claude && typeof window.claude.use === "function") {
+      pruefeDbVerfuegbarkeit();
+    } else {
+      App.dbVerfuegbar = false;
+    }
+  }
+
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", main);
+  else main();
+})();
+
+</script>

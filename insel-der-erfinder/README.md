@@ -1,13 +1,36 @@
 # 🏝️ Insel der Erfinder
 
-Ein komplettes Brettspiel zum Selbstausdrucken: Spielplan, Anleitung,
-Spielfiguren, 86 Karten, Tableaus und Marker.
+Ein komplettes Brettspiel: zum Selbstausdrucken **und** als voll spielbares
+Online-Spiel im Browser.
 
 **2–4 Spieler · ab 10 Jahren · 45–60 Minuten**
 
 ---
 
-## 📕 Der einfachste Weg: ein einziges PDF
+## 🎮 Online spielen (keine Installation)
+
+**[→ online-spiel.html öffnen](online-spiel.html)** – Doppelklick, fertig.
+Komplette Spiel-Engine mit allen 24 Erfindungen, 12 Ereignissen, 8
+Inselkarten, Fundkarten, Missionen und Wertung. Zwei Wege, es zu spielen:
+
+- **Lokal auf einem Gerät** – 2–4 Leute reichen sich Handy oder Tablet
+  weiter (Pass-and-Play). Funktioniert überall, sofort, ganz ohne Internet.
+  Tippt auf eure Spielfigur auf der Karte, um Lager und Missionen zu sehen –
+  die Missionen bleiben verdeckt, bis man selbst auf „zeigen" tippt.
+- **Online-Raum** – ein Spielstand wird live über mehrere Geräte geteilt
+  (Raumcode erstellen, andere treten bei). Das braucht die `db`-Fähigkeit
+  von Claude-Artefakten, die **nur innerhalb derselben Organisation/desselben
+  Kontexts** funktioniert – nicht als öffentlicher Link an beliebige Leute.
+  Klappt das bei euch nicht, zeigt die Seite das an und der **lokale Modus
+  bleibt die zuverlässige Wahl** für einen Spieleabend.
+
+Alles läuft aus derselben Datenquelle wie die Druckvorlagen (`werkzeuge/daten.py`)
+– ändert dort etwas, und sowohl die Karten als auch das Online-Spiel stimmen
+danach wieder überein.
+
+---
+
+## 📕 Der einfachste Weg zum Ausdrucken: ein einziges PDF
 
 **[→ Insel-der-Erfinder-komplett.pdf](Insel-der-Erfinder-komplett.pdf)** –
 52 Seiten, alles drin, mit Deckblatt, Inhaltsverzeichnis und Bastelanleitung.
@@ -133,12 +156,21 @@ In `werkzeuge/daten.py` bei `ERFINDUNGEN` eine Zeile dazuschreiben, zum
 Beispiel:
 
 ```python
-{"stufe": 2, "emoji": "🎈", "name": "Heißluftballon",
+{"id": "heissluftballon", "stufe": 2, "emoji": "🎈", "name": "Heißluftballon",
  "kosten": {HOLZ: 2, ENERGIE: 1}, "punkte": 5,
  "text": "Einmal pro Runde: Bewege dich 2 Felder für 1 Aktionspunkt."},
 ```
 
-Dann wieder `python3 werkzeuge/erzeuge.py` starten. Die Karte ist sofort dabei.
+Dann wieder `python3 werkzeuge/erzeuge.py` starten. Die Karte ist sofort auf
+Spielplan, in der Anleitung und beim Ausdrucken dabei.
+
+**Fürs Online-Spiel gilt zusätzlich:** Die Karte taucht dort automatisch als
+kaufbare, punktende Karte auf (nach `erzeuge_spielseite.py`) – aber ihre
+*Fähigkeit* (der Text) wird nur wirksam, wenn du sie auch in
+`werkzeuge/motor.js` einträgst. Schau dir dort an, wie z. B. `"strickleiter"`
+oder `"roboterhelfer"` verdrahtet sind (Suche nach dem Text `hatErfindung`),
+und ergänze deine `id` an der passenden Stelle. Ohne das baut man die Karte
+einfach nur für die Punkte – nicht falsch, nur ohne Extra-Effekt.
 
 ### Bleibt die Insel fair?
 
@@ -161,18 +193,34 @@ insel-der-erfinder/
 ├── README.md                          ← diese Datei
 ├── ANLEITUNG.md                       ← die Spielanleitung zum Lesen
 ├── Insel-der-Erfinder-komplett.pdf    ← alles in einem PDF
-├── webseite.html                      ← Online-Fassung zum Nachschlagen
+├── online-spiel.html                  ← das spielbare Online-Spiel
+├── webseite.html                      ← Nachschlage-Seite (kein Spiel, nur Regeln & Karten)
+├── spiel/
+│   └── daten.json                     ← Spieldaten fürs Online-Spiel (erzeugt)
 ├── druckvorlagen/                     ← alles einzeln zum Ausdrucken
 └── werkzeuge/
-    ├── daten.py           ← Karten, Felder, Zahlen
-    ├── regeln.py          ← Regeltext
-    ├── erzeuge.py         ← baut die Druckvorlagen
-    ├── erzeuge_webseite.py← baut die Online-Fassung
-    ├── erzeuge_pdf.py     ← fügt alles zu einem PDF zusammen (optional)
-    └── pruefe_balance.py  ← prüft die Ausgewogenheit der Insel
+    ├── daten.py                ← Karten, Felder, Zahlen — DIE Quelle für alles
+    ├── regeln.py               ← Regeltext
+    ├── erzeuge.py              ← baut die Druckvorlagen
+    ├── erzeuge_webseite.py     ← baut die Nachschlage-Seite
+    ├── erzeuge_pdf.py          ← fügt alles zu einem PDF zusammen (optional)
+    ├── pruefe_balance.py       ← prüft die Ausgewogenheit der Insel
+    ├── exportiere_json.py     ← daten.py -> spiel/daten.json
+    ├── motor.js                ← die Spiel-Engine (reine Spielregeln, kein Aussehen)
+    ├── app.js                  ← die Oberfläche des Online-Spiels
+    ├── spiel_stil.css          ← das Aussehen des Online-Spiels
+    ├── spiel_schale.html       ← HTML-Grundgerüst
+    ├── erzeuge_spielseite.py   ← baut online-spiel.html aus den vier Dateien oben
+    ├── teste_motor.js          ← 3000 zufällige Partien gegen die Engine (Node)
+    ├── teste_motor_einzeln.js  ← gezielte Tests für einzelne Erfindungen/Regeln
+    ├── teste_ui.js             ← testet die Oberfläche mit einem echten Browser
+    ├── teste_online.js         ← testet den Online-Modus mit zwei simulierten Geräten
+    └── teste_endspiel.js       ← spielt eine ganze Partie bis zum Endbildschirm durch
 ```
 
-Für die Druckvorlagen brauchst du nur **Python 3** – sonst nichts.
+Für die Druckvorlagen brauchst du nur **Python 3** – sonst nichts. Für das
+Online-Spiel auch nur Python (zum Bauen); zum Spielen selbst reicht ein
+Browser.
 
 Das Gesamt-PDF neu bauen geht nur, wenn zusätzlich **Chrome** installiert ist
 und einmalig `pip install pypdf` gelaufen ist:
@@ -181,5 +229,20 @@ und einmalig `pip install pypdf` gelaufen ist:
 python3 werkzeuge/erzeuge_pdf.py
 ```
 
-Das fertige PDF liegt aber schon dabei – du brauchst das nur, wenn du selbst
-etwas geändert hast.
+Das Online-Spiel neu bauen (z. B. nachdem du eine Erfindung in `daten.py`
+geändert hast):
+
+```
+python3 werkzeuge/erzeuge_spielseite.py
+```
+
+Die Tests laufen mit **Node.js** (die reinen Regel-Tests) bzw. zusätzlich
+mit **Playwright** für die Oberflächen-Tests:
+
+```
+node werkzeuge/teste_motor.js          # 3000 Zufallspartien
+node werkzeuge/teste_motor_einzeln.js  # gezielte Einzeltests
+```
+
+Alle fertigen Dateien liegen schon bei – du brauchst diese Befehle nur, wenn
+du selbst etwas geändert hast.

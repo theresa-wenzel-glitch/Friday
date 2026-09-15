@@ -1,0 +1,265 @@
+/* Insel der Erfinder — Online-Spiel. Eigenständiges CSS, wird von
+   erzeuge_spielseite.py in die fertige Seite eingebettet. */
+
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Mono:wght@400;600;700&display=swap');
+
+:root {
+  --papier: #f4efe3; --blatt: #fffdf7; --blatt2: #f8f2e4;
+  --tinte: #241c12; --tinte2: #5c5140; --tinte3: #8a7d64;
+  --linie: #ddd0b3; --linie2: #ecdfc0;
+  --akzent: #a8642c; --akzent-hell: #f3e2c9; --akzent-dunkel: #7a4a1f;
+  --gut: #4a7a3c; --schlecht: #9c4a35; --info: #3f6478;
+  --schatten: 0 2px 0 #ffffffa0, 0 10px 26px -16px #24140055;
+  --holz: #7a5230; --holz-hell: #e8d9c5;
+  --metall: #5a6673; --metall-hell: #d8dee5;
+  --wasser: #2a6f97; --wasser-hell: #cfe4f2;
+  --energie: #b8860b; --energie-hell: #f7e9bf;
+  --bauteil: #6b4a9e; --bauteil-hell: #e4dbf5;
+  --rot: #9c4a35; --rot-hell: #f8e6de;
+  --blau: #3f6478; --blau-hell: #e4eef4;
+  --gruen: #5a7345; --gruen-hell: #eaefe1;
+  --gelb: #a8842c; --gelb-hell: #faf2dd;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --papier: #1b1611; --blatt: #241d16; --blatt2: #2b2319;
+    --tinte: #efe6d4; --tinte2: #c2b494; --tinte3: #8c7f64;
+    --linie: #4a3e2c; --linie2: #362c1e;
+    --akzent: #d38a45; --akzent-hell: #3a2c18; --akzent-dunkel: #f0ac6a;
+    --gut: #7bb367; --schlecht: #d5765c; --info: #6fa2c0;
+    --schatten: 0 1px 0 #ffffff10, 0 10px 26px -16px #00000090;
+    --holz-hell: #3a2f1e; --metall-hell: #2b3138; --wasser-hell: #1c2f3a;
+    --energie-hell: #3a2f11; --bauteil-hell: #2b2038;
+    --rot-hell: #3a2018; --blau-hell: #1c2830; --gruen-hell: #212a1c; --gelb-hell: #332c15;
+  }
+}
+:root[data-theme="dark"] {
+  --papier: #1b1611; --blatt: #241d16; --blatt2: #2b2319;
+  --tinte: #efe6d4; --tinte2: #c2b494; --tinte3: #8c7f64;
+  --linie: #4a3e2c; --linie2: #362c1e;
+  --akzent: #d38a45; --akzent-hell: #3a2c18; --akzent-dunkel: #f0ac6a;
+  --gut: #7bb367; --schlecht: #d5765c; --info: #6fa2c0;
+  --schatten: 0 1px 0 #ffffff10, 0 10px 26px -16px #00000090;
+  --holz-hell: #3a2f1e; --metall-hell: #2b3138; --wasser-hell: #1c2f3a;
+  --energie-hell: #3a2f11; --bauteil-hell: #2b2038;
+  --rot-hell: #3a2018; --blau-hell: #1c2830; --gruen-hell: #212a1c; --gelb-hell: #332c15;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--papier); color: var(--tinte);
+  font-family: "Source Serif 4", Georgia, serif; font-size: 15px; line-height: 1.5;
+  height: 100%; overflow: hidden;
+}
+html { height: 100%; }
+h1, h2, h3, button, .titel, .zahl { font-family: "Bricolage Grotesque", "Trebuchet MS", sans-serif; }
+.mono { font-family: "IBM Plex Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+button { font: inherit; cursor: pointer; }
+button:disabled { cursor: not-allowed; opacity: 0.45; }
+button:focus-visible, input:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--akzent); outline-offset: 2px; }
+[hidden] { display: none !important; }
+img { max-width: 100%; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; } }
+
+#app { height: 100%; display: flex; flex-direction: column; }
+
+/* ------------------------------------------------------------- Startseite */
+.start { max-width: 640px; margin: 0 auto; padding: max(24px, env(safe-area-inset-top)) 20px 32px;
+         overflow-y: auto; height: 100%; }
+.start-kopf { text-align: center; margin-bottom: 28px; }
+.start-kopf .emoji { font-size: 44px; line-height: 1; }
+.start-kopf h1 { font-size: 30px; margin: 8px 0 4px; letter-spacing: -0.02em; }
+.start-kopf p { color: var(--tinte2); margin: 0; font-size: 15px; }
+.wahlkarten { display: grid; gap: 12px; margin-top: 20px; }
+.wahlkarte { display: flex; align-items: center; gap: 14px; text-align: left; background: var(--blatt);
+             border: 1.5px solid var(--linie); border-radius: 14px; padding: 16px 18px; box-shadow: var(--schatten); }
+.wahlkarte .we { font-size: 26px; }
+.wahlkarte .wt { flex: 1; }
+.wahlkarte .wt b { display: block; font-size: 16px; }
+.wahlkarte .wt span { color: var(--tinte2); font-size: 13.5px; }
+.wahlkarte:hover { border-color: var(--akzent); }
+
+.feld-gruppe { margin: 18px 0; }
+.feld-gruppe label { display: block; font-size: 12.5px; font-weight: 700; letter-spacing: 0.03em;
+                     color: var(--tinte2); margin-bottom: 6px; text-transform: uppercase; }
+.textfeld { width: 100%; font: inherit; font-size: 16px; padding: 11px 14px; border-radius: 10px;
+            border: 1.5px solid var(--linie); background: var(--blatt); color: var(--tinte); }
+.textfeld:focus { border-color: var(--akzent); }
+.code-feld { text-align: center; font-family: "IBM Plex Mono", monospace; font-size: 26px; font-weight: 700;
+             letter-spacing: 0.18em; text-transform: uppercase; }
+
+.spielerliste { display: flex; flex-direction: column; gap: 8px; margin: 10px 0; }
+.spielerzeile { display: flex; align-items: center; gap: 10px; background: var(--blatt); border: 1.5px solid var(--linie);
+                border-radius: 10px; padding: 8px 10px; }
+.farbpunkt { width: 20px; height: 20px; border-radius: 50%; flex: none; border: 2px solid #0002; }
+.spielerzeile input { flex: 1; border: none; background: transparent; font: inherit; font-size: 15px; color: var(--tinte); }
+.spielerzeile input:focus { outline: none; }
+.sitz-frei { opacity: 0.55; font-style: italic; }
+
+.knopf { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: none; border-radius: 11px;
+         padding: 13px 20px; font-size: 15.5px; font-weight: 700; }
+.knopf.primaer { background: var(--akzent); color: #fff; box-shadow: var(--schatten); }
+.knopf.primaer:hover:not(:disabled) { background: var(--akzent-dunkel); }
+.knopf.zweitrangig { background: var(--blatt2); color: var(--tinte); border: 1.5px solid var(--linie); }
+.knopf.zweitrangig:hover:not(:disabled) { border-color: var(--akzent); }
+.knopf.gefahr { background: var(--schlecht); color: #fff; }
+.knopf.breit { width: 100%; }
+.knopf.klein { padding: 8px 13px; font-size: 13.5px; border-radius: 9px; }
+
+.raumcode-anzeige { text-align: center; margin: 14px 0; }
+.raumcode-anzeige .code { font-family: "IBM Plex Mono", monospace; font-size: 40px; font-weight: 700;
+                          letter-spacing: 0.2em; color: var(--akzent); }
+.raumcode-anzeige p { color: var(--tinte2); font-size: 13px; margin: 4px 0 0; }
+
+.zurueck-link { display: inline-flex; align-items: center; gap: 4px; color: var(--tinte2); font-size: 13.5px;
+                background: none; border: none; padding: 6px 0; margin-bottom: 4px; }
+.zurueck-link:hover { color: var(--akzent); }
+
+.fehlermeldung { background: var(--rot-hell); color: var(--schlecht); border-radius: 10px; padding: 10px 13px;
+                 font-size: 13.5px; margin: 10px 0; font-weight: 600; }
+
+/* ------------------------------------------------------------- Spielkopf */
+.spielkopf { flex: none; display: flex; align-items: center; gap: 12px; padding: max(10px, env(safe-area-inset-top)) 14px 10px;
+             background: var(--blatt); border-bottom: 1.5px solid var(--linie); }
+.spielkopf .runde-chip { font-family: "IBM Plex Mono", monospace; font-weight: 700; font-size: 13px; background: var(--akzent-hell);
+                         color: var(--akzent-dunkel); border-radius: 8px; padding: 5px 10px; white-space: nowrap; }
+.spielkopf .amzug { flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px; font-size: 14px; overflow: hidden; }
+.spielkopf .amzug b { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.spielkopf .ap-punkte { display: flex; gap: 4px; flex: none; }
+.spielkopf .ap-punkt { width: 13px; height: 13px; border-radius: 50%; background: var(--linie2); border: 1.5px solid var(--linie); }
+.spielkopf .ap-punkt.voll { background: var(--akzent); border-color: var(--akzent-dunkel); }
+.spielkopf button.icon { background: none; border: none; font-size: 18px; padding: 4px; color: var(--tinte2); flex: none; }
+
+.buehne { flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr; grid-template-rows: minmax(0, 1fr);
+          overflow: hidden; position: relative; }
+@media (min-width: 860px) { .buehne { grid-template-columns: 1fr 300px; } }
+
+.brett-bereich { position: relative; overflow: hidden; min-height: 0; min-width: 0;
+                background: radial-gradient(ellipse at 50% 40%, var(--blatt2), var(--papier)); }
+.brett-bereich svg { width: 100%; height: 100%; display: block; touch-action: manipulation; }
+.hexfeld { cursor: default; transition: filter 0.15s; }
+.hexfeld.anklickbar { cursor: pointer; }
+.hexfeld.anklickbar:hover { filter: brightness(1.06); }
+.hexfeld.anklickbar .hexumriss { stroke-width: 5; }
+
+.seitenleiste { border-left: 1.5px solid var(--linie); background: var(--blatt); overflow-y: auto;
+                display: flex; flex-direction: column; }
+@media (max-width: 859px) {
+  .seitenleiste { position: absolute; inset: 0; z-index: 20; transform: translateX(100%);
+                  transition: transform 0.22s ease; border-left: none; }
+  .seitenleiste.offen { transform: translateX(0); }
+}
+.leiste-kopf { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px;
+               border-bottom: 1.5px solid var(--linie); flex: none; }
+.leiste-kopf h2 { margin: 0; font-size: 15px; }
+.leiste-kopf button { background: none; border: none; font-size: 18px; color: var(--tinte2); }
+.leiste-tabs { display: flex; gap: 2px; padding: 8px 10px 0; flex: none; }
+.leiste-tab { flex: 1; text-align: center; padding: 8px 4px; font-size: 12px; font-weight: 700; background: none;
+              border: none; border-bottom: 2.5px solid transparent; color: var(--tinte2); }
+.leiste-tab.aktiv { color: var(--akzent); border-color: var(--akzent); }
+.leiste-inhalt { padding: 12px 14px; flex: 1; overflow-y: auto; }
+
+.marktkarte { display: flex; gap: 10px; padding: 10px; border: 1.5px solid var(--linie); border-radius: 12px;
+              background: var(--blatt2); margin-bottom: 8px; }
+.marktkarte .me { font-size: 22px; }
+.marktkarte .mt { flex: 1; min-width: 0; }
+.marktkarte .mt b { display: block; font-size: 13.5px; }
+.marktkarte .mkosten { display: flex; gap: 4px; flex-wrap: wrap; margin: 3px 0; }
+.marktkarte .mkosten span { font-size: 10.5px; font-weight: 700; border-radius: 5px; padding: 1px 5px; }
+.marktkarte .mtext { font-size: 11.5px; color: var(--tinte2); line-height: 1.35; }
+.marktkarte .mpunkte { align-self: center; font-family: "IBM Plex Mono", monospace; font-weight: 700; font-size: 15px;
+                       color: var(--akzent-dunkel); flex: none; }
+.marktkarte.bauen-moeglich { border-color: var(--gut); }
+
+.log-zeile { font-size: 12.5px; padding: 5px 0; border-bottom: 1px solid var(--linie2); color: var(--tinte2); }
+.log-zeile .lr { font-family: "IBM Plex Mono", monospace; font-weight: 700; color: var(--tinte3); margin-right: 5px; }
+
+/* ------------------------------------------------------------- Aktionsriegel */
+.aktionsriegel { flex: none; display: flex; gap: 6px; padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
+                 background: var(--blatt); border-top: 1.5px solid var(--linie); overflow-x: auto; }
+.aktionsknopf { flex: none; display: flex; flex-direction: column; align-items: center; gap: 3px; background: var(--blatt2);
+                border: 1.5px solid var(--linie); border-radius: 12px; padding: 8px 12px; min-width: 64px; color: var(--tinte); }
+.aktionsknopf .ae { font-size: 19px; }
+.aktionsknopf .at { font-size: 10.5px; font-weight: 700; white-space: nowrap; }
+.aktionsknopf.aktiv { background: var(--akzent); border-color: var(--akzent-dunkel); color: #fff; }
+.aktionsknopf.beenden { background: var(--tinte); color: var(--papier); border-color: var(--tinte); }
+
+/* ------------------------------------------------------------- Modale */
+.schleier { position: fixed; inset: 0; background: #24140077; display: flex; align-items: center; justify-content: center;
+            padding: 20px; z-index: 50; }
+.modal { background: var(--blatt); border-radius: 16px; padding: 22px; max-width: 420px; width: 100%;
+         max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 50px -20px #00000066; }
+.modal h2 { margin: 0 0 4px; font-size: 18px; }
+.modal .modal-unter { color: var(--tinte2); font-size: 13.5px; margin: 0 0 14px; }
+.modal-aktionen { display: flex; gap: 8px; margin-top: 16px; }
+.modal-aktionen .knopf { flex: 1; }
+
+.ressourcenraster { display: grid; grid-template-columns: repeat(auto-fit, minmax(64px, 1fr)); gap: 8px; margin: 10px 0; }
+.ressourcenwahl { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 6px;
+                  border: 1.5px solid var(--linie); border-radius: 10px; background: var(--blatt2); }
+.ressourcenwahl .re { font-size: 20px; }
+.ressourcenwahl .rz { display: flex; align-items: center; gap: 8px; }
+.ressourcenwahl button { width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid var(--linie); background: var(--blatt);
+                         font-size: 14px; line-height: 1; padding: 0; display: flex; align-items: center; justify-content: center; }
+.ressourcenwahl .rn { font-family: "IBM Plex Mono", monospace; font-weight: 700; min-width: 16px; text-align: center; }
+
+.karte-vorschau { display: flex; gap: 12px; align-items: center; padding: 12px; border: 1.5px solid var(--linie);
+                  border-radius: 12px; background: var(--blatt2); margin-bottom: 8px; cursor: pointer; }
+.karte-vorschau.gewaehlt { border-color: var(--akzent); background: var(--akzent-hell); }
+.karte-vorschau .ke { font-size: 26px; }
+.karte-vorschau .kt b { display: block; font-size: 14px; }
+.karte-vorschau .kt span { font-size: 12px; color: var(--tinte2); }
+
+/* --------------------------------------------------------- Eigenes Tableau */
+.tableau-schleier { position: fixed; inset: 0; background: #24140055; z-index: 40; }
+.tableau { position: fixed; left: 0; right: 0; bottom: 0; background: var(--blatt); border-radius: 20px 20px 0 0;
+           max-height: 82vh; overflow-y: auto; z-index: 41; padding: 8px 18px calc(20px + env(safe-area-inset-bottom));
+           box-shadow: 0 -10px 40px -10px #00000055; }
+.tableau-griff { width: 40px; height: 5px; background: var(--linie); border-radius: 3px; margin: 6px auto 12px; }
+.tableau-kopf { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.tableau-kopf .farbpunkt { width: 26px; height: 26px; }
+.tableau-kopf h2 { margin: 0; font-size: 18px; flex: 1; }
+.tableau-abschnitt { margin-bottom: 18px; }
+.tableau-abschnitt h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--tinte3);
+                        margin: 0 0 8px; font-weight: 700; }
+.lagerraster { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.lagerfach { text-align: center; padding: 10px 4px; border-radius: 10px; }
+.lagerfach .le { font-size: 17px; }
+.lagerfach .ln { font-family: "IBM Plex Mono", monospace; font-weight: 700; font-size: 16px; display: block; margin-top: 2px; }
+.chip-liste { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { display: inline-flex; align-items: center; gap: 5px; background: var(--blatt2); border: 1.5px solid var(--linie);
+        border-radius: 20px; padding: 5px 11px; font-size: 12.5px; }
+.missionskarte { display: flex; gap: 10px; align-items: flex-start; padding: 11px; border-radius: 11px;
+                background: var(--blatt2); border: 1.5px solid var(--linie); margin-bottom: 8px; }
+.missionskarte.erfuellt { border-color: var(--gut); background: color-mix(in srgb, var(--gut) 10%, var(--blatt2)); }
+.missionskarte .mie { font-size: 20px; }
+.missionskarte .mit b { font-size: 13.5px; }
+.missionskarte .mit p { margin: 2px 0 0; font-size: 12px; color: var(--tinte2); }
+.missionskarte .mip { margin-left: auto; font-family: "IBM Plex Mono", monospace; font-weight: 700; color: var(--akzent-dunkel); }
+.verdeckt-hinweis { text-align: center; padding: 24px 10px; color: var(--tinte2); }
+.verdeckt-hinweis button { margin-top: 10px; }
+
+/* ------------------------------------------------------------ Endergebnis */
+.endbuehne { padding: max(28px, env(safe-area-inset-top)) 18px 32px; overflow-y: auto; height: 100%; max-width: 600px; margin: 0 auto; }
+.endbuehne h1 { text-align: center; font-size: 26px; margin-bottom: 4px; }
+.endbuehne .unter { text-align: center; color: var(--tinte2); margin-bottom: 20px; }
+.platzkarte { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: 14px; margin-bottom: 10px;
+              border: 1.5px solid var(--linie); background: var(--blatt); }
+.platzkarte.sieger { border-color: var(--akzent); background: var(--akzent-hell); }
+.platzkarte .platz { font-family: "IBM Plex Mono", monospace; font-weight: 700; font-size: 20px; color: var(--tinte3); width: 26px; }
+.platzkarte .pname { flex: 1; font-weight: 700; }
+.platzkarte .ppunkte { font-family: "IBM Plex Mono", monospace; font-weight: 800; font-size: 20px; }
+.wertungsdetail { margin-top: 6px; font-size: 12px; color: var(--tinte2); }
+.wertungsdetail summary { cursor: pointer; color: var(--akzent-dunkel); font-weight: 600; }
+.wertungszeile { display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px dotted var(--linie2); }
+
+/* ------------------------------------------------------------ Ereignis-Banner */
+.karten-toast { position: fixed; top: max(14px, env(safe-area-inset-top)); left: 50%; transform: translateX(-50%);
+                background: var(--tinte); color: var(--papier); border-radius: 12px; padding: 10px 18px;
+                font-size: 13.5px; display: flex; align-items: center; gap: 8px; z-index: 60; box-shadow: 0 10px 30px -12px #000000aa;
+                max-width: 90vw; }
+.karten-toast .te { font-size: 18px; }
+
+.wartehinweis { position: fixed; bottom: calc(70px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%);
+               background: var(--info); color: #fff; border-radius: 20px; padding: 8px 16px; font-size: 12.5px;
+               font-weight: 700; z-index: 45; }

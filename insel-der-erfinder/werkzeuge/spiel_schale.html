@@ -1,0 +1,13 @@
+<title>Insel der Erfinder</title>
+<style>{{STIL}}</style>
+<div id="app"><noscript>Dieses Spiel braucht JavaScript.</noscript></div>
+<script type="application/json" id="spieldaten-json">{{SPIELDATEN_JSON}}</script>
+<script>
+window.SPIELDATEN = JSON.parse(document.getElementById("spieldaten-json").textContent);
+</script>
+<script>
+{{MOTOR_JS}}
+</script>
+<script>
+{{APP_JS}}
+</script>
