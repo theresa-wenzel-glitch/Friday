@@ -593,6 +593,83 @@
     return [OX + HEX_S * Math.sqrt(3) * (q + r / 2), OY + HEX_S * 1.5 * r];
   }
 
+  // ----------------------------------------------- Schatzkarten-Symbole
+  // Kleine gestreute Symbole statt eines großen Emojis mit Beschriftung je
+  // Feld — was ein Feld ist, zeigt die Legende, nicht ein bunter Block.
+
+  function seedVon(text) {
+    let wert = 0;
+    for (let i = 0; i < text.length; i++) wert = (wert * 131 + text.charCodeAt(i)) % 1000003;
+    return wert || 1;
+  }
+  function zufallsReihe(seed) {
+    let z = seed;
+    return function () { z = (z * 9301 + 49297) % 233280; return z / 233280; };
+  }
+  function emojiSvg(cx, cy, emoji, groesse, drehung, opacity) {
+    let attrs = "";
+    if (drehung) attrs += ' transform="rotate(' + drehung.toFixed(1) + " " + cx.toFixed(1) + " " + cy.toFixed(1) + ')"';
+    if (opacity !== undefined && opacity < 1) attrs += ' opacity="' + opacity + '"';
+    return '<text x="' + cx.toFixed(1) + '" y="' + cy.toFixed(1) + '" font-size="' + groesse +
+      '" text-anchor="middle" dominant-baseline="middle"' + attrs + ">" + emoji + "</text>";
+  }
+  function streueSymbole(cx, cy, radius, seed, elemente) {
+    const zufall = zufallsReihe(seed);
+    let out = "";
+    elemente.forEach(function (el) {
+      const winkel = zufall() * Math.PI * 2;
+      const abstand = radius * (0.1 + zufall() * 0.4);
+      const x = cx + Math.cos(winkel) * abstand;
+      const y = cy + Math.sin(winkel) * abstand * 0.85;
+      out += emojiSvg(x, y, el[0], el[1], (zufall() - 0.5) * 28);
+    });
+    return out;
+  }
+  function wellenSymbole(cx, cy, radius, farbe, seed) {
+    const zufall = zufallsReihe(seed);
+    let out = "";
+    for (let i = 0; i < 2; i++) {
+      const x = cx + (zufall() - 0.5) * radius * 0.6;
+      const y = cy + (zufall() - 0.5) * radius * 0.4 + i * 10;
+      const w = radius * 0.6;
+      out += '<path d="M ' + (x - w / 2).toFixed(1) + " " + y.toFixed(1) + " q " + (w / 4).toFixed(1) + " -6 " +
+        (w / 2).toFixed(1) + " 0 q " + (w / 4).toFixed(1) + " 6 " + (w / 2).toFixed(1) + ' 0" stroke="' + farbe +
+        '" stroke-width="2.2" fill="none" stroke-linecap="round"/>';
+    }
+    return out;
+  }
+  function steinkreisSvg(cx, cy, r, farbeStein, farbeSchatten) {
+    let out = "";
+    const n = 7;
+    for (let i = 0; i < n; i++) {
+      const a = (2 * Math.PI * i) / n - Math.PI / 2;
+      const sx = cx + Math.cos(a) * r, sy = cy + Math.sin(a) * r;
+      const breite = r * 0.24, hoehe = r * 0.6;
+      const dreh = (a * 180) / Math.PI + 90;
+      out += '<rect x="' + (sx - breite / 2).toFixed(1) + '" y="' + (sy - hoehe).toFixed(1) + '" width="' +
+        breite.toFixed(1) + '" height="' + hoehe.toFixed(1) + '" rx="2" fill="' + farbeStein + '" stroke="' +
+        farbeSchatten + '" stroke-width="1.3" transform="rotate(' + dreh.toFixed(1) + " " + sx.toFixed(1) + " " +
+        sy.toFixed(1) + ')"/>';
+    }
+    return out;
+  }
+  function zeltSvg(cx, cy, r, farbe) {
+    const sx = cx, sy = cy - r * 0.95;
+    const liY = cy + r * 0.38, reX = cx + r * 0.72;
+    return (
+      '<polygon points="' + sx + "," + sy + " " + (cx - r * 0.72) + "," + liY + " " + reX + "," + liY +
+      '" fill="' + farbe + '" stroke="var(--tinte)" stroke-width="2"/>' +
+      '<line x1="' + sx + '" y1="' + sy + '" x2="' + cx + '" y2="' + liY + '" stroke="var(--tinte)" stroke-width="1.4"/>' +
+      '<line x1="' + sx + '" y1="' + sy + '" x2="' + sx + '" y2="' + (sy - r * 0.6) + '" stroke="var(--tinte)" stroke-width="1.6"/>' +
+      '<polygon points="' + sx + "," + (sy - r * 0.6) + " " + (sx + r * 0.5) + "," + (sy - r * 0.46) + " " + sx + "," +
+      (sy - r * 0.32) + '" fill="var(--tinte)"/>'
+    );
+  }
+  const GELAENDE_SYMBOLE = {
+    wald: [["\u{1F332}", 19], ["\u{1F334}", 16], ["\u{1F332}", 13]],
+    mine: [["⛰️", 18], ["\u{1FAA8}", 13], ["⛏️", 11]],
+  };
+
   function renderBrettBereich(zustand, sitz) {
     const bereich = h('<div class="brett-bereich"></div>');
     const optionen = sitz ? M.gueltigeAktionen(zustand, sitz) : [];
@@ -607,27 +684,48 @@
 
     let svg = '<svg viewBox="0 0 ' + BREITE + ' ' + HOEHE + '">';
     svg += '<defs><radialGradient id="meer" cx="50%" cy="45%" r="75%">' +
-      '<stop offset="0%" stop-color="var(--blatt2)"/><stop offset="100%" stop-color="var(--papier)"/></radialGradient></defs>';
+      '<stop offset="0%" stop-color="var(--meer)"/><stop offset="100%" stop-color="var(--meer-dunkel)"/></radialGradient></defs>';
+    svg += '<rect x="0" y="0" width="' + BREITE + '" height="' + HOEHE + '" fill="url(#meer)"/>';
+    // Insel als ruhige zweifarbige Fläche unter dem Feldkranz - eine
+    // Schatzkarte, kein Formular mit farbigen Kästchen.
+    svg += '<rect x="8" y="8" width="' + (BREITE - 16) + '" height="' + (HOEHE - 16) +
+      '" rx="44" fill="var(--strand)"/>';
+    svg += '<rect x="22" y="22" width="' + (BREITE - 44) + '" height="' + (HOEHE - 44 - TOKEN_RAND * 0.6) +
+      '" rx="36" fill="var(--inselgruen)" stroke="var(--tinte2)" stroke-width="2"/>';
 
     D.felder.forEach(function (f) {
       const [cx, cy] = hexMitte(f.q, f.r);
       const typ = M.hilfen.feldTyp(zustand, f.id);
-      const istWerkstatt = typ === "werkstatt" || f.spieler;
-      let fuell, rand;
-      if (f.spieler) { const sp = farbeVon(f.spieler); fuell = sp.hell; rand = sp.farbe; }
-      else { const g = D.gelaende[typ]; fuell = g.fuell; rand = g.rand; }
       const anklickbar = !!zielFelder[f.id];
+      const seed = seedVon(f.id);
       svg += '<g class="hexfeld' + (anklickbar ? " anklickbar" : "") + '" data-feld="' + f.id + '">';
-      svg += '<polygon class="hexumriss" points="' + hexPunkte(cx, cy, HEX_S - 3) + '" fill="' + fuell + '" stroke="' +
-        (anklickbar ? "var(--gut)" : rand) + '" stroke-width="' + (anklickbar ? 5 : 3.5) + '"/>';
-      const g = D.gelaende[typ];
-      svg += '<text x="' + cx + '" y="' + (cy - 14) + '" font-size="30" text-anchor="middle">' + g.emoji + '</text>';
-      const name = f.spieler ? farbeVon(f.spieler).name.toUpperCase() : g.name.toUpperCase();
-      svg += '<text x="' + cx + '" y="' + (cy + 8) + '" font-size="10.5" font-weight="800" text-anchor="middle" fill="' +
-        (anklickbar ? "var(--gut)" : rand) + '" letter-spacing="0.5">' + esc(name) + '</text>';
+      // Ein sehr blasser Feldumriss als Platzierungshilfe - nicht als bunter Rahmen.
+      svg += '<polygon class="hexumriss" points="' + hexPunkte(cx, cy, HEX_S - 3) + '" fill="' +
+        (anklickbar ? "var(--akzent-hell)" : "transparent") + '" stroke="' + (anklickbar ? "var(--gut)" : "var(--tinte2)") +
+        '" stroke-width="' + (anklickbar ? 5 : 1.4) + '"' +
+        (anklickbar ? "" : ' stroke-dasharray="1 6" stroke-opacity="0.55"') + "/>";
+
+      if (f.spieler) {
+        svg += zeltSvg(cx, cy + 6, 27, farbeVon(f.spieler).farbe);
+      } else if (typ === "grruine") {
+        svg += steinkreisSvg(cx, cy + 4, 27, "#c9beA4", "var(--tinte2)");
+      } else if (typ === "ruine") {
+        svg += emojiSvg(cx, cy, "\u{1F3DB}️", 27, 0, 0.92);
+        svg += streueSymbole(cx, cy, HEX_S * 0.68, seed, [["\u{1FAA8}", 11]]);
+      } else if (typ === "energie") {
+        svg += emojiSvg(cx, cy - 2, "\u{1F30B}", 30);
+      } else if (typ === "kueste") {
+        svg += wellenSymbole(cx, cy, HEX_S, "var(--meer-dunkel)", seed);
+      } else if (GELAENDE_SYMBOLE[typ]) {
+        svg += streueSymbole(cx, cy, HEX_S * 0.6, seed, GELAENDE_SYMBOLE[typ]);
+      } else if (typ === "brachland") {
+        svg += emojiSvg(cx, cy, "\u{1F33E}", 14, 0, 0.35);
+      }
+
       if (M.hilfen.istUntersuchbar(zustand, f.id)) {
-        svg += '<circle cx="' + (cx + 24) + '" cy="' + (cy - 24) + '" r="13" fill="var(--blatt)" stroke="' + rand + '" stroke-width="2"/>';
-        svg += '<text x="' + (cx + 24) + '" y="' + (cy - 20) + '" font-size="12" font-weight="800" text-anchor="middle" fill="' + rand + '">' +
+        svg += '<circle cx="' + (cx + 24) + '" cy="' + (cy - 24) + '" r="13" fill="var(--blatt)" ' +
+          'stroke="var(--tinte2)" stroke-width="2" stroke-dasharray="4 3"/>';
+        svg += '<text x="' + (cx + 24) + '" y="' + (cy - 20) + '" font-size="12" font-weight="800" text-anchor="middle" fill="var(--tinte2)">' +
           M.hilfen.fundmarkenRest(zustand, f.id) + '</text>';
       }
       svg += "</g>";

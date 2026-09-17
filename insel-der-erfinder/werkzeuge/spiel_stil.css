@@ -19,6 +19,8 @@
   --blau: #3f6478; --blau-hell: #e4eef4;
   --gruen: #5a7345; --gruen-hell: #eaefe1;
   --gelb: #a8842c; --gelb-hell: #faf2dd;
+  --meer: #5f8a92; --meer-dunkel: #436469;
+  --strand: #e8d9ab; --inselgruen: #dcdba8;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
@@ -31,6 +33,7 @@
     --holz-hell: #3a2f1e; --metall-hell: #2b3138; --wasser-hell: #1c2f3a;
     --energie-hell: #3a2f11; --bauteil-hell: #2b2038;
     --rot-hell: #3a2018; --blau-hell: #1c2830; --gruen-hell: #212a1c; --gelb-hell: #332c15;
+    --meer: #3a5257; --meer-dunkel: #263a3d; --strand: #4a4128; --inselgruen: #454a2e;
   }
 }
 :root[data-theme="dark"] {
@@ -43,6 +46,7 @@
   --holz-hell: #3a2f1e; --metall-hell: #2b3138; --wasser-hell: #1c2f3a;
   --energie-hell: #3a2f11; --bauteil-hell: #2b2038;
   --rot-hell: #3a2018; --blau-hell: #1c2830; --gruen-hell: #212a1c; --gelb-hell: #332c15;
+  --meer: #3a5257; --meer-dunkel: #263a3d; --strand: #4a4128; --inselgruen: #454a2e;
 }
 
 * { box-sizing: border-box; }

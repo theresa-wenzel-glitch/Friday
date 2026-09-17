@@ -162,14 +162,137 @@ KLEIN_ANTEIL = KLEIN_BREITE_MM / GROSS_BREITE_MM
 # Insel-Plättchen passen zum großen Plan.
 HEX_S_MM = (PLAN_S - PLAN_LUFT) * GROSS_BREITE_MM / PLAN_W
 
-# Erdtöne. Der Plan kommt mit fünf Farben aus, alles andere macht die Helligkeit.
-GRUND   = "#c9b998"      # Tischfläche rund um die Insel
-STRAND  = "#e6d9bc"
-INSEL   = "#f3ead7"
-TINTE   = "#4a3b2a"
-TINTE_2 = "#7a6a52"
-LINIE   = "#a8977a"
-PAPIER  = "#fdfaf2"
+# Eine Schatzkarte statt eines Formulars: gedecktes Blaugrün fürs Meer,
+# warmes Sand/Oliv für die Insel selbst. Einzelne Felder bekommen keine
+# eigene Signalfarbe mehr – was ein Feld ist, zeigen kleine gestreute
+# Symbole und am Ende die Legende, nicht ein bunter Kasten mit Beschriftung.
+MEER        = "#5f8a92"
+MEER_DUNKEL = "#436469"
+STRAND      = "#e8d9ab"
+INSEL       = "#dcdba8"
+TINTE       = "#3c2f1e"
+TINTE_2     = "#6b5a3e"
+LINIE       = "#9c8b64"
+PAPIER      = "#fdfaf2"
+
+
+def feld_seed(feld_id):
+    """Deterministischer Seed aus einer Feld-ID - Pythons hash() auf
+    Strings ist pro Programmlauf zufällig gesalzen, das wollen wir hier
+    nicht (sonst sieht die Insel bei jedem Bauen anders aus)."""
+    wert = 0
+    for zeichen in feld_id:
+        wert = (wert * 131 + ord(zeichen)) % 1000003
+    return wert
+
+
+def emoji_text(cx, cy, emoji, groesse, drehung=0.0, opacity=1.0):
+    zusatz = ""
+    if drehung:
+        zusatz += ' transform="rotate(%.1f %.1f %.1f)"' % (drehung, cx, cy)
+    if opacity < 1:
+        zusatz += ' opacity="%.2f"' % opacity
+    return ('<text x="%.1f" y="%.1f" font-size="%.1f" text-anchor="middle" '
+            'dominant-baseline="middle"%s>%s</text>' % (cx, cy, groesse, zusatz, emoji))
+
+
+def streue_symbole(cx, cy, radius, seed, elemente):
+    """Verstreut kleine Symbole locker um eine Feldmitte statt ein großes
+    Icon zentriert hinzuklatschen – wirkt handgezeichnet, nicht wie ein Button."""
+    rnd = random.Random(seed)
+    teile = []
+    for emoji, groesse in elemente:
+        winkel = rnd.uniform(0, 2 * math.pi)
+        abstand = rnd.uniform(radius * 0.10, radius * 0.48)
+        x = cx + math.cos(winkel) * abstand
+        y = cy + math.sin(winkel) * abstand * 0.85
+        teile.append(emoji_text(x, y, emoji, groesse, drehung=rnd.uniform(-14, 14)))
+    return "".join(teile)
+
+
+def welle_symbole(cx, cy, radius, farbe, seed):
+    rnd = random.Random(seed)
+    teile = []
+    for i in range(2):
+        x = cx + rnd.uniform(-radius * 0.3, radius * 0.3)
+        y = cy + rnd.uniform(-radius * 0.22, radius * 0.05) + i * 11
+        w = radius * 0.62
+        teile.append('<path d="M %.1f %.1f q %.1f -6.5 %.1f 0 q %.1f 6.5 %.1f 0" '
+                     'stroke="%s" stroke-width="2.3" fill="none" stroke-linecap="round"/>'
+                     % (x - w / 2, y, w / 4, w / 4, w / 4, w / 4, farbe))
+    return "".join(teile)
+
+
+def steinkreis(cx, cy, r, farbe_stein, farbe_schatten):
+    """Für die Große Ruine: ein kleiner Steinkreis, wie eine Mini-Stonehenge."""
+    teile = []
+    n = 7
+    for i in range(n):
+        a = 2 * math.pi * i / n - math.pi / 2
+        sx, sy = cx + math.cos(a) * r, cy + math.sin(a) * r
+        breite, hoehe = r * 0.24, r * 0.6
+        dreh = math.degrees(a) + 90
+        teile.append('<rect x="%.1f" y="%.1f" width="%.1f" height="%.1f" rx="2" '
+                     'fill="%s" stroke="%s" stroke-width="1.3" '
+                     'transform="rotate(%.1f %.1f %.1f)"/>'
+                     % (sx - breite / 2, sy - hoehe, breite, hoehe, farbe_stein, farbe_schatten,
+                        dreh, sx, sy))
+    return "".join(teile)
+
+
+def zelt_symbol(cx, cy, r, farbe, farbe_dunkel):
+    """Kleines Zelt mit Fähnchen in Spielerfarbe statt eines großen farbigen Feldes."""
+    spitze = (cx, cy - r * 0.95)
+    li, re = (cx - r * 0.72, cy + r * 0.38), (cx + r * 0.72, cy + r * 0.38)
+    return (
+        '<polygon points="%.1f,%.1f %.1f,%.1f %.1f,%.1f" fill="%s" stroke="%s" stroke-width="2"/>'
+        '<line x1="%.1f" y1="%.1f" x2="%.1f" y2="%.1f" stroke="%s" stroke-width="1.5"/>'
+        '<line x1="%.1f" y1="%.1f" x2="%.1f" y2="%.1f" stroke="%s" stroke-width="1.6"/>'
+        '<polygon points="%.1f,%.1f %.1f,%.1f %.1f,%.1f" fill="%s"/>'
+        % (spitze[0], spitze[1], li[0], li[1], re[0], re[1], farbe, farbe_dunkel,
+           spitze[0], spitze[1], cx, spitze[1] + (li[1] - spitze[1]), farbe_dunkel,
+           spitze[0], spitze[1], spitze[0], spitze[1] - r * 0.62, TINTE,
+           spitze[0], spitze[1] - r * 0.62, spitze[0] + r * 0.5, spitze[1] - r * 0.48,
+           spitze[0], spitze[1] - r * 0.32, farbe_dunkel))
+
+
+def kompassrose(cx, cy, r, farbe):
+    teile = ['<circle cx="%.1f" cy="%.1f" r="%.1f" fill="none" stroke="%s" stroke-width="1.6"/>'
+             % (cx, cy, r, farbe)]
+    for i in range(8):
+        a = math.radians(i * 45 - 90)
+        spitze = r if i % 2 == 0 else r * 0.52
+        x1, y1 = cx + math.cos(a) * spitze, cy + math.sin(a) * spitze
+        w = math.radians(10)
+        x2, y2 = cx + math.cos(a - w) * r * 0.2, cy + math.sin(a - w) * r * 0.2
+        x3, y3 = cx + math.cos(a + w) * r * 0.2, cy + math.sin(a + w) * r * 0.2
+        fuell = farbe if i % 2 == 0 else "none"
+        teile.append('<polygon points="%.1f,%.1f %.1f,%.1f %.1f,%.1f" fill="%s" '
+                     'stroke="%s" stroke-width="1.1"/>' % (x1, y1, x2, y2, x3, y3, fuell, farbe))
+    teile.append('<text x="%.1f" y="%.1f" font-size="%.1f" font-weight="800" '
+                 'text-anchor="middle" fill="%s">N</text>' % (cx, cy - r - 9, r * 0.34, farbe))
+    return "".join(teile)
+
+
+def abenteuerpfad(punkte, farbe, seed=77):
+    """Gestrichelte Route zwischen Feldmitten, mit leichtem Schlenker statt Geraden."""
+    rnd = random.Random(seed)
+    teil = ["M %.1f %.1f" % punkte[0]]
+    for i in range(1, len(punkte)):
+        (x0, y0), (x1, y1) = punkte[i - 1], punkte[i]
+        mx = (x0 + x1) / 2 + rnd.uniform(-18, 18)
+        my = (y0 + y1) / 2 + rnd.uniform(-18, 18)
+        teil.append("Q %.1f %.1f %.1f %.1f" % (mx, my, x1, y1))
+    return ('<path d="%s" fill="none" stroke="%s" stroke-width="2.6" '
+           'stroke-dasharray="1 9" stroke-linecap="round"/>' % (" ".join(teil), farbe))
+
+
+# Kleine, verstreute Symbole je Gelände statt eines großen zentrierten Emojis
+# mit Beschriftung darunter. Die Bedeutung steht in der Legende am Rand.
+GELAENDE_SYMBOLE = {
+    "wald":    [("\U0001F332", 21), ("\U0001F334", 18), ("\U0001F332", 15)],
+    "mine":    [("⛰️", 20), ("\U0001FAA8", 15), ("⛏️", 13)],
+}
 
 
 def spielplan_svg():
@@ -179,69 +302,111 @@ def spielplan_svg():
     o = ['<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 %d %d" '
          'font-family="Segoe UI, Helvetica Neue, Arial, sans-serif">' % (W, H)]
 
-    o.append('<rect x="0" y="0" width="%d" height="%d" fill="%s"/>' % (W, H, GRUND))
+    o.append('<defs><radialGradient id="tiefsee" cx="50%%" cy="50%%" r="72%%">'
+             '<stop offset="0%%" stop-color="%s"/><stop offset="100%%" stop-color="%s"/>'
+             '</radialGradient></defs>' % (MEER, MEER_DUNKEL))
+    o.append('<rect x="0" y="0" width="%d" height="%d" fill="url(#tiefsee)"/>' % (W, H))
     o.append('<rect x="6" y="6" width="%d" height="%d" rx="10" fill="none" stroke="%s" '
-             'stroke-width="3"/>' % (W - 12, H - 12, TINTE_2))
+             'stroke-width="3"/>' % (W - 12, H - 12, PAPIER))
 
-    # Insel: zwei ruhige Umrisse, kein Farbverlauf
-    o.append('<path d="%s" fill="%s"/>' % (blob_pfad(OX, OY, 420, 392, 15, 0.055, 11), STRAND))
+    # Wellenmuster im offenen Meer, außerhalb der Insel.
+    feld_mitten = {(f["q"], f["r"]): hex_mitte(f["q"], f["r"], S, OX, OY) for f in D.FELDER}
+    rnd_meer = random.Random(4)
+    versucht = 0
+    gesetzt = 0
+    while gesetzt < 26 and versucht < 400:
+        versucht += 1
+        wx = rnd_meer.uniform(60, W - 60)
+        wy = rnd_meer.uniform(60, H - 150)
+        if (wx - OX) ** 2 / 430.0 ** 2 + (wy - OY) ** 2 / 400.0 ** 2 < 1.18:
+            continue
+        gesetzt += 1
+        breite = rnd_meer.uniform(24, 40)
+        o.append('<path d="M %.1f %.1f q %.1f -6 %.1f 0 q %.1f 6 %.1f 0" stroke="%s" '
+                 'stroke-opacity="0.35" stroke-width="2.4" fill="none" stroke-linecap="round"/>'
+                 % (wx - breite / 2, wy, breite / 4, breite / 4, breite / 4, breite / 4, PAPIER))
+
+    # Insel: ein weicher Umriss, kein Farbverlauf zwischen Strand und Innenland.
+    o.append('<path d="%s" fill="%s"/>' % (blob_pfad(OX, OY, 420, 392, 16, 0.07, 11), STRAND))
     o.append('<path d="%s" fill="%s" stroke="%s" stroke-width="2.5"/>'
-             % (blob_pfad(OX, OY, 400, 372, 15, 0.05, 11), INSEL, LINIE))
+             % (blob_pfad(OX, OY, 388, 360, 16, 0.065, 23), INSEL, LINIE))
+
+    # Die Abenteuerroute: eine gestrichelte Reise quer über die Insel.
+    route = ["2_-2", "2_-1", "2_0", "1_0", "0_0", "-1_1", "-1_2", "-2_2"]
+    route_punkte = [feld_mitten[tuple(int(z) for z in fid.split("_"))] for fid in route]
+    o.append(abenteuerpfad(route_punkte, TINTE_2))
 
     for f in D.FELDER:
-        g = D.GELAENDE[f["typ"]]
-        cx, cy = hex_mitte(f["q"], f["r"], S, OX, OY)
-        ist_werkstatt = f["typ"] == "werkstatt"
+        typ = f["typ"]
+        g = D.GELAENDE[typ]
+        cx, cy = feld_mitten[(f["q"], f["r"])]
+        ist_werkstatt = typ == "werkstatt"
+        seed = feld_seed("%d_%d" % (f["q"], f["r"]))
+
+        # Sehr blasse gepunktete Feldgrenze – als Platzierungshilfe fürs
+        # Aufstellen der Figuren, nicht als bunter Rahmen.
+        o.append('<polygon points="%s" fill="none" stroke="%s" stroke-width="1.4" '
+                 'stroke-dasharray="1 6" stroke-opacity="0.55"/>'
+                 % (hex_punkte(cx, cy, S - PLAN_LUFT), TINTE_2))
+
         if ist_werkstatt:
             sp = D.SPIELERFARBEN[f["spieler"]]
-            fuell, rand = sp["hell"], sp["farbe"]
-        else:
-            fuell, rand = g["fuell"], g["rand"]
-        o.append('<polygon points="%s" fill="%s" stroke="%s" stroke-width="%s" '
-                 'stroke-linejoin="round"/>' % (hex_punkte(cx, cy, S - PLAN_LUFT), fuell, rand,
-                                                "5" if ist_werkstatt else "3.5"))
-        o.append('<text x="%.0f" y="%.0f" font-size="42" text-anchor="middle">%s</text>'
-                 % (cx, cy - 4, g["emoji"]))
-        name = (sp["name"].upper() if ist_werkstatt else g["name"].upper())
-        o.append('<text x="%.0f" y="%.0f" font-size="14" font-weight="800" text-anchor="middle" '
-                 'fill="%s" letter-spacing="1">%s</text>' % (cx, cy + 22, rand, html.escape(name)))
-        if ist_werkstatt:
-            o.append('<text x="%.0f" y="%.0f" font-size="11" font-weight="700" text-anchor="middle" '
-                     'fill="%s" letter-spacing="0.6">WERKSTATT</text>' % (cx, cy + 38, TINTE_2))
-        elif g["gibt"]:
-            r = D.RESSOURCEN[g["gibt"]]
-            o.append('<text x="%.0f" y="%.0f" font-size="15" font-weight="700" text-anchor="middle" '
-                     'fill="%s">%s +1</text>' % (cx, cy + 41, TINTE_2, r["emoji"]))
+            o.append(zelt_symbol(cx, cy + 6, 30, sp["farbe"], TINTE))
+        elif typ == "grruine":
+            o.append(steinkreis(cx, cy + 4, 30, "#c9beA4", TINTE_2))
+            o.append(emoji_text(cx - 32, cy + 26, "\U0001F480", 15, opacity=0.55, drehung=-10))
+        elif typ == "ruine":
+            o.append(emoji_text(cx, cy, "\U0001F3DB️", 30, opacity=0.9))
+            o.append(streue_symbole(cx, cy, S * 0.7, seed % 999, [("\U0001FAA8", 13)]))
+        elif typ == "energie":
+            o.append(emoji_text(cx, cy - 2, "\U0001F30B", 34))
+            o.append(streue_symbole(cx, cy - 26, S * 0.35, seed % 997, [("☁️", 13)]))
+        elif typ == "kueste":
+            o.append(welle_symbole(cx, cy, S, MEER_DUNKEL, seed % 991))
+            if seed % 2 == 0:
+                o.append(emoji_text(cx + S * 0.3, cy + S * 0.22, "\U0001F41A", 14))
+        elif typ in GELAENDE_SYMBOLE:
+            o.append(streue_symbole(cx, cy, S * 0.62, seed % 9973, GELAENDE_SYMBOLE[typ]))
+        elif typ == "brachland":
+            o.append(emoji_text(cx, cy, "\U0001F33E", 16, opacity=0.35))
+
         if f.get("fundkarten"):
-            o.append('<circle cx="%.0f" cy="%.0f" r="17" fill="%s" stroke="%s" '
-                     'stroke-width="2.4" stroke-dasharray="5 3.5"/>' % (cx, cy + 40, PAPIER, rand))
-            o.append('<text x="%.0f" y="%.0f" font-size="17" font-weight="800" text-anchor="middle" '
-                     'fill="%s">%d</text>' % (cx, cy + 46, rand, f["fundkarten"]))
-        if f["typ"] == "brachland":
-            for i, t in enumerate(("wartet auf", "eine Inselkarte")):
-                o.append('<text x="%.0f" y="%.0f" font-size="11" font-weight="700" '
-                         'text-anchor="middle" fill="%s">%s</text>' % (cx, cy + 36 + i * 13, LINIE, t))
+            o.append('<circle cx="%.0f" cy="%.0f" r="16" fill="%s" stroke="%s" '
+                     'stroke-width="2.2" stroke-dasharray="4.5 3.5"/>' % (cx + 40, cy - 40, PAPIER, TINTE_2))
+            o.append('<text x="%.0f" y="%.0f" font-size="16" font-weight="800" text-anchor="middle" '
+                     'fill="%s">%d</text>' % (cx + 40, cy - 35, TINTE_2, f["fundkarten"]))
 
-    o.append('<text x="%d" y="42" font-size="34" font-weight="800" text-anchor="middle" '
-             'fill="%s" letter-spacing="4">INSEL DER ERFINDER</text>' % (W / 2, TINTE))
+    # Kompassrose und Anker in den beiden Meeresecken unten, die von den
+    # Seitenpanels frei bleiben (weiter oben liegt dort nur offenes Meer
+    # unter den Panels - dort wäre es hinter ihnen versteckt).
+    o.append(emoji_text(78, 800, "⚓", 32, opacity=0.85))
+    o.append(kompassrose(W - 78, 800, 28, PAPIER))
 
-    o.append(panel(14, 66, 206, 366, "GELÄNDE", [
-        ("🌲", "Wald", "gibt 🪵 Holz"),
-        ("⛏️", "Mine", "gibt ⚙️ Metall"),
-        ("🌊", "Küste", "gibt 💧 Wasser"),
-        ("⚡", "Energiequelle", "gibt ⚡ Energie"),
+    # Titel als Banderole statt nackter Text.
+    o.append('<g>'
+             '<path d="M %d 8 L %d 8 L %d 30 L %d 52 L %d 52 L %d 30 Z" fill="%s" stroke="%s" stroke-width="2"/>'
+             '<text x="%d" y="38" font-size="30" font-weight="800" text-anchor="middle" '
+             'fill="%s" letter-spacing="3">INSEL DER ERFINDER</text></g>'
+             % (W / 2 - 300, W / 2 + 300, W / 2 + 330, W / 2 + 300, W / 2 - 300, W / 2 - 330,
+                PAPIER, TINTE_2, W / 2, TINTE))
+
+    o.append(panel(14, 66, 206, 366, "LEGENDE", [
+        ("\U0001F332", "Wald", "gibt \U0001FAB5 Holz"),
+        ("⛰️", "Mine", "gibt ⚙️ Metall"),
+        ("\U0001F30A", "Küste", "gibt \U0001F4A7 Wasser"),
+        ("\U0001F30B", "Energiequelle", "gibt ⚡ Energie"),
         (None, None, None),
-        ("🏛️", "Ruine", "untersuchen: 💎 & mehr"),
-        ("🏭", "Werkstatt", "hier baust du"),
-        ("🏜️", "Brachland", "noch nichts"),
+        ("\U0001F3DB️", "Ruine", "untersuchen: \U0001F48E & mehr"),
+        ("⛺", "Werkstatt", "Zelt in deiner Farbe"),
+        ("\U0001F33E", "Brachland", "wartet auf Neues"),
     ]))
 
     o.append(panel(960, 66, 206, 366, "DEINE 3 AP", [
-        ("🚶", "Bewegen — 1 AP", "1 Feld weit"),
-        ("🪵", "Sammeln — 1 AP", "1 Rohstoff des Feldes"),
-        ("🔍", "Untersuchen — 1 AP", "nur Ruine mit Marke"),
-        ("🔧", "Bauen — 2 AP", "nur eigene Werkstatt"),
-        ("🤝", "Handeln — 1 AP", "Nachbar oder gleiches Feld"),
+        ("\U0001F6B6", "Bewegen — 1 AP", "1 Feld weit"),
+        ("\U0001FAB5", "Sammeln — 1 AP", "1 Rohstoff des Feldes"),
+        ("\U0001F50D", "Untersuchen — 1 AP", "nur Ruine mit Marke"),
+        ("\U0001F527", "Bauen — 2 AP", "nur eigene Werkstatt"),
+        ("\U0001F91D", "Handeln — 1 AP", "Nachbar oder gleiches Feld"),
         ("⚖️", "Tauschbank — 1 AP", "3 gleiche → 1 beliebige"),
     ]))
 
@@ -263,7 +428,7 @@ def spielplan_svg():
                      % (cx, ry0 + 4))
     o.append('<text x="%d" y="%d" font-size="13" fill="%s" text-anchor="middle">'
              '⭐ Nach dieser Runde wird eine Inselkarte aufgedeckt – '
-             'die Insel verändert sich für immer.</text>' % (W / 2, ry0 + 82, TINTE))
+             'die Insel verändert sich für immer.</text>' % (W / 2, ry0 + 82, PAPIER))
 
     o.append('<g><rect x="20" y="622" width="196" height="120" rx="10" fill="%s" '
              'stroke="%s" stroke-width="2.5" stroke-dasharray="7 5"/>' % (PAPIER, TINTE_2))
@@ -306,7 +471,7 @@ def bau_spielplan():
            ".marke.unten { bottom: 1.5mm; }\n"
            ".links .marke { right: 1.5mm; }\n"
            ".rechts .marke { left: 1.5mm; }\n"
-           % (HALB_MM, GROSS_HOEHE_MM, GRUND, GROSS_BREITE_MM, GROSS_HOEHE_MM,
+           % (HALB_MM, GROSS_HOEHE_MM, MEER_DUNKEL, GROSS_BREITE_MM, GROSS_HOEHE_MM,
               HALB_MM, TINTE))
     haelften = []
     for seite_name, klasse, pfeil in (("Linke Hälfte", "links", "▶"), ("Rechte Hälfte", "rechts", "◀")):
