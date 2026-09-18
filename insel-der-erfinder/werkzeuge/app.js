@@ -73,6 +73,8 @@
     offenesTableau: null,    // Sitz, dessen Tableau gerade offen ist
     missionenSichtbar: false,
     toast: null,
+    letzterEffekt: null,   // { feldId, art: 'funkeln'|'fliesstext', text?, zeit } - kurze Reaktion aufs Brett
+    konfettiGezeigt: false,
     localLobby: { anzahl: 2, namen: {} },
   };
 
@@ -133,7 +135,7 @@
       if (r.fehler) { melde(r.fehler, "fehler"); return; }
       App.zustand = r.zustand;
       App.brettModus = "ruhe";
-      zeigeKartenToast(r.ereignisse);
+      zeigeKartenToast(r.ereignisse, r.zustand);
       sichereLokal();
       render();
       return;
@@ -149,14 +151,38 @@
       App.brettModus = "ruhe";
       const patch = berechneMinimalesUpdate(dok, r.zustand);
       if (Object.keys(patch).length > 0) await ref.update(patch);
-      zeigeKartenToast(r.ereignisse);
+      zeigeKartenToast(r.ereignisse, r.zustand);
       // App.zustand wird gleich über onSnapshot aktualisiert.
     } catch (e) {
       melde("Verbindung hat nicht geklappt: " + (e && e.message ? e.message : e), "fehler");
     }
   }
 
-  function zeigeKartenToast(ereignisse) {
+  /** Setzt App.letzterEffekt für die kurze Reaktion aufs Brett (Funkeln,
+   * Fließtext) — zeichneAktionsEffekt() in app.js liest das beim Rendern. */
+  function setzeAktionsEffekt(ereignisse, zustandDanach) {
+    for (let i = ereignisse.length - 1; i >= 0; i--) {
+      const e = ereignisse[i];
+      if (e.typ === "gesammelt") {
+        const feldId = zustandDanach.spieler[e.sitz].position;
+        const teile = Object.keys(e.gaben).map(function (k) { return ressourceZeichen(k) + " +" + e.gaben[k]; });
+        App.letzterEffekt = { feldId: feldId, art: "fliesstext", text: teile.join("  "), zeit: Date.now() };
+        return;
+      }
+      if (e.typ === "bewegt") {
+        App.letzterEffekt = { feldId: e.ziel, art: "funkeln", zeit: Date.now() };
+        return;
+      }
+      if (e.typ === "gebaut" || e.typ === "fund_gezogen" || e.typ === "ruine_taschenlampe" || e.typ === "getauscht_bank" || e.typ === "sonderfaehigkeit") {
+        const feldId = zustandDanach.spieler[e.sitz].position;
+        App.letzterEffekt = { feldId: feldId, art: "funkeln", zeit: Date.now() };
+        return;
+      }
+    }
+  }
+
+  function zeigeKartenToast(ereignisse, zustandDanach) {
+    setzeAktionsEffekt(ereignisse, zustandDanach);
     ereignisse.forEach(function (e) {
       if (e.typ === "ereignis") melde((M.nach.ereignis[e.karte].emoji) + " " + M.nach.ereignis[e.karte].name, "karte");
       if (e.typ === "inselkarte") melde((M.nach.insel[e.karte].emoji) + " " + M.nach.insel[e.karte].name, "karte");
@@ -632,7 +658,8 @@
       const x = cx + (zufall() - 0.5) * radius * 0.6;
       const y = cy + (zufall() - 0.5) * radius * 0.4 + i * 10;
       const w = radius * 0.6;
-      out += '<path d="M ' + (x - w / 2).toFixed(1) + " " + y.toFixed(1) + " q " + (w / 4).toFixed(1) + " -6 " +
+      out += '<path class="eff-welle" style="animation-delay:' + (i * 0.7).toFixed(1) + 's" d="M ' +
+        (x - w / 2).toFixed(1) + " " + y.toFixed(1) + " q " + (w / 4).toFixed(1) + " -6 " +
         (w / 2).toFixed(1) + " 0 q " + (w / 4).toFixed(1) + " 6 " + (w / 2).toFixed(1) + ' 0" stroke="' + farbe +
         '" stroke-width="2.2" fill="none" stroke-linecap="round"/>';
     }
@@ -661,14 +688,58 @@
       '" fill="' + farbe + '" stroke="var(--tinte)" stroke-width="2"/>' +
       '<line x1="' + sx + '" y1="' + sy + '" x2="' + cx + '" y2="' + liY + '" stroke="var(--tinte)" stroke-width="1.4"/>' +
       '<line x1="' + sx + '" y1="' + sy + '" x2="' + sx + '" y2="' + (sy - r * 0.6) + '" stroke="var(--tinte)" stroke-width="1.6"/>' +
-      '<polygon points="' + sx + "," + (sy - r * 0.6) + " " + (sx + r * 0.5) + "," + (sy - r * 0.46) + " " + sx + "," +
+      '<polygon class="eff-fahne" points="' + sx + "," + (sy - r * 0.6) + " " + (sx + r * 0.5) + "," + (sy - r * 0.46) + " " + sx + "," +
       (sy - r * 0.32) + '" fill="var(--tinte)"/>'
     );
+  }
+
+  // ------------------------------------------------------ Rauch am Vulkan
+  function rauchSvg(cx, cy, seed) {
+    const zufall = zufallsReihe(seed + 7);
+    let out = "";
+    for (let i = 0; i < 3; i++) {
+      const x = cx + (zufall() - 0.5) * 10;
+      const versatz = ((zufall() - 0.5) * 16).toFixed(1);
+      const verzoegerung = (i * 1.1 + zufall()).toFixed(2);
+      out += '<circle class="eff-rauch" style="--rauch-x:' + versatz + 'px; animation-delay:-' + verzoegerung +
+        's" cx="' + x.toFixed(1) + '" cy="' + (cy - 14).toFixed(1) + '" r="' + (5 + zufall() * 3).toFixed(1) +
+        '" fill="var(--tinte3)"/>';
+    }
+    return out;
   }
   const GELAENDE_SYMBOLE = {
     wald: [["\u{1F332}", 19], ["\u{1F334}", 16], ["\u{1F332}", 13]],
     mine: [["⛰️", 18], ["\u{1FAA8}", 13], ["⛏️", 11]],
   };
+
+  const EFFEKT_DAUER_MS = 1100;
+
+  /** Die kurze Reaktion aufs Brett, die sende() über App.letzterEffekt
+   * ausgelöst hat: ein Funken-Kranz beim Bewegen/Bauen/Untersuchen, ein
+   * aufsteigender Fließtext beim Sammeln. Läuft rein über CSS-Animationen,
+   * die Grafik wird nur einmal gezeichnet, wenn sie noch frisch ist. */
+  function zeichneAktionsEffekt() {
+    const e = App.letzterEffekt;
+    if (!e) return "";
+    if (Date.now() - e.zeit > EFFEKT_DAUER_MS) { App.letzterEffekt = null; return ""; }
+    const feld = nach_feld(e.feldId);
+    if (!feld) return "";
+    const [cx, cy] = hexMitte(feld.q, feld.r);
+    if (e.art === "fliesstext") {
+      return '<text class="eff-fliesstext" x="' + cx.toFixed(1) + '" y="' + (cy - 8).toFixed(1) +
+        '" font-size="19" text-anchor="middle" font-weight="800" fill="var(--tinte)">' + esc(e.text) + "</text>";
+    }
+    let out = '<circle class="eff-ring" cx="' + cx.toFixed(1) + '" cy="' + cy.toFixed(1) +
+      '" r="18" fill="none" stroke="var(--akzent)"/>';
+    const sterne = ["✨", "⭐", "✦"];
+    for (let i = 0; i < 5; i++) {
+      const winkel = (Math.PI * 2 * i) / 5;
+      const x = cx + Math.cos(winkel) * 30, y = cy + Math.sin(winkel) * 30;
+      out += '<text class="eff-funkel" style="animation-delay:' + (i * 0.05).toFixed(2) + 's" x="' + x.toFixed(1) +
+        '" y="' + y.toFixed(1) + '" font-size="16" text-anchor="middle">' + sterne[i % sterne.length] + "</text>";
+    }
+    return out;
+  }
 
   function renderBrettBereich(zustand, sitz) {
     const bereich = h('<div class="brett-bereich"></div>');
@@ -714,6 +785,7 @@
         svg += streueSymbole(cx, cy, HEX_S * 0.68, seed, [["\u{1FAA8}", 11]]);
       } else if (typ === "energie") {
         svg += emojiSvg(cx, cy - 2, "\u{1F30B}", 30);
+        svg += rauchSvg(cx, cy - 16, seed);
       } else if (typ === "kueste") {
         svg += wellenSymbole(cx, cy, HEX_S, "var(--meer-dunkel)", seed);
       } else if (GELAENDE_SYMBOLE[typ]) {
@@ -742,10 +814,11 @@
         (cx + versatz[0]) + "," + (cy + 28 + versatz[1]) + ')">';
       svg += '<circle r="15" fill="' + farbe.farbe + '" stroke="var(--blatt)" stroke-width="2.5"/>';
       svg += '<text x="0" y="5" font-size="14" text-anchor="middle">🙂</text>';
-      if (istEigener) svg += '<circle r="19" fill="none" stroke="' + farbe.farbe + '" stroke-width="1.5" stroke-dasharray="2 2"/>';
+      if (istEigener) svg += '<circle class="eff-eigener-ring" r="19" fill="none" stroke="' + farbe.farbe + '" stroke-width="1.5" stroke-dasharray="2 2"/>';
       svg += "</g>";
     });
 
+    svg += zeichneAktionsEffekt();
     svg += "</svg>";
     bereich.innerHTML = svg;
 
@@ -1312,7 +1385,8 @@
     el.appendChild(h('<h1>🏆 Die Insel ist erfunden</h1><p class="unter">Nach ' + D.regeln.runden + ' Runden steht das Ergebnis.</p>'));
     zustand.ergebnis.platzierung.forEach(function (p, i) {
       const farbe = farbeVon(p.sitz);
-      const karte = h('<div class="platzkarte' + (i === 0 ? " sieger" : "") + '">' +
+      const karte = h('<div class="platzkarte' + (i === 0 ? " sieger" : "") + '" style="animation-delay:' +
+        (i * 0.1).toFixed(1) + 's">' +
         '<span class="platz">' + (i + 1) + '</span>' +
         '<span class="farbpunkt" style="background:' + farbe.farbe + '"></span>' +
         '<span class="pname">' + esc(p.name) + '</span><span class="ppunkte">' + p.punkte + '</span></div>');
@@ -1334,11 +1408,33 @@
     const neu = h('<button class="knopf primaer breit" style="margin-top:18px">Neue Partie</button>');
     neu.onclick = function () {
       loescheLokal();
+      App.konfettiGezeigt = false;
       if (App.modus === "online") raumVerlassen();
       else { App.bildschirm = "start"; App.zustand = null; render(); }
     };
     el.appendChild(neu);
+    if (!App.konfettiGezeigt) { App.konfettiGezeigt = true; setTimeout(zeigeKonfetti, 0); }
     return el;
+  }
+
+  /** Ein einmaliger Konfettiregen fürs Spielende - in den Spielerfarben plus
+   * der Akzentfarbe, per CSS-Fall-Animation, entfernt sich selbst. */
+  function zeigeKonfetti() {
+    const farben = D.spielerfarben.map(function (s) { return s.farbe; }).concat(["var(--akzent)"]);
+    const lage = document.createElement("div");
+    lage.className = "konfetti-lage";
+    for (let i = 0; i < 46; i++) {
+      const stueck = document.createElement("span");
+      stueck.className = "konfetti-stueck";
+      stueck.style.left = (Math.random() * 100).toFixed(1) + "%";
+      stueck.style.background = farben[i % farben.length];
+      stueck.style.animationDuration = (2.2 + Math.random() * 1.6).toFixed(2) + "s";
+      stueck.style.animationDelay = (Math.random() * 0.6).toFixed(2) + "s";
+      stueck.style.transform = "rotate(" + Math.floor(Math.random() * 360) + "deg)";
+      lage.appendChild(stueck);
+    }
+    document.body.appendChild(lage);
+    setTimeout(function () { lage.remove(); }, 4200);
   }
 
   // ======================================================================

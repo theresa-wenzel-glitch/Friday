@@ -268,6 +268,115 @@ img { max-width: 100%; }
 .wartehinweis { position: fixed; bottom: calc(70px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%);
                background: var(--info); color: #fff; border-radius: 20px; padding: 8px 16px; font-size: 12.5px;
                font-weight: 700; z-index: 45; }
+
+/* ======================================================= Bewegung & Effekte
+   Ambiente (immer an: Rauch, Wellen, wehende Fähnchen, Puls) + kurze
+   Reaktionen auf Aktionen (Funkeln, Fließtext, Konfetti). Wer Bewegung
+   reduziert eingestellt hat, bekommt nichts davon — siehe die
+   prefers-reduced-motion-Regel weit oben, die alle Animationsdauern auf
+   praktisch null setzt. */
+
+@keyframes rauchAuf {
+  0%   { transform: translate(0, 0) scale(0.5); opacity: 0; }
+  15%  { opacity: 0.55; }
+  100% { transform: translate(var(--rauch-x, 4px), -26px) scale(1.15); opacity: 0; }
+}
+.eff-rauch { animation: rauchAuf 3.4s ease-in infinite; transform-origin: center; }
+
+@keyframes fahneWehen {
+  0%, 100% { transform: skewX(0deg); }
+  50%      { transform: skewX(-14deg); }
+}
+.eff-fahne { animation: fahneWehen 2.4s ease-in-out infinite; transform-box: fill-box; transform-origin: left center; }
+
+@keyframes wellenDriften {
+  0%, 100% { transform: translateX(0); opacity: 0.35; }
+  50%      { transform: translateX(5px); opacity: 0.55; }
+}
+.eff-welle { animation: wellenDriften 5s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+
+@keyframes anklickbarPuls {
+  0%, 100% { stroke-opacity: 1; }
+  50%      { stroke-opacity: 0.45; }
+}
+.hexfeld.anklickbar .hexumriss { animation: anklickbarPuls 1.4s ease-in-out infinite; }
+
+@keyframes eigenerTokenPuls {
+  0%, 100% { stroke-opacity: 0.9; }
+  50%      { stroke-opacity: 0.3; }
+}
+/* Nur die Deckkraft pulsiert, nie die Größe - ein Radius, der sich per
+   SVG-Attribut ändert, verändert die sichtbare Fläche jeden Frame, was
+   Klicks auf die Figur (und automatisierte Tests) unnötig stören würde. */
+.eff-eigener-ring { animation: eigenerTokenPuls 1.8s ease-in-out infinite; }
+
+@keyframes funkelPop {
+  0%   { transform: scale(0) rotate(0deg); opacity: 0; }
+  35%  { transform: scale(1.15) rotate(25deg); opacity: 1; }
+  100% { transform: scale(0.6) rotate(70deg); opacity: 0; }
+}
+.eff-funkel { animation: funkelPop 0.85s ease-out both; transform-box: fill-box; transform-origin: center; }
+
+@keyframes fliesstextAuf {
+  0%   { transform: translateY(0); opacity: 0; }
+  20%  { opacity: 1; }
+  100% { transform: translateY(-46px); opacity: 0; }
+}
+.eff-fliesstext { animation: fliesstextAuf 1.1s ease-out both; }
+
+@keyframes ringPuls {
+  0%   { transform: scale(0.3); opacity: 0.9; stroke-width: 4; }
+  100% { transform: scale(2.4); opacity: 0; stroke-width: 0.5; }
+}
+.eff-ring { animation: ringPuls 0.8s ease-out both; transform-box: fill-box; transform-origin: center; }
+
+/* -------------------------------------------------------------- Übergänge */
+
+@keyframes modalHerein {
+  0%   { opacity: 0; transform: translateY(10px) scale(0.96); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+.modal { animation: modalHerein 0.22s ease-out both; }
+
+@keyframes schleierHerein { 0% { opacity: 0; } 100% { opacity: 1; } }
+.schleier, .tableau-schleier { animation: schleierHerein 0.18s ease-out both; }
+
+@keyframes tableauHerein {
+  0%   { transform: translateY(100%); }
+  100% { transform: translateY(0); }
+}
+.tableau { animation: tableauHerein 0.28s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+@keyframes toastHerein {
+  0%   { opacity: 0; transform: translate(-50%, -14px) scale(0.9); }
+  60%  { transform: translate(-50%, 2px) scale(1.03); }
+  100% { opacity: 1; transform: translate(-50%, 0) scale(1); }
+}
+.karten-toast { animation: toastHerein 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+
+.knopf, .aktionsknopf { transition: transform 0.12s ease, box-shadow 0.12s ease; }
+.knopf:active:not(:disabled), .aktionsknopf:active:not(:disabled) { transform: scale(0.94); }
+.wahlkarte, .marktkarte.bauen-moeglich, .karte-vorschau { transition: transform 0.15s ease, box-shadow 0.15s ease; }
+.wahlkarte:active { transform: scale(0.98); }
+.marktkarte.bauen-moeglich:hover { transform: translateY(-2px); box-shadow: var(--schatten); }
+
+/* ------------------------------------------------------------- Konfetti */
+
+.konfetti-lage { position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 70; }
+.konfetti-stueck { position: absolute; top: -12px; width: 8px; height: 14px; opacity: 0.9;
+                   animation-name: konfettiFall; animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1);
+                   animation-iteration-count: 1; animation-fill-mode: forwards; }
+@keyframes konfettiFall {
+  0%   { transform: translateY(0) rotate(0deg); opacity: 0.95; }
+  100% { transform: translateY(112vh) rotate(540deg); opacity: 0.15; }
+}
+
+@keyframes platzkarteHerein {
+  0%   { opacity: 0; transform: translateY(14px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.platzkarte { animation: platzkarteHerein 0.4s ease-out both; }
+.platzkarte.sieger .ppunkte { animation: funkelPop 1s ease-out 0.5s both; display: inline-block; }
 </style>
 <div id="app"><noscript>Dieses Spiel braucht JavaScript.</noscript></div>
 <script type="application/json" id="spieldaten-json">{"version": 1, "regeln": {"runden": 8, "aktionspunkte": 3, "lagerlimit": 10, "inselkartenRunden": [2, 4, 6]}, "ressourcen": {"holz": {"name": "Holz", "emoji": "🪵", "farbe": "#7a5230", "hell": "#e8d9c5"}, "metall": {"name": "Metall", "emoji": "⚙️", "farbe": "#5a6673", "hell": "#d8dee5"}, "wasser": {"name": "Wasser", "emoji": "💧", "farbe": "#2a6f97", "hell": "#cfe4f2"}, "energie": {"name": "Energie", "emoji": "⚡", "farbe": "#b8860b", "hell": "#f7e9bf"}, "bauteil": {"name": "Seltenes Bauteil", "emoji": "💎", "farbe": "#6b4a9e", "hell": "#e4dbf5"}}, "gelaende": {"wald": {"name": "Wald", "emoji": "🌲", "gibt": "holz", "fuell": "#dbd5b2", "rand": "#7b7a4f"}, "mine": {"name": "Mine", "emoji": "⛏️", "gibt": "metall", "fuell": "#dad3c5", "rand": "#7d7264"}, "kueste": {"name": "Küste", "emoji": "🌊", "gibt": "wasser", "fuell": "#e9e1cd", "rand": "#8a8168"}, "energie": {"name": "Energiequelle", "emoji": "⚡", "gibt": "energie", "fuell": "#ecdcab", "rand": "#987d38"}, "ruine": {"name": "Ruine", "emoji": "🏛️", "gibt": null, "fuell": "#d5c8b0", "rand": "#796950"}, "grruine": {"name": "Große Ruine", "emoji": "🏛️", "gibt": null, "fuell": "#c7b593", "rand": "#67563d"}, "brachland": {"name": "Brachland", "emoji": "🏜️", "gibt": null, "fuell": "#f2ead9", "rand": "#b2a78e"}, "werkstatt": {"name": "Werkstatt", "emoji": "🏭", "gibt": null, "fuell": "#fffdf8", "rand": "#4a3b2a"}}, "spielerfarben": [{"key": "rot", "name": "Rot", "farbe": "#9c4a35", "hell": "#f8e6de"}, {"key": "blau", "name": "Blau", "farbe": "#3f6478", "hell": "#e4eef4"}, {"key": "gruen", "name": "Grün", "farbe": "#5a7345", "hell": "#eaefe1"}, {"key": "gelb", "name": "Gelb", "farbe": "#a8842c", "hell": "#faf2dd"}], "felder": [{"id": "0_0", "q": 0, "r": 0, "typ": "grruine", "fundmarken": 8}, {"id": "1_-1", "q": 1, "r": -1, "typ": "energie", "fundmarken": 0}, {"id": "1_0", "q": 1, "r": 0, "typ": "wald", "fundmarken": 0}, {"id": "0_1", "q": 0, "r": 1, "typ": "mine", "fundmarken": 0}, {"id": "-1_1", "q": -1, "r": 1, "typ": "ruine", "fundmarken": 4}, {"id": "-1_0", "q": -1, "r": 0, "typ": "wald", "fundmarken": 0}, {"id": "0_-1", "q": 0, "r": -1, "typ": "mine", "fundmarken": 0}, {"id": "2_-2", "q": 2, "r": -2, "typ": "werkstatt", "fundmarken": 0, "spieler": "rot"}, {"id": "2_-1", "q": 2, "r": -1, "typ": "kueste", "fundmarken": 0}, {"id": "2_0", "q": 2, "r": 0, "typ": "mine", "fundmarken": 0}, {"id": "1_1", "q": 1, "r": 1, "typ": "werkstatt", "fundmarken": 0, "spieler": "blau"}, {"id": "0_2", "q": 0, "r": 2, "typ": "brachland", "fundmarken": 0}, {"id": "-1_2", "q": -1, "r": 2, "typ": "energie", "fundmarken": 0}, {"id": "-2_2", "q": -2, "r": 2, "typ": "werkstatt", "fundmarken": 0, "spieler": "gruen"}, {"id": "-2_1", "q": -2, "r": 1, "typ": "kueste", "fundmarken": 0}, {"id": "-2_0", "q": -2, "r": 0, "typ": "brachland", "fundmarken": 0}, {"id": "-1_-1", "q": -1, "r": -1, "typ": "werkstatt", "fundmarken": 0, "spieler": "gelb"}, {"id": "0_-2", "q": 0, "r": -2, "typ": "wald", "fundmarken": 0}, {"id": "1_-2", "q": 1, "r": -2, "typ": "ruine", "fundmarken": 4}], "nachbarn": {"0_0": ["1_0", "-1_0", "0_1", "0_-1", "1_-1", "-1_1"], "1_-1": ["2_-1", "0_-1", "1_0", "1_-2", "2_-2", "0_0"], "1_0": ["2_0", "0_0", "1_1", "1_-1", "2_-1", "0_1"], "0_1": ["1_1", "-1_1", "0_2", "0_0", "1_0", "-1_2"], "-1_1": ["0_1", "-2_1", "-1_2", "-1_0", "0_0", "-2_2"], "-1_0": ["0_0", "-2_0", "-1_1", "-1_-1", "0_-1", "-2_1"], "0_-1": ["1_-1", "-1_-1", "0_0", "0_-2", "1_-2", "-1_0"], "2_-2": ["1_-2", "2_-1", "1_-1"], "2_-1": ["1_-1", "2_0", "2_-2", "1_0"], "2_0": ["1_0", "2_-1", "1_1"], "1_1": ["0_1", "1_0", "2_0", "0_2"], "0_2": ["-1_2", "0_1", "1_1"], "-1_2": ["0_2", "-2_2", "-1_1", "0_1"], "-2_2": ["-1_2", "-2_1", "-1_1"], "-2_1": ["-1_1", "-2_2", "-2_0", "-1_0"], "-2_0": ["-1_0", "-2_1", "-1_-1"], "-1_-1": ["0_-1", "-1_0", "0_-2", "-2_0"], "0_-2": ["1_-2", "0_-1", "-1_-1"], "1_-2": ["2_-2", "0_-2", "1_-1", "0_-1"]}, "startWerkstatt": {"rot": "2_-2", "blau": "1_1", "gruen": "-2_2", "gelb": "-1_-1"}, "grosseRuine": "0_0", "erfindungen": [{"id": "holzfaelleraxt", "stufe": 1, "emoji": "🪓", "name": "Holzfäller-Axt", "kosten": {"holz": 2, "metall": 1}, "punkte": 3, "text": "Wenn du im 🌲 Wald sammelst, bekommst du 1 🪵 Holz extra."}, {"id": "regenfaenger", "stufe": 1, "emoji": "🪣", "name": "Regenfänger", "kosten": {"holz": 1, "metall": 1, "wasser": 1}, "punkte": 3, "text": "Wenn du an der 🌊 Küste sammelst, bekommst du 1 💧 Wasser extra."}, {"id": "schubkarre", "stufe": 1, "emoji": "🛒", "name": "Schubkarre", "kosten": {"holz": 2}, "punkte": 3, "text": "Dein Lager fasst 4 Ressourcen mehr (also 14 statt 10)."}, {"id": "taschenlampe", "stufe": 1, "emoji": "🔦", "name": "Taschenlampe", "kosten": {"metall": 1, "energie": 1}, "punkte": 4, "text": "Wenn du eine Ruine untersuchst, ziehe 2 Fundkarten und behalte 1. Die andere kommt zurück unter den Stapel."}, {"id": "strickleiter", "stufe": 1, "emoji": "🪜", "name": "Strickleiter", "kosten": {"holz": 3}, "punkte": 3, "text": "Einmal pro Runde: Bewege dich 1 Feld weit, ohne einen Aktionspunkt zu bezahlen."}, {"id": "spitzhacke", "stufe": 1, "emoji": "⛏️", "name": "Spitzhacke", "kosten": {"holz": 1, "metall": 2}, "punkte": 4, "text": "Wenn du in der ⛏️ Mine sammelst, bekommst du 1 ⚙️ Metall extra."}, {"id": "lagerfeuer", "stufe": 1, "emoji": "🔥", "name": "Lagerfeuer", "kosten": {"holz": 2, "wasser": 1}, "punkte": 3, "text": "Einmal pro Runde: Tausche 2 gleiche Ressourcen gegen 1 beliebige. Das kostet keine Aktion."}, {"id": "signalhorn", "stufe": 1, "emoji": "📯", "name": "Signalhorn", "kosten": {"holz": 1, "metall": 1, "wasser": 1}, "punkte": 4, "text": "Handeln kostet dich keinen Aktionspunkt mehr."}, {"id": "miniflugmaschine", "stufe": 2, "emoji": "🚁", "name": "Mini-Flugmaschine", "kosten": {"metall": 2, "energie": 1, "holz": 1}, "punkte": 6, "text": "Einmal pro Runde: Fliege für 1 Aktionspunkt auf ein beliebiges Feld der Insel."}, {"id": "roboterhelfer", "stufe": 2, "emoji": "🤖", "name": "Roboter-Helfer", "kosten": {"metall": 3, "energie": 1}, "punkte": 5, "text": "Einmal pro Runde: Beim Sammeln bekommst du 1 zusätzliche Ressource des Feldes."}, {"id": "wasserrecycling", "stufe": 2, "emoji": "💧", "name": "Wasser-Recyclingmaschine", "kosten": {"metall": 2, "wasser": 2}, "punkte": 4, "text": "Am Spielende: Jedes 💧 Wasser in deinem Lager ist 1 Punkt wert."}, {"id": "aussichtsturm", "stufe": 2, "emoji": "🔭", "name": "Aussichtsturm", "kosten": {"holz": 3, "metall": 1}, "punkte": 5, "text": "Wenn du sammelst, darfst du stattdessen von einem angrenzenden Feld sammeln."}, {"id": "auslegerboot", "stufe": 2, "emoji": "🛶", "name": "Auslegerboot", "kosten": {"holz": 3, "wasser": 1}, "punkte": 5, "text": "Einmal pro Runde: Fahre für 1 Aktionspunkt auf ein beliebiges 🌊 Küstenfeld."}, {"id": "energiespeicher", "stufe": 2, "emoji": "🔌", "name": "Energiespeicher", "kosten": {"metall": 2, "energie": 1}, "punkte": 5, "text": "Am Spielende: Jede ⚡ Energie in deinem Lager ist 2 Punkte wert."}, {"id": "magnetkran", "stufe": 2, "emoji": "🧲", "name": "Magnetkran", "kosten": {"metall": 3, "holz": 1}, "punkte": 6, "text": "Einmal pro Runde: Sammle, ohne einen Aktionspunkt zu bezahlen."}, {"id": "feldlabor", "stufe": 2, "emoji": "🧪", "name": "Feldlabor", "kosten": {"metall": 2, "wasser": 1, "energie": 1}, "punkte": 6, "text": "Sofort: Ziehe 1 Forschungsauftrag. Außerdem einmal pro Runde: Tausche 1 Ressource gegen 1 andere, ohne Aktion."}, {"id": "destillieranlage", "stufe": 2, "emoji": "⚗️", "name": "Destillieranlage", "kosten": {"metall": 2, "wasser": 2, "energie": 1}, "punkte": 7, "text": "Einmal pro Runde für 1 Aktionspunkt: Tausche 3 💧 Wasser gegen 1 💎 seltenes Bauteil."}, {"id": "hebekran", "stufe": 2, "emoji": "🏗️", "name": "Hebekran", "kosten": {"holz": 2, "metall": 2}, "punkte": 5, "text": "Erfindungen bauen kostet dich nur noch 1 Aktionspunkt statt 2."}, {"id": "supergenerator", "stufe": 3, "emoji": "⚡", "name": "Supergenerator", "kosten": {"metall": 2, "energie": 2, "bauteil": 1}, "punkte": 10, "text": "Keine Fähigkeit – dafür besonders viele Punkte."}, {"id": "luftschiff", "stufe": 3, "emoji": "🛸", "name": "Luftschiff", "kosten": {"holz": 3, "metall": 2, "energie": 1}, "punkte": 9, "text": "Bewegung kostet dich ab jetzt nie mehr einen Aktionspunkt."}, {"id": "ruinenscanner", "stufe": 3, "emoji": "📡", "name": "Ruinen-Scanner", "kosten": {"metall": 2, "energie": 2, "bauteil": 1}, "punkte": 9, "text": "Einmal pro Runde: Untersuche eine Ruine, ohne einen Aktionspunkt zu bezahlen."}, {"id": "grossebruecke", "stufe": 3, "emoji": "🌉", "name": "Große Brücke", "kosten": {"holz": 4, "metall": 2}, "punkte": 7, "text": "Am Spielende: +1 Punkt für jede Erfindung, die du gebaut hast (diese mitgezählt)."}, {"id": "automatikfabrik", "stufe": 3, "emoji": "🏭", "name": "Automatik-Fabrik", "kosten": {"metall": 3, "energie": 2, "bauteil": 1}, "punkte": 11, "text": "Zu Beginn jeder Runde: Nimm 1 beliebige Ressource aus dem Vorrat."}, {"id": "leuchtturm", "stufe": 3, "emoji": "🗼", "name": "Leuchtturm der Erfinder", "kosten": {"holz": 2, "metall": 2, "wasser": 2, "energie": 1}, "punkte": 12, "text": "Am Spielende: Jedes übrige 💎 seltene Bauteil zählt 4 statt 2 Punkte."}], "ereignisse": [{"id": "tropensturm", "emoji": "🌪️", "name": "Tropensturm", "text": "Nächste Runde: Jede Bewegung kostet 1 Aktionspunkt mehr.", "art": "schlecht"}, {"id": "geistesblitz", "emoji": "💡", "name": "Geistesblitz", "text": "Nächste Runde: Jede Erfindung kostet 1 Ressource weniger (du suchst aus welche).", "art": "gut"}, {"id": "neugierigeaffen", "emoji": "🐒", "name": "Neugierige Affen", "text": "Jeder Spieler verliert sofort 1 Ressource seiner Wahl.", "art": "schlecht"}, {"id": "inselbebt", "emoji": "🌋", "name": "Die Insel bebt", "text": "Der Startspieler wählt 1 Feld (keine Werkstatt). Nächste Runde darf niemand darauf ziehen. Figuren, die dort stehen, dürfen bleiben.", "art": "schlecht"}, {"id": "regenzeit", "emoji": "🌧️", "name": "Regenzeit", "text": "Jeder Spieler nimmt 1 💧 Wasser aus dem Vorrat.", "art": "gut"}, {"id": "sonnensturm", "emoji": "☀️", "name": "Sonnensturm", "text": "Jeder Spieler auf einem ⚡ Energiefeld nimmt 1 ⚡ Energie. Alle anderen verlieren 1 ⚡ Energie, falls sie welche haben.", "art": "gemischt"}, {"id": "buntevoegel", "emoji": "🦜", "name": "Bunte Vögel", "text": "Nächste Runde: Jedes Sammeln bringt für alle 1 Ressource extra.", "art": "gut"}, {"id": "flut", "emoji": "🌊", "name": "Flut", "text": "Nächste Runde sind alle 🌊 Küstenfelder gesperrt. Figuren, die dort stehen, müssen als erste Aktion wegziehen.", "art": "schlecht"}, {"id": "waldbrand", "emoji": "🔥", "name": "Waldbrand", "text": "Nächste Runde kann im 🌲 Wald nicht gesammelt werden.", "art": "schlecht"}, {"id": "strandgut", "emoji": "🎁", "name": "Strandgut", "text": "Jeder Spieler, dessen Figur an der 🌊 Küste steht, nimmt 2 beliebige Ressourcen.", "art": "gut"}, {"id": "erfinderkongress", "emoji": "🤝", "name": "Erfinderkongress", "text": "Nächste Runde kostet Handeln für alle keinen Aktionspunkt.", "art": "gut"}, {"id": "sternenklarenacht", "emoji": "🌙", "name": "Sternenklare Nacht", "text": "Nächste Runde hat jeder Spieler 4 Aktionspunkte statt 3.", "art": "gut"}], "inselkarten": [{"id": "neueenergiequelle", "emoji": "⚡", "name": "Neue Energiequelle entdeckt!", "text": "Lege das ⚡ Insel-Plättchen auf ein 🏜️ Brachland. Dort kann ab jetzt Energie gesammelt werden."}, {"id": "verschuetteteruine", "emoji": "🏛️", "name": "Verschüttete Ruine freigelegt!", "text": "Lege das 🏛️ Insel-Plättchen auf ein 🏜️ Brachland und 3 Fundmarken darauf."}, {"id": "minebrichtein", "emoji": "⛏️", "name": "Die Mine bricht ein!", "text": "Lege das ⚠️ Plättchen auf ein ⛏️ Minenfeld. Dort kann nicht mehr gesammelt werden – dafür liegen jetzt 3 Fundmarken darauf – die Ruine kann untersucht werden."}, {"id": "waldwaechst", "emoji": "🌲", "name": "Der Wald wächst", "text": "Lege das 🌲 Insel-Plättchen auf ein 🏜️ Brachland. Dort kann ab jetzt Holz gesammelt werden."}, {"id": "wasserspiegelsteigt", "emoji": "🌊", "name": "Der Wasserspiegel steigt", "text": "Lege das 🌊 Insel-Plättchen auf ein beliebiges Randfeld (keine Werkstatt). Es ist ab jetzt Küste."}, {"id": "bruecke", "emoji": "🌉", "name": "Brücke über die Schlucht", "text": "Lege das 🌉 Plättchen zwischen die Große Ruine und ein beliebiges Werkstattfeld. Diese beiden Felder sind ab jetzt für alle benachbart."}, {"id": "leuchtpilze", "emoji": "🍄", "name": "Leuchtpilze", "text": "Lege auf jedes 🏛️ Ruinenfeld (auch die Große Ruine) 2 zusätzliche Fundkarten."}, {"id": "fruchtbareerde", "emoji": "🌺", "name": "Fruchtbare Erde", "text": "Ab jetzt bringt Sammeln im 🌲 Wald und an der 🌊 Küste für alle Spieler 1 Ressource extra."}], "fundkarten": [{"id": "fundbauteil", "emoji": "💎", "name": "Seltenes Bauteil", "anzahl": 8, "text": "Nimm 1 💎 seltenes Bauteil.", "relikt": false}, {"id": "reicherfund", "emoji": "💎💎", "name": "Reicher Fund", "anzahl": 3, "text": "Nimm 2 💎 seltene Bauteile.", "relikt": false}, {"id": "vorratskiste", "emoji": "📦", "name": "Alte Vorratskiste", "anzahl": 4, "text": "Nimm 2 beliebige Ressourcen (kein Bauteil).", "relikt": false}, {"id": "verwitterte", "emoji": "🗺️", "name": "Verwitterte Karte", "anzahl": 2, "text": "Nimm 1 beliebige Ressource und ziehe 1 Forschungsauftrag.", "relikt": false}, {"id": "reliktkompass", "emoji": "🧭", "name": "Relikt: Alter Kompass", "anzahl": 1, "text": "Behalte diese Karte offen. Deine erste Bewegung in jeder Runde kostet keinen Aktionspunkt.", "relikt": true}, {"id": "reliktbatterie", "emoji": "🔋", "name": "Relikt: Ewige Batterie", "anzahl": 1, "text": "Behalte diese Karte offen. Einmal pro Runde bekommst du beim Sammeln zusätzlich 1 ⚡ Energie.", "relikt": true}, {"id": "reliktwaechter", "emoji": "🗿", "name": "Relikt: Steinerner Wächter", "anzahl": 1, "text": "Behalte diese Karte offen. Am Spielende bekommst du +4 Punkte.", "relikt": true}], "auftraege": [{"id": "holzsammler", "emoji": "🪵", "name": "Holzsammler", "punkte": 3, "text": "Du hast am Spielende mindestens 4 🪵 Holz im Lager."}, {"id": "metallhaendler", "emoji": "⚙️", "name": "Metallhändler", "punkte": 3, "text": "Du hast am Spielende mindestens 4 ⚙️ Metall im Lager."}, {"id": "wassertraeger", "emoji": "💧", "name": "Wasserträger", "punkte": 3, "text": "Du hast am Spielende mindestens 4 💧 Wasser im Lager."}, {"id": "energiebuendel", "emoji": "⚡", "name": "Energiebündel", "punkte": 4, "text": "Du hast am Spielende mindestens 3 ⚡ Energie im Lager."}, {"id": "schatzsucher", "emoji": "💎", "name": "Schatzsucher", "punkte": 4, "text": "Du hast am Spielende mindestens 2 💎 seltene Bauteile im Lager."}, {"id": "weltenbummler", "emoji": "🧭", "name": "Weltenbummler", "punkte": 4, "text": "Deine Figur stand im Lauf des Spiels auf jeder Geländeart: 🌲 ⛏️ 🌊 ⚡ 🏛️ (Haken auf dem Werkstatt-Tableau machen!)."}, {"id": "baumeister", "emoji": "🔨", "name": "Baumeister", "punkte": 4, "text": "Du hast mindestens 3 Erfindungen gebaut."}, {"id": "grossmeister", "emoji": "🎓", "name": "Großmeister", "punkte": 5, "text": "Du hast mindestens 1 Erfindung der Stufe III gebaut."}, {"id": "ruinenforscher", "emoji": "🏛️", "name": "Ruinenforscher", "punkte": 4, "text": "Du hast mindestens 4-mal eine Ruine untersucht."}, {"id": "haendler", "emoji": "🤝", "name": "Händler", "punkte": 3, "text": "Du hast mindestens 3-mal mit anderen Spielern gehandelt."}, {"id": "heimwerker", "emoji": "🛠️", "name": "Heimwerker", "punkte": 3, "text": "Du hast mindestens 2 Erfindungen der Stufe I gebaut."}, {"id": "sparfuchs", "emoji": "📦", "name": "Sparfuchs", "punkte": 4, "text": "Du hast am Spielende mindestens 8 Ressourcen im Lager."}], "bonusziele": [{"id": "meistermaschinen", "emoji": "⚙️", "name": "Meister der Maschinen", "punkte": 5, "text": "Du hast mindestens 3 verschiedene Erfindungen gebaut."}, {"id": "vielfalt", "emoji": "🌈", "name": "Vielfalt", "punkte": 5, "text": "Du hast am Spielende von jeder Art mindestens 1: 🪵 ⚙️ 💧 ⚡ 💎"}, {"id": "entdecker", "emoji": "🔍", "name": "Entdecker", "punkte": 4, "text": "Du hast die meisten 💎 seltenen Bauteile gefunden (verbaute zählen mit). Bei Gleichstand bekommen alle die Punkte."}, {"id": "schnellbauer", "emoji": "🏁", "name": "Schnellbauer", "punkte": 4, "text": "Du hast als Erster eine Erfindung der Stufe III gebaut. Nur ein Spieler bekommt das."}, {"id": "energiemeister", "emoji": "⚡", "name": "Energiemeister", "punkte": 4, "text": "Du hast mindestens 2 Erfindungen gebaut, die ⚡ Energie gekostet haben."}, {"id": "guternachbar", "emoji": "🤝", "name": "Guter Nachbar", "punkte": 4, "text": "Du hast mindestens 3-mal mit anderen Spielern gehandelt."}, {"id": "heimatverbunden", "emoji": "🏠", "name": "Heimatverbunden", "punkte": 3, "text": "Deine Figur steht am Spielende auf deinem eigenen Werkstattfeld."}, {"id": "fleissig", "emoji": "🐝", "name": "Fleißig", "punkte": 6, "text": "Du hast mindestens 5 Erfindungen gebaut."}, {"id": "holzhuette", "emoji": "🌲", "name": "Holzhütte", "punkte": 4, "text": "Du hast mindestens 3 Erfindungen gebaut, die 🪵 Holz gekostet haben."}, {"id": "kuestenbewohner", "emoji": "🌊", "name": "Küstenbewohner", "punkte": 4, "text": "Du hast am Spielende mindestens 5 💧 Wasser im Lager."}]}</script>
@@ -1456,6 +1565,8 @@ window.SPIELDATEN = JSON.parse(document.getElementById("spieldaten-json").textCo
     offenesTableau: null,    // Sitz, dessen Tableau gerade offen ist
     missionenSichtbar: false,
     toast: null,
+    letzterEffekt: null,   // { feldId, art: 'funkeln'|'fliesstext', text?, zeit } - kurze Reaktion aufs Brett
+    konfettiGezeigt: false,
     localLobby: { anzahl: 2, namen: {} },
   };
 
@@ -1516,7 +1627,7 @@ window.SPIELDATEN = JSON.parse(document.getElementById("spieldaten-json").textCo
       if (r.fehler) { melde(r.fehler, "fehler"); return; }
       App.zustand = r.zustand;
       App.brettModus = "ruhe";
-      zeigeKartenToast(r.ereignisse);
+      zeigeKartenToast(r.ereignisse, r.zustand);
       sichereLokal();
       render();
       return;
@@ -1532,14 +1643,38 @@ window.SPIELDATEN = JSON.parse(document.getElementById("spieldaten-json").textCo
       App.brettModus = "ruhe";
       const patch = berechneMinimalesUpdate(dok, r.zustand);
       if (Object.keys(patch).length > 0) await ref.update(patch);
-      zeigeKartenToast(r.ereignisse);
+      zeigeKartenToast(r.ereignisse, r.zustand);
       // App.zustand wird gleich über onSnapshot aktualisiert.
     } catch (e) {
       melde("Verbindung hat nicht geklappt: " + (e && e.message ? e.message : e), "fehler");
     }
   }
 
-  function zeigeKartenToast(ereignisse) {
+  /** Setzt App.letzterEffekt für die kurze Reaktion aufs Brett (Funkeln,
+   * Fließtext) — zeichneAktionsEffekt() in app.js liest das beim Rendern. */
+  function setzeAktionsEffekt(ereignisse, zustandDanach) {
+    for (let i = ereignisse.length - 1; i >= 0; i--) {
+      const e = ereignisse[i];
+      if (e.typ === "gesammelt") {
+        const feldId = zustandDanach.spieler[e.sitz].position;
+        const teile = Object.keys(e.gaben).map(function (k) { return ressourceZeichen(k) + " +" + e.gaben[k]; });
+        App.letzterEffekt = { feldId: feldId, art: "fliesstext", text: teile.join("  "), zeit: Date.now() };
+        return;
+      }
+      if (e.typ === "bewegt") {
+        App.letzterEffekt = { feldId: e.ziel, art: "funkeln", zeit: Date.now() };
+        return;
+      }
+      if (e.typ === "gebaut" || e.typ === "fund_gezogen" || e.typ === "ruine_taschenlampe" || e.typ === "getauscht_bank" || e.typ === "sonderfaehigkeit") {
+        const feldId = zustandDanach.spieler[e.sitz].position;
+        App.letzterEffekt = { feldId: feldId, art: "funkeln", zeit: Date.now() };
+        return;
+      }
+    }
+  }
+
+  function zeigeKartenToast(ereignisse, zustandDanach) {
+    setzeAktionsEffekt(ereignisse, zustandDanach);
     ereignisse.forEach(function (e) {
       if (e.typ === "ereignis") melde((M.nach.ereignis[e.karte].emoji) + " " + M.nach.ereignis[e.karte].name, "karte");
       if (e.typ === "inselkarte") melde((M.nach.insel[e.karte].emoji) + " " + M.nach.insel[e.karte].name, "karte");
@@ -2015,7 +2150,8 @@ window.SPIELDATEN = JSON.parse(document.getElementById("spieldaten-json").textCo
       const x = cx + (zufall() - 0.5) * radius * 0.6;
       const y = cy + (zufall() - 0.5) * radius * 0.4 + i * 10;
       const w = radius * 0.6;
-      out += '<path d="M ' + (x - w / 2).toFixed(1) + " " + y.toFixed(1) + " q " + (w / 4).toFixed(1) + " -6 " +
+      out += '<path class="eff-welle" style="animation-delay:' + (i * 0.7).toFixed(1) + 's" d="M ' +
+        (x - w / 2).toFixed(1) + " " + y.toFixed(1) + " q " + (w / 4).toFixed(1) + " -6 " +
         (w / 2).toFixed(1) + " 0 q " + (w / 4).toFixed(1) + " 6 " + (w / 2).toFixed(1) + ' 0" stroke="' + farbe +
         '" stroke-width="2.2" fill="none" stroke-linecap="round"/>';
     }
@@ -2044,14 +2180,58 @@ window.SPIELDATEN = JSON.parse(document.getElementById("spieldaten-json").textCo
       '" fill="' + farbe + '" stroke="var(--tinte)" stroke-width="2"/>' +
       '<line x1="' + sx + '" y1="' + sy + '" x2="' + cx + '" y2="' + liY + '" stroke="var(--tinte)" stroke-width="1.4"/>' +
       '<line x1="' + sx + '" y1="' + sy + '" x2="' + sx + '" y2="' + (sy - r * 0.6) + '" stroke="var(--tinte)" stroke-width="1.6"/>' +
-      '<polygon points="' + sx + "," + (sy - r * 0.6) + " " + (sx + r * 0.5) + "," + (sy - r * 0.46) + " " + sx + "," +
+      '<polygon class="eff-fahne" points="' + sx + "," + (sy - r * 0.6) + " " + (sx + r * 0.5) + "," + (sy - r * 0.46) + " " + sx + "," +
       (sy - r * 0.32) + '" fill="var(--tinte)"/>'
     );
+  }
+
+  // ------------------------------------------------------ Rauch am Vulkan
+  function rauchSvg(cx, cy, seed) {
+    const zufall = zufallsReihe(seed + 7);
+    let out = "";
+    for (let i = 0; i < 3; i++) {
+      const x = cx + (zufall() - 0.5) * 10;
+      const versatz = ((zufall() - 0.5) * 16).toFixed(1);
+      const verzoegerung = (i * 1.1 + zufall()).toFixed(2);
+      out += '<circle class="eff-rauch" style="--rauch-x:' + versatz + 'px; animation-delay:-' + verzoegerung +
+        's" cx="' + x.toFixed(1) + '" cy="' + (cy - 14).toFixed(1) + '" r="' + (5 + zufall() * 3).toFixed(1) +
+        '" fill="var(--tinte3)"/>';
+    }
+    return out;
   }
   const GELAENDE_SYMBOLE = {
     wald: [["\u{1F332}", 19], ["\u{1F334}", 16], ["\u{1F332}", 13]],
     mine: [["⛰️", 18], ["\u{1FAA8}", 13], ["⛏️", 11]],
   };
+
+  const EFFEKT_DAUER_MS = 1100;
+
+  /** Die kurze Reaktion aufs Brett, die sende() über App.letzterEffekt
+   * ausgelöst hat: ein Funken-Kranz beim Bewegen/Bauen/Untersuchen, ein
+   * aufsteigender Fließtext beim Sammeln. Läuft rein über CSS-Animationen,
+   * die Grafik wird nur einmal gezeichnet, wenn sie noch frisch ist. */
+  function zeichneAktionsEffekt() {
+    const e = App.letzterEffekt;
+    if (!e) return "";
+    if (Date.now() - e.zeit > EFFEKT_DAUER_MS) { App.letzterEffekt = null; return ""; }
+    const feld = nach_feld(e.feldId);
+    if (!feld) return "";
+    const [cx, cy] = hexMitte(feld.q, feld.r);
+    if (e.art === "fliesstext") {
+      return '<text class="eff-fliesstext" x="' + cx.toFixed(1) + '" y="' + (cy - 8).toFixed(1) +
+        '" font-size="19" text-anchor="middle" font-weight="800" fill="var(--tinte)">' + esc(e.text) + "</text>";
+    }
+    let out = '<circle class="eff-ring" cx="' + cx.toFixed(1) + '" cy="' + cy.toFixed(1) +
+      '" r="18" fill="none" stroke="var(--akzent)"/>';
+    const sterne = ["✨", "⭐", "✦"];
+    for (let i = 0; i < 5; i++) {
+      const winkel = (Math.PI * 2 * i) / 5;
+      const x = cx + Math.cos(winkel) * 30, y = cy + Math.sin(winkel) * 30;
+      out += '<text class="eff-funkel" style="animation-delay:' + (i * 0.05).toFixed(2) + 's" x="' + x.toFixed(1) +
+        '" y="' + y.toFixed(1) + '" font-size="16" text-anchor="middle">' + sterne[i % sterne.length] + "</text>";
+    }
+    return out;
+  }
 
   function renderBrettBereich(zustand, sitz) {
     const bereich = h('<div class="brett-bereich"></div>');
@@ -2097,6 +2277,7 @@ window.SPIELDATEN = JSON.parse(document.getElementById("spieldaten-json").textCo
         svg += streueSymbole(cx, cy, HEX_S * 0.68, seed, [["\u{1FAA8}", 11]]);
       } else if (typ === "energie") {
         svg += emojiSvg(cx, cy - 2, "\u{1F30B}", 30);
+        svg += rauchSvg(cx, cy - 16, seed);
       } else if (typ === "kueste") {
         svg += wellenSymbole(cx, cy, HEX_S, "var(--meer-dunkel)", seed);
       } else if (GELAENDE_SYMBOLE[typ]) {
@@ -2125,10 +2306,11 @@ window.SPIELDATEN = JSON.parse(document.getElementById("spieldaten-json").textCo
         (cx + versatz[0]) + "," + (cy + 28 + versatz[1]) + ')">';
       svg += '<circle r="15" fill="' + farbe.farbe + '" stroke="var(--blatt)" stroke-width="2.5"/>';
       svg += '<text x="0" y="5" font-size="14" text-anchor="middle">🙂</text>';
-      if (istEigener) svg += '<circle r="19" fill="none" stroke="' + farbe.farbe + '" stroke-width="1.5" stroke-dasharray="2 2"/>';
+      if (istEigener) svg += '<circle class="eff-eigener-ring" r="19" fill="none" stroke="' + farbe.farbe + '" stroke-width="1.5" stroke-dasharray="2 2"/>';
       svg += "</g>";
     });
 
+    svg += zeichneAktionsEffekt();
     svg += "</svg>";
     bereich.innerHTML = svg;
 
@@ -2695,7 +2877,8 @@ window.SPIELDATEN = JSON.parse(document.getElementById("spieldaten-json").textCo
     el.appendChild(h('<h1>🏆 Die Insel ist erfunden</h1><p class="unter">Nach ' + D.regeln.runden + ' Runden steht das Ergebnis.</p>'));
     zustand.ergebnis.platzierung.forEach(function (p, i) {
       const farbe = farbeVon(p.sitz);
-      const karte = h('<div class="platzkarte' + (i === 0 ? " sieger" : "") + '">' +
+      const karte = h('<div class="platzkarte' + (i === 0 ? " sieger" : "") + '" style="animation-delay:' +
+        (i * 0.1).toFixed(1) + 's">' +
         '<span class="platz">' + (i + 1) + '</span>' +
         '<span class="farbpunkt" style="background:' + farbe.farbe + '"></span>' +
         '<span class="pname">' + esc(p.name) + '</span><span class="ppunkte">' + p.punkte + '</span></div>');
@@ -2717,11 +2900,33 @@ window.SPIELDATEN = JSON.parse(document.getElementById("spieldaten-json").textCo
     const neu = h('<button class="knopf primaer breit" style="margin-top:18px">Neue Partie</button>');
     neu.onclick = function () {
       loescheLokal();
+      App.konfettiGezeigt = false;
       if (App.modus === "online") raumVerlassen();
       else { App.bildschirm = "start"; App.zustand = null; render(); }
     };
     el.appendChild(neu);
+    if (!App.konfettiGezeigt) { App.konfettiGezeigt = true; setTimeout(zeigeKonfetti, 0); }
     return el;
+  }
+
+  /** Ein einmaliger Konfettiregen fürs Spielende - in den Spielerfarben plus
+   * der Akzentfarbe, per CSS-Fall-Animation, entfernt sich selbst. */
+  function zeigeKonfetti() {
+    const farben = D.spielerfarben.map(function (s) { return s.farbe; }).concat(["var(--akzent)"]);
+    const lage = document.createElement("div");
+    lage.className = "konfetti-lage";
+    for (let i = 0; i < 46; i++) {
+      const stueck = document.createElement("span");
+      stueck.className = "konfetti-stueck";
+      stueck.style.left = (Math.random() * 100).toFixed(1) + "%";
+      stueck.style.background = farben[i % farben.length];
+      stueck.style.animationDuration = (2.2 + Math.random() * 1.6).toFixed(2) + "s";
+      stueck.style.animationDelay = (Math.random() * 0.6).toFixed(2) + "s";
+      stueck.style.transform = "rotate(" + Math.floor(Math.random() * 360) + "deg)";
+      lage.appendChild(stueck);
+    }
+    document.body.appendChild(lage);
+    setTimeout(function () { lage.remove(); }, 4200);
   }
 
   // ======================================================================
