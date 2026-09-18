@@ -148,8 +148,9 @@ def panel(x, y, w, h, titel, zeilen, kopffarbe="#3b3128"):
     return "\n".join(o)
 
 
-PLAN_S = 84.0            # Hex-Radius in SVG-Einheiten
-PLAN_LUFT = 3.0          # Fuge zwischen den Feldern
+PLAN_S = 84.0            # Abstand zwischen benachbarten Stationen (Layout-Raster,
+                         # wird nicht mehr als Kachel gezeichnet - nur zur Positionierung)
+PLAN_LUFT = 3.0          # (nicht mehr für Kacheln benutzt, siehe Insel-Plättchen)
 PLAN_W, PLAN_H = 1180, 874
 
 # Der große Plan: zwei A4-Hochformatseiten, die zusammengeklebt A3 ergeben.
@@ -274,17 +275,40 @@ def kompassrose(cx, cy, r, farbe):
     return "".join(teile)
 
 
-def abenteuerpfad(punkte, farbe, seed=77):
-    """Gestrichelte Route zwischen Feldmitten, mit leichtem Schlenker statt Geraden."""
+def jitter(q, r):
+    """Kleine, aber deterministische Verschiebung je Station - damit die
+    Stationen wie natürlich verteilte Lichtungen wirken statt wie exakt
+    aufgereihte Gitterpunkte."""
+    rnd = random.Random(feld_seed("jit_%d_%d" % (q, r)))
+    winkel = rnd.uniform(0, 2 * math.pi)
+    versatz = rnd.uniform(6, 15)
+    return (math.cos(winkel) * versatz, math.sin(winkel) * versatz)
+
+
+def trampelpfad(p0, p1, seed):
+    """Ein ausgetretener Pfad zwischen zwei Stationen: ein weiches, breites
+    Sandband mit leichtem Schlenker, darüber eine gestrichelte Trittspur -
+    wirkt begangen statt gezeichnet."""
     rnd = random.Random(seed)
-    teil = ["M %.1f %.1f" % punkte[0]]
-    for i in range(1, len(punkte)):
-        (x0, y0), (x1, y1) = punkte[i - 1], punkte[i]
-        mx = (x0 + x1) / 2 + rnd.uniform(-18, 18)
-        my = (y0 + y1) / 2 + rnd.uniform(-18, 18)
-        teil.append("Q %.1f %.1f %.1f %.1f" % (mx, my, x1, y1))
-    return ('<path d="%s" fill="none" stroke="%s" stroke-width="2.6" '
-           'stroke-dasharray="1 9" stroke-linecap="round"/>' % (" ".join(teil), farbe))
+    mx = (p0[0] + p1[0]) / 2 + rnd.uniform(-16, 16)
+    my = (p0[1] + p1[1]) / 2 + rnd.uniform(-16, 16)
+    d = "M %.1f %.1f Q %.1f %.1f %.1f %.1f" % (p0[0], p0[1], mx, my, p1[0], p1[1])
+    return ('<path d="%s" fill="none" stroke="%s" stroke-width="10" '
+            'stroke-linecap="round" stroke-opacity="0.55"/>'
+            '<path d="%s" fill="none" stroke="%s" stroke-width="1.8" '
+            'stroke-linecap="round" stroke-dasharray="1.5 6.5" stroke-opacity="0.85"/>'
+            % (d, STRAND, d, TINTE_2))
+
+
+def gelaende_patch(cx, cy, r, seed, fuell, rand, kantig=False):
+    """Ein organischer Fleck Landschaft an einer Station - rund und weich
+    für Wald/Wiese/Ruinen, kantiger und unruhiger für Fels/Vulkangebiet.
+    Ersetzt die frühere hexagonale Feldkachel."""
+    if kantig:
+        pfad = blob_pfad(cx, cy, r, r * 0.88, 9, 0.24, seed)
+    else:
+        pfad = blob_pfad(cx, cy, r, r * 0.86, 13, 0.09, seed)
+    return '<path d="%s" fill="%s" stroke="%s" stroke-width="1.8" opacity="0.9"/>' % (pfad, fuell, rand)
 
 
 # Kleine, verstreute Symbole je Gelände statt eines großen zentrierten Emojis
@@ -292,6 +316,18 @@ def abenteuerpfad(punkte, farbe, seed=77):
 GELAENDE_SYMBOLE = {
     "wald":    [("\U0001F332", 21), ("\U0001F334", 18), ("\U0001F332", 15)],
     "mine":    [("⛰️", 20), ("\U0001FAA8", 15), ("⛏️", 13)],
+}
+
+# Farbtöne für die organischen Geländeflecken - gedeckt und erdig, damit sie
+# als Teil derselben Insel wirken und nicht wie bunte Zonenmarkierungen.
+PATCH_FARBEN = {
+    "wald":     ("#8aa869", "#6c8a4f"),
+    "mine":     ("#a89d86", "#867a62"),
+    "kueste":   (STRAND, LINIE),
+    "energie":  ("#c98a5c", "#a5623c"),
+    "ruine":    ("#c7bb9f", "#a0906e"),
+    "grruine":  ("#cfc4a6", "#a0906e"),
+    "brachland": (INSEL, LINIE),
 }
 
 
@@ -309,8 +345,16 @@ def spielplan_svg():
     o.append('<rect x="6" y="6" width="%d" height="%d" rx="10" fill="none" stroke="%s" '
              'stroke-width="3"/>' % (W - 12, H - 12, PAPIER))
 
+    # Stationsmitten: das Hex-Raster liefert nur die Grundverteilung, jede
+    # Station bekommt zusätzlich einen kleinen, festen Versatz - damit die
+    # Insel wie natürlich verteilte Lichtungen wirkt statt wie ein Gitter.
+    feld_mitten = {}
+    for f in D.FELDER:
+        bx, by = hex_mitte(f["q"], f["r"], S, OX, OY)
+        dx, dy = jitter(f["q"], f["r"])
+        feld_mitten[(f["q"], f["r"])] = (bx + dx, by + dy)
+
     # Wellenmuster im offenen Meer, außerhalb der Insel.
-    feld_mitten = {(f["q"], f["r"]): hex_mitte(f["q"], f["r"], S, OX, OY) for f in D.FELDER}
     rnd_meer = random.Random(4)
     versucht = 0
     gesetzt = 0
@@ -331,10 +375,31 @@ def spielplan_svg():
     o.append('<path d="%s" fill="%s" stroke="%s" stroke-width="2.5"/>'
              % (blob_pfad(OX, OY, 388, 360, 16, 0.065, 23), INSEL, LINIE))
 
-    # Die Abenteuerroute: eine gestrichelte Reise quer über die Insel.
-    route = ["2_-2", "2_-1", "2_0", "1_0", "0_0", "-1_1", "-1_2", "-2_2"]
-    route_punkte = [feld_mitten[tuple(int(z) for z in fid.split("_"))] for fid in route]
-    o.append(abenteuerpfad(route_punkte, TINTE_2))
+    # Ein kleiner Süßwassersee mit Zufluss - reine Landschaftsdekoration in
+    # einer freien Lücke des Rasters, macht aus der Insel mehr als nur
+    # Lichtungen an einem Wegenetz.
+    seex, seey = OX + 18, OY + 158
+    o.append('<path d="M %.0f %.0f Q %.0f %.0f %.0f %.0f" fill="none" stroke="%s" '
+             'stroke-width="7" stroke-opacity="0.75" stroke-linecap="round"/>'
+             % (seex - 6, seey - 92, seex + 26, seey - 50, seex, seey - 18, MEER_DUNKEL))
+    o.append('<path d="%s" fill="%s" stroke="%s" stroke-width="2"/>'
+             % (blob_pfad(seex, seey, 34, 24, 11, 0.12, 41), MEER, MEER_DUNKEL))
+    o.append(welle_symbole(seex, seey, 26, PAPIER, 41))
+
+    # Das Wegenetz: statt einer einzelnen Route zeichnen wir einen
+    # ausgetretenen Pfad über jede echte Nachbarschaft im Bewegungs-Gitter -
+    # so ist auf einen Blick sichtbar, welche Stationen verbunden sind
+    # (das ersetzt die frühere Hex-Umrandung als Orientierungshilfe), und
+    # zugleich wirkt die Insel wie von einem einzigen Wegenetz durchzogen,
+    # nicht wie ein Spielbrett mit Feldern.
+    positionen = {(f["q"], f["r"]) for f in D.FELDER}
+    for f in D.FELDER:
+        p = (f["q"], f["r"])
+        for dq, dr in ((1, 0), (0, 1), (1, -1)):
+            n = (p[0] + dq, p[1] + dr)
+            if n in positionen:
+                seed = feld_seed("weg_%d_%d_%d_%d" % (p[0], p[1], n[0], n[1]))
+                o.append(trampelpfad(feld_mitten[p], feld_mitten[n], seed))
 
     for f in D.FELDER:
         typ = f["typ"]
@@ -343,14 +408,18 @@ def spielplan_svg():
         ist_werkstatt = typ == "werkstatt"
         seed = feld_seed("%d_%d" % (f["q"], f["r"]))
 
-        # Sehr blasse gepunktete Feldgrenze – als Platzierungshilfe fürs
-        # Aufstellen der Figuren, nicht als bunter Rahmen.
-        o.append('<polygon points="%s" fill="none" stroke="%s" stroke-width="1.4" '
-                 'stroke-dasharray="1 6" stroke-opacity="0.55"/>'
-                 % (hex_punkte(cx, cy, S - PLAN_LUFT), TINTE_2))
+        # Ein organischer Landschaftsfleck statt einer Hex-Kachel - rund und
+        # weich für Wald/Ruinen/Brachland, kantiger für Fels und Vulkangebiet.
+        patch_typ = "werkstatt" if ist_werkstatt else typ
+        patch_farben = PATCH_FARBEN.get(patch_typ, (INSEL, LINIE))
+        patch_radius = 46 if typ == "grruine" else 36
+        kantig = typ in ("mine", "energie")
+        if not ist_werkstatt:
+            o.append(gelaende_patch(cx, cy, patch_radius, seed, patch_farben[0], patch_farben[1], kantig))
 
         if ist_werkstatt:
             sp = D.SPIELERFARBEN[f["spieler"]]
+            o.append(gelaende_patch(cx, cy, 34, seed, INSEL, LINIE, False))
             o.append(zelt_symbol(cx, cy + 6, 30, sp["farbe"], TINTE))
         elif typ == "grruine":
             o.append(steinkreis(cx, cy + 4, 30, "#c9beA4", TINTE_2))

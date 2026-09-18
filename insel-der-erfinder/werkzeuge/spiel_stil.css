@@ -21,6 +21,10 @@
   --gelb: #a8842c; --gelb-hell: #faf2dd;
   --meer: #5f8a92; --meer-dunkel: #436469;
   --strand: #e8d9ab; --inselgruen: #dcdba8;
+  --patch-wald: #8aa869; --patch-wald-rand: #6c8a4f;
+  --patch-mine: #a89d86; --patch-mine-rand: #867a62;
+  --patch-energie: #c98a5c; --patch-energie-rand: #a5623c;
+  --patch-ruine: #c7bb9f; --patch-ruine-rand: #a0906e;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
@@ -34,6 +38,10 @@
     --energie-hell: #3a2f11; --bauteil-hell: #2b2038;
     --rot-hell: #3a2018; --blau-hell: #1c2830; --gruen-hell: #212a1c; --gelb-hell: #332c15;
     --meer: #3a5257; --meer-dunkel: #263a3d; --strand: #4a4128; --inselgruen: #454a2e;
+    --patch-wald: #526b3a; --patch-wald-rand: #3f5329;
+    --patch-mine: #5c5647; --patch-mine-rand: #464236;
+    --patch-energie: #6e4a30; --patch-energie-rand: #543722;
+    --patch-ruine: #5c543f; --patch-ruine-rand: #46402f;
   }
 }
 :root[data-theme="dark"] {
@@ -47,6 +55,10 @@
   --energie-hell: #3a2f11; --bauteil-hell: #2b2038;
   --rot-hell: #3a2018; --blau-hell: #1c2830; --gruen-hell: #212a1c; --gelb-hell: #332c15;
   --meer: #3a5257; --meer-dunkel: #263a3d; --strand: #4a4128; --inselgruen: #454a2e;
+  --patch-wald: #526b3a; --patch-wald-rand: #3f5329;
+  --patch-mine: #5c5647; --patch-mine-rand: #464236;
+  --patch-energie: #6e4a30; --patch-energie-rand: #543722;
+  --patch-ruine: #5c543f; --patch-ruine-rand: #46402f;
 }
 
 * { box-sizing: border-box; }
@@ -144,7 +156,7 @@ img { max-width: 100%; }
 .hexfeld { cursor: default; transition: filter 0.15s; }
 .hexfeld.anklickbar { cursor: pointer; }
 .hexfeld.anklickbar:hover { filter: brightness(1.06); }
-.hexfeld.anklickbar .hexumriss { stroke-width: 5; }
+.hexfeld.anklickbar .stationsring { stroke-width: 5; }
 
 .seitenleiste { border-left: 1.5px solid var(--linie); background: var(--blatt); overflow-y: auto;
                 display: flex; flex-direction: column; }
@@ -298,7 +310,7 @@ img { max-width: 100%; }
   0%, 100% { stroke-opacity: 1; }
   50%      { stroke-opacity: 0.45; }
 }
-.hexfeld.anklickbar .hexumriss { animation: anklickbarPuls 1.4s ease-in-out infinite; }
+.hexfeld.anklickbar .stationsring { animation: anklickbarPuls 1.4s ease-in-out infinite; }
 
 @keyframes eigenerTokenPuls {
   0%, 100% { stroke-opacity: 0.9; }

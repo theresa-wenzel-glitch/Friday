@@ -590,14 +590,6 @@
   function hexMitteRoh(q, r) {
     return [HEX_S * Math.sqrt(3) * (q + r / 2), HEX_S * 1.5 * r];
   }
-  function hexPunkte(cx, cy, s) {
-    const pts = [];
-    for (let i = 0; i < 6; i++) {
-      const a = (Math.PI / 180) * (60 * i + 30);
-      pts.push((cx + s * Math.cos(a)).toFixed(1) + "," + (cy + s * Math.sin(a)).toFixed(1));
-    }
-    return pts.join(" ");
-  }
 
   const RAHMEN = (function () {
     let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
@@ -615,14 +607,6 @@
   })();
   const OX = RAHMEN.ox, OY = RAHMEN.oy, BREITE = RAHMEN.breite, HOEHE = RAHMEN.hoehe;
 
-  function hexMitte(q, r) {
-    return [OX + HEX_S * Math.sqrt(3) * (q + r / 2), OY + HEX_S * 1.5 * r];
-  }
-
-  // ----------------------------------------------- Schatzkarten-Symbole
-  // Kleine gestreute Symbole statt eines großen Emojis mit Beschriftung je
-  // Feld — was ein Feld ist, zeigt die Legende, nicht ein bunter Block.
-
   function seedVon(text) {
     let wert = 0;
     for (let i = 0; i < text.length; i++) wert = (wert * 131 + text.charCodeAt(i)) % 1000003;
@@ -632,6 +616,27 @@
     let z = seed;
     return function () { z = (z * 9301 + 49297) % 233280; return z / 233280; };
   }
+
+  // Jede Station bekommt zusätzlich zum Hex-Lageraster einen kleinen,
+  // festen Versatz - damit die Insel wie natürlich verteilte Lichtungen
+  // wirkt statt wie ein exaktes Gitter. Rein visuell, das Bewegungs-Gitter
+  // (Nachbarschaft in D.nachbarn) bleibt unverändert.
+  function jitter(q, r) {
+    const zufall = zufallsReihe(seedVon("jit_" + q + "_" + r));
+    const winkel = zufall() * Math.PI * 2;
+    const versatz = 6 + zufall() * 9;
+    return [Math.cos(winkel) * versatz, Math.sin(winkel) * versatz];
+  }
+  function hexMitte(q, r) {
+    const [bx, by] = hexMitteRoh(q, r);
+    const [dx, dy] = jitter(q, r);
+    return [OX + bx + dx, OY + by + dy];
+  }
+
+  // ----------------------------------------------- Schatzkarten-Symbole
+  // Kleine gestreute Symbole statt eines großen Emojis mit Beschriftung je
+  // Feld — was ein Feld ist, zeigt die Legende, nicht ein bunter Block.
+
   function emojiSvg(cx, cy, emoji, groesse, drehung, opacity) {
     let attrs = "";
     if (drehung) attrs += ' transform="rotate(' + drehung.toFixed(1) + " " + cx.toFixed(1) + " " + cy.toFixed(1) + ')"';
@@ -665,6 +670,41 @@
     }
     return out;
   }
+  function blobPfad(cx, cy, rx, ry, n, wobble, seed) {
+    const zufall = zufallsReihe(seed);
+    const pts = [];
+    for (let i = 0; i < n; i++) {
+      const a = (2 * Math.PI * i) / n;
+      const f = 1 + (zufall() * 2 - 1) * wobble;
+      pts.push([cx + Math.cos(a) * rx * f, cy + Math.sin(a) * ry * f]);
+    }
+    const mid = function (p, q) { return [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2]; };
+    const m0 = mid(pts[pts.length - 1], pts[0]);
+    let d = "M " + m0[0].toFixed(1) + " " + m0[1].toFixed(1);
+    for (let i = 0; i < n; i++) {
+      const p = pts[i], m = mid(pts[i], pts[(i + 1) % n]);
+      d += " Q " + p[0].toFixed(1) + " " + p[1].toFixed(1) + " " + m[0].toFixed(1) + " " + m[1].toFixed(1);
+    }
+    return d + " Z";
+  }
+  // Ein organischer Landschaftsfleck an einer Station statt einer Hex-
+  // Kachel - rund und weich für Wald/Ruinen/Brachland, kantiger und
+  // unruhiger für Fels- und Vulkangebiet.
+  function gelaendePatch(cx, cy, r, seed, fuell, rand, kantig, klasse) {
+    const pfad = kantig ? blobPfad(cx, cy, r, r * 0.88, 9, 0.24, seed) : blobPfad(cx, cy, r, r * 0.86, 13, 0.09, seed);
+    return '<path class="' + (klasse || "") + '" d="' + pfad + '" fill="' + fuell + '" stroke="' + rand +
+      '" stroke-width="1.8" opacity="0.9"/>';
+  }
+  function trampelpfad(p0, p1, seed) {
+    const zufall = zufallsReihe(seed);
+    const mx = (p0[0] + p1[0]) / 2 + (zufall() * 2 - 1) * 16;
+    const my = (p0[1] + p1[1]) / 2 + (zufall() * 2 - 1) * 16;
+    const d = "M " + p0[0].toFixed(1) + " " + p0[1].toFixed(1) + " Q " + mx.toFixed(1) + " " + my.toFixed(1) +
+      " " + p1[0].toFixed(1) + " " + p1[1].toFixed(1);
+    return '<path d="' + d + '" fill="none" stroke="var(--strand)" stroke-width="10" stroke-linecap="round" stroke-opacity="0.55"/>' +
+      '<path d="' + d + '" fill="none" stroke="var(--tinte2)" stroke-width="1.8" stroke-linecap="round" ' +
+      'stroke-dasharray="1.5 6.5" stroke-opacity="0.85"/>';
+  }
   function steinkreisSvg(cx, cy, r, farbeStein, farbeSchatten) {
     let out = "";
     const n = 7;
@@ -687,13 +727,24 @@
       '<polygon points="' + sx + "," + sy + " " + (cx - r * 0.72) + "," + liY + " " + reX + "," + liY +
       '" fill="' + farbe + '" stroke="var(--tinte)" stroke-width="2"/>' +
       '<line x1="' + sx + '" y1="' + sy + '" x2="' + cx + '" y2="' + liY + '" stroke="var(--tinte)" stroke-width="1.4"/>' +
-      '<line x1="' + sx + '" y1="' + sy + '" x2="' + sx + '" y2="' + (sy - r * 0.6) + '" stroke="var(--tinte)" stroke-width="1.6"/>' +
-      '<polygon class="eff-fahne" points="' + sx + "," + (sy - r * 0.6) + " " + (sx + r * 0.5) + "," + (sy - r * 0.46) + " " + sx + "," +
-      (sy - r * 0.32) + '" fill="var(--tinte)"/>'
+      '<line x1="' + sx + '" y1="' + sy + '" x2="' + sx + '" y2="' + (sy - r * 0.6) + '" stroke="var(--tinte)" stroke-width="1.6"/>'
     );
+  }
+  // Die wehende Fähnchenspitze eines Zelts - eigens getrennt von zeltSvg,
+  // weil sie animiert wird (transform: skewX) und deshalb NICHT innerhalb
+  // der anklickbaren .hexfeld-Gruppe stehen darf: sonst ändert sich deren
+  // Bounding-Box jeden Frame und ein Klick auf das Feld wird von Playwright
+  // (und jedem Browser) nie als "stabil" erkannt. Wird darum in einer
+  // eigenen, pointer-events-losen Effekt-Ebene über allen Feldern gezeichnet.
+  function fahneSvg(cx, cy, r) {
+    const sx = cx, sy = cy - r * 0.95 - r * 0.6;
+    return '<polygon class="eff-fahne" points="' + sx + "," + sy + " " + (sx + r * 0.5) + "," + (sy + r * 0.14) +
+      " " + sx + "," + (sy + r * 0.28) + '" fill="var(--tinte)"/>';
   }
 
   // ------------------------------------------------------ Rauch am Vulkan
+  // Wie die Fahne: animiert (transform: translate/scale), deshalb ebenfalls
+  // außerhalb der anklickbaren Feld-Gruppe gezeichnet.
   function rauchSvg(cx, cy, seed) {
     const zufall = zufallsReihe(seed + 7);
     let out = "";
@@ -710,6 +761,17 @@
   const GELAENDE_SYMBOLE = {
     wald: [["\u{1F332}", 19], ["\u{1F334}", 16], ["\u{1F332}", 13]],
     mine: [["⛰️", 18], ["\u{1FAA8}", 13], ["⛏️", 11]],
+  };
+  // Gedeckte, erdige Farbtöne für die organischen Geländeflecken - wirken
+  // wie Teil derselben Insel statt wie bunte Zonenmarkierungen.
+  const PATCH_FARBEN = {
+    wald: ["var(--patch-wald)", "var(--patch-wald-rand)"],
+    mine: ["var(--patch-mine)", "var(--patch-mine-rand)"],
+    kueste: ["var(--strand)", "var(--tinte2)"],
+    energie: ["var(--patch-energie)", "var(--patch-energie-rand)"],
+    ruine: ["var(--patch-ruine)", "var(--patch-ruine-rand)"],
+    grruine: ["var(--patch-ruine)", "var(--patch-ruine-rand)"],
+    brachland: ["var(--inselgruen)", "var(--tinte2)"],
   };
 
   const EFFEKT_DAUER_MS = 1100;
@@ -764,19 +826,43 @@
     svg += '<rect x="22" y="22" width="' + (BREITE - 44) + '" height="' + (HOEHE - 44 - TOKEN_RAND * 0.6) +
       '" rx="36" fill="var(--inselgruen)" stroke="var(--tinte2)" stroke-width="2"/>';
 
+    // Das Wegenetz: ein ausgetretener Pfad über jede echte Nachbarschaft im
+    // Bewegungs-Gitter, statt eines bunten Hex-Rasters. So bleibt auf einen
+    // Blick sichtbar, welche Stationen verbunden sind, und die Insel wirkt
+    // als ein einziges, zusammenhängendes Wegenetz.
+    const gezeichneteKanten = {};
+    D.felder.forEach(function (f) {
+      const [cx, cy] = hexMitte(f.q, f.r);
+      (D.nachbarn[f.id] || []).forEach(function (nid) {
+        const kante = f.id < nid ? f.id + "|" + nid : nid + "|" + f.id;
+        if (gezeichneteKanten[kante]) return;
+        gezeichneteKanten[kante] = true;
+        const n = D.felder.find(function (x) { return x.id === nid; });
+        const [nx, ny] = hexMitte(n.q, n.r);
+        svg += trampelpfad([cx, cy], [nx, ny], seedVon("weg_" + kante));
+      });
+    });
+
     D.felder.forEach(function (f) {
       const [cx, cy] = hexMitte(f.q, f.r);
       const typ = M.hilfen.feldTyp(zustand, f.id);
       const anklickbar = !!zielFelder[f.id];
       const seed = seedVon(f.id);
       svg += '<g class="hexfeld' + (anklickbar ? " anklickbar" : "") + '" data-feld="' + f.id + '">';
-      // Ein sehr blasser Feldumriss als Platzierungshilfe - nicht als bunter Rahmen.
-      svg += '<polygon class="hexumriss" points="' + hexPunkte(cx, cy, HEX_S - 3) + '" fill="' +
-        (anklickbar ? "var(--akzent-hell)" : "transparent") + '" stroke="' + (anklickbar ? "var(--gut)" : "var(--tinte2)") +
-        '" stroke-width="' + (anklickbar ? 5 : 1.4) + '"' +
-        (anklickbar ? "" : ' stroke-dasharray="1 6" stroke-opacity="0.55"') + "/>";
+      // Ein organischer Landschaftsfleck statt einer Hex-Kachel - er trägt
+      // auch die Anklickbar-Hervorhebung (Klasse "stationsring").
+      const patchFarben = PATCH_FARBEN[typ] || ["var(--inselgruen)", "var(--tinte2)"];
+      const kantig = typ === "mine" || typ === "energie";
+      const patchRadius = typ === "grruine" ? 46 : 36;
+      if (anklickbar) {
+        svg += gelaendePatch(cx, cy, patchRadius, seed, "var(--akzent-hell)", "var(--gut)", kantig, "stationsring");
+      } else if (!f.spieler) {
+        svg += gelaendePatch(cx, cy, patchRadius, seed, patchFarben[0], patchFarben[1], kantig, "stationsring");
+      }
 
       if (f.spieler) {
+        svg += gelaendePatch(cx, cy, 34, seed, anklickbar ? "var(--akzent-hell)" : "var(--inselgruen)",
+          anklickbar ? "var(--gut)" : "var(--tinte2)", false, "stationsring");
         svg += zeltSvg(cx, cy + 6, 27, farbeVon(f.spieler).farbe);
       } else if (typ === "grruine") {
         svg += steinkreisSvg(cx, cy + 4, 27, "#c9beA4", "var(--tinte2)");
@@ -785,9 +871,8 @@
         svg += streueSymbole(cx, cy, HEX_S * 0.68, seed, [["\u{1FAA8}", 11]]);
       } else if (typ === "energie") {
         svg += emojiSvg(cx, cy - 2, "\u{1F30B}", 30);
-        svg += rauchSvg(cx, cy - 16, seed);
       } else if (typ === "kueste") {
-        svg += wellenSymbole(cx, cy, HEX_S, "var(--meer-dunkel)", seed);
+        // Wellen kommen weiter unten in der pointer-events-losen Effekt-Ebene.
       } else if (GELAENDE_SYMBOLE[typ]) {
         svg += streueSymbole(cx, cy, HEX_S * 0.6, seed, GELAENDE_SYMBOLE[typ]);
       } else if (typ === "brachland") {
@@ -802,6 +887,25 @@
       }
       svg += "</g>";
     });
+
+    // Effekt-Ebene: alles, was animiert ist (Rauch, Wellen, wehende Fähnchen),
+    // steht bewusst außerhalb der anklickbaren .hexfeld-Gruppen und ohne
+    // Klick-Empfang - sonst ändert sich deren Bounding-Box jeden Frame und
+    // ein Klick auf das Feld gilt nie als "stabil".
+    svg += '<g pointer-events="none">';
+    D.felder.forEach(function (f) {
+      const [cx, cy] = hexMitte(f.q, f.r);
+      const typ = M.hilfen.feldTyp(zustand, f.id);
+      const seed = seedVon(f.id);
+      if (f.spieler) {
+        svg += fahneSvg(cx, cy + 6, 27);
+      } else if (typ === "energie") {
+        svg += rauchSvg(cx, cy - 18, seed);
+      } else if (typ === "kueste") {
+        svg += wellenSymbole(cx, cy, HEX_S, "var(--meer-dunkel)", seed);
+      }
+    });
+    svg += "</g>";
 
     // Spielfiguren
     zustand.sitzplaetze.forEach(function (s, idx) {
