@@ -10,7 +10,7 @@ Ergebnis: insel-der-erfinder/online-spiel.html — eine einzige Datei.
 
     python3 werkzeuge/erzeuge_spielseite.py
 """
-import os, sys, io
+import os, sys, io, base64
 
 HIER = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HIER)
@@ -32,10 +32,13 @@ def baue():
     stil = lese(os.path.join(HIER, "spiel_stil.css"))
     motor = lese(os.path.join(HIER, "motor.js"))
     app = lese(os.path.join(HIER, "app.js"))
+    with open(os.path.join(HIER, "artwork", "inselkarte.jpg"), "rb") as bilddatei:
+        inselbild = "data:image/jpeg;base64," + base64.b64encode(bilddatei.read()).decode("ascii")
 
     seite = (schale
              .replace("{{STIL}}", stil)
              .replace("{{SPIELDATEN_JSON}}", daten_json)
+             .replace("{{INSELBILD_DATENURL}}", inselbild)
              .replace("{{MOTOR_JS}}", motor)
              .replace("{{APP_JS}}", app))
 

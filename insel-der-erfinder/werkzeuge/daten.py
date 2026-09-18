@@ -40,33 +40,43 @@ SPIELERFARBEN = [
 
 # ------------------------------------------------------------- Der Spielplan
 # Achsiale Hex-Koordinaten (q, r). Gültig ist alles mit |q|,|r|,|q+r| <= 2.
-# Das ergibt 19 Felder: 1 Mitte + 6 innerer Ring + 12 äußerer Ring.
+# Das ergibt 19 Felder: 1 Mitte + 6 innerer Ring + 12 äußerer Ring. (q, r)
+# bestimmen weiterhin, welche Felder als Nachbarn gelten (Bewegungsregeln) -
+# das bleibt unverändert.
+#
+# "bx"/"by" sind zusätzlich die Bildkoordinaten der Station auf der
+# handgezeichneten Insel-Illustration (werkzeuge/artwork/inselkarte.jpg,
+# BILD_BREITE x BILD_HOEHE Pixel). Spielplan und Online-Brett zeichnen die
+# Insel nicht mehr geometrisch aus (q, r), sondern legen dieses Bild als
+# Hintergrund und platzieren jede Station exakt auf ihre passende Stelle
+# darauf (Werkstatt-Zelt, Ruine, Vulkan, Wald, ...).
+BILD_BREITE, BILD_HOEHE = 1536, 1024
 
 FELDER = [
     # Mitte
-    {"q":  0, "r":  0, "typ": "grruine", "fundkarten": 8},
+    {"q":  0, "r":  0, "typ": "grruine", "fundkarten": 8, "bx":  770, "by": 490},
 
     # Innerer Ring (6 Felder, alle grenzen an die Große Ruine)
-    {"q":  1, "r": -1, "typ": "energie"},
-    {"q":  1, "r":  0, "typ": "wald"},
-    {"q":  0, "r":  1, "typ": "mine"},
-    {"q": -1, "r":  1, "typ": "ruine", "fundkarten": 4},
-    {"q": -1, "r":  0, "typ": "wald"},
-    {"q":  0, "r": -1, "typ": "mine"},
+    {"q":  1, "r": -1, "typ": "energie", "bx": 1195, "by":  90},
+    {"q":  1, "r":  0, "typ": "wald", "bx": 1030, "by": 460},
+    {"q":  0, "r":  1, "typ": "mine", "bx":  870, "by": 650},
+    {"q": -1, "r":  1, "typ": "ruine", "fundkarten": 4, "bx":  560, "by": 545},
+    {"q": -1, "r":  0, "typ": "wald", "bx":  650, "by": 460},
+    {"q":  0, "r": -1, "typ": "mine", "bx":  960, "by": 290},
 
     # Äußerer Ring (12 Felder, darunter die 4 Startwerkstätten)
-    {"q":  2, "r": -2, "typ": "werkstatt", "spieler": 0},
-    {"q":  2, "r": -1, "typ": "kueste"},
-    {"q":  2, "r":  0, "typ": "mine"},
-    {"q":  1, "r":  1, "typ": "werkstatt", "spieler": 1},
-    {"q":  0, "r":  2, "typ": "brachland"},
-    {"q": -1, "r":  2, "typ": "energie"},
-    {"q": -2, "r":  2, "typ": "werkstatt", "spieler": 2},
-    {"q": -2, "r":  1, "typ": "kueste"},
-    {"q": -2, "r":  0, "typ": "brachland"},
-    {"q": -1, "r": -1, "typ": "werkstatt", "spieler": 3},
-    {"q":  0, "r": -2, "typ": "wald"},
-    {"q":  1, "r": -2, "typ": "ruine", "fundkarten": 4},
+    {"q":  2, "r": -2, "typ": "werkstatt", "spieler": 0, "bx": 1135, "by": 155},
+    {"q":  2, "r": -1, "typ": "kueste", "bx": 1380, "by": 680},
+    {"q":  2, "r":  0, "typ": "mine", "bx": 1300, "by": 430},
+    {"q":  1, "r":  1, "typ": "werkstatt", "spieler": 1, "bx": 1245, "by": 617},
+    {"q":  0, "r":  2, "typ": "brachland", "bx": 1000, "by": 640},
+    {"q": -1, "r":  2, "typ": "energie", "bx":  800, "by": 760},
+    {"q": -2, "r":  2, "typ": "werkstatt", "spieler": 2, "bx":  510, "by": 175},
+    {"q": -2, "r":  1, "typ": "kueste", "bx":  220, "by": 340},
+    {"q": -2, "r":  0, "typ": "brachland", "bx":  250, "by": 620},
+    {"q": -1, "r": -1, "typ": "werkstatt", "spieler": 3, "bx":  480, "by": 760},
+    {"q":  0, "r": -2, "typ": "wald", "bx":  700, "by": 150},
+    {"q":  1, "r": -2, "typ": "ruine", "fundkarten": 4, "bx":  830, "by": 140},
 ]
 
 # --------------------------------------------------------- Erfindungskarten

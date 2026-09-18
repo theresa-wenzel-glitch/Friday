@@ -104,7 +104,7 @@ h2 { font-size: 15pt; margin: 0 0 4mm; }
 .kasten { background: %(papier)s; border-left: 1.2mm solid %(tinte)s; padding: 4mm 5mm;
           margin: 6mm 0 0; font-size: 10.5pt; line-height: 1.5; }
 .fuss { font-size: 9pt; color: %(tinte2)s; margin: 4mm 0 0; }
-""" % {"insel": E.INSEL, "papier": E.PAPIER, "tinte": E.TINTE,
+""" % {"insel": E.STRAND, "papier": E.PAPIER, "tinte": E.TINTE,
        "tinte2": E.TINTE_2, "linie": E.LINIE}
 
 

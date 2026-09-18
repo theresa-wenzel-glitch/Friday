@@ -126,55 +126,73 @@
       "hell": "#faf2dd"
     }
   ],
+  "bild": {
+    "breite": 1536,
+    "hoehe": 1024
+  },
   "felder": [
     {
       "id": "0_0",
       "q": 0,
       "r": 0,
       "typ": "grruine",
-      "fundmarken": 8
+      "fundmarken": 8,
+      "bx": 770,
+      "by": 490
     },
     {
       "id": "1_-1",
       "q": 1,
       "r": -1,
       "typ": "energie",
-      "fundmarken": 0
+      "fundmarken": 0,
+      "bx": 1195,
+      "by": 90
     },
     {
       "id": "1_0",
       "q": 1,
       "r": 0,
       "typ": "wald",
-      "fundmarken": 0
+      "fundmarken": 0,
+      "bx": 1030,
+      "by": 460
     },
     {
       "id": "0_1",
       "q": 0,
       "r": 1,
       "typ": "mine",
-      "fundmarken": 0
+      "fundmarken": 0,
+      "bx": 870,
+      "by": 650
     },
     {
       "id": "-1_1",
       "q": -1,
       "r": 1,
       "typ": "ruine",
-      "fundmarken": 4
+      "fundmarken": 4,
+      "bx": 560,
+      "by": 545
     },
     {
       "id": "-1_0",
       "q": -1,
       "r": 0,
       "typ": "wald",
-      "fundmarken": 0
+      "fundmarken": 0,
+      "bx": 650,
+      "by": 460
     },
     {
       "id": "0_-1",
       "q": 0,
       "r": -1,
       "typ": "mine",
-      "fundmarken": 0
+      "fundmarken": 0,
+      "bx": 960,
+      "by": 290
     },
     {
       "id": "2_-2",
@@ -182,6 +200,8 @@
       "r": -2,
       "typ": "werkstatt",
       "fundmarken": 0,
+      "bx": 1135,
+      "by": 155,
       "spieler": "rot"
     },
     {
@@ -189,14 +209,18 @@
       "q": 2,
       "r": -1,
       "typ": "kueste",
-      "fundmarken": 0
+      "fundmarken": 0,
+      "bx": 1380,
+      "by": 680
     },
     {
       "id": "2_0",
       "q": 2,
       "r": 0,
       "typ": "mine",
-      "fundmarken": 0
+      "fundmarken": 0,
+      "bx": 1300,
+      "by": 430
     },
     {
       "id": "1_1",
@@ -204,6 +228,8 @@
       "r": 1,
       "typ": "werkstatt",
       "fundmarken": 0,
+      "bx": 1245,
+      "by": 617,
       "spieler": "blau"
     },
     {
@@ -211,14 +237,18 @@
       "q": 0,
       "r": 2,
       "typ": "brachland",
-      "fundmarken": 0
+      "fundmarken": 0,
+      "bx": 1000,
+      "by": 640
     },
     {
       "id": "-1_2",
       "q": -1,
       "r": 2,
       "typ": "energie",
-      "fundmarken": 0
+      "fundmarken": 0,
+      "bx": 800,
+      "by": 760
     },
     {
       "id": "-2_2",
@@ -226,6 +256,8 @@
       "r": 2,
       "typ": "werkstatt",
       "fundmarken": 0,
+      "bx": 510,
+      "by": 175,
       "spieler": "gruen"
     },
     {
@@ -233,14 +265,18 @@
       "q": -2,
       "r": 1,
       "typ": "kueste",
-      "fundmarken": 0
+      "fundmarken": 0,
+      "bx": 220,
+      "by": 340
     },
     {
       "id": "-2_0",
       "q": -2,
       "r": 0,
       "typ": "brachland",
-      "fundmarken": 0
+      "fundmarken": 0,
+      "bx": 250,
+      "by": 620
     },
     {
       "id": "-1_-1",
@@ -248,6 +284,8 @@
       "r": -1,
       "typ": "werkstatt",
       "fundmarken": 0,
+      "bx": 480,
+      "by": 760,
       "spieler": "gelb"
     },
     {
@@ -255,14 +293,18 @@
       "q": 0,
       "r": -2,
       "typ": "wald",
-      "fundmarken": 0
+      "fundmarken": 0,
+      "bx": 700,
+      "by": 150
     },
     {
       "id": "1_-2",
       "q": 1,
       "r": -2,
       "typ": "ruine",
-      "fundmarken": 4
+      "fundmarken": 4,
+      "bx": 830,
+      "by": 140
     }
   ],
   "nachbarn": {

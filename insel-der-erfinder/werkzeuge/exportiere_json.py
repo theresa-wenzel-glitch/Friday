@@ -36,6 +36,7 @@ def baue_daten():
         eintrag = {
             "id": fid, "q": f["q"], "r": f["r"], "typ": f["typ"],
             "fundmarken": f.get("fundkarten", 0),
+            "bx": f["bx"], "by": f["by"],
         }
         if "spieler" in f:
             eintrag["spieler"] = D.SPIELERFARBEN[f["spieler"]]["key"]
@@ -76,6 +77,7 @@ def baue_daten():
                     for k, v in D.GELAENDE.items()},
         "spielerfarben": [{"key": s["key"], "name": s["name"], "farbe": s["farbe"], "hell": s["hell"]}
                          for s in D.SPIELERFARBEN],
+        "bild": {"breite": D.BILD_BREITE, "hoehe": D.BILD_HOEHE},
         "felder": felder,
         "nachbarn": nachbarn,
         "startWerkstatt": start_werkstatt,

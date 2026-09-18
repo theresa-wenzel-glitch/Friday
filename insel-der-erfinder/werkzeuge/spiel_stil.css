@@ -19,12 +19,6 @@
   --blau: #3f6478; --blau-hell: #e4eef4;
   --gruen: #5a7345; --gruen-hell: #eaefe1;
   --gelb: #a8842c; --gelb-hell: #faf2dd;
-  --meer: #5f8a92; --meer-dunkel: #436469;
-  --strand: #e8d9ab; --inselgruen: #dcdba8;
-  --patch-wald: #8aa869; --patch-wald-rand: #6c8a4f;
-  --patch-mine: #a89d86; --patch-mine-rand: #867a62;
-  --patch-energie: #c98a5c; --patch-energie-rand: #a5623c;
-  --patch-ruine: #c7bb9f; --patch-ruine-rand: #a0906e;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
@@ -37,11 +31,6 @@
     --holz-hell: #3a2f1e; --metall-hell: #2b3138; --wasser-hell: #1c2f3a;
     --energie-hell: #3a2f11; --bauteil-hell: #2b2038;
     --rot-hell: #3a2018; --blau-hell: #1c2830; --gruen-hell: #212a1c; --gelb-hell: #332c15;
-    --meer: #3a5257; --meer-dunkel: #263a3d; --strand: #4a4128; --inselgruen: #454a2e;
-    --patch-wald: #526b3a; --patch-wald-rand: #3f5329;
-    --patch-mine: #5c5647; --patch-mine-rand: #464236;
-    --patch-energie: #6e4a30; --patch-energie-rand: #543722;
-    --patch-ruine: #5c543f; --patch-ruine-rand: #46402f;
   }
 }
 :root[data-theme="dark"] {
@@ -54,11 +43,6 @@
   --holz-hell: #3a2f1e; --metall-hell: #2b3138; --wasser-hell: #1c2f3a;
   --energie-hell: #3a2f11; --bauteil-hell: #2b2038;
   --rot-hell: #3a2018; --blau-hell: #1c2830; --gruen-hell: #212a1c; --gelb-hell: #332c15;
-  --meer: #3a5257; --meer-dunkel: #263a3d; --strand: #4a4128; --inselgruen: #454a2e;
-  --patch-wald: #526b3a; --patch-wald-rand: #3f5329;
-  --patch-mine: #5c5647; --patch-mine-rand: #464236;
-  --patch-energie: #6e4a30; --patch-energie-rand: #543722;
-  --patch-ruine: #5c543f; --patch-ruine-rand: #46402f;
 }
 
 * { box-sizing: border-box; }
@@ -286,25 +270,6 @@ img { max-width: 100%; }
    reduziert eingestellt hat, bekommt nichts davon — siehe die
    prefers-reduced-motion-Regel weit oben, die alle Animationsdauern auf
    praktisch null setzt. */
-
-@keyframes rauchAuf {
-  0%   { transform: translate(0, 0) scale(0.5); opacity: 0; }
-  15%  { opacity: 0.55; }
-  100% { transform: translate(var(--rauch-x, 4px), -26px) scale(1.15); opacity: 0; }
-}
-.eff-rauch { animation: rauchAuf 3.4s ease-in infinite; transform-origin: center; }
-
-@keyframes fahneWehen {
-  0%, 100% { transform: skewX(0deg); }
-  50%      { transform: skewX(-14deg); }
-}
-.eff-fahne { animation: fahneWehen 2.4s ease-in-out infinite; transform-box: fill-box; transform-origin: left center; }
-
-@keyframes wellenDriften {
-  0%, 100% { transform: translateX(0); opacity: 0.35; }
-  50%      { transform: translateX(5px); opacity: 0.55; }
-}
-.eff-welle { animation: wellenDriften 5s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
 
 @keyframes anklickbarPuls {
   0%, 100% { stroke-opacity: 1; }
