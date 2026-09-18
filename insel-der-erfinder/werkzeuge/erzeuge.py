@@ -216,7 +216,7 @@ def spielplan_svg():
         ("\U0001F33E", "Brachland", "wartet auf Neues"),
     ]))
 
-    o.append(panel(960, 66, 206, 366, "DEINE 3 AP", [
+    o.append(panel(960, 66, 206, 366, "DEINE %d AP" % D.AKTIONSPUNKTE, [
         ("\U0001F6B6", "Bewegen — 1 AP", "1 Feld weit"),
         ("\U0001FAB5", "Sammeln — 1 AP", "1 Rohstoff des Feldes"),
         ("\U0001F50D", "Untersuchen — 1 AP", "nur Ruine mit Marke"),
@@ -230,17 +230,22 @@ def spielplan_svg():
              'stroke-width="2.5"/>' % (rx0, ry0, PAPIER, LINIE))
     o.append('<text x="%d" y="%d" font-size="13" font-weight="800" fill="%s" '
              'letter-spacing="1.5">RUNDE</text>' % (rx0 + 20, ry0 + 37, TINTE_2))
+    # Kreisgröße und Abstand richten sich nach D.RUNDEN, damit die Leiste bei
+    # 8 wie bei 12+ Runden ins 708px breite Band passt (Label links, etwas Luft rechts).
+    spur_start, spur_ende = rx0 + 100, rx0 + 698
+    schritt = (spur_ende - spur_start) / max(1, D.RUNDEN - 1)
+    radius = min(23, schritt / 2 - 3)
     for i in range(1, D.RUNDEN + 1):
-        cx = rx0 + 96 + (i - 1) * 78
-        insel = i in (2, 4, 6)
-        o.append('<circle cx="%d" cy="%d" r="23" fill="%s" stroke="%s" stroke-width="%s"/>'
-                 % (cx, ry0 + 30, STRAND if insel else PAPIER, TINTE if insel else LINIE,
+        cx = spur_start + (i - 1) * schritt
+        insel = i in D.INSELKARTEN_RUNDEN
+        o.append('<circle cx="%.1f" cy="%d" r="%.1f" fill="%s" stroke="%s" stroke-width="%s"/>'
+                 % (cx, ry0 + 30, radius, STRAND if insel else PAPIER, TINTE if insel else LINIE,
                     "3.5" if insel else "2.5"))
-        o.append('<text x="%d" y="%d" font-size="20" font-weight="800" text-anchor="middle" '
-                 'fill="%s">%d</text>' % (cx, ry0 + 37, TINTE, i))
+        o.append('<text x="%.1f" y="%d" font-size="%.1f" font-weight="800" text-anchor="middle" '
+                 'fill="%s">%d</text>' % (cx, ry0 + 36, min(20, radius * 0.85), TINTE, i))
         if insel:
-            o.append('<text x="%d" y="%d" font-size="15" text-anchor="middle">⭐</text>'
-                     % (cx, ry0 + 4))
+            o.append('<text x="%.1f" y="%d" font-size="%.1f" text-anchor="middle">⭐</text>'
+                     % (cx, ry0 + 30 - radius - 3, min(15, radius * 0.65)))
     o.append('<text x="%d" y="%d" font-size="13" fill="%s" text-anchor="middle">'
              '⭐ Nach dieser Runde wird eine Inselkarte aufgedeckt – '
              'die Insel verändert sich für immer.</text>' % (W / 2, ry0 + 82, PAPIER))
@@ -448,8 +453,10 @@ def bau_inselkarten():
               for k in D.INSELKARTEN]
     karten_datei("inselkarten.html", "Inselkarten – Insel der Erfinder", karten,
                  ruecken_html("#1e8449", "🏝️", "Insel"),
-                 "<p>Von diesen 8 Karten werden pro Partie nur <strong>3</strong> gebraucht: "
-                 "nach Runde 2, 4 und 6. Dadurch ist jede Partie anders.</p>")
+                 "<p>Von diesen %d Karten werden pro Partie nur <strong>%d</strong> gebraucht: "
+                 "nach Runde %s. Dadurch ist jede Partie anders.</p>"
+                 % (len(D.INSELKARTEN), len(D.INSELKARTEN_RUNDEN),
+                    " und ".join(", ".join(str(r) for r in D.INSELKARTEN_RUNDEN).rsplit(", ", 1))))
 
 
 def bau_forschungsauftraege():

@@ -3,7 +3,7 @@
 Ein komplettes Brettspiel: zum Selbstausdrucken **und** als voll spielbares
 Online-Spiel im Browser.
 
-**2–4 Spieler · ab 10 Jahren · 45–60 Minuten**
+**2–4 Spieler · ab 10 Jahren · 65–90 Minuten**
 
 ---
 

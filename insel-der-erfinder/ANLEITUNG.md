@@ -1,13 +1,13 @@
 # 🏝️ Insel der Erfinder
 
-**2–4 Spieler · ab 10 Jahren · 45–60 Minuten**
+**2–4 Spieler · ab 10 Jahren · 65–90 Minuten**
 
 Nach einem heftigen Sturm stranden mehrere Erfinder auf einer unbekannten
 Insel. Zum Glück gibt es dort jede Menge Rohstoffe – aber auch geheimnisvolle
 Ruinen und seltsame Energiequellen. Jeder von euch gründet eine kleine
 Werkstatt und versucht, die beeindruckendsten Erfindungen zu bauen.
 
-Wer nach 8 Runden die meisten Erfinderpunkte hat, gewinnt.
+Wer nach 12 Runden die meisten Erfinderpunkte hat, gewinnt.
 
 ---
 
@@ -78,7 +78,7 @@ Genau deshalb sind sie so wertvoll.
 
 ## 4. Spielablauf
 
-Das Spiel geht über **8 Runden**. Jede Runde läuft so ab:
+Das Spiel geht über **12 Runden**. Jede Runde läuft so ab:
 
 **A. Zugphase** – Reihum ist jeder Spieler einmal am Zug (im Uhrzeigersinn,
 beginnend beim Startspieler).
@@ -89,7 +89,7 @@ beginnend beim Startspieler).
 **C. Ereigniskarte** – Der Startspieler deckt **1 Ereigniskarte** auf und
 liest sie vor. Effekte, die "nächste Runde" gelten, bleiben offen liegen.
 
-**D. Inselentwicklung** – **Nach Runde 2, 4 und 6** wird zusätzlich
+**D. Inselentwicklung** – **Nach Runde 3, 6 und 9** wird zusätzlich
 **1 Inselkarte** aufgedeckt. Sie verändert den Spielplan **dauerhaft**.
 
 **E. Rundenende** – Rundenmarker ein Feld weiter, Startspielermarker einen
@@ -97,9 +97,9 @@ Platz nach links.
 
 ---
 
-## 5. Dein Zug: 3 Aktionspunkte
+## 5. Dein Zug: 4 Aktionspunkte
 
-In deinem Zug hast du **3 Aktionspunkte (AP)**. Du darfst sie auf beliebige
+In deinem Zug hast du **4 Aktionspunkte (AP)**. Du darfst sie auf beliebige
 Aktionen verteilen und dieselbe Aktion auch **mehrfach** machen.
 Nicht benutzte AP verfallen.
 
@@ -217,12 +217,12 @@ nächste Runde gelten, bleiben offen liegen und werden danach abgeworfen.
 
 ## 9. ⭐ Der besondere Mechanismus: Inselentwicklung
 
-**Nach Runde 2, 4 und 6** wird eine Inselkarte aufgedeckt. Sie verändert die
+**Nach Runde 3, 6 und 9** wird eine Inselkarte aufgedeckt. Sie verändert die
 Insel **für immer**: Es entstehen neue Gebiete, alte werden unbrauchbar, oder
 Wege werden kürzer.
 
 Dadurch sieht die Insel am Ende ganz anders aus als am Anfang – und eine
-Strategie, die in Runde 1 gut war, kann in Runde 7 wertlos sein. Wer das früh
+Strategie, die in Runde 1 gut war, kann in Runde 10 wertlos sein. Wer das früh
 mitdenkt, hat einen Vorteil.
 
 Die beiden 🏜️ **Brachland-Felder** sind absichtlich leer: Sie warten darauf,
@@ -263,10 +263,10 @@ gleich? Wer mehr 💎 Bauteile hat. Immer noch gleich? Gemeinsamer Sieg.
 
 ### 👶 Kinderinsel (ab 8 Jahren)
 
-- Jeder hat **4 Aktionspunkte** statt 3.
+- Jeder hat **5 Aktionspunkte** statt 4.
 - **Keine Ereigniskarten.**
 - Nur Erfindungen der **Stufe I und II** benutzen.
-- Nur **6 Runden** spielen.
+- Nur **8 Runden** spielen.
 
 ### 👥 Zu zweit
 
@@ -309,9 +309,9 @@ gleich? Wer mehr 💎 Bauteile hat. Immer noch gleich? Gemeinsamer Sieg.
 ## 13. Schnellübersicht für den Tisch
 
 **Runde:** Alle sind dran → Lager auf 10 prüfen → Ereigniskarte →
-(nach Runde 2/4/6) Inselkarte → nächste Runde
+(nach Runde 3/6/9) Inselkarte → nächste Runde
 
-**3 AP:** Bewegen 1 · Sammeln 1 · Ruine untersuchen 1 · Bauen 2 ·
+**4 AP:** Bewegen 1 · Sammeln 1 · Ruine untersuchen 1 · Bauen 2 ·
 Handeln 1 · Tauschbank 1
 
 **Bauen** nur in der eigenen Werkstatt. **Untersuchen** nur auf Ruinen mit
@@ -377,7 +377,7 @@ Fundmarke. **Sammeln** nicht auf Ruinen, Werkstätten und Brachland.
 | 🔥 **Waldbrand** | Nächste Runde kann im 🌲 Wald nicht gesammelt werden. |
 | 🎁 **Strandgut** | Jeder Spieler, dessen Figur an der 🌊 Küste steht, nimmt 2 beliebige Ressourcen. |
 | 🤝 **Erfinderkongress** | Nächste Runde kostet Handeln für alle keinen Aktionspunkt. |
-| 🌙 **Sternenklare Nacht** | Nächste Runde hat jeder Spieler 4 Aktionspunkte statt 3. |
+| 🌙 **Sternenklare Nacht** | Nächste Runde hat jeder Spieler 5 Aktionspunkte statt 4. |
 
 ## Anhang C: Alle 8 Inselkarten
 

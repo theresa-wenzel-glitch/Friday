@@ -188,7 +188,7 @@ EREIGNISSE = [
     {"emoji": "\U0001F91D", "id": "erfinderkongress", "name": "Erfinderkongress",
      "text": "Nächste Runde kostet Handeln für alle keinen Aktionspunkt.", "art": "gut"},
     {"emoji": "\U0001F319", "id": "sternenklarenacht", "name": "Sternenklare Nacht",
-     "text": "Nächste Runde hat jeder Spieler 4 Aktionspunkte statt 3.", "art": "gut"},
+     "text": "Nächste Runde hat jeder Spieler 5 Aktionspunkte statt 4.", "art": "gut"},
 ]
 
 # --------------------------------------------------------------- Inselkarten
@@ -275,6 +275,11 @@ INSELPLAETTCHEN = [
     {"emoji": "\U0001F309", "name": "Brücke", "karte": "Brücke über die Schlucht", "gelaende": None},
 ]
 
-RUNDEN = 8
-AKTIONSPUNKTE = 3
+RUNDEN = 12
+AKTIONSPUNKTE = 4
 LAGERLIMIT = 10
+
+# Nach diesen Runden wird zusätzlich eine Inselkarte aufgedeckt (verändert
+# den Spielplan dauerhaft) - bei 25/50/75% der Partie, damit das letzte
+# Viertel ruhig bleibt, genau wie ursprünglich bei RUNDEN=8 mit [2, 4, 6].
+INSELKARTEN_RUNDEN = sorted({round(RUNDEN * anteil) for anteil in (0.25, 0.5, 0.75)})

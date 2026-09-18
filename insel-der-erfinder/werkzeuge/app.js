@@ -569,7 +569,7 @@
       (zustand.wartetAuf ? " gefragt" : " am Zug") + '</b>';
     kopf.appendChild(amzug);
     const apAnzeige = h('<div class="ap-punkte"></div>');
-    for (let i = 0; i < Math.max(3, zustand.ap); i++) {
+    for (let i = 0; i < Math.max(D.regeln.aktionspunkte, zustand.ap); i++) {
       apAnzeige.appendChild(h('<span class="ap-punkt' + (i < zustand.ap ? " voll" : "") + '"></span>'));
     }
     kopf.appendChild(apAnzeige);

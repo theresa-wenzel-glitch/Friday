@@ -274,10 +274,11 @@ AKTIONEN = [
 ]
 
 ABLAUF = [
-    ("A", "Zugphase", "Reihum hat jeder Spieler 3 Aktionspunkte."),
-    ("B", "Lager prüfen", "Wer mehr als 10 Rohstoffe hat, wirft ab. 💎 zählen nicht mit."),
+    ("A", "Zugphase", "Reihum hat jeder Spieler %d Aktionspunkte." % D.AKTIONSPUNKTE),
+    ("B", "Lager prüfen", "Wer mehr als %d Rohstoffe hat, wirft ab. 💎 zählen nicht mit." % D.LAGERLIMIT),
     ("C", "Ereigniskarte", "Eine Karte aufdecken und vorlesen."),
-    ("D", "Inselentwicklung", "Nach Runde 2, 4 und 6: eine Inselkarte. Die Insel ändert sich für immer."),
+    ("D", "Inselentwicklung", "Nach Runde %s: eine Inselkarte. Die Insel ändert sich für immer."
+     % " und ".join(", ".join(str(r) for r in D.INSELKARTEN_RUNDEN).rsplit(", ", 1))),
     ("E", "Weiter", "Rundenmarker vor, Startspieler wechselt."),
 ]
 
@@ -286,8 +287,8 @@ def bau():
     spielplan = E.spielplan_svg()
 
     daten = "".join('<div><span class="marke">%s</span><b>%s</b></div>' % (a, b) for a, b in
-                    [("Spieler", "2–4"), ("Alter", "ab 10"), ("Dauer", "45–60 Min"),
-                     ("Runden", "8"), ("Karten", "86")])
+                    [("Spieler", "2–4"), ("Alter", "ab 10"), ("Dauer", "65–90 Min"),
+                     ("Runden", str(D.RUNDEN)), ("Karten", "86")])
     chips = "".join('<button class="chip" type="button" data-filter="%s" aria-pressed="%s">%s</button>'
                     % (w, "true" if w == "alle" else "false", html.escape(t)) for w, t in CHIPS)
     aktionen = "".join('<tr><td class="ap">%s AP</td><td class="was">%s</td><td class="wo">%s</td></tr>'

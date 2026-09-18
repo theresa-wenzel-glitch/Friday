@@ -1,13 +1,13 @@
 {
   "version": 1,
   "regeln": {
-    "runden": 8,
-    "aktionspunkte": 3,
+    "runden": 12,
+    "aktionspunkte": 4,
     "lagerlimit": 10,
     "inselkartenRunden": [
-      2,
-      4,
-      6
+      3,
+      6,
+      9
     ]
   },
   "ressourcen": {
@@ -819,7 +819,7 @@
       "id": "sternenklarenacht",
       "emoji": "🌙",
       "name": "Sternenklare Nacht",
-      "text": "Nächste Runde hat jeder Spieler 4 Aktionspunkte statt 3.",
+      "text": "Nächste Runde hat jeder Spieler 5 Aktionspunkte statt 4.",
       "art": "gut"
     }
   ],

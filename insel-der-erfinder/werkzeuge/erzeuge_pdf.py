@@ -114,7 +114,7 @@ def deckblatt(eintraege, gesamt):
         '<span class="punkte"></span><span class="nr">%d</span></li>'
         % (html.escape(n), html.escape(w), s) for n, w, s in eintraege)
     zahlen = "".join('<div><span>%s</span><b>%s</b></div>' % (a, b) for a, b in
-                     [("Spieler", "2–4"), ("Alter", "ab 10"), ("Dauer", "45–60 Min"),
+                     [("Spieler", "2–4"), ("Alter", "ab 10"), ("Dauer", "65–90 Min"),
                       ("Seiten", str(gesamt))])
     return """<!doctype html><html lang="de"><head><meta charset="utf-8">
 <title>Insel der Erfinder</title><style>%s</style></head><body>

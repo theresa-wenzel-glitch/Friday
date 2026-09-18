@@ -69,7 +69,7 @@ def baue_daten():
             "runden": D.RUNDEN,
             "aktionspunkte": D.AKTIONSPUNKTE,
             "lagerlimit": D.LAGERLIMIT,
-            "inselkartenRunden": [2, 4, 6],
+            "inselkartenRunden": D.INSELKARTEN_RUNDEN,
         },
         "ressourcen": ohne_gibt(D.RESSOURCEN),
         "gelaende": {k: {"name": v["name"], "emoji": v["emoji"], "gibt": v["gibt"],
