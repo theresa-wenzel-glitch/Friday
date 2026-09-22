@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 150" width="680" height="150" role="img" aria-label="Tippfeld Wortmarke">
+  <title>Tippfeld Wortmarke</title>
+  <g transform="translate(10 15)">
+    <rect width="120" height="120" rx="28" fill="#101A2B"/>
+    <g fill="none" stroke="#F5F7F2" stroke-opacity="0.5" stroke-width="4" stroke-linecap="round">
+      <path d="M20 60h80"/>
+      <circle cx="60" cy="60" r="26"/>
+    </g>
+    <circle cx="60" cy="60" r="10" fill="#FF5A1F"/>
+  </g>
+  <text x="160" y="88" font-family="Oswald, 'Arial Narrow', sans-serif" font-size="66" font-weight="600" letter-spacing="3" fill="#101A2B">TIPPFELD</text>
+  <text x="163" y="116" font-family="'Source Sans 3', 'Segoe UI', system-ui, sans-serif" font-size="19" letter-spacing="4.5" fill="#8C9689">PROGNOSEN &amp; TIPPLIGEN</text>
+</svg>

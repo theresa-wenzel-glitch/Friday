@@ -170,3 +170,16 @@ Sichert `data/westernhengste.db` regelmässig – das ist der gesamte Bestand.
   Unter-Abhängigkeiten von Next.js. Sie lassen sich erst mit einem Next-Update
   beheben; ein `npm audit fix --force` würde Next auf eine uralte Version
   zurücksetzen und ist keine Lösung.
+
+---
+
+## Weitere Projekte in diesem Repository
+
+Dieses Repository sammelt mehrere eigenständige Projekte. Jedes hat eine eigene
+Anleitung in seinem Ordner:
+
+| Ordner | Was es ist |
+| --- | --- |
+| `.` (dieses Verzeichnis) | Westernhengste – das oben beschriebene Hengstverzeichnis |
+| `design-system/` | Tippfeld – Designsystem für eine Fußball-Tippspiel-App: Farben, Schrift, Symbole, Grafiken |
+| `tippfeld/` | Tippfeld – die App selbst: Prognosen, Tipps, Ligen, Ranglisten |

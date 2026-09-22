@@ -1,0 +1,291 @@
+@import "./tokens.css";
+@import "./components.css";
+
+/*
+ * Nur das App-Gerüst. Farben, Schrift und Bausteine kommen unverändert aus dem
+ * Designsystem in ../../design-system.
+ */
+
+* { box-sizing: border-box; }
+
+html, body { height: 100%; }
+
+body {
+  margin: 0;
+  background: var(--tf-bg);
+  color: var(--tf-text);
+  font-family: var(--tf-font-text);
+  font-size: var(--tf-size-m);
+  line-height: var(--tf-lh-normal);
+  -webkit-font-smoothing: antialiased;
+  overflow-wrap: break-word;
+}
+
+h1, h2, h3 { text-wrap: balance; }
+
+a { color: inherit; }
+
+:focus-visible {
+  outline: 2px solid var(--tf-fokus);
+  outline-offset: 2px;
+  border-radius: var(--tf-radius-s);
+}
+
+.sprungmarke {
+  position: absolute; left: -9999px; top: 0; z-index: 20;
+  background: var(--tf-akzent); color: var(--tf-text-auf-akzent);
+  padding: var(--tf-raum-3) var(--tf-raum-4);
+}
+.sprungmarke:focus { left: 0; }
+
+.versteckt {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip-path: inset(50%); white-space: nowrap;
+}
+
+/* --- Gerüst ------------------------------------------------------------- */
+.huelle {
+  max-width: 620px;
+  margin: 0 auto;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.kopfleiste {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: var(--tf-bg);
+  border-bottom: var(--tf-rahmen) solid var(--tf-linie);
+  padding: var(--tf-raum-3) var(--tf-raum-4);
+  padding-top: calc(var(--tf-raum-3) + env(safe-area-inset-top, 0px));
+  display: flex;
+  align-items: center;
+  gap: var(--tf-raum-3);
+}
+
+.kopfleiste__titel {
+  font-family: var(--tf-font-display);
+  font-size: var(--tf-size-l);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  margin: 0;
+  flex: 1;
+  min-width: 0;
+}
+
+.kopfleiste__zurueck {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 40px; height: 40px; flex: none;
+  border-radius: var(--tf-radius-rund);
+  border: var(--tf-rahmen) solid var(--tf-linie);
+  background: var(--tf-bg-erhoben);
+  color: var(--tf-text);
+}
+
+.marke-klein { display: flex; align-items: center; gap: var(--tf-raum-2); flex: 1; min-width: 0; }
+.marke-klein__zeichen {
+  width: 32px; height: 32px; flex: none; border-radius: 9px;
+  background: var(--tf-nacht-900); display: grid; place-items: center; position: relative;
+}
+.marke-klein__zeichen::before {
+  content: ""; position: absolute; left: 5px; right: 5px; height: 1px;
+  background: rgba(245, 247, 242, 0.45);
+}
+.marke-klein__zeichen::after {
+  content: ""; position: absolute; width: 16px; height: 16px; border-radius: 50%;
+  border: 1px solid rgba(245, 247, 242, 0.45);
+}
+.marke-klein__punkt {
+  width: 8px; height: 8px; border-radius: 50%; background: var(--tf-anstoss-500); z-index: 1;
+}
+
+.inhalt {
+  flex: 1;
+  padding: var(--tf-raum-4);
+  padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+  display: flex;
+  flex-direction: column;
+  gap: var(--tf-raum-5);
+}
+
+.stapel { display: flex; flex-direction: column; gap: var(--tf-raum-3); }
+.stapel--eng { gap: var(--tf-raum-2); }
+.stapel--weit { gap: var(--tf-raum-5); }
+.reihe { display: flex; align-items: center; gap: var(--tf-raum-2); flex-wrap: wrap; }
+.reihe--verteilt { justify-content: space-between; }
+.wachsen { flex: 1; min-width: 0; }
+
+.abschnitt__kopf {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: var(--tf-raum-3); margin-bottom: var(--tf-raum-3);
+}
+.abschnitt__titel {
+  font-family: var(--tf-font-display); font-size: var(--tf-size-l);
+  font-weight: 600; letter-spacing: 0.03em; margin: 0;
+}
+.abschnitt__mehr { font-size: var(--tf-size-s); color: var(--tf-akzent); font-weight: 600; text-decoration: none; }
+
+.seitentitel {
+  font-family: var(--tf-font-display); font-weight: 600;
+  font-size: var(--tf-size-xl); line-height: 1.1; margin: 0;
+}
+.leise { color: var(--tf-text-leise); }
+.klein { font-size: var(--tf-size-s); }
+.winzig { font-size: var(--tf-size-xs); }
+.fliess { margin: 0; max-width: 62ch; }
+
+/* --- Untere Navigation --------------------------------------------------- */
+.untenleiste {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 6;
+  background: var(--tf-bg-erhoben);
+  border-top: var(--tf-rahmen) solid var(--tf-linie);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.untenleiste__innen {
+  max-width: 620px; margin: 0 auto;
+  display: grid; grid-template-columns: repeat(5, 1fr);
+}
+.untenleiste__knopf {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 2px; min-height: 60px; padding: var(--tf-raum-2) 2px;
+  color: var(--tf-text-leise); text-decoration: none;
+  font-size: 11px; font-weight: 600; letter-spacing: 0.02em;
+}
+.untenleiste__knopf[aria-current="page"] { color: var(--tf-akzent); }
+.untenleiste__knopf[aria-current="page"] .tf-symbol { transform: translateY(-1px); }
+
+/* --- Hinweisbänder -------------------------------------------------------- */
+.band {
+  display: flex; gap: var(--tf-raum-3); align-items: flex-start;
+  padding: var(--tf-raum-3) var(--tf-raum-4);
+  border-radius: var(--tf-radius-m);
+  background: var(--tf-bg-gedaempft);
+  font-size: var(--tf-size-s);
+}
+.band--demo { background: var(--tf-remis-flaeche); color: var(--tf-remis); }
+.band--gut { background: var(--tf-sieg-flaeche); color: var(--tf-sieg); }
+.band--fehler { background: var(--tf-niederlage-flaeche); color: var(--tf-niederlage); }
+.band strong { color: inherit; }
+.band .tf-symbol { flex: none; }
+
+/* --- Kacheln -------------------------------------------------------------- */
+.kacheln { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: var(--tf-raum-3); }
+.kachel {
+  background: var(--tf-bg-erhoben); border: var(--tf-rahmen) solid var(--tf-linie);
+  border-radius: var(--tf-radius-m); padding: var(--tf-raum-4);
+  display: flex; flex-direction: column; gap: var(--tf-raum-1);
+}
+.kachel__wert {
+  font-family: var(--tf-font-display); font-size: var(--tf-size-xl);
+  font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1;
+}
+
+.schnellzugriff { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--tf-raum-2); }
+.schnellzugriff a {
+  display: flex; flex-direction: column; align-items: center; gap: var(--tf-raum-2);
+  padding: var(--tf-raum-3) var(--tf-raum-2); text-decoration: none;
+  background: var(--tf-bg-erhoben); border: var(--tf-rahmen) solid var(--tf-linie);
+  border-radius: var(--tf-radius-m); font-size: 11px; font-weight: 600; text-align: center;
+  min-height: var(--tf-touch-min);
+}
+.schnellzugriff a .tf-symbol { color: var(--tf-akzent); }
+
+/* --- Spielkarte als Verweis ----------------------------------------------- */
+.spielkarte { text-decoration: none; color: inherit; display: block; }
+.spielkarte:hover .tf-karte { border-color: var(--tf-akzent); }
+.spielkarte .tf-karte { transition: border-color var(--tf-zeit-schnell) var(--tf-kurve); }
+
+/* --- Formulare -------------------------------------------------------------- */
+.feld { display: flex; flex-direction: column; gap: var(--tf-raum-2); }
+.feld > label, .feldgruppe > legend {
+  font-size: var(--tf-size-xs); font-weight: 600; letter-spacing: var(--tf-spur-label);
+  text-transform: uppercase; color: var(--tf-text-leise);
+}
+.eingabe, .auswahl, .textfeld {
+  width: 100%; min-height: var(--tf-touch-min);
+  padding: var(--tf-raum-3);
+  border: var(--tf-rahmen) solid var(--tf-linie);
+  border-radius: var(--tf-radius-m);
+  background: var(--tf-bg);
+  color: var(--tf-text);
+  font-family: var(--tf-font-text);
+  font-size: var(--tf-size-m);
+}
+.textfeld { min-height: 84px; resize: vertical; }
+.eingabe:focus, .auswahl:focus, .textfeld:focus { border-color: var(--tf-akzent); }
+.eingabe[aria-invalid="true"] { border-color: var(--tf-niederlage); }
+.feldgruppe { border: 0; padding: 0; margin: 0; display: flex; flex-direction: column; gap: var(--tf-raum-2); }
+.hilfe { font-size: var(--tf-size-xs); color: var(--tf-text-leise); }
+
+.wahlreihe { display: flex; flex-wrap: wrap; gap: var(--tf-raum-2); }
+.wahl {
+  display: inline-flex; align-items: center; gap: var(--tf-raum-2);
+  padding: var(--tf-raum-2) var(--tf-raum-3); min-height: var(--tf-touch-min);
+  border: var(--tf-rahmen) solid var(--tf-linie); border-radius: var(--tf-radius-rund);
+  background: var(--tf-bg-erhoben); cursor: pointer; font-size: var(--tf-size-s);
+}
+.wahl input { accent-color: var(--tf-akzent); width: 18px; height: 18px; }
+.wahl:has(input:checked) { border-color: var(--tf-akzent); background: var(--tf-akzent-flaeche); }
+
+.zeichenwahl { display: flex; flex-wrap: wrap; gap: var(--tf-raum-2); }
+.zeichenwahl label { cursor: pointer; }
+.zeichenwahl input { position: absolute; opacity: 0; pointer-events: none; }
+.zeichenwahl img {
+  width: 52px; height: 52px; border-radius: var(--tf-radius-m);
+  border: 2px solid transparent; display: block;
+}
+.zeichenwahl input:checked + img { border-color: var(--tf-akzent); }
+.zeichenwahl input:focus-visible + img { outline: 2px solid var(--tf-fokus); outline-offset: 2px; }
+
+/* --- Tabellenumrandung ------------------------------------------------------- */
+.tabellenrahmen { overflow-x: auto; }
+
+/* --- QR-Code ------------------------------------------------------------------ */
+.qr-flaeche {
+  background: #FFFFFF; padding: var(--tf-raum-4); border-radius: var(--tf-radius-m);
+  display: grid; place-items: center; align-self: center;
+}
+.qr-flaeche svg { display: block; width: 180px; height: 180px; }
+
+.code-anzeige {
+  font-family: var(--tf-font-daten); font-size: var(--tf-size-l); font-weight: 600;
+  letter-spacing: 0.22em; text-align: center; padding: var(--tf-raum-3);
+  background: var(--tf-bg-gedaempft); border-radius: var(--tf-radius-m);
+}
+
+/* --- Leerzustand ---------------------------------------------------------------- */
+.leer {
+  display: flex; flex-direction: column; align-items: center; gap: var(--tf-raum-3);
+  text-align: center; padding: var(--tf-raum-6) var(--tf-raum-4);
+  border: 1px dashed var(--tf-linie); border-radius: var(--tf-radius-l);
+  color: var(--tf-text-leise);
+}
+.leer img { width: 180px; max-width: 100%; height: auto; color: var(--tf-text-leise); }
+
+/* --- Spieler-Listen --------------------------------------------------------------- */
+.spielerliste { display: flex; flex-direction: column; }
+.torliste { display: flex; flex-direction: column; gap: var(--tf-raum-2); font-size: var(--tf-size-s); }
+.torliste li { display: flex; gap: var(--tf-raum-2); align-items: center; }
+.torliste .minute { font-family: var(--tf-font-daten); color: var(--tf-text-leise); min-width: 3.2em; }
+
+/* --- Vergleichstabelle: links Heim, rechts Gast, Erklärung darüber ---------- */
+.vergleich { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--tf-raum-1) var(--tf-raum-3); }
+.vergleich__titel {
+  grid-column: 1 / -1; font-size: var(--tf-size-xs); font-weight: 600;
+  letter-spacing: var(--tf-spur-label); text-transform: uppercase; color: var(--tf-text-leise);
+  border-top: var(--tf-rahmen) solid var(--tf-linie); padding-top: var(--tf-raum-2); margin-top: var(--tf-raum-2);
+}
+.vergleich__hinweis { grid-column: 1 / -1; font-size: var(--tf-size-xs); color: var(--tf-text-leise); }
+.vergleich__heim { text-align: left; font-weight: 600; min-width: 0; }
+.vergleich__gast { text-align: right; font-weight: 600; min-width: 0; }
+
+.aufzaehlung { margin: 0; padding-left: 1.1rem; display: flex; flex-direction: column; gap: var(--tf-raum-2); font-size: var(--tf-size-s); }
+
+/* --- Schriften aus next/font ------------------------------------------------ */
+:root {
+  --tf-font-display: var(--schrift-display), "Arial Narrow", sans-serif;
+  --tf-font-text: var(--schrift-text), "Segoe UI", system-ui, sans-serif;
+  --tf-font-daten: var(--schrift-daten), ui-monospace, monospace;
+}

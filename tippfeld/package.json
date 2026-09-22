@@ -1,0 +1,36 @@
+{
+  "name": "tippfeld",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Tippfeld - Fußball-Prognosen und Tippligen. Ohne Echtgeld, ohne Quoten.",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "seed": "tsx scripts/seed.ts",
+    "design:sync": "node scripts/design-sync.mjs",
+    "pruefen": "tsx scripts/pruefen.ts",
+    "e2e": "node scripts/e2e.mjs"
+  },
+  "dependencies": {
+    "better-sqlite3": "^13.0.1",
+    "next": "^16.2.12",
+    "qrcode": "^1.5.4",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/node": "^22.15.0",
+    "@types/qrcode": "^1.5.5",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "typescript": "^5.9.0",
+    "tsx": "^4.23.1",
+    "playwright": "1.56.1"
+  },
+  "engines": {
+    "node": ">=22.6.0"
+  }
+}

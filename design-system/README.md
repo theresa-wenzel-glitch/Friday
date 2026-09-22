@@ -13,6 +13,10 @@ Lade den Ordner herunter und öffne **`index.html`** mit einem Doppelklick. Es �
 sich eine Seite, auf der alles gezeigt wird. Du brauchst dafür nichts zu installieren.
 Oben rechts kannst du zwischen Hell- und Dunkelmodus umschalten.
 
+**Dunkel ist der Standard.** Der Hellmodus verwendet dieselbe Bildsprache und ist
+vollständig ausgearbeitet; getauscht werden nur die Rollenfarben, nie die
+Komponenten.
+
 ## Was liegt wo
 
 | Datei / Ordner | Was drin ist |
@@ -22,8 +26,16 @@ Oben rechts kannst du zwischen Hell- und Dunkelmodus umschalten.
 | `tokens.json` | Dieselben Werte maschinenlesbar, für App-Builder und Figma |
 | `components.css` | Die fertigen Bausteine (Karte, Chip, Balken, Knopf, Tabelle) |
 | `seite.css` | Nur das Layout der Schaustafel, nicht Teil des Systems |
-| `icons/` | 24 Symbole, je 24 × 24 px, Farbe passt sich automatisch an |
-| `illustrations/` | Logo, App-Icon, Splash Screen, Kartengrafiken |
+| `icons/` | 42 Symbole, je 24 × 24 px, Farbe passt sich automatisch an |
+| `illustrations/` | Logo, App-Icon, Splash Screen, Kartengrafiken, sechs generische Zeichen für Profil- und Ligabilder |
+
+## Wo es schon benutzt wird
+
+Im Ordner [`../tippfeld`](../tippfeld) liegt die fertige App, die genau dieses
+System verwendet. Sie holt sich Farben, Symbole und Grafiken mit
+`npm run design:sync` von hier – dieser Ordner bleibt also die einzige Quelle
+der Wahrheit. Änderst du hier etwas, führe in `tippfeld/` einmal
+`npm run design:sync` aus.
 
 ## Wie du es einem App-Builder gibst
 
@@ -43,6 +55,9 @@ noch einmal ausgeschrieben.
   Kürzel, damit die App bei Farbfehlsichtigkeit verständlich bleibt.
 - **Alles Antippbare ist mindestens 44 × 44 px groß.**
 - **Zahlen bekommen Tabellenziffern** (`tabular-nums`), damit Spalten sauber stehen.
+- **Hilfstexte haben genug Kontrast.** Dafür gibt es eigene Töne
+  (`--tf-kreide-500` hell, `--tf-nacht-300` dunkel). Die hellen Grautöne
+  `--tf-kreide-400` und `--tf-nacht-400` sind nur für Linien und Ränder.
 - **Keine Wettsprache**, keine Quoten, kein Echtgeld. Die App tippt, sie wettet nicht.
 
 ## Schriften
