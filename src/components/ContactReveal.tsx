@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import { revealContactAction } from "@/app/actions";
+import { revealContactAction } from "@/app/(western)/actions";
 import { EMPTY_CONTACT_STATE, type ContactState } from "@/lib/form-state";
 
 export function ContactReveal({

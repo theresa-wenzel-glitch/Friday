@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { reportCorrectionAction } from "@/app/actions";
+import { reportCorrectionAction } from "@/app/(western)/actions";
 import {
   EMPTY_CORRECTION_STATE,
   type CorrectionState,
