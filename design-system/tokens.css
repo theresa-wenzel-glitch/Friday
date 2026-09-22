@@ -1,0 +1,149 @@
+/*
+ * TIPPFELD - Designsystem für eine Fußball-Prognose- und Tippliga-App
+ * ------------------------------------------------------------------
+ * Bildwelt: Matchday-Programmheft und Anzeigetafel. Tiefes Nachtblau als
+ * Grund, Kreideweiß für Linien, ein Signalorange als einzige laute Farbe.
+ * Rasengrün, Flutlichtgelb und Abseitsrot sind ausschließlich Statusfarben
+ * (Sieg / Unentschieden / Niederlage) und niemals Dekoration.
+ *
+ * Alle Werte sind reine CSS-Variablen: keine Build-Tools, kein Framework.
+ * Die gleichen Werte liegen maschinenlesbar in tokens.json.
+ */
+
+:root {
+  /* --- Markenfarben ------------------------------------------------- */
+  --tf-nacht-900: #0B1220;   /* tiefster Grund, Splash */
+  --tf-nacht-800: #101A2B;   /* App-Hintergrund dunkel */
+  --tf-nacht-700: #18253A;   /* Karten dunkel */
+  --tf-nacht-600: #24344C;   /* Trennlinien dunkel */
+  --tf-nacht-400: #55688A;   /* Sekundärtext dunkel */
+
+  --tf-kreide-000: #FFFFFF;  /* Linienweiß */
+  --tf-kreide-050: #F5F7F2;  /* App-Hintergrund hell (leicht grünstichig) */
+  --tf-kreide-100: #E9EDE4;  /* Flächen hell */
+  --tf-kreide-200: #D5DBCE;  /* Trennlinien hell */
+  --tf-kreide-400: #8C9689;  /* Sekundärtext hell */
+
+  --tf-anstoss-500: #FF5A1F; /* Akzent: Aktionen, aktiver Tipp */
+  --tf-anstoss-600: #E24610; /* Akzent gedrückt */
+  --tf-anstoss-100: #FFE6DB; /* Akzentfläche hell */
+
+  /* --- Statusfarben (Bedeutung, nicht Deko) -------------------------- */
+  --tf-rasen-500: #1F7A54;   /* Sieg / Treffer / positiv */
+  --tf-rasen-100: #D8EDE3;
+  --tf-flut-500: #E8A200;    /* Unentschieden / Warnung */
+  --tf-flut-100: #FCEFD2;
+  --tf-abseits-500: #C8323B; /* Niederlage / Fehler */
+  --tf-abseits-100: #F8DCDD;
+
+  /* --- Rollen (hell = Standard) -------------------------------------- */
+  --tf-bg: var(--tf-kreide-050);
+  --tf-bg-erhoben: var(--tf-kreide-000);
+  --tf-bg-gedaempft: var(--tf-kreide-100);
+  --tf-linie: var(--tf-kreide-200);
+  --tf-text: var(--tf-nacht-800);
+  --tf-text-leise: var(--tf-kreide-400);
+  --tf-text-auf-akzent: #FFFFFF;
+  --tf-akzent: var(--tf-anstoss-500);
+  --tf-akzent-flaeche: var(--tf-anstoss-100);
+  --tf-fokus: var(--tf-anstoss-500);
+
+  --tf-sieg: var(--tf-rasen-500);
+  --tf-sieg-flaeche: var(--tf-rasen-100);
+  --tf-remis: #9A6C00;
+  --tf-remis-flaeche: var(--tf-flut-100);
+  --tf-niederlage: var(--tf-abseits-500);
+  --tf-niederlage-flaeche: var(--tf-abseits-100);
+
+  /* --- Schrift -------------------------------------------------------- */
+  --tf-font-display: "Oswald", "Haettenschweiler", "Arial Narrow", sans-serif;
+  --tf-font-text: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --tf-font-daten: "IBM Plex Mono", ui-monospace, "Courier New", monospace;
+
+  /* Typoskala (mobil first, 1.25er Schritte) */
+  --tf-size-anzeige: 2.75rem; /* Spielstand */
+  --tf-size-xl: 1.75rem;      /* Seitentitel */
+  --tf-size-l: 1.3125rem;     /* Abschnittstitel */
+  --tf-size-m: 1rem;          /* Fließtext */
+  --tf-size-s: 0.875rem;      /* Hilfstext */
+  --tf-size-xs: 0.75rem;      /* Label, Versalien */
+
+  --tf-lh-eng: 1.05;
+  --tf-lh-normal: 1.5;
+  --tf-spur-label: 0.08em;    /* Laufweite für Versallabels */
+
+  /* --- Abstände (4er-Raster) ------------------------------------------ */
+  --tf-raum-1: 4px;
+  --tf-raum-2: 8px;
+  --tf-raum-3: 12px;
+  --tf-raum-4: 16px;
+  --tf-raum-5: 24px;
+  --tf-raum-6: 32px;
+  --tf-raum-7: 48px;
+
+  /* --- Radien, Rahmen, Schatten --------------------------------------- */
+  --tf-radius-s: 6px;
+  --tf-radius-m: 12px;
+  --tf-radius-l: 18px;
+  --tf-radius-rund: 999px;
+  --tf-rahmen: 1px;
+  --tf-streifen: 4px;        /* Statusstreifen an der Kartenkante */
+  --tf-schatten-karte: 0 1px 2px rgba(11, 18, 32, 0.08), 0 8px 20px -12px rgba(11, 18, 32, 0.25);
+  --tf-schatten-dialog: 0 24px 60px -20px rgba(11, 18, 32, 0.45);
+
+  /* --- Bewegung -------------------------------------------------------- */
+  --tf-zeit-schnell: 120ms;
+  --tf-zeit-normal: 220ms;
+  --tf-kurve: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  /* --- Antippflächen ---------------------------------------------------- */
+  --tf-touch-min: 44px;       /* Mindestgröße für Finger (iOS/Android) */
+}
+
+/* Dunkelmodus: nur die Rollen werden neu belegt, nie die Komponenten. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --tf-bg: var(--tf-nacht-800);
+    --tf-bg-erhoben: var(--tf-nacht-700);
+    --tf-bg-gedaempft: var(--tf-nacht-600);
+    --tf-linie: var(--tf-nacht-600);
+    --tf-text: var(--tf-kreide-050);
+    --tf-text-leise: var(--tf-nacht-400);
+    --tf-akzent: #FF6F3C;
+    --tf-akzent-flaeche: rgba(255, 90, 31, 0.16);
+    --tf-fokus: #FF6F3C;
+    --tf-sieg: #4FCB92;
+    --tf-sieg-flaeche: rgba(79, 203, 146, 0.16);
+    --tf-remis: #F3BE4D;
+    --tf-remis-flaeche: rgba(243, 190, 77, 0.16);
+    --tf-niederlage: #FF7A80;
+    --tf-niederlage-flaeche: rgba(255, 122, 128, 0.16);
+    --tf-schatten-karte: 0 1px 2px rgba(0, 0, 0, 0.5), 0 10px 24px -16px rgba(0, 0, 0, 0.8);
+  }
+}
+
+:root[data-theme="dark"] {
+  --tf-bg: var(--tf-nacht-800);
+  --tf-bg-erhoben: var(--tf-nacht-700);
+  --tf-bg-gedaempft: var(--tf-nacht-600);
+  --tf-linie: var(--tf-nacht-600);
+  --tf-text: var(--tf-kreide-050);
+  --tf-text-leise: var(--tf-nacht-400);
+  --tf-akzent: #FF6F3C;
+  --tf-akzent-flaeche: rgba(255, 90, 31, 0.16);
+  --tf-fokus: #FF6F3C;
+  --tf-sieg: #4FCB92;
+  --tf-sieg-flaeche: rgba(79, 203, 146, 0.16);
+  --tf-remis: #F3BE4D;
+  --tf-remis-flaeche: rgba(243, 190, 77, 0.16);
+  --tf-niederlage: #FF7A80;
+  --tf-niederlage-flaeche: rgba(255, 122, 128, 0.16);
+  --tf-schatten-karte: 0 1px 2px rgba(0, 0, 0, 0.5), 0 10px 24px -16px rgba(0, 0, 0, 0.8);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --tf-zeit-schnell: 1ms;
+    --tf-zeit-normal: 1ms;
+  }
+}

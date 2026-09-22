@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="Tippfeld App-Icon">
+  <title>Tippfeld App-Icon</title>
+  <defs>
+    <linearGradient id="tfGrund" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#18253A"/>
+      <stop offset="1" stop-color="#0B1220"/>
+    </linearGradient>
+    <radialGradient id="tfFlut" cx="0.5" cy="0.12" r="0.85">
+      <stop offset="0" stop-color="#FF5A1F" stop-opacity="0.34"/>
+      <stop offset="1" stop-color="#FF5A1F" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="512" height="512" rx="114" fill="url(#tfGrund)"/>
+  <rect width="512" height="512" rx="114" fill="url(#tfFlut)"/>
+  <g fill="none" stroke="#F5F7F2" stroke-opacity="0.5" stroke-width="13" stroke-linecap="round">
+    <path d="M78 256h356"/>
+    <circle cx="256" cy="256" r="104"/>
+    <path d="M78 150V112a34 34 0 0 1 34-34h38"/>
+    <path d="M434 362v38a34 34 0 0 1-34 34h-38"/>
+  </g>
+  <circle cx="256" cy="256" r="40" fill="#FF5A1F"/>
+  <g fill="none" stroke="#0B1220" stroke-width="7" stroke-linecap="round" stroke-opacity="0.85">
+    <path d="M256 224v14M238 268l-12 8M274 268l12 8"/>
+  </g>
+</svg>

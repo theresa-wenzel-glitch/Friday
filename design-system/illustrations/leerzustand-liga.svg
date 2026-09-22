@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 220" width="320" height="220" role="img" aria-label="Noch keine Liga">
+  <title>Noch keine Liga</title>
+  <g fill="none" stroke="currentColor" stroke-opacity="0.22" stroke-width="3" stroke-linecap="round">
+    <path d="M40 186h240"/>
+    <path d="M96 186V86a8 8 0 0 1 8-8h112a8 8 0 0 1 8 8v100"/>
+    <path d="M96 112h128M96 146h128M160 78v108"/>
+  </g>
+  <g fill="none" stroke="currentColor" stroke-opacity="0.4" stroke-width="3" stroke-linecap="round">
+    <circle cx="242" cy="62" r="26"/>
+    <path d="M242 50v24M230 62h24"/>
+  </g>
+  <circle cx="72" cy="168" r="14" fill="#FF5A1F"/>
+  <g fill="none" stroke="#0B1220" stroke-width="2.4" stroke-linecap="round" stroke-opacity="0.8">
+    <path d="M72 157v5M65 174l-4 3M79 174l4 3"/>
+  </g>
+</svg>

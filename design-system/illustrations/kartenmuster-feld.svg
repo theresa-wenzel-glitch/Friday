@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 160" width="400" height="160" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Kreidemuster Spielfeld">
+  <title>Kreidemuster Spielfeld</title>
+  <g fill="none" stroke="currentColor" stroke-opacity="0.12" stroke-width="2">
+    <circle cx="340" cy="80" r="66"/>
+    <circle cx="340" cy="80" r="110"/>
+    <path d="M0 26h150M0 134h150"/>
+    <path d="M60 0v160"/>
+  </g>
+</svg>

@@ -1,0 +1,358 @@
+/*
+ * TIPPFELD - Bausteine
+ * Setzt tokens.css voraus. Jede Komponente holt ihre Farben ausschließlich
+ * über die Rollen-Variablen, damit Hell- und Dunkelmodus automatisch stimmen.
+ */
+
+/* --- Grundlagen ------------------------------------------------------ */
+.tf-wurzel {
+  font-family: var(--tf-font-text);
+  font-size: var(--tf-size-m);
+  line-height: var(--tf-lh-normal);
+  color: var(--tf-text);
+  background: var(--tf-bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+.tf-label {
+  font-family: var(--tf-font-text);
+  font-size: var(--tf-size-xs);
+  font-weight: 600;
+  letter-spacing: var(--tf-spur-label);
+  text-transform: uppercase;
+  color: var(--tf-text-leise);
+}
+
+.tf-zahl {
+  font-family: var(--tf-font-daten);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+.tf-spielstand {
+  font-family: var(--tf-font-display);
+  font-size: var(--tf-size-anzeige);
+  line-height: var(--tf-lh-eng);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+}
+
+:where(.tf-wurzel) :focus-visible {
+  outline: 2px solid var(--tf-fokus);
+  outline-offset: 2px;
+  border-radius: var(--tf-radius-s);
+}
+
+/* --- Karte ------------------------------------------------------------ */
+.tf-karte {
+  background: var(--tf-bg-erhoben);
+  border: var(--tf-rahmen) solid var(--tf-linie);
+  border-radius: var(--tf-radius-l);
+  box-shadow: var(--tf-schatten-karte);
+  padding: var(--tf-raum-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--tf-raum-3);
+}
+
+/* Der Statusstreifen an der linken Kante codiert das Ergebnis.
+   Er ersetzt Farbe als einziges Signal nie - es steht immer auch Text daneben. */
+.tf-karte--sieg { border-left: var(--tf-streifen) solid var(--tf-sieg); }
+.tf-karte--remis { border-left: var(--tf-streifen) solid var(--tf-remis); }
+.tf-karte--niederlage { border-left: var(--tf-streifen) solid var(--tf-niederlage); }
+.tf-karte--offen { border-left: var(--tf-streifen) solid var(--tf-akzent); }
+
+.tf-karte__kopf {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--tf-raum-2) var(--tf-raum-3);
+}
+
+/* --- Vereinsplatzhalter (kein fremdes Logo, nur Kürzel) --------------- */
+.tf-wappen {
+  width: 40px;
+  height: 40px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: var(--tf-radius-s) var(--tf-radius-s) 14px 14px;
+  background: var(--tf-bg-gedaempft);
+  border: var(--tf-rahmen) solid var(--tf-linie);
+  font-family: var(--tf-font-display);
+  font-size: var(--tf-size-s);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--tf-text);
+}
+
+/* --- Mannschaftszeile ------------------------------------------------- */
+.tf-mannschaft {
+  display: flex;
+  align-items: center;
+  gap: var(--tf-raum-3);
+  min-width: 0;
+}
+
+/* Namen dürfen umbrechen statt abgeschnitten zu werden - in einer Tippliga
+   muss man erkennen können, wer da spielt. */
+.tf-mannschaft__name {
+  font-weight: 600;
+  line-height: 1.2;
+  overflow-wrap: break-word;
+}
+
+/* --- Formchips (letzte fünf Spiele) ----------------------------------- */
+.tf-formreihe { display: flex; gap: var(--tf-raum-1); }
+
+.tf-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--tf-raum-1);
+  min-width: 22px;
+  height: 22px;
+  padding: 0 var(--tf-raum-2);
+  border-radius: var(--tf-radius-rund);
+  font-family: var(--tf-font-text);
+  font-size: var(--tf-size-xs);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  background: var(--tf-bg-gedaempft);
+  color: var(--tf-text-leise);
+}
+
+.tf-chip--sieg { background: var(--tf-sieg-flaeche); color: var(--tf-sieg); }
+.tf-chip--remis { background: var(--tf-remis-flaeche); color: var(--tf-remis); }
+.tf-chip--niederlage { background: var(--tf-niederlage-flaeche); color: var(--tf-niederlage); }
+.tf-chip--akzent { background: var(--tf-akzent-flaeche); color: var(--tf-akzent); }
+
+/* --- Positionskennzeichen --------------------------------------------- */
+.tf-position {
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+  padding: 0 var(--tf-raum-2);
+  border-radius: var(--tf-radius-s);
+  font-size: var(--tf-size-xs);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--tf-text-auf-akzent);
+}
+
+.tf-position--tw { background: #B07C00; }
+.tf-position--abw { background: #3160A8; }
+.tf-position--mit { background: var(--tf-rasen-500); }
+.tf-position--ang { background: var(--tf-anstoss-600); }
+
+/* --- Wahrscheinlichkeitsbalken ---------------------------------------- */
+.tf-balken {
+  display: grid;
+  grid-template-columns: 2.5rem 1fr 3rem;
+  align-items: center;
+  gap: var(--tf-raum-3);
+}
+
+.tf-balken__spur {
+  height: 8px;
+  border-radius: var(--tf-radius-rund);
+  background: var(--tf-bg-gedaempft);
+  overflow: hidden;
+}
+
+.tf-balken__fuellung {
+  height: 100%;
+  border-radius: inherit;
+  background: var(--tf-akzent);
+  transition: width var(--tf-zeit-normal) var(--tf-kurve);
+}
+
+.tf-balken__fuellung--leise { background: var(--tf-text-leise); }
+.tf-balken__wert { text-align: right; font-size: var(--tf-size-s); }
+
+/* --- Knöpfe ------------------------------------------------------------ */
+.tf-knopf {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--tf-raum-2);
+  min-height: var(--tf-touch-min);
+  padding: 0 var(--tf-raum-5);
+  border: var(--tf-rahmen) solid transparent;
+  border-radius: var(--tf-radius-rund);
+  font-family: var(--tf-font-text);
+  font-size: var(--tf-size-m);
+  font-weight: 600;
+  cursor: pointer;
+  background: var(--tf-akzent);
+  color: var(--tf-text-auf-akzent);
+  transition: transform var(--tf-zeit-schnell) var(--tf-kurve),
+              background var(--tf-zeit-schnell) var(--tf-kurve);
+}
+
+.tf-knopf:active { transform: translateY(1px); }
+.tf-knopf:hover { background: var(--tf-anstoss-600); }
+
+.tf-knopf--zweit {
+  background: transparent;
+  color: var(--tf-text);
+  border-color: var(--tf-linie);
+}
+.tf-knopf--zweit:hover { background: var(--tf-bg-gedaempft); }
+
+.tf-knopf--leise {
+  background: transparent;
+  color: var(--tf-akzent);
+  padding-inline: var(--tf-raum-3);
+}
+.tf-knopf--leise:hover { background: var(--tf-akzent-flaeche); }
+
+.tf-knopf[disabled] { opacity: 0.45; cursor: not-allowed; }
+.tf-knopf--breit { width: 100%; }
+
+/* --- Tippeingabe (Ergebnis) -------------------------------------------- */
+.tf-tipp {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--tf-raum-3);
+}
+
+.tf-tipp__feld {
+  width: 56px;
+  height: var(--tf-touch-min);
+  border: var(--tf-rahmen) solid var(--tf-linie);
+  border-radius: var(--tf-radius-m);
+  background: var(--tf-bg);
+  color: var(--tf-text);
+  font-family: var(--tf-font-daten);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--tf-size-l);
+  text-align: center;
+}
+
+.tf-tipp__feld:focus { border-color: var(--tf-akzent); }
+.tf-tipp__trenner { color: var(--tf-text-leise); font-size: var(--tf-size-l); }
+
+/* --- Umschalter (Reiter) ------------------------------------------------ */
+.tf-umschalter {
+  display: inline-flex;
+  padding: var(--tf-raum-1);
+  gap: var(--tf-raum-1);
+  background: var(--tf-bg-gedaempft);
+  border-radius: var(--tf-radius-rund);
+}
+
+.tf-umschalter__knopf {
+  border: 0;
+  background: transparent;
+  color: var(--tf-text-leise);
+  font-family: var(--tf-font-text);
+  font-size: var(--tf-size-s);
+  font-weight: 600;
+  padding: var(--tf-raum-2) var(--tf-raum-4);
+  border-radius: var(--tf-radius-rund);
+  cursor: pointer;
+}
+
+.tf-umschalter__knopf[aria-selected="true"] {
+  background: var(--tf-bg-erhoben);
+  color: var(--tf-text);
+  box-shadow: var(--tf-schatten-karte);
+}
+
+/* --- Rangliste ---------------------------------------------------------- */
+.tf-rangliste { width: 100%; border-collapse: collapse; }
+
+.tf-rangliste th {
+  text-align: left;
+  font-size: var(--tf-size-xs);
+  font-weight: 600;
+  letter-spacing: var(--tf-spur-label);
+  text-transform: uppercase;
+  color: var(--tf-text-leise);
+  padding: var(--tf-raum-2) var(--tf-raum-2);
+  border-bottom: var(--tf-rahmen) solid var(--tf-linie);
+}
+
+.tf-rangliste td {
+  padding: var(--tf-raum-3) var(--tf-raum-2);
+  border-bottom: var(--tf-rahmen) solid var(--tf-linie);
+  font-variant-numeric: tabular-nums;
+}
+
+.tf-rangliste tr:last-child td { border-bottom: 0; }
+.tf-rangliste tr[aria-current="true"] td { background: var(--tf-akzent-flaeche); font-weight: 600; }
+.tf-rangliste__platz { font-family: var(--tf-font-display); font-size: var(--tf-size-l); width: 2.5rem; }
+.tf-rangliste__zahl { text-align: right; font-family: var(--tf-font-daten); }
+
+/* --- Hinweisfläche ------------------------------------------------------ */
+.tf-hinweis {
+  display: flex;
+  gap: var(--tf-raum-3);
+  padding: var(--tf-raum-3) var(--tf-raum-4);
+  border-radius: var(--tf-radius-m);
+  background: var(--tf-bg-gedaempft);
+  font-size: var(--tf-size-s);
+  color: var(--tf-text);
+}
+
+.tf-hinweis--akzent { background: var(--tf-akzent-flaeche); }
+
+/* --- Symbole ------------------------------------------------------------ */
+.tf-symbol { width: 24px; height: 24px; flex: none; display: block; }
+.tf-symbol--klein { width: 18px; height: 18px; }
+.tf-symbol--gross { width: 32px; height: 32px; }
+
+/* --- Spielpaarung ------------------------------------------------------- */
+/* Zwei gestapelte Zeilen wie auf einer Anzeigetafel. Das hält auch bei
+   langen Vereinsnamen und auf schmalen Geräten, weil jeder Name die ganze
+   Kartenbreite nutzen darf. */
+.tf-spiel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tf-raum-2);
+}
+
+.tf-spiel__zeile {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--tf-raum-3);
+}
+
+.tf-spiel__block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tf-raum-1);
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.tf-spiel__tore {
+  font-family: var(--tf-font-display);
+  font-size: var(--tf-size-xl);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  color: var(--tf-text-leise);
+}
+
+.tf-spiel__zeile--vorn .tf-spiel__tore { color: var(--tf-text); }
+
+/* --- Spielerzeile (positionsbasierte Prognose) --------------------------- */
+.tf-spieler {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--tf-raum-3);
+  padding: var(--tf-raum-2) 0;
+  border-bottom: var(--tf-rahmen) solid var(--tf-linie);
+}
+
+.tf-spieler:last-child { border-bottom: 0; }
+.tf-spieler__name { font-weight: 600; }
+.tf-spieler__rolle { font-size: var(--tf-size-s); color: var(--tf-text-leise); }
+.tf-spieler__wert { font-family: var(--tf-font-daten); font-variant-numeric: tabular-nums; text-align: right; }

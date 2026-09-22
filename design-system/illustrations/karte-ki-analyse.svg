@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" width="320" height="180" role="img" aria-label="KI-Analyse">
+  <title>KI-Analyse</title>
+  <g fill="none" stroke="currentColor" stroke-opacity="0.18" stroke-width="2">
+    <path d="M24 36h272M24 72h272M24 108h272M24 144h272"/>
+  </g>
+  <path d="M24 132 68 118 112 126 156 92 200 100 244 58 288 44" fill="none" stroke="#FF5A1F" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="288" cy="44" r="7" fill="#FF5A1F"/>
+  <g fill="currentColor" fill-opacity="0.25">
+    <rect x="40" y="148" width="14" height="18" rx="3"/>
+    <rect x="84" y="140" width="14" height="26" rx="3"/>
+    <rect x="128" y="146" width="14" height="20" rx="3"/>
+    <rect x="172" y="134" width="14" height="32" rx="3"/>
+    <rect x="216" y="142" width="14" height="24" rx="3"/>
+  </g>
+</svg>

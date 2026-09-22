@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1920" width="1080" height="1920" role="img" aria-label="Tippfeld Splash Screen">
+  <title>Tippfeld Splash Screen</title>
+  <defs>
+    <linearGradient id="spGrund" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#16223A"/>
+      <stop offset="0.55" stop-color="#101A2B"/>
+      <stop offset="1" stop-color="#0B1220"/>
+    </linearGradient>
+    <linearGradient id="spKegel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFD9C6" stop-opacity="0.30"/>
+      <stop offset="1" stop-color="#FFD9C6" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="1080" height="1920" fill="url(#spGrund)"/>
+
+  <!-- Flutlichtkegel von oben, abstrahiert -->
+  <path d="M150 0 540 980 -90 980Z" fill="url(#spKegel)"/>
+  <path d="M930 0 1170 980 540 980Z" fill="url(#spKegel)" opacity="0.7"/>
+
+  <!-- Spielfeldlinien in Kreide, stark abstrahiert -->
+  <g fill="none" stroke="#F5F7F2" stroke-opacity="0.16" stroke-width="5">
+    <path d="M0 1180h1080"/>
+    <circle cx="540" cy="1180" r="210"/>
+    <path d="M330 1520h420v400H330Z"/>
+    <path d="M440 1760h200v160H440Z"/>
+  </g>
+
+  <!-- Marke -->
+  <g transform="translate(400 620)">
+    <rect width="280" height="280" rx="66" fill="#18253A"/>
+    <g fill="none" stroke="#F5F7F2" stroke-opacity="0.5" stroke-width="8" stroke-linecap="round">
+      <path d="M44 140h192"/>
+      <circle cx="140" cy="140" r="62"/>
+    </g>
+    <circle cx="140" cy="140" r="24" fill="#FF5A1F"/>
+  </g>
+
+  <text x="540" y="1010" text-anchor="middle" font-family="Oswald, 'Arial Narrow', sans-serif" font-size="96" font-weight="600" letter-spacing="7" fill="#F5F7F2">TIPPFELD</text>
+  <text x="540" y="1068" text-anchor="middle" font-family="'Source Sans 3', 'Segoe UI', system-ui, sans-serif" font-size="30" letter-spacing="6" fill="#55688A">TIPPEN · ANALYSIEREN · AUFSTEIGEN</text>
+</svg>
