@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import { submitHorseAction } from "@/app/actions";
+import { submitHorseAction } from "@/app/(western)/actions";
 import { EMPTY_SUBMIT_STATE, type SubmitState } from "@/lib/form-state";
 import {
   AVAILABILITIES,

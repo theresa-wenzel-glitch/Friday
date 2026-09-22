@@ -21,3 +21,6 @@ next-env.d.ts
 .DS_Store
 npm-debug.log*
 yarn-error.log*
+
+# Screenshots aus scripts/*-screenshots.mjs - nur zur Sichtprüfung
+screenshots/

@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import { loginAction } from "@/app/admin/actions";
+import { loginAction } from "@/app/(western)/admin/actions";
 import { EMPTY_LOGIN_STATE, type LoginState } from "@/lib/form-state";
 
 export function AdminLogin({ configured }: { configured: boolean }) {
