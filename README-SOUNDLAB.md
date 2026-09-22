@@ -120,6 +120,13 @@ auf dem Handy nichts seitwärts scrollt. Screenshots aller Seiten:
 BASE=http://localhost:3000 npm run shots:soundlab
 ```
 
+## Die Einzeldatei-Version
+
+Unter `standalone/soundlab.html` liegt dieselbe App noch einmal als eine
+einzige Datei ohne Next.js - zum Verschicken und sofort Benutzen. Sie ist
+veröffentlicht unter <https://claude.ai/artifact/45o86pHW9CHuBs8yXHKuuf>.
+Mehr dazu in [standalone/README.md](standalone/README.md).
+
 ## Was noch fehlt
 
 - Der Song wird nicht als Audiodatei exportiert (kein Download).
