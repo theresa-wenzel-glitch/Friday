@@ -1,0 +1,23 @@
+name: JARVIS II Tests
+
+on:
+  push:
+    paths: ["jarvis/**", ".github/workflows/jarvis-tests.yml"]
+  pull_request:
+    paths: ["jarvis/**", ".github/workflows/jarvis-tests.yml"]
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: jarvis
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Abhaengigkeiten installieren
+        run: pip install -e ".[llm,dev]"
+      - name: Tests
+        run: python -m pytest -q
