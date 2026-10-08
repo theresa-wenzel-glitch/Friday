@@ -6,7 +6,9 @@
 #     -v westernhengste-data:/data \
 #     westernhengste
 #
-# Wichtig: /data muss ein dauerhaftes Volume sein - dort liegt die Datenbank.
+# Wichtig: /data muss ein dauerhaftes Volume sein - dort liegen Datenbanken,
+# Fotos und Sprachnachrichten. Kein VOLUME-Befehl hier, weil manche Hoster
+# (z. B. Railway) ihn ablehnen; das Volume wird beim Hoster eingehängt.
 
 FROM node:22-slim AS deps
 WORKDIR /app
@@ -32,6 +34,8 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ENV DATABASE_PATH=/data/westernhengste.db
 ENV BAUTAGEBUCH_DATA_DIR=/data/bautagebuch
 ENV PORT=3000
+# Auf allen Netzwerkschnittstellen lauschen, nicht nur auf dem Container-Namen.
+ENV HOSTNAME=0.0.0.0
 
 RUN useradd --system --uid 1001 nextjs \
  && mkdir -p /data && chown nextjs:nextjs /data
@@ -46,7 +50,6 @@ COPY --from=builder /app/node_modules/bindings ./node_modules/bindings
 COPY --from=builder /app/node_modules/file-uri-to-path ./node_modules/file-uri-to-path
 
 USER nextjs
-VOLUME ["/data"]
 EXPOSE 3000
 
 CMD ["node", "server.js"]

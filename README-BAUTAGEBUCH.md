@@ -81,16 +81,51 @@ Cron-Dienst (z. B. cron-job.org, kostenlos) einrichten:
 `Authorization: Bearer <CRON_SECRET>`, Montag–Freitag 16:00. Erinnert wird nur,
 wer heute für seine Baustelle noch nichts erfasst hat.
 
-## Online stellen
+## Online stellen – Schritt für Schritt (Railway)
 
-Die App braucht einen Server mit dauerhaftem Speicher (Datenbank und Fotos
-liegen als Dateien). Am einfachsten mit dem `Dockerfile` bei einem Anbieter wie
-Hetzner, Fly.io oder Railway; das Volume `/data` muss dauerhaft sein und
-**gesichert** werden (Backups!). Reine „Serverless“-Hosts wie Vercel passen
-nicht, weil dort keine Dateien liegen bleiben.
+Railway ist ein Hosting-Dienst, der die App direkt aus GitHub baut. Kosten:
+ab etwa 5 $ im Monat (Hobby-Tarif, Stand Oktober 2026 – bitte auf
+railway.com prüfen). Vercel passt **nicht**, weil dort keine Dateien
+(Fotos, Datenbank) dauerhaft liegen bleiben.
 
-Pflicht-Umgebungsvariablen: `SESSION_SECRET` (langer Zufallswert),
-`NEXT_PUBLIC_SITE_URL`.
+1. **Konto anlegen**: <https://railway.com> → „Login with GitHub“.
+2. **Projekt anlegen**: „New Project“ → „Deploy from GitHub repo“ →
+   Repository `Friday` auswählen. Railway findet das `Dockerfile` selbst.
+3. **Speicher anhängen** (sonst sind nach jedem Update alle Einträge weg!):
+   Im Dienst rechte Maustaste / „+ New“ → **Volume** → Mount path: `/data`.
+4. **Variablen eintragen** (Reiter „Variables“ → „New Variable“):
+
+   | Name | Wert |
+   | --- | --- |
+   | `SESSION_SECRET` | langer Zufallswert (z. B. von <https://www.random.org/strings/>: 40 Zeichen) |
+   | `ADMIN_PASSWORD` | Passwort für `/admin` des Hengstverzeichnisses |
+   | `RAILWAY_RUN_UID` | `0` (damit die App auf das Volume schreiben darf) |
+   | `OPENAI_API_KEY` | dein OpenAI-Schlüssel, siehe unten |
+   | `NEXT_PUBLIC_SITE_URL` | die Adresse aus Schritt 5, z. B. `https://friday-production.up.railway.app` |
+
+5. **Adresse erzeugen**: Reiter „Settings“ → „Networking“ →
+   „Generate Domain“. Diese Adresse bei `NEXT_PUBLIC_SITE_URL` eintragen.
+   Railway baut danach neu (dauert ein paar Minuten).
+6. **Testen**: `https://deine-adresse/bautagebuch` öffnen, Konto anlegen,
+   Baustelle anlegen, am Handy einen Eintrag machen.
+
+Später lässt sich unter „Networking“ eine eigene Domain wie
+`bautagebuch-automat.de` verbinden.
+
+**Backups**: Railway bietet Backups für Volumes an (Volume → „Backups“).
+Einschalten!
+
+## OpenAI-Schlüssel besorgen
+
+1. <https://platform.openai.com> → Konto anlegen.
+2. „Settings“ → „Billing“ → 10 $ Guthaben aufladen. Dort auch ein
+   **monatliches Limit** setzen, damit nie mehr ausgegeben wird als gewollt.
+3. „API keys“ → „Create new secret key“ → Schlüssel (beginnt mit `sk-`)
+   kopieren. Er wird nur einmal angezeigt.
+4. In Railway als Variable `OPENAI_API_KEY` eintragen. Nie in den Code oder
+   auf GitHub schreiben.
+
+Danach verschwindet der Hinweis „Demo-Modus“ in der App.
 
 ## Vor dem ersten zahlenden Kunden – bitte lesen
 
