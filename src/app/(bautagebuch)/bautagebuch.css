@@ -1,0 +1,307 @@
+/*
+ * Bautagebuch-Automat.
+ *
+ * Gebaut für draußen: hoher Kontrast (Sonne aufs Display), große Knöpfe
+ * (Arbeitshandschuhe), Signalorange als einzige Akzentfarbe. Alles hängt an
+ * der Klasse .btb, damit die anderen Apps im Projekt unberührt bleiben.
+ */
+
+.btb {
+  --btb-bg: #f3f2ee;
+  --btb-surface: #ffffff;
+  --btb-surface-2: #ebe9e3;
+  --btb-line: #d9d6cd;
+  --btb-text: #1b1d20;
+  --btb-muted: #5f6368;
+  --btb-asphalt: #1f2328;
+  --btb-asphalt-fg: #f3f2ee;
+  --btb-accent: #e8620c;
+  --btb-accent-hover: #c95205;
+  --btb-accent-fg: #ffffff;
+  --btb-accent-soft: #fde9da;
+  --btb-ok: #237a3b;
+  --btb-ok-soft: #dff1e3;
+  --btb-warn: #8a5a00;
+  --btb-warn-soft: #fff1c9;
+  --btb-danger: #b42318;
+  --btb-danger-soft: #fde4e1;
+
+  background-color: var(--btb-bg);
+  color: var(--btb-text);
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+@media (prefers-color-scheme: dark) {
+  .btb {
+    --btb-bg: #121417;
+    --btb-surface: #1b1e22;
+    --btb-surface-2: #24282d;
+    --btb-line: #33383f;
+    --btb-text: #eceae4;
+    --btb-muted: #a3a7ad;
+    --btb-asphalt: #0b0d0f;
+    --btb-asphalt-fg: #eceae4;
+    --btb-accent: #ff7a26;
+    --btb-accent-hover: #ff9147;
+    --btb-accent-fg: #160a02;
+    --btb-accent-soft: #3a220f;
+    --btb-ok: #6fd28b;
+    --btb-ok-soft: #12301c;
+    --btb-warn: #f2c14e;
+    --btb-warn-soft: #3a2f10;
+    --btb-danger: #ff8a80;
+    --btb-danger-soft: #3d1714;
+  }
+}
+
+body:has(.btb) {
+  background-color: var(--btb-bg, #f3f2ee);
+}
+
+.btb h1,
+.btb h2,
+.btb h3 {
+  font-family: inherit;
+  font-weight: 750;
+  letter-spacing: -0.02em;
+}
+
+.btb :focus-visible {
+  outline: 3px solid var(--btb-accent);
+  outline-offset: 2px;
+}
+
+.btb-card {
+  background: var(--btb-surface);
+  border: 1px solid var(--btb-line);
+  border-radius: 14px;
+}
+
+.btb-muted {
+  color: var(--btb-muted);
+}
+
+.btb-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 48px;
+  padding: 0.7rem 1.2rem;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 1rem;
+  line-height: 1.2;
+  border: 1.5px solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.05s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btb-btn:active {
+  transform: scale(0.98);
+}
+
+.btb-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.btb-btn-primary {
+  background: var(--btb-accent);
+  color: var(--btb-accent-fg);
+}
+
+.btb-btn-primary:hover:not(:disabled) {
+  background: var(--btb-accent-hover);
+}
+
+.btb-btn-secondary {
+  background: var(--btb-surface);
+  color: var(--btb-text);
+  border-color: var(--btb-line);
+}
+
+.btb-btn-secondary:hover:not(:disabled) {
+  background: var(--btb-surface-2);
+}
+
+.btb-btn-ghost {
+  background: transparent;
+  color: var(--btb-text);
+}
+
+.btb-btn-danger {
+  background: transparent;
+  color: var(--btb-danger);
+  border-color: color-mix(in srgb, var(--btb-danger) 40%, transparent);
+}
+
+.btb-btn-lg {
+  min-height: 60px;
+  font-size: 1.1rem;
+  border-radius: 14px;
+}
+
+.btb-label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--btb-muted);
+  margin-bottom: 0.35rem;
+}
+
+.btb-field {
+  width: 100%;
+  min-height: 48px;
+  padding: 0.65rem 0.8rem;
+  border-radius: 10px;
+  border: 1.5px solid var(--btb-line);
+  background: var(--btb-surface);
+  color: var(--btb-text);
+  font-size: 1rem;
+}
+
+textarea.btb-field {
+  min-height: 90px;
+  line-height: 1.45;
+  resize: vertical;
+}
+
+.btb-field:focus {
+  border-color: var(--btb-accent);
+  outline: none;
+}
+
+.btb-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.btb-chip-ok {
+  background: var(--btb-ok-soft);
+  color: var(--btb-ok);
+}
+
+.btb-chip-warn {
+  background: var(--btb-warn-soft);
+  color: var(--btb-warn);
+}
+
+.btb-chip-neutral {
+  background: var(--btb-surface-2);
+  color: var(--btb-muted);
+}
+
+.btb-notice {
+  border-radius: 12px;
+  padding: 0.8rem 1rem;
+  font-size: 0.95rem;
+}
+
+.btb-notice-warn {
+  background: var(--btb-warn-soft);
+  color: var(--btb-warn);
+}
+
+.btb-notice-error {
+  background: var(--btb-danger-soft);
+  color: var(--btb-danger);
+}
+
+.btb-notice-ok {
+  background: var(--btb-ok-soft);
+  color: var(--btb-ok);
+}
+
+.btb-notice-info {
+  background: var(--btb-accent-soft);
+  color: var(--btb-text);
+}
+
+/* Der große Aufnahmeknopf */
+.btb-rec {
+  width: 112px;
+  height: 112px;
+  border-radius: 999px;
+  border: none;
+  background: var(--btb-accent);
+  color: var(--btb-accent-fg);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  box-shadow: 0 6px 20px color-mix(in srgb, var(--btb-accent) 35%, transparent);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btb-rec[data-aktiv="true"] {
+  background: var(--btb-danger);
+  animation: btb-puls 1.4s ease-in-out infinite;
+}
+
+@keyframes btb-puls {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--btb-danger) 45%, transparent); }
+  50% { box-shadow: 0 0 0 16px color-mix(in srgb, var(--btb-danger) 0%, transparent); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btb-rec[data-aktiv="true"] { animation: none; }
+}
+
+.btb-spinner {
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  border: 3px solid currentColor;
+  border-right-color: transparent;
+  animation: btb-dreh 0.8s linear infinite;
+}
+
+@keyframes btb-dreh {
+  to { transform: rotate(360deg); }
+}
+
+/* Untere Navigation auf dem Handy */
+.btb-tabbar {
+  position: fixed;
+  inset: auto 0 0 0;
+  z-index: 30;
+  background: var(--btb-surface);
+  border-top: 1px solid var(--btb-line);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.btb-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 4px 10px;
+  font-size: 0.72rem;
+  font-weight: 650;
+  color: var(--btb-muted);
+  text-decoration: none;
+}
+
+.btb-tab[aria-current="page"] {
+  color: var(--btb-accent);
+}
+
+.btb-stripes {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    var(--btb-accent) 0 14px,
+    var(--btb-asphalt) 14px 28px
+  );
+}

@@ -30,6 +30,7 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV DATABASE_PATH=/data/westernhengste.db
+ENV BAUTAGEBUCH_DATA_DIR=/data/bautagebuch
 ENV PORT=3000
 
 RUN useradd --system --uid 1001 nextjs \
