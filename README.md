@@ -1,13 +1,15 @@
 # Friday
 
-In diesem Projekt wohnen zwei Anwendungen nebeneinander:
+In diesem Projekt wohnen drei Anwendungen nebeneinander:
 
 - **Westernhengste** unter `/` - das Hengstverzeichnis, siehe unten.
 - **SoundLab** unter `/soundlab` - die Musik-Web-App, siehe
   [README-SOUNDLAB.md](README-SOUNDLAB.md).
+- **Bautagebuch-Automat** unter `/bautagebuch` - Foto + Sprachnachricht wird
+  zum Bautagebuch-PDF, siehe [README-BAUTAGEBUCH.md](README-BAUTAGEBUCH.md).
 
-Beide teilen sich Next.js, Tailwind und den Wurzel-Layout; ihre Seiten liegen in
-den Gruppen `src/app/(western)/` und `src/app/(soundlab)/`.
+Alle teilen sich Next.js, Tailwind und den Wurzel-Layout; ihre Seiten liegen in
+den Gruppen `src/app/(western)/`, `src/app/(soundlab)/` und `src/app/(bautagebuch)/`.
 
 ---
 
