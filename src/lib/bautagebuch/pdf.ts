@@ -268,7 +268,7 @@ async function schreibeEintrag(
     if (!bild) continue;
     // Passt das Foto noch einigermaßen groß auf die aktuelle Seite, dort lassen.
     const rest = s.y - (RAND + 40) - 30;
-    const maxH = rest >= 220 ? Math.min(330, rest) : 330;
+    const maxH = rest >= 160 ? Math.min(330, rest) : 330;
     const scale = Math.min(BREITE / bild.width, maxH / bild.height);
     const w = bild.width * scale;
     const h = bild.height * scale;
