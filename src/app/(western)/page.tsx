@@ -1,10 +1,26 @@
 import Link from "next/link";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 import { countByStatus, queryHorses } from "@/lib/db";
 import { HorseCard } from "@/components/HorseCard";
 
 export const dynamic = "force-dynamic";
 
-export default function HomePage() {
+/**
+ * Rechnernamen, unter denen die Startseite direkt zu "Kühl in Mülheim" führt,
+ * z. B. KUEHL_HOSTS="kuehl-in-muelheim.de,www.kuehl-in-muelheim.de".
+ */
+function kuehlHosts(): string[] {
+  return (process.env.KUEHL_HOSTS ?? "")
+    .split(",")
+    .map((h) => h.trim().toLowerCase())
+    .filter(Boolean);
+}
+
+export default async function HomePage() {
+  const host = (await headers()).get("host")?.split(":")[0].toLowerCase() ?? "";
+  if (kuehlHosts().includes(host)) redirect("/kuehl");
+
   const total = countByStatus("approved");
   const { horses: newest } = queryHorses({ sort: "newest", limit: 6 });
   const { horses: legends } = queryHorses({ historic: "only", limit: 6 });

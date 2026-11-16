@@ -1,0 +1,33 @@
+# Bauanleitung für Render (render.com), Schritt für Schritt erklärt in
+# ANLEITUNG-ONLINE.md. Render liest diese Datei beim Anlegen eines "Blueprint".
+services:
+  - type: web
+    name: kuehl-in-muelheim
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    region: frankfurt
+    # "free" kostet nichts, schläft aber nach einer Pause ein und vergisst
+    # Meldungen bei jedem Neustart. Für den echten Betrieb auf "starter"
+    # wechseln und den Block "disk" unten einkommentieren.
+    plan: free
+    healthCheckPath: /kuehl
+    autoDeploy: true
+    # disk:
+    #   name: daten
+    #   mountPath: /data
+    #   sizeGB: 1
+    envVars:
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: KUEHL_HOSTS
+        sync: false
+      - key: NEXT_PUBLIC_SITE_URL
+        sync: false
+      - key: IMPRESSUM_NAME
+        sync: false
+      - key: IMPRESSUM_ANSCHRIFT
+        sync: false
+      - key: IMPRESSUM_EMAIL
+        sync: false

@@ -82,6 +82,8 @@ erst nach Freigabe auf der Karte zu sehen. Gespeichert werden nur Kategorie,
 Beschreibung und Position, keine Namen, E-Mail- oder IP-Adressen. Pro
 Anschluss sind 5 Meldungen pro Stunde erlaubt.
 
+Online stellen mit eigener Adresse: siehe [ANLEITUNG-ONLINE.md](ANLEITUNG-ONLINE.md).
+
 Zum Prüfen unter `/admin` anmelden (Passwort aus `ADMIN_PASSWORD`, siehe
 `.env.example`) und dann `/kuehl/moderation` öffnen.
 

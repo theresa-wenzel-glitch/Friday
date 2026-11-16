@@ -36,7 +36,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <footer className="k-foot">
           Kartendaten © OpenStreetMap-Mitwirkende (ODbL). Wetter: Open-Meteo bzw. Deutscher
           Wetterdienst über Bright Sky. Trinkbrunnen nach Angaben der Stadt Mülheim an der Ruhr.
-          Kein offizielles Angebot der Stadt. <Link href="/kuehl/info">Datenquellen und Hinweise</Link>
+          Kein offizielles Angebot der Stadt.{" "}
+          <Link href="/kuehl/info">Datenquellen</Link> · <Link href="/kuehl/impressum">Impressum</Link> ·{" "}
+          <Link href="/kuehl/datenschutz">Datenschutz</Link>
         </footer>
       </div>
       <nav className="k-nav" aria-label="Hauptnavigation">

@@ -85,12 +85,13 @@ export default function InfoPage() {
           nicht an unseren Server.
         </p>
         <p>
-          Die Kartenbilder lädt dein Browser direkt von OpenStreetMap. Dabei sieht OpenStreetMap deine IP-Adresse, wie bei
-          jedem Webseitenaufruf. Meldungen speichern keine persönlichen Daten.
+          Die Kartenbilder lädt dein Browser direkt von OpenStreetMap. Meldungen speichern keine persönlichen Daten. Alles
+          Weitere steht in der <Link href="/kuehl/datenschutz">Datenschutzerklärung</Link>.
         </p>
       </div>
       <p className="k-small">
-        Moderation: <Link href="/kuehl/moderation">Meldungen prüfen</Link>
+        <Link href="/kuehl/impressum">Impressum</Link> · Moderation:{" "}
+        <Link href="/kuehl/moderation">Meldungen prüfen</Link>
       </p>
     </section>
   );
