@@ -12,10 +12,13 @@
     "e2e": "node scripts/e2e.mjs",
     "e2e:soundlab": "node scripts/soundlab-e2e.mjs",
     "shots": "node scripts/screenshots.mjs",
-    "shots:soundlab": "node scripts/soundlab-screenshots.mjs"
+    "shots:soundlab": "node scripts/soundlab-screenshots.mjs",
+    "test:kuehl": "tsx --test src/lib/kuehl/*.test.ts",
+    "e2e:kuehl": "node scripts/kuehl-e2e.mjs"
   },
   "dependencies": {
     "better-sqlite3": "^13.0.1",
+    "leaflet": "^1.9.4",
     "next": "^16.2.12",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
@@ -23,6 +26,7 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.18",
     "@types/better-sqlite3": "^7.6.13",
+    "@types/leaflet": "^1.9.20",
     "@types/node": "^22.15.0",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",

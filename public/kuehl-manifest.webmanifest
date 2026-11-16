@@ -1,0 +1,16 @@
+{
+  "name": "Kühl in Mülheim",
+  "short_name": "Kühl in MH",
+  "description": "Trinkbrunnen, kühle Orte und Hitzewarnungen für Mülheim an der Ruhr.",
+  "lang": "de",
+  "start_url": "/kuehl",
+  "scope": "/kuehl",
+  "display": "standalone",
+  "background_color": "#FAFCFA",
+  "theme_color": "#208C68",
+  "icons": [
+    { "src": "/kuehl-icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/kuehl-icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/kuehl-icon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}

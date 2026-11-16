@@ -18,6 +18,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${base}/hengste`, changeFrequency: "daily", priority: 0.9 },
     { url: `${base}/eintragen`, changeFrequency: "monthly", priority: 0.7 },
     { url: `${base}/info`, changeFrequency: "yearly", priority: 0.4 },
+    { url: `${base}/kuehl`, changeFrequency: "daily", priority: 0.9 },
+    { url: `${base}/kuehl/karte`, changeFrequency: "daily", priority: 0.8 },
+    { url: `${base}/kuehl/entdecken`, changeFrequency: "daily", priority: 0.7 },
+    { url: `${base}/kuehl/hitzeschutz`, changeFrequency: "monthly", priority: 0.7 },
+    { url: `${base}/kuehl/info`, changeFrequency: "yearly", priority: 0.4 },
   ];
 
   // Alle freigegebenen Pferde. Bei sehr grossen Beständen müsste das auf
